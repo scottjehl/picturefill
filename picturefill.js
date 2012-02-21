@@ -42,9 +42,6 @@
 	if( w.addEventListener ){
 		w.addEventListener( "resize", picturefill, false );
 	}
-	else if( w.addEvent ){
-		w.addEvent( "onresize", picturefill );
-	}
 	
 	// Run when DOM is ready
 	picturefill();
