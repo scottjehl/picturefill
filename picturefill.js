@@ -26,7 +26,7 @@
 			// See if which sources match	
 			for( var j = 0, jl = sources.length; j < jl; j++ ){
 				var media = sources[ j ].getAttribute( "media" );
-				if( !media || w.matchMedia( sources[ j ].getAttribute( "media" ) ).matches ){
+				if( !media || w.matchMedia( media ).matches ){
 					matches.push( sources[ j ] );
 				}
 			}
