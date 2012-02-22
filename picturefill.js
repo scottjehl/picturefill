@@ -9,48 +9,22 @@
 		B) A major browser implements <picture>
 */ 
 (function( w ){
-	var document = w.document,
-		Modernizr = w.Modernizr;
+	var document = w.document;
 	
 	// Test if `<picture>` is supported natively. Store the boolean result for
 	// later use.
 	var hasNativePicture = !!(
-		document.createElement('picture') && window.HTMLPictureElement
+		document.createElement('picture') && w.HTMLPictureElement
 	);
 	
-	// Register a Modernizr test for `<picture>`, if Modernizr is present.
-	// Modernizr is NOT required -- this just augments it if present.
-	// 
-	// If you have support for Modernizr classes in your build, this will also
-	// give you a handy `.picture` or `.no-picture` class on the `html` element.
-	if (Modernizr) Modernizr.addTest('picture', function () {
-		return hasNativePicture;
-	});
+	var matchMedia = w.matchMedia;
 	
 	// Exit early if `<picture>` is natively supported.
-	if (hasNativePicture) return;
-	
-	var matchMedia = w.matchMedia;
-
-	// A wrapper for `window.matchMedia` that gives us a consistent interface
-	// whether we are using `Modernizr.mq` or `matchMedia`.
-	var mqWrapper = function (query) {
-		return matchMedia(query).matches;
-	};
-	
-	// Pick a media query function. If Modernizr is installed with the media
-	// query extension, use it; otherwise, use `window.matchMedia` wrapper
-	// defined above.
-	var mq = Modernizr && Modernizr.mq ?
-		Modernizr.mq :
-		(matchMedia && matchMedia( "only all" ) ? mqWrapper : null);
-	
-	// Exit early if:
-	//
-	// * Browser supports `<picture>`
-	// * Browser does not support either `<picture>`,
-	//   or Media Queries, or Modernizr-shimmed media queries.
-	if( !mq ) return;
+	// If neither `<picture>` **or** `window.matchMedia is supported, exit
+	// as well -- we need `matchMedia` to be able to properly polyfill this
+	// feature. **Note**: there is a polyfill available for `matchMedia`:
+	// <https://github.com/paulirish/matchMedia.js/>
+	if ( hasNativePicture || !matchMedia || !matchMedia('only all') ) return;
 	
 	w.picturefill = function(){
 		var ps = document.getElementsByTagName( "picture" );
@@ -63,7 +37,7 @@
 			// See if which sources match	
 			for( var j = 0, jl = sources.length; j < jl; j++ ){
 				var media = sources[ j ].getAttribute( "media" );
-				if( !media || mq( media ) ){
+				if( !media || matchMedia( media ).matches ){
 					matches.push( sources[ j ] );
 				}
 			}
