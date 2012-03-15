@@ -10,6 +10,6 @@ A crude polyfill for proposed behavior of the picture element, which does not ye
 		
 	B) A major browser implements <picture>
 
-Demo URL: [http://scottjehl.github.com/picturefill/](http://scottjehl.github.com/picturefill/)
+Demo URL: [http://scottjehl.com/picturefill/](http://scottjehl.com/picturefill/)
 
 Note: The demo only polyfills picture support for browsers that support CSS3 media queries, but it includes the [matchMedia polyfill](https://github.com/paulirish/matchMedia.js/) for media-query-supporting browsers that don't have matchMedia.
