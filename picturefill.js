@@ -9,14 +9,25 @@
 		B) A major browser implements <picture>
 */ 
 (function( w ){
+	var document = w.document;
 	
-	// requires media query supporting browser with matchMedia support (polyfill available)
-	if( !w.matchMedia || !w.matchMedia( "only all" ) ){
-		return;
-	}
+	// Test if `<picture>` is supported natively. Store the boolean result for
+	// later use.
+	var hasNativePicture = !!(
+		document.createElement('picture') && w.HTMLPictureElement
+	);
+	
+	var matchMedia = w.matchMedia;
+	
+	// Exit early if `<picture>` is natively supported.
+	// If neither `<picture>` **or** `window.matchMedia is supported, exit
+	// as well -- we need `matchMedia` to be able to properly polyfill this
+	// feature. **Note**: there is a polyfill available for `matchMedia`:
+	// <https://github.com/paulirish/matchMedia.js/>
+	if ( hasNativePicture || !matchMedia || !matchMedia('only all') ) return;
 	
 	w.picturefill = function(){
-		var ps = w.document.getElementsByTagName( "picture" );
+		var ps = document.getElementsByTagName( "picture" );
 		
 		// Loop the pictures
 		for( var i = 0, il = ps.length; i < il; i++ ){
@@ -26,7 +37,7 @@
 			// See if which sources match	
 			for( var j = 0, jl = sources.length; j < jl; j++ ){
 				var media = sources[ j ].getAttribute( "media" );
-				if( !media || w.matchMedia( media ).matches ){
+				if( !media || matchMedia( media ).matches ){
 					matches.push( sources[ j ] );
 				}
 			}
@@ -42,7 +53,7 @@
 				picImg.src =  matches.pop().getAttribute( "src" );
 			}
 		}
-	}
+	};
 	
 	// Run on resize
 	if( w.addEventListener ){
