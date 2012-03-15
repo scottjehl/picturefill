@@ -33,7 +33,13 @@
 
 			// Set fallback img element src from that of last matching source element
 			if( matches.length ){
-				ps[ i ].getElementsByTagName( "img" )[ 0 ].src =  matches.pop().getAttribute( "src" );
+				var picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
+				if( !picImg ){
+					picImg = w.document.createElement( "img" );
+					picImg.alt = ps[ i ].getAttribute( "alt" );
+					ps[ i ].appendChild( picImg );
+				}
+				picImg.src =  matches.pop().getAttribute( "src" );
 			}
 		}
 	}
