@@ -25,9 +25,14 @@
 	// feature. **Note**: there is a polyfill available for `matchMedia`:
 	// <https://github.com/paulirish/matchMedia.js/>
 	if ( hasNativePicture || !matchMedia || !matchMedia('only all') ) return;
+
+    var matchMediaSupport = window.matchMedia("(min-width: 0px)").matches;
 	
 	w.picturefill = function(){
 		var ps = document.getElementsByTagName( "picture" );
+
+        var patt_min_width = new RegExp('min-width: [0-9]+px');  
+        var patt_min_width_value = new RegExp("[0-9]+");         
 		
 		// Loop the pictures
 		for( var i = 0, il = ps.length; i < il; i++ ){
@@ -37,7 +42,7 @@
 			// See if which sources match	
 			for( var j = 0, jl = sources.length; j < jl; j++ ){
 				var media = sources[ j ].getAttribute( "media" );
-				if( !media || matchMedia( media ).matches ){
+                if( !media || matchMedia( media ).matches || ( !matchMediaSupport && document.documentElement.clientWidth > patt_min_width_value.exec( patt_min_width.exec( media ) ) ) ) {
 					matches.push( sources[ j ] );
 				}
 			}
