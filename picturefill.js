@@ -26,14 +26,20 @@
 	// <https://github.com/paulirish/matchMedia.js/>
 	if ( hasNativePicture || !matchMedia || !matchMedia('only all') ) return;
 
+    // Test if matchMedia is support, store the boolean result for later use.
     var matchMediaSupport = window.matchMedia("(min-width: 0px)").matches;
-	
+
+    // Add matchMedia basic regex support
+    // TODO add max-width and em support
+    w.matchMediaRegex = function ( media ) {
+        var patt_min_width = new RegExp('min-width: [0-9]+px');
+        var patt_min_width_value = new RegExp("[0-9]+");
+        return document.documentElement.clientWidth > patt_min_width_value.exec( patt_min_width.exec( media ) );
+    }
+
 	w.picturefill = function(){
 		var ps = document.getElementsByTagName( "picture" );
 
-        var patt_min_width = new RegExp('min-width: [0-9]+px');  
-        var patt_min_width_value = new RegExp("[0-9]+");         
-		
 		// Loop the pictures
 		for( var i = 0, il = ps.length; i < il; i++ ){
 			var sources = ps[ i ].getElementsByTagName( "source" ),
@@ -42,7 +48,7 @@
 			// See if which sources match	
 			for( var j = 0, jl = sources.length; j < jl; j++ ){
 				var media = sources[ j ].getAttribute( "media" );
-                if( !media || matchMedia( media ).matches || ( !matchMediaSupport && document.documentElement.clientWidth > patt_min_width_value.exec( patt_min_width.exec( media ) ) ) ) {
+                if( !media || matchMedia( media ).matches || ( !matchMediaSupport && w.matchMediaRegex( media ) ) ) {
 					matches.push( sources[ j ] );
 				}
 			}
@@ -59,7 +65,7 @@
 			}
 		}
 	};
-	
+
 	// Run on resize
 	if( w.addEventListener ){
 		w.addEventListener( "resize", picturefill, false );
