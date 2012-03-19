@@ -29,11 +29,30 @@
     var matchMediaSupport = window.matchMedia("(min-width: 0px)").matches;
 	
 	w.picturefill = function(){
+
+        // IE 9 fix:
+        // The picture element must be placed inside a video element, to prevent the stripping of the source elements
+        // This removes the picture element from the video element
+        // TODO - only run this in IE9,
+        var vs = document.getElementsByTagName( "video" );
+        for( var i = 0, il = vs.length; i < il; i++ ){
+            var vps = vs[ i ].getElementsByTagName( "picture" );
+            for( var j = 0, jl = vps.length; j < jl; j++ ){
+                document.getElementsByTagName('body')[0].insertBefore(
+                    vps[j].cloneNode(true),
+                    vs[ i ]
+                );
+                if (vps.length!=0) {
+                    vs[i].removeChild(vps[j]);
+                }
+            }
+        }
+
 		var ps = document.getElementsByTagName( "picture" );
 
         var patt_min_width = new RegExp('min-width: [0-9]+px');  
-        var patt_min_width_value = new RegExp("[0-9]+");         
-		
+        var patt_min_width_value = new RegExp("[0-9]+");
+
 		// Loop the pictures
 		for( var i = 0, il = ps.length; i < il; i++ ){
 			var sources = ps[ i ].getElementsByTagName( "source" ),

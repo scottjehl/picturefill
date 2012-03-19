@@ -17,7 +17,8 @@
 		<h1>Picturefill: A &lt;picture&gt; element polyfill</h1>
 				
 		<p>For more info: <a href="http://github.com/scottjehl/picturefill">see project home.</a></p>
-		
+
+        <!--[if IE 9]><video style="display:none"><![endif]-->
 		<picture alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 			<!-- smallest size first - no @media qualifier -->
 			<source src="http://farm8.staticflickr.com/7144/6547286841_635bbd97e5_m.jpg">
@@ -32,7 +33,8 @@
 			<!-- Fallback content for non-JS or non-media-query-supporting browsers. Same img src as the initial, unqualified source element. -->
 			<noscript><img src="http://farm8.staticflickr.com/7144/6547286841_635bbd97e5_m.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
 		</picture>
-  	  	
+        <!--[if IE 9]></video><![endif]-->
+
 		<script src="external/matchmedia.js"></script>
 		<script src="picturefill.js"></script>
 	</body>
