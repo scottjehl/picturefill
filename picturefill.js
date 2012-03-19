@@ -30,28 +30,30 @@
 	
 	w.picturefill = function(){
 
-        // IE 9 fix:
-        // The picture element must be placed inside a video element, to prevent the stripping of the source elements
-        // This removes the picture element from inside the video element, and places it before it.
-        // TODO - only run this in IE9,
-        var vs = document.getElementsByTagName( "video" );
-        for( var i = 0, il = vs.length; i < il; i++ ){
-            var vps = vs[ i ].getElementsByTagName( "picture" );
-            for( var j = 0, jl = vps.length; j < jl; j++ ){
-                document.getElementsByTagName('body')[0].insertBefore(
-                    vps[j].cloneNode(true),
-                    vs[ i ]
-                );
+        // In IE 9 The picture element must be placed inside a video element,
+        // to prevent the stripping of the source elements. This removes the
+        // picture element from inside the video element, and places it before it.
+        if ( document.getElementsByTagName( "picture" )[0].parentElement.tagName == "VIDEO" ) {
+
+            var vs = document.getElementsByTagName( "video" );
+
+            // Loop the video elements
+            for( var i = 0, il = vs.length; i < il; i++ ){
+
+                var vps = vs[ i ].getElementsByTagName( "picture" );
+
+                // If there is a picture element, move it
                 if (vps.length!=0) {
-                    vs[i].removeChild(vps[j]);
+                    document.getElementsByTagName('body')[0].insertBefore(
+                        vps[0].cloneNode(true),
+                        vs[ i ]
+                    );
+                    vs[i].removeChild(vps[0]);
                 }
             }
         }
 
 		var ps = document.getElementsByTagName( "picture" );
-
-        var patt_min_width = new RegExp('min-width: [0-9]+px');  
-        var patt_min_width_value = new RegExp("[0-9]+");
 
 		// Loop the pictures
 		for( var i = 0, il = ps.length; i < il; i++ ){
