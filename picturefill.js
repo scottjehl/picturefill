@@ -26,8 +26,6 @@
 	// <https://github.com/paulirish/matchMedia.js/>
 	if ( hasNativePicture || !matchMedia || !matchMedia('only all') ) return;
 
-    var matchMediaSupport = window.matchMedia("(min-width: 0px)").matches;
-	
 	w.picturefill = function(){
 
         // In IE 9 The picture element must be placed inside a video element,
@@ -63,7 +61,7 @@
 			// See if which sources match	
 			for( var j = 0, jl = sources.length; j < jl; j++ ){
 				var media = sources[ j ].getAttribute( "media" );
-                if( !media || matchMedia( media ).matches || ( !matchMediaSupport && document.documentElement.clientWidth > patt_min_width_value.exec( patt_min_width.exec( media ) ) ) ) {
+                if( !media || matchMedia( media ).matches ) {
 					matches.push( sources[ j ] );
 				}
 			}
@@ -80,7 +78,7 @@
 			}
 		}
 	};
-	
+
 	// Run on resize
 	if( w.addEventListener ){
 		w.addEventListener( "resize", picturefill, false );
