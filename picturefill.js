@@ -48,7 +48,7 @@
                         vps[0].cloneNode(true),
                         vs[ i ]
                     );
-                    vs[i].removeChild(vps[0]);
+                    vs[i].parentElement.removeChild( vs[i] );
                 }
             }
         }
