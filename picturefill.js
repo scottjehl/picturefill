@@ -32,7 +32,7 @@
 
         // IE 9 fix:
         // The picture element must be placed inside a video element, to prevent the stripping of the source elements
-        // This removes the picture element from the video element
+        // This removes the picture element from inside the video element, and places it before it.
         // TODO - only run this in IE9,
         var vs = document.getElementsByTagName( "video" );
         for( var i = 0, il = vs.length; i < il; i++ ){
