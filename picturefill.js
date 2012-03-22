@@ -51,12 +51,12 @@
 	// Run on resize and domready (w.load as a fallback)
 	if( w.addEventListener ){
 		w.addEventListener( "resize", w.picturefill, false );
-		if( w.document.onDOMContentLoaded ){
-			w.document.addEventListener( "DOMContentLoaded", w.picturefill, false );
-		}
-		else{
-			w.addEventListener( "load", w.picturefill, false );
-		}
+		w.addEventListener( "DOMContentLoaded", function(){
+			w.picturefill();
+			// Run once only
+			w.removeEventListener( "load", w.picturefill, false );
+		}, false );
+		w.addEventListener( "load", w.picturefill, false );
 	}
 	else if( w.attachEvent ){
 		w.attachEvent( "onload", w.picturefill );
