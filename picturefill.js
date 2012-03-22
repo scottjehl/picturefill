@@ -25,10 +25,34 @@
 	// feature. **Note**: there is a polyfill available for `matchMedia`:
 	// <https://github.com/paulirish/matchMedia.js/>
 	if ( hasNativePicture || !matchMedia || !matchMedia('only all') ) return;
-	
+
 	w.picturefill = function(){
+
+        // In IE 9 The picture element must be placed inside a video element,
+        // to prevent the stripping of the source elements. This removes the
+        // picture element from inside the video element, and places it before it.
+        if ( document.getElementsByTagName( "picture" )[0].parentElement.tagName == "VIDEO" ) {
+
+            var vs = document.getElementsByTagName( "video" );
+
+            // Loop the video elements
+            for( var i = 0, il = vs.length; i < il; i++ ){
+
+                var vps = vs[ i ].getElementsByTagName( "picture" );
+
+                // If there is a picture element, move it
+                if (vps.length!=0) {
+                    document.getElementsByTagName('body')[0].insertBefore(
+                        vps[0].cloneNode(true),
+                        vs[ i ]
+                    );
+                    vs[i].parentElement.removeChild( vs[i] );
+                }
+            }
+        }
+
 		var ps = document.getElementsByTagName( "picture" );
-		
+
 		// Loop the pictures
 		for( var i = 0, il = ps.length; i < il; i++ ){
 			var sources = ps[ i ].getElementsByTagName( "source" ),
@@ -37,7 +61,7 @@
 			// See if which sources match	
 			for( var j = 0, jl = sources.length; j < jl; j++ ){
 				var media = sources[ j ].getAttribute( "media" );
-				if( !media || matchMedia( media ).matches ){
+                if( !media || matchMedia( media ).matches ) {
 					matches.push( sources[ j ] );
 				}
 			}
@@ -54,7 +78,7 @@
 			}
 		}
 	};
-	
+
 	// Run on resize
 	if( w.addEventListener ){
 		w.addEventListener( "resize", picturefill, false );
