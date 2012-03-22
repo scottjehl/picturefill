@@ -45,17 +45,18 @@
 		}
 	};
 	
-	// Run on resize
+	// Run on resize and domready (w.load as a fallback)
 	if( w.addEventListener ){
-		w.addEventListener( "resize", picturefill, false );
+		w.addEventListener( "resize", w.picturefill, false );
+		if( w.document.onDOMContentLoaded ){
+			w.document.addEventListener( "DOMContentLoaded", w.picturefill, false );
+		}
+		else{
+			w.addEventListener( "load", w.picturefill, false );
+		}
 	}
-	
-	/*
-		Run now.
-		* Note: picturefill must run first when the DOM is ready, or else it won't find any picture elements to enhance.
-		* You can do this by referencing picturefill.js at the end of your document,
-		* or by calling picturefill() when the DOM is ready, via a JavaScript framework's "ready" event
-	*/
-	picturefill();
+	else if( w.attachEvent ){
+		w.attachEvent( "onload", w.picturefill );
+	}
 	
 })( this );
