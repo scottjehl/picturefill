@@ -3,10 +3,10 @@
 	* Author: Scott Jehl, 2012
 	* License: MIT/GPLv2
 	* Notes: 
-	  * For active discussion of the picture element, see http://www.w3.org/community/respimg/
-	  * While this code does work, it is intended to be used only for example purposes until either:
-		A) A W3C Candidate Recommendation for <picture> is released
-		B) A major browser implements <picture>
+		* For active discussion of the picture element, see http://www.w3.org/community/respimg/
+		* While this code does work, it is intended to be used only for example purposes until either:
+			A) A W3C Candidate Recommendation for <picture> is released
+			B) A major browser implements <picture>
 */ 
 (function( w ){
 	
