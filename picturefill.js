@@ -10,10 +10,8 @@
 */ 
 (function( w ){
 	
-	/*
-		* Test if `<picture>` is supported natively, if so, exit - no polyfill needed.
-	*/
-	if ( !!( w.document.createElement( "picture" ) && w.HTMLPictureElement ) ){
+	// Test if `<picture>` is supported natively, if so, exit - no polyfill needed.
+	if ( !!( w.document.createElement( "picture" ) && !!document.createElement( "source" ) && w.HTMLPictureElement ) ){
 		return;
 	}
 	
