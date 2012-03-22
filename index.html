@@ -18,18 +18,17 @@
 		<p>For more info: <a href="http://github.com/scottjehl/picturefill">see project home.</a></p>
 		
 		<picture alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-			<!-- smallest size first - no @media qualifier -->
-			<source src="http://farm8.staticflickr.com/7144/6547286841_635bbd97e5_m.jpg">
-			<!-- medium size - send to viewport widths 400px wide and up -->
-			<source src="http://farm8.staticflickr.com/7144/6547286841_635bbd97e5.jpg" media="(min-width: 400px)">
-			<!-- large size - send to viewport widths 800px wide and up -->
-			<source src="http://farm8.staticflickr.com/7144/6547286841_635bbd97e5_z.jpg" media="(min-width: 800px)">
-			<!-- extra large size - send to viewport widths 1000px wide and up -->
-			<source src="http://farm8.staticflickr.com/7144/6547286841_635bbd97e5_b.jpg" media="(min-width: 1000px)">
-			<!-- extra large size - send to viewport widths 1200px wide and up -->
-			<source src="http://farm8.staticflickr.com/7144/6547286841_c6160b34e2_o.jpg" media="(min-width: 1200px)">
-			<!-- Fallback content for non-JS or non-media-query-supporting browsers. Same img src as the initial, unqualified source element. -->
-			<noscript><img src="http://farm8.staticflickr.com/7144/6547286841_635bbd97e5_m.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
+			<!-- <source src="external/imgs/small.jpg"> -->
+			<source src="external/imgs/small.jpg">
+			<!-- <source src="external/imgs/medium.jpg" media="(min-width: 400px)"> -->
+			<source src="external/imgs/medium.jpg" media="(min-width: 400px)">
+			<!-- <source src="external/imgs/large.jpg" media="(min-width: 800px)"> -->
+			<source src="external/imgs/large.jpg" media="(min-width: 800px)">
+			<!-- <source src="external/imgs/extralarge.jpg" media="(min-width: 1000px)"> -->
+			<source src="external/imgs/extralarge.jpg" media="(min-width: 1000px)">
+
+			<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+			<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
 		</picture>
 	</body>
 </html>
