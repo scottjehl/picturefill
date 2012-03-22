@@ -12,10 +12,8 @@
 	
 	/*
 		* Test if `<picture>` is supported natively, if so, exit - no polyfill needed.
-		* Also, if `window.matchMedia is not defined, or if it is and media queries aren't supported ("only all" below), exit
-		* Note: there is a polyfill available for `matchMedia`: https://github.com/paulirish/matchMedia.js
 	*/
-	if ( !!( w.document.createElement( "picture" ) && w.HTMLPictureElement ) || !w.matchMedia || !w.matchMedia( "only all" ) ){
+	if ( !!( w.document.createElement( "picture" ) && w.HTMLPictureElement ) ){
 		return;
 	}
 	
@@ -30,7 +28,8 @@
 			// See if which sources match	
 			for( var j = 0, jl = sources.length; j < jl; j++ ){
 				var media = sources[ j ].getAttribute( "media" );
-				if( !media || w.matchMedia( media ).matches ){
+				// if there's no media specified, OR w.matchMedia is supported 
+				if( !media || ( w.matchMedia && w.matchMedia( media ).matches ) ){
 					matches.push( sources[ j ] );
 				}
 			}
