@@ -9,25 +9,18 @@
 		B) A major browser implements <picture>
 */ 
 (function( w ){
-	var document = w.document;
 	
-	// Test if `<picture>` is supported natively. Store the boolean result for
-	// later use.
-	var hasNativePicture = !!(
-		document.createElement('picture') && w.HTMLPictureElement
-	);
+	/*
+		* Test if `<picture>` is supported natively, if so, exit - no polyfill needed.
+		* Also, if `window.matchMedia is not defined, or if it is and media queries aren't supported ("only all" below), exit
+		* Note: there is a polyfill available for `matchMedia`: https://github.com/paulirish/matchMedia.js
+	*/
+	if ( !!( w.document.createElement( "picture" ) && w.HTMLPictureElement ) || !w.matchMedia || !w.matchMedia( "only all" ) ){
+		return;
+	}
 	
-	var matchMedia = w.matchMedia;
-	
-	// Exit early if `<picture>` is natively supported.
-	// If neither `<picture>` **or** `window.matchMedia is supported, exit
-	// as well -- we need `matchMedia` to be able to properly polyfill this
-	// feature. **Note**: there is a polyfill available for `matchMedia`:
-	// <https://github.com/paulirish/matchMedia.js/>
-	if ( hasNativePicture || !matchMedia || !matchMedia('only all') ) return;
-	
-	w.picturefill = function(){
-		var ps = document.getElementsByTagName( "picture" );
+	w.picturefill = function() {
+		var ps = w.document.getElementsByTagName( "picture" );
 		
 		// Loop the pictures
 		for( var i = 0, il = ps.length; i < il; i++ ){
@@ -37,7 +30,7 @@
 			// See if which sources match	
 			for( var j = 0, jl = sources.length; j < jl; j++ ){
 				var media = sources[ j ].getAttribute( "media" );
-				if( !media || matchMedia( media ).matches ){
+				if( !media || w.matchMedia( media ).matches ){
 					matches.push( sources[ j ] );
 				}
 			}
@@ -60,7 +53,12 @@
 		w.addEventListener( "resize", picturefill, false );
 	}
 	
-	// Run when DOM is ready
+	/*
+		Run now.
+		* Note: picturefill must run first when the DOM is ready, or else it won't find any picture elements to enhance.
+		* You can do this by referencing picturefill.js at the end of your document,
+		* or by calling picturefill() when the DOM is ready, via a JavaScript framework's "ready" event
+	*/
 	picturefill();
 	
 })( this );
