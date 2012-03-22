@@ -11,7 +11,7 @@
 (function( w ){
 	
 	// Test if `<picture>` is supported natively, if so, exit - no polyfill needed.
-	if ( !!( w.document.createElement( "picture" ) && !!w.document.createElement( "source" ) && w.HTMLPictureElement ) ){
+	if ( !!( w.document.createElement( "picture" ) && w.document.createElement( "source" ) && w.HTMLPictureElement ) ){
 		return;
 	}
 	
