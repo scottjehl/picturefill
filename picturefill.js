@@ -11,51 +11,38 @@
 	
 	// Enable strict mode
 	"use strict";
-	
-	// Test if `<picture>` is supported natively, if so, exit - no polyfill needed.
-	if ( !!( w.document.createElement( "picture" ) && w.document.createElement( "source" ) && w.HTMLPictureElement ) ){
-		return;
-	}
-	
+
 	w.picturefill = function() {
-		var ps = w.document.getElementsByTagName( "picture" );
+		var ps = w.document.getElementsByTagName( "div" );
 		
 		// Loop the pictures
 		for( var i = 0, il = ps.length; i < il; i++ ){
-			var sources = ps[ i ].getElementsByTagName( "source" ),
-				matches = [];
-
-			// If no sources are found, they're likely erased from the DOM. Try finding them inside comments.
-			if( !sources.length ){
-				var picText =  ps[ i ].innerHTML,
-					frag = w.document.createElement( "div" ),
-					// For IE9, convert the source elements to divs
-					srcs = picText.replace( /(<)source([^>]+>)/gmi, "$1div$2" ).match( /<div[^>]+>/gmi );
-				
-				frag.innerHTML = srcs.join( "" );
-				sources = frag.getElementsByTagName( "div" );
-			}
+			if( ps[ i ].getAttribute( "data-picture" ) !== null ){
+				alert("dfads")
+				var sources = ps[ i ].getElementsByTagName( "div" ),
+					matches = [];
 			
-			// See if which sources match
-			for( var j = 0, jl = sources.length; j < jl; j++ ){
-				var media = sources[ j ].getAttribute( "media" );
-				// if there's no media specified, OR w.matchMedia is supported 
-				if( !media || ( w.matchMedia && w.matchMedia( media ).matches ) ){
-					matches.push( sources[ j ] );
+				// See if which sources match
+				for( var j = 0, jl = sources.length; j < jl; j++ ){
+					var media = sources[ j ].getAttribute( "data-media" );
+					// if there's no media specified, OR w.matchMedia is supported 
+					if( !media || ( w.matchMedia && w.matchMedia( media ).matches ) ){
+						matches.push( sources[ j ] );
+					}
 				}
-			}
 			
-			if( matches.length ){
-				// Set fallback img element src from that of last matching source element
-				var picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
+				if( matches.length ){
+					// Set fallback img element src from that of last matching source element
+					var picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
 			
-				if( !picImg ){
-					picImg = w.document.createElement( "img" );
-					picImg.alt = ps[ i ].getAttribute( "alt" );
-					ps[ i ].appendChild( picImg );
-				}
+					if( !picImg ){
+						picImg = w.document.createElement( "img" );
+						picImg.alt = ps[ i ].getAttribute( "data-alt" );
+						ps[ i ].appendChild( picImg );
+					}
 				
-				picImg.src =  matches.pop().getAttribute( "src" );
+					picImg.src =  matches.pop().getAttribute( "data-src" );
+				}
 			}
 		}
 	};
