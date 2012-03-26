@@ -18,7 +18,7 @@
 		// Loop the pictures
 		for( var i = 0, il = ps.length; i < il; i++ ){
 			if( ps[ i ].getAttribute( "data-picture" ) !== null ){
-				alert("dfads")
+
 				var sources = ps[ i ].getElementsByTagName( "div" ),
 					matches = [];
 			
