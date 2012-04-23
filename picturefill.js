@@ -31,9 +31,9 @@
 					}
 				}
 			
+				var picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
+				
 				if( matches.length ){
-					// Set fallback img element src from that of last matching source element
-					var picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
 			
 					if( !picImg ){
 						picImg = w.document.createElement( "img" );
@@ -42,6 +42,9 @@
 					}
 				
 					picImg.src =  matches.pop().getAttribute( "data-src" );
+				}
+				else if( picImg ){
+					ps[ i ].removeChild( picImg );
 				}
 			}
 		}
