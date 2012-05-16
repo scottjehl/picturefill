@@ -36,6 +36,33 @@ While the [proposed markup for the `picture` element](http://www.w3.org/communit
 			<noscript><img src="small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
 		</picture>
 
+The following is a more extensive example with HD(retina) images backing up each image step.
+
+		<picture alt="Responsive Octocat">
+			<!-- <source src="external/imgs/octocat_320.png"> -->
+			<source src="external/imgs/octocat_320.png">
+			<!-- <source src="external/imgs/hd/octocat_320x2.png" media="(min-device-pixel-ratio: 2.0)"> -->
+			<source src="external/imgs/hd/octocat_320x2.png" media="(-webkit-min-device-pixel-ratio: 2.0)">
+			
+			<!-- <source src="external/imgs/octocat_480.png" media="(min-width: 400px)"> -->
+			<source src="external/imgs/octocat_480.png" media="(min-width: 400px)">
+			<!-- <source src="external/imgs/hd/octocat_480x2.png" media="(min-width: 400px) and (-webkit-min-device-pixel-ratio: 2.0)"> -->
+			<source src="external/imgs/hd/octocat_480x2.png" media="(min-width: 400px) and (-webkit-min-device-pixel-ratio: 2.0)">
+
+			<!-- <source src="external/imgs/octocat_768.png" media="(min-width: 800px)"> -->
+			<source src="external/imgs/octocat_768.png" media="(min-width: 800px)">
+			<!-- <source src="external/imgs/hd/octocat_768x2.png" media="(min-width: 800px) and (-webkit-min-device-pixel-ratio: 2.0)"> -->
+			<source src="external/imgs/hd/octocat_768x2.png" media="(min-width: 800px) and (-webkit-min-device-pixel-ratio: 2.0)">
+						
+			<!-- <source src="external/imgs/octocat_1024.png" media="(min-width: 1000px)"> -->
+			<source src="external/imgs/octocat_1024.png" media="(min-width: 1000px)">
+			<!-- <source src="external/imgs/hd/octocat_1024x2.png" media="(min-width: 1000px) and (-webkit-min-device-pixel-ratio: 2.0)"> -->
+			<source src="external/imgs/hd/octocat_1024x2.png" media="(min-width: 1000px) and (-webkit-min-device-pixel-ratio: 2.0)">
+			
+			<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+			<noscript><img src="external/imgs/octocat_320.png" alt="octocat Logo Fallback"></noscript>
+		</picture>
+
 ### Explained...
 
 Notes on the markup above...
