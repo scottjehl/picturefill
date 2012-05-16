@@ -6,9 +6,14 @@
 		* While this code does work, it is intended to be used only for example purposes until either:
 			A) A W3C Candidate Recommendation for <picture> is released
 			B) A major browser implements <picture>
-*/ 
-(function( w ){
-	
+*/
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        define(function () {  factory(root); } );
+    } else {
+        factory( root );
+    }
+})(this, function( w ){
 	// Enable strict mode
 	"use strict";
 	
@@ -78,4 +83,4 @@
 		w.attachEvent( "onload", w.picturefill );
 	}
 	
-})( this );
+});
