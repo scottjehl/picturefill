@@ -60,7 +60,7 @@
 				}
 
 				if( srcset ) {
-					var screenRes =  w.devicePixelRatio || 1, // Is it worth looping through reasonable matchMedia values here?
+					var screenRes = w.devicePixelRatio || 1, // Is it worth looping through reasonable matchMedia values here?
 						sources = srcset.split(","); // Split comma-separated `srcset` sources into an array.
 
 					for( var res = sources.length, r = res - 1; r >= 0; r-- ) { // Loop through each source/resolution in `srcset`.
@@ -76,8 +76,8 @@
 								this.width = ( this.cloneNode( true ).width / resMatch ); // Clone the original image into memory so the width is unaffected by page styles
 							}
 							picImg.parentNode.replaceChild( newImg, picImg );
+							break;
 						}
-						break;
 					}
 				} else {
 					// No `srcset` in play, so just use the `src` value:
