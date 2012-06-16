@@ -49,14 +49,40 @@
 			var picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
 			
 			if( matches.length ){
-			
+				// Grab the most appropriate (last) match.
+				var match = matches.pop(),
+					srcset = match.getAttribute( "srcset" );
+
 				if( !picImg ){
 					picImg = w.document.createElement( "img" );
 					picImg.alt = ps[ i ].getAttribute( "alt" );
 					ps[ i ].appendChild( picImg );
 				}
-				
-				picImg.src =  matches.pop().getAttribute( "src" );
+
+				if( srcset ) {
+					var screenRes = w.devicePixelRatio || 1, // Is it worth looping through reasonable matchMedia values here?
+						sources = srcset.split(","); // Split comma-separated `srcset` sources into an array.
+
+					for( var res = sources.length, r = res - 1; r >= 0; r-- ) { // Loop through each source/resolution in `srcset`.
+						var source = sources[ r ].replace(/^\s*/, '').replace(/\s*$/, '').split(" "), // Remove any leading whitespace, then split on spaces.
+							resMatch = parseInt( source[1], 10 ); // Parse out the resolution for each source in `srcset`.
+
+						if( resMatch == screenRes && picImg.getAttribute( "src" ) !== source[0] ) {
+							var newImg = document.createElement("img");
+
+							newImg.src = source[0];
+
+							// When the image is loaded, set a width equal to that of the original’s intrinsic width divided by the screen resolution:
+							newImg.onload = function() {
+								this.width = ( this.cloneNode( true ).width / screenRes ); // Clone the original image into memory so the width is unaffected by page styles
+							}
+							picImg.parentNode.replaceChild( newImg, picImg );
+						}
+					}
+				} else {
+					// No `srcset` in play, so just use the `src` value:
+					picImg.src = match.getAttribute( "src" );
+				}
 			}
 			else if( picImg ) {
 				ps[ i ].removeChild( picImg );
