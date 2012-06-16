@@ -8,12 +8,11 @@
 	"use strict";
 	
 	// User preference for HD content when available
-	var prefHD = false;
+	var prefHD = false || w.localStorage && w.localStorage[ "picturefill-prefHD" ] === "true";
 
 	w.picturefill = function() {
 		var ps = w.document.getElementsByTagName( "div" );
-			//prefHDLoc = prefHD;// || w.localStorage && w.localStorage[ "img-pref-hd" ];
-		
+				
 		// Loop the pictures
 		for( var i = 0, il = ps.length; i < il; i++ ){
 			if( ps[ i ].getAttribute( "data-picture" ) !== null ){
@@ -66,6 +65,9 @@
 						ps[ i ].appendChild( picSwitch );
 						picSwitch.onmouseup = function(){
 							prefHD = !prefHD;
+							if( w.localStorage ){
+								w.localStorage[ "picturefill-prefHD" ] = prefHD; 
+							}
 							w.picturefill();
 							return false;
 						};
