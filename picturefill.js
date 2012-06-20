@@ -10,6 +10,7 @@
 		
 		// Loop the pictures
 		for( var i = 0, il = ps.length; i < il; i++ ){
+			var picImg = null;
 			if( ps[ i ].getAttribute( "data-picture" ) !== null ){
 
 				var sources = ps[ i ].getElementsByTagName( "div" ),
@@ -25,7 +26,7 @@
 				}
 
 			// Find any existing img element in the picture element
-			var picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
+			picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
 
 			if( matches.length ){			
 				if( !picImg ){
