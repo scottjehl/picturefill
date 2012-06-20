@@ -12,6 +12,10 @@
 	// Enable strict mode
 	"use strict";
 	
+	// User preference for HD content when available
+	var prefHD = false || w.localStorage && w.localStorage[ "picturefill-prefHD" ] === "true",
+		hasHD;
+
 	// Test if `<picture>` is supported natively, if so, exit - no polyfill needed.
 	if ( !!( w.document.createElement( "picture" ) && w.document.createElement( "source" ) && w.HTMLPictureElement ) ){
 		return;
@@ -23,6 +27,7 @@
 		// Loop the pictures
 		for( var i = 0, il = ps.length; i < il; i++ ){
 			var sources = ps[ i ].getElementsByTagName( "source" ),
+				picImg = null,
 				matches = [];
 
 			// If no sources are found, they're likely erased from the DOM. Try finding them inside comments.
@@ -36,7 +41,7 @@
 				sources = frag.getElementsByTagName( "div" );
 			}
 			
-			// See if which sources match
+			// See which sources match
 			for( var j = 0, jl = sources.length; j < jl; j++ ){
 				var media = sources[ j ].getAttribute( "media" );
 				// if there's no media specified, OR w.matchMedia is supported 
@@ -44,10 +49,10 @@
 					matches.push( sources[ j ] );
 				}
 			}
-			
+
 			// Find any existing img element in the picture element
-			var picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
-			
+			picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
+
 			if( matches.length ){
 				// Grab the most appropriate (last) match.
 				var match = matches.pop(),
@@ -60,8 +65,10 @@
 				}
 
 				if( srcset ) {
-						var screenRes = w.devicePixelRatio || 1, // Is it worth looping through reasonable matchMedia values here?
+						var screenRes = ( prefHD && w.devicePixelRatio ) || 1, // Is it worth looping through reasonable matchMedia values here?
 							sources = srcset.split(","); // Split comma-separated `srcset` sources into an array.
+
+						hasHD = w.devicePixelRatio > 1;
 
 						for( var res = sources.length, r = res - 1; r >= 0; r-- ) { // Loop through each source/resolution in `srcset`.
 							var source = sources[ r ].replace(/^\s*/, '').replace(/\s*$/, '').split(" "), // Remove any leading whitespace, then split on spaces.
@@ -87,12 +94,34 @@
 					picImg.src = match.getAttribute( "src" );
 				}
 			}
-			else if( picImg ) {
-				ps[ i ].removeChild( picImg );
+		}
+		if( hasHD ){
+			var body = w.document.getElementsByTagName("body")[0],
+				prevSwitch = w.document.getElementById( "#toggle-res" ),
+				picSwitch = w.document.createElement( "a" );
+
+			if( prevSwitch ){
+				body.removeChild( prevSwitch );
 			}
+
+			picSwitch.id = "toggle-res";
+			picSwitch.href = "#";
+			picSwitch.innerHTML = ( prefHD ? "S" : "H" ) + "D only";
+			picSwitch.title = "Switch images to " + ( prefHD ? "Standard" : "High" ) + "Definition";
+			picSwitch.className = "pf-pref pf-pref-" + ( prefHD ? "standard" : "high" );
+
+			body.insertBefore( picSwitch, body.children[0] );
+
+			picSwitch.onclick = function(){
+				prefHD = !prefHD;
+				if( w.localStorage ){
+					w.localStorage[ "picturefill-prefHD" ] = prefHD; 
+				}
+				return false;
+			};
 		}
 	};
-	
+
 	// Run on resize and domready (w.load as a fallback)
 	if( w.addEventListener ){
 		w.addEventListener( "resize", w.picturefill, false );
@@ -106,5 +135,4 @@
 	else if( w.attachEvent ){
 		w.attachEvent( "onload", w.picturefill );
 	}
-	
 })( this );
