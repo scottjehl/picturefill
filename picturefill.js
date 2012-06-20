@@ -1,7 +1,4 @@
-/*! Picturefill - Author: Scott Jehl, 2012 | License: MIT/GPLv2 */
-/*
-	Picturefill: user preference switcher extension for HD
-*/ 
+/*! Picturefill - Responsive Images that work today. (and mimic the proposed Picture element with divs). Author: Scott Jehl, Filament Group, 2012 | License: MIT/GPLv2 */
 (function( w ){
 	
 	// Enable strict mode
@@ -12,7 +9,7 @@
 
 	w.picturefill = function() {
 		var ps = w.document.getElementsByTagName( "div" );
-				
+
 		// Loop the pictures
 		for( var i = 0, il = ps.length; i < il; i++ ){
 			if( ps[ i ].getAttribute( "data-picture" ) !== null ){
@@ -95,4 +92,4 @@
 		w.attachEvent( "onload", w.picturefill );
 	}
 	
-})( this );
+}( this ));
