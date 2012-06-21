@@ -95,6 +95,8 @@
 				}
 			}
 		}
+		/*
+// Manual resolution switching, to simulate UA interference.
 		if( hasHD ){
 			var body = w.document.getElementsByTagName("body")[0],
 				prevSwitch = w.document.getElementById( "#toggle-res" ),
@@ -119,7 +121,7 @@
 				}
 				return false;
 			};
-		}
+		}*/
 	};
 
 	// Run on resize and domready (w.load as a fallback)
