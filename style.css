@@ -223,6 +223,15 @@ ul {
   padding: 0;
 }
 
+* {
+  -webkit-box-sizing: border-box;
+}
+
+div[role="main"] {
+  overflow: auto;
+  padding: 0 5%:
+}
+
 
 /* ==|== primary styles =====================================================
    Header:
@@ -234,13 +243,12 @@ hgroup {
 }
 
 hgroup, footer {
-  background: blue;
+  background: rgb(0,0,50);
   width: 100%;
 }
 
 hgroup h1 {
   margin: 0;
-  padding: 0 5%;
 }
 
 hgroup h1, 
@@ -250,7 +258,6 @@ hgroup small {
 
 hgroup small {
   display: block;
-  padding: 0 5%;
 }
 
 hgroup a,
@@ -267,6 +274,11 @@ hgroup a {
 /* ==|== primary styles =====================================================
    Main Content:
    ========================================================================== */
+
+hgroup h1, 
+hgroup small {
+  padding: 0 5%;
+}
 
 #content, footer small {
   padding: .75em 5%;
@@ -288,37 +300,36 @@ footer {
    Media Queries:
    ========================================================================== */
 
-@media screen and (min-width: 600px) {
+@media screen and (min-width: 1025px) {
 
-  #content article {
-    float: left;
-    width: auto;
-  }
-
-  #content {
-    max-width: 1140px;
+  hgroup h1, 
+  hgroup small,
+  #content, 
+  footer small {
+    max-width: 1450px;
     margin: 0 auto;
-    overflow: hidden;
-  }
-
-  #content article {
-    float: left;
-    width: auto;
+    overflow: auto;
+    position:relative;
+    padding: 0;
   }
 
   #content aside {
-    float: right;
-    width: 47%;
+    position: absolute;
+    top: 0;
+    padding-left: 620px;
+    padding-right: 120px;
   }
 
   #sub-content {
+    width: 2000px
+    margin: 0 auto;
     clear: both;
     margin-bottom: 1.5em;
   }
 
   #sub-content article {
-    float: left; 
-    width: 306.666666666667px;
+    display: inline-block;
+    width: 200px;
   }
 
   footer {
