@@ -227,45 +227,39 @@ ul {
   -webkit-box-sizing: border-box;
 }
 
-div[role="main"] {
-  overflow: auto;
-  padding: 0 5%:
-}
-
 
 /* ==|== primary styles =====================================================
    Header:
    ========================================================================== */
 
-hgroup {
+header {
   margin-bottom: 1.5em;
-  padding: .75em 0;
 }
 
-hgroup, footer {
+header h1{
+  margin-top: 0;
+}
+
+header, 
+footer {
   background: rgb(0,0,50);
-  width: 100%;
 }
 
-hgroup h1 {
-  margin: 0;
-}
-
-hgroup h1, 
-hgroup small {
+header h1, 
+header small {
   color: #FFF;
 }
 
-hgroup small {
+header small {
   display: block;
 }
 
-hgroup a,
-hgroup a:visited {
+header a,
+header a:visited {
   color: cyan;
 }
 
-hgroup a {
+header small a {
   font-size: .75em;
   text-decoration: none;
 }
@@ -274,13 +268,9 @@ hgroup a {
 /* ==|== primary styles =====================================================
    Main Content:
    ========================================================================== */
-
-hgroup h1, 
-hgroup small {
-  padding: 0 5%;
-}
-
-#content, footer small {
+header div,
+#content, 
+footer small {
   padding: .75em 5%;
 }
 
@@ -300,17 +290,40 @@ footer {
    Media Queries:
    ========================================================================== */
 
-@media screen and (min-width: 1025px) {
+@media screen and (max-width: 1024px) {
+  header div,
+  #content {
+    padding: 0 5%;
+  }
+}
 
-  hgroup h1, 
-  hgroup small,
-  #content, 
+
+@media screen and (min-width: 1024px) {
+  header div,
+  #page,
   footer small {
-    max-width: 1450px;
+    max-width: 1080px;
     margin: 0 auto;
     overflow: auto;
+  }
+
+  header div,
+  #content, 
+  footer small {
+    overflow: auto;
+  }
+
+  header div {
+    padding: .75em 0;
+  }
+
+
+  header div h1 {padding-left: 0;margin-bottom: 0;}
+  #content, 
+  footer small {
+    overflow: auto;
     position:relative;
-    padding: 0;
+    padding-left: 0;
   }
 
   #content aside {
@@ -321,7 +334,7 @@ footer {
   }
 
   #sub-content {
-    width: 2000px
+    max-width: 2000px
     margin: 0 auto;
     clear: both;
     margin-bottom: 1.5em;
