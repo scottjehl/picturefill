@@ -80,7 +80,13 @@
 	
 	// Run on resize and domready (w.load as a fallback)
 	if( w.addEventListener ){
-		w.addEventListener( "resize", w.picturefill, false );
+		var throttle;
+		w.addEventListener( "resize", function() {
+			if( throttle ) { w.clearTimeout( throttle ); }
+			throttle = w.setTimeout(function () {
+				w.picturefill();
+			}, 150 );
+		}, false );
 		w.addEventListener( "DOMContentLoaded", function(){
 			w.picturefill();
 			// Run once only
