@@ -6,13 +6,13 @@
 	"use strict";
 
 	w.picturefill = function() {
-		var ps = w.document.getElementsByTagName( "div" );
+		var ps = w.document.getElementsByTagName( "span" );
 		
 		// Loop the pictures
 		for( var i = 0, il = ps.length; i < il; i++ ){
 			if( ps[ i ].getAttribute( "data-picture" ) !== null ){
 
-				var sources = ps[ i ].getElementsByTagName( "div" ),
+				var sources = ps[ i ].getElementsByTagName( "span" ),
 					matches = [];
 			
 				// See if which sources match
