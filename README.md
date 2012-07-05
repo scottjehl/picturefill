@@ -5,9 +5,9 @@ A Responsive Images approach that you can use today, that mimics the [proposed p
 * Author: Scott Jehl (c) 2012
 * License: MIT/GPLv2
 
-Demo URL: [http://scottjehl.github.com/picturefill/](http://scottjehl.github.com/picturefill/)
+**Demo URL:** [http://scottjehl.github.com/picturefill/](http://scottjehl.github.com/picturefill/)
 
-Note: Picturefill works best in browsers that support CSS3 media queries. It includes (externally) the [matchMedia polyfill](https://github.com/paulirish/matchMedia.js/) which makes matchMedia work in `media-query`-supporting browsers that don't have `matchMedia`, or at least allows media types to be tested in most any browser. `matchMedia` and the `matchMedia` polyfill are not required for `picturefill` to work, but they are required to support the `media` attributes on `picture` `source` elements.
+**Note:** Picturefill works best in browsers that support CSS3 media queries. It includes (externally) the [matchMedia polyfill](https://github.com/paulirish/matchMedia.js/) which makes matchMedia work in `media-query`-supporting browsers that don't have `matchMedia`, or at least allows media types to be tested in most any browser. `matchMedia` and the `matchMedia` polyfill are not required for `picturefill` to work, but they are required to support the `media` attributes on `picture` `source` elements.
 
 ## Size and delivery
 
@@ -15,18 +15,23 @@ Currently, `picturefill.js` compresses to around 498bytes (~0.5kb), after minify
 
 ## Markup pattern and explanation
 
-Mark up your responsive images like this. The data-media attribute on each div[data-src] element accepts and and all CSS3 media queries, such as `min` or `max` width, or even `min-device-pixel-ratio` for HD (retina) displays. 
+Mark up your responsive images like this. 
 
-		<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-			<div data-src="small.jpg"></div>
-			<div data-src="medium.jpg" data-media="(min-width: 400px)"></div>
-			<div data-src="large.jpg" data-media="(min-width: 800px)"></div>
-			<div data-src="extralarge.jpg" data-media="(min-width: 1000px)"></div>
+```html
+	<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+		<div data-src="small.jpg"></div>
+		<div data-src="medium.jpg"     data-media="(min-width: 400px)"></div>
+		<div data-src="large.jpg"      data-media="(min-width: 800px)"></div>
+		<div data-src="extralarge.jpg" data-media="(min-width: 1000px)"></div>
 
-			<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
-			<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
-		</div>
+		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+		<noscript>
+			<img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+		</noscript>
+	</div>
+```
 
+Each `div[data-src]` element’s `data-media` attribute accepts and and all CSS3 media queries—such as `min` or `max` width, or even `min-device-pixel-ratio` for HD (retina) displays. 
 
 ### Explained...
 
