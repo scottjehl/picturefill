@@ -31,7 +31,7 @@ Mark up your responsive images like this.
 	</div>
 ```
 
-Each `div[data-src]` element’s `data-media` attribute accepts and and all CSS3 media queries—such as `min` or `max` width, or even `min-device-pixel-ratio` for HD (retina) displays. 
+Each `div[data-src]` element’s `data-media` attribute accepts any and all CSS3 media queries—such as `min` or `max` width, or even `min-device-pixel-ratio` for HD (retina) displays. 
 
 ### Explained...
 
