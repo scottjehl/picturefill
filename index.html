@@ -1,30 +1,170 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html>
 	<head>
 		<meta charset=utf-8 />
 		<meta name="viewport" content="width=device-width,initial-scale=1">
 		<title>Picturefill</title>
+		<link rel="stylesheet" href="style.css">
 		<script src="external/matchmedia.js"></script>
 		<script src="picturefill.js"></script>
-		<style>
-			body { font-family: sans-serif }
-			img {  max-width: 100% }
-		</style>
 	</head>
 	<body>
-		
-		<h1>Picturefill: A &lt;picture&gt; element polyfill</h1>
-				
-		<p>For more info: <a href="http://github.com/scottjehl/picturefill">see project home.</a></p>
-		
-		<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-			<div data-src="external/imgs/small.jpg"></div>
-			<div data-src="external/imgs/medium.jpg" data-media="(min-width: 400px)"></div>
-			<div data-src="external/imgs/large.jpg" data-media="(min-width: 800px)"></div>
-			<div data-src="external/imgs/extralarge.jpg" data-media="(min-width: 1000px)"></div>
+		<header>
+			<div>
+			<h1>Picturefill: A &lt;responsive&ndash;able&gt; imagery polyfill</h1>
+			<small>For more info: <a href="http://github.com/scottjehl/picturefill">see project home</a>. You can also join in on the discussion at the <a href="http://www.w3.org/community/respimg">Responisve images Community Group</a></small>
+			</div>
+		</header>
 
-			<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
-			<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
-		</div>
+		<div id="page">
+
+		<section id="content" role="main" class="clearfix">
+			
+			<article>
+				<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+					<div data-src="external/imgs/small.jpg" data-media="(min-width: 200px)"></div>
+					<div data-src="external/imgs/medium.jpg" data-media="(min-width: 320px)"></div>
+					<div data-src="external/imgs/large.jpg" data-media="(min-width: 800px)"></div>
+
+					<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+					<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
+				</div>
+			</article>
+
+			<aside role="complementary">
+				<h3>Tell A Story With Your Photo</h3>
+				
+				<p>Include rich descriptions such as titles, tags, location, people and more to give your photo context and a life of its own. Include rich descriptions such as titles, tags, location, people and more to give your photo context and a life of its own. </p>
+				
+				<h3>Select a Month</h3>
+				
+				<form>
+					<select>
+						<option select="selected">Choose</option>
+						<option select="option1">Option1</option>
+						<option select="option2">Option2</option>
+					</select>
+				</form>
+
+				<ul>
+					<li><a href="#">Interesting photos from the last 7 days</a></li>
+					<li><a href="#">Calendar view of this month</a></li>
+					<li><a href="#">A map of the world</a></li>
+					<li><a href="#">Camera Finder</a></li>
+					<li><a href="#">Most recent uploads</a></li>
+				</ul>
+			</aside>
+
+		<section id="sub-content">
+			<article>
+				<h3>Stone Face Talks</h3>
+				<p>If Stone Face could talk what would he say? how would we know he is real and not a hallucination</p>
+				<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+					<div data-src="external/imgs/small.jpg" data-media="(min-width: 320px)"></div>
+
+					<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+					<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
+				</div>
+			</article>
+
+			<article>
+				<h3>Stone Face Talks</h3>
+				<p>If Stone Face could talk what would he say? how would we know he is real and not a hallucination</p>
+				<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+					<div data-src="external/imgs/small.jpg" data-media="(min-width: 320px)"></div>
+					<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+					<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
+				</div>
+			</article>
+
+			<article>
+				<h3>Stone Face Talks</h3>
+				
+				<p>If Stone Face could talk what would he say? how would we know he is real and not a hallucination</p>
+				<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+					<div data-src="external/imgs/small.jpg" data-media="(min-width: 320px)"></div>
+					<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+					<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
+				</div>
+			</article>
+
+
+			<article>
+				<h3>Stone Face Talks</h3>
+				<p>If Stone Face could talk what would he say? how would we know he is real and not a hallucination</p>
+				<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+					<div data-src="external/imgs/small.jpg" data-media="(min-width: 320px)"></div>
+
+					<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+					<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
+				</div>
+			</article>
+
+			<article>
+				<h3>Stone Face Talks</h3>
+				<p>If Stone Face could talk what would he say? how would we know he is real and not a hallucination</p>
+				<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+					<div data-src="external/imgs/small.jpg" data-media="(min-width: 320px)"></div>
+					<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+					<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
+				</div>
+			</article>
+
+			<article>
+				<h3>Stone Face Talks</h3>
+				<p>If Stone Face could talk what would he say? how would we know he is real and not a hallucination</p>
+				<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+					<div data-src="external/imgs/small.jpg" data-media="(min-width: 320px)"></div>
+					<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+					<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
+				</div>
+			</article>
+
+			<article>
+				<h3>Stone Face Talks</h3>
+				<p>If Stone Face could talk what would he say? how would we know he is real and not a hallucination</p>
+				<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+					<div data-src="external/imgs/small.jpg" data-media="(min-width: 320px)"></div>
+					<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+					<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
+				</div>
+			</article>
+
+			<article>
+				<h3>Stone Face Talks</h3>
+				<p>If Stone Face could talk what would he say? how would we know he is real and not a hallucination</p>
+				<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+					<div data-src="external/imgs/small.jpg" data-media="(min-width: 320px)"></div>
+					<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+					<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
+				</div>
+			</article>
+
+			<article>
+				<h3>Stone Face Talks</h3>
+				<p>If Stone Face could talk what would he say? how would we know he is real and not a hallucination</p>
+				<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+					<div data-src="external/imgs/small.jpg" data-media="(min-width: 320px)"></div>
+					<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+					<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
+				</div>
+			</article>
+
+			<article>
+				<h3>Stone Face Talks</h3>
+				<p>If Stone Face could talk what would he say? how would we know he is real and not a hallucination</p>
+				<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+					<div data-src="external/imgs/small.jpg" data-media="(min-width: 320px)"></div>
+					<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+					<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
+				</div>
+			</article>
+		</section>
+	</section>
+	</div>
+	<footer>
+		<small>This polyfill and all other elements are listed under MIT Licensing Blah Blah Blah</small>
+	</footer>
+	
 	</body>
 </html>
