@@ -45,8 +45,32 @@ Notes on the markup above...
 * The `matchMedia` polyfill (included in `/external`) is necessary to support the `media` attribute across browsers, even in browsers that support media queries, although it is becoming more widely supported in new browsers.
 * The `noscript` element wraps the fallback image for non-JavaScript environments, and including this wrapper prevents browsers from fetching the fallback image during page load (causing unnecessary overhead). Generally, it's a good idea to reference a small image here, as it's likely to be loaded in older/underpowered mobile devices.
 
+### HD Media Queries
+
+Picturefill natively supports HD(Retina) image replacement.  While numerous other solutions exist, picturefill has the added benefit of performance for the user in only getting served one image.
+
+* The `data-media` attribute supports compound media queries, allowing for very specific behaviors to emerge.  For example, a `data-media="(min-width: 400px) and (min-device-pixel-ratio: 2.0)` attribute can be used to serve a higher resolution version of the source instead of a standard definition image.
+
+```html
+	<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+		<div data-src="small.jpg"></div>
+		<div data-src="small.jpg"         data-media="(min-device-pixel-ratio: 2.0)"></div>
+		<div data-src="medium.jpg"        data-media="(min-width: 400px)"></div>
+		<div data-src="medium_x2.jpg"     data-media="(min-width: 400px) and (min-device-pixel-ratio: 2.0)"></div>
+		<div data-src="large.jpg"         data-media="(min-width: 800px)"></div>
+		<div data-src="large_x2.jpg"      data-media="(min-width: 800px) and (min-device-pixel-ratio: 2.0)"></div>	
+		<div data-src="extralarge.jpg"    data-media="(min-width: 1000px)"></div>
+		<div data-src="extralarge_x2.jpg" data-media="(min-width: 1000px) and (min-device-pixel-ratio: 2.0)"></div>	
+
+		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+		<noscript>
+			<img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+		</noscript>
+	</div>
+```
+
+* Note: Supporting this many breakpoints quickly adds size to the DOM and increases implementation and maintenance time, so use this technique sparingly.
 
 ## Support
 
 Picturefill supports a broad range of browsers and devices (there are currently no known unsupported browsers), provided that you stick with the markup conventions provided.
-
