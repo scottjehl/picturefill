@@ -24,22 +24,33 @@
 					}
 				}
 
-			// Find any existing img element in the picture element
-			var picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
+				// Find any existing img element in the picture element
+				var picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
 
-			if( matches.length ){			
-				if( !picImg ){
-					picImg = w.document.createElement( "img" );
-					picImg.alt = ps[ i ].getAttribute( "data-alt" );
-					ps[ i ].appendChild( picImg );
+				if( matches.length ){			
+					if( !picImg ){
+						picImg = w.document.createElement( "img" );
+						picImg.alt = ps[ i ].getAttribute( "data-alt" );
+						ps[ i ].appendChild( picImg );
+					}
+					
+					var match = matches.pop();
+					picImg.src =  match.getAttribute( "data-src" );
+
+					//Preserve any css classnames associated with the match as well as the img fallback
+					if(picImg.className !== match.className){
+						picImg.className = match.className;
+					}
 				}
-				
-				picImg.src =  matches.pop().getAttribute( "data-src" );
+				else if( picImg ){
+					ps[ i ].removeChild( picImg );
+				}
+
+				//Remove all class attributes from the list of data sources to prevent unwanted rendering of hidden elements
+				for( var j = 0, jl = sources.length; j < jl; j++ ){
+					sources[ j ].removeAttribute('class');
+				}
 			}
-			else if( picImg ){
-				ps[ i ].removeChild( picImg );
-			}
-		}
 		}
 	};
 	
