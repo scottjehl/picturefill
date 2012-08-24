@@ -31,7 +31,7 @@
 				if( !picImg ){
 					picImg = w.document.createElement( "img" );
 					picImg.alt = ps[ i ].getAttribute( "data-alt" );
-					picImg.style = ps[ i ].getAttribute( "data-style" );
+					picImg.setAttribute('style', ps[ i ].getAttribute( "data-style" ));
 					ps[ i ].appendChild( picImg );
 				}
 				
