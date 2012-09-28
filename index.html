@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html>
 	<head>
 		<meta charset=utf-8 />
@@ -12,12 +12,22 @@
 		</style>
 	</head>
 	<body>
-		
+
 		<h1>Picturefill: A &lt;picture&gt; element polyfill</h1>
-				
+
 		<p>For more info: <a href="http://github.com/scottjehl/picturefill">see project home.</a></p>
-		
+
 		<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+			<!-- If browser supports inline SVG, use image below: -->
+			<div data-src="external/imgs/vector.svg" data-type="image/svg+xml"></div>
+
+			<!-- Otherwise, if browser supports WebP, use images below: -->
+			<div data-src="external/imgs/small.webp" data-type="image/webp"></div>
+			<div data-src="external/imgs/medium.webp" data-media="(min-width: 400px)" data-type="image/webp"></div>
+			<div data-src="external/imgs/large.webp" data-media="(min-width: 800px)" data-type="image/webp"></div>
+			<div data-src="external/imgs/extralarge.webp" data-media="(min-width: 1000px)" data-type="image/webp"></div>
+
+			<!-- Otherwise, fallback on JPEGs -->
 			<div data-src="external/imgs/small.jpg"></div>
 			<div data-src="external/imgs/medium.jpg" data-media="(min-width: 400px)"></div>
 			<div data-src="external/imgs/large.jpg" data-media="(min-width: 800px)"></div>
