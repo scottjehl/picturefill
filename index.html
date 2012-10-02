@@ -17,24 +17,58 @@
 
 		<p>For more info: <a href="http://github.com/scottjehl/picturefill">see project home.</a></p>
 
-		<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-			<!-- If browser supports inline SVG, use image below: -->
-			<div data-src="external/imgs/vector.svg" data-type="image/svg+xml"></div>
+		<section>
+			<h1><code>source</code> elements using both <code>media</code> and <code>srcset</code> attributes</h1>
+			<p>This markup pattern is further detailed in the <a href="http://lists.whatwg.org/htdig.cgi/whatwg-whatwg.org/2012-May/036160.html">original proposal</a> by Florian Rivoal.</p>
+			<p>This syntax combines the resolution switching of <code>srcset</code> with <code>picture</code>’s ability to tailor sources to the viewport. This has a couple of major benefits over the originally-propsed <code>picture</code> element:</p>
+			<ul>
+				<li>Less verbose and more readable syntax, especially considering the vendor prefixing that comes along with <code>min-device-pixel-ratio</code>. Determining viewport-appropriate sources is handled through <code>media</code> attributes as expected, while serving that viewport-appropriate source at the correct <em>resolution</em> is done with <code>srcset</code>.</li>
+				<li>A native implementation would allow us to apply the original intrinsic dimensions of the <code>1x</code> source to the higher-resolution sources rather than simply delivering an image twice the size. This polyfill simply divides the image’s intrinsic width against the screen resolution (1x, 2x, etc.), though I’m sure this can be handled more intelligently in a native implementation.</li>
+				<li>By sandboxing the resolution in this new attribute, we allow the browser to intervene without compromising the effectiveness of media queries. The decision to serve higher-resolution images based on available bandwidth is a decision best left in the hands of the browser. <code>srcset</code> allows us to define a set of <em>suggested</em> sources based on resolution, while a user setting or automated bandwidth detection in the browser could still intervene. This approach prevents us from breaking the intended “absolute” terms of media queries.</li>
+			</ul>
+			<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+				<!-- If browser supports inline SVG, use image below: -->
+				<div data-type="image/svg+xml" data-src="external/imgs/vector.svg"></div>
 
-			<!-- Otherwise, if browser supports WebP, use images below: -->
-			<div data-src="external/imgs/small.webp" data-type="image/webp"></div>
-			<div data-src="external/imgs/medium.webp" data-media="(min-width: 400px)" data-type="image/webp"></div>
-			<div data-src="external/imgs/large.webp" data-media="(min-width: 800px)" data-type="image/webp"></div>
-			<div data-src="external/imgs/extralarge.webp" data-media="(min-width: 1000px)" data-type="image/webp"></div>
+				<!-- Otherwise, if browser supports WebP, use images below: -->
+				<div data-type="image/webp" data-srcset="external/imgs/small.webp 1x, external/imgs/small2x.webp 2x"></div>
+				<div data-type="image/webp" data-media="(min-width: 400px)" data-srcset="external/imgs/medium.webp 1x, external/imgs/medium2x.webp 2x"></div>
+				<div data-type="image/webp" data-media="(min-width: 800px)" data-srcset="external/imgs/large.webp 1x, external/imgs/large2x.webp 2x"></div>
+				<div data-type="image/webp" data-media="(min-width: 1000px)" data-srcset="external/imgs/extralarge.webp 1x, external/imgs/extralarge2x.webp 2x"></div>
+	
+				<!-- Otherwise, fallback on JPEGs -->
+				<div data-srcset="external/imgs/small.jpg 1x, external/imgs/small2x.jpg 2x"></div>
+				<div data-media="(min-width: 400px)" data-srcset="external/imgs/medium.jpg 1x, external/imgs/medium2x.jpg 2x"></div>
+				<div data-media="(min-width: 800px)" data-srcset="external/imgs/large.jpg 1x, external/imgs/large2x.jpg 2x"></div>
+				<div data-media="(min-width: 1000px)" data-srcset="external/imgs/extralarge.jpg 1x, external/imgs/extralarge2x.jpg 2x"></div>
 
-			<!-- Otherwise, fallback on JPEGs -->
-			<div data-src="external/imgs/small.jpg"></div>
-			<div data-src="external/imgs/medium.jpg" data-media="(min-width: 400px)"></div>
-			<div data-src="external/imgs/large.jpg" data-media="(min-width: 800px)"></div>
-			<div data-src="external/imgs/extralarge.jpg" data-media="(min-width: 1000px)"></div>
+				<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+				<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
+			</picture>
+		</section>
 
-			<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
-			<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
-		</div>
+		<section>
+			<h1><code>source</code> elements using <code>media</code> attributes only</h1>
+			<p>Does not perform any resolution switching.</p>
+			<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+				<!-- If browser supports inline SVG, use image below: -->
+				<div data-type="image/svg+xml" data-src="external/imgs/vector.svg"></div>
+
+				<!-- Otherwise, if browser supports WebP, use images below: -->
+				<div data-type="image/webp" data-src="external/imgs/small.webp"></source></div>
+				<div data-type="image/webp" data-src="external/imgs/medium.webp" data-media="(min-width: 400px)"></source></div>
+				<div data-type="image/webp" data-src="external/imgs/large.webp" data-media="(min-width: 800px)"></source></div>
+				<div data-type="image/webp" data-src="external/imgs/extralarge.webp" data-media="(min-width: 1000px)"></source></div>
+	
+				<!-- Otherwise, fallback on JPEGs -->
+				<div data-src="external/imgs/small.jpg"></div>
+				<div data-src="external/imgs/medium.jpg" data-media="(min-width: 400px)"></div>
+				<div data-src="external/imgs/large.jpg" data-media="(min-width: 800px)"></div>
+				<div data-src="external/imgs/extralarge.jpg" data-media="(min-width: 1000px)"></div>
+
+				<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+				<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
+			</picture>
+		</section>
 	</body>
 </html>
