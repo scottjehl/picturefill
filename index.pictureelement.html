@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset=utf-8 />
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<title>Picturefill</title>
+		<script src="external/matchmedia.js"></script>
+		<script src="picturefill.pictureelement.js"></script>
+		<style>
+			body { font-family: sans-serif }
+			img {  max-width: 100% }
+		</style>
+	</head>
+	<body>
+
+		<h1>Picturefill: A &lt;picture&gt; element polyfill</h1>
+
+		<p>For more info: <a href="http://github.com/scottjehl/picturefill">see project home.</a></p>
+
+		<picture alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+			<!-- If browser supports inline SVG, use image below: -->
+			<source src="external/imgs/vector.svg" type="image/svg+xml"></source>
+
+			<!-- Otherwise, if browser supports WebP, use images below: -->
+			<source src="external/imgs/small.webp" type="image/webp"></source>
+			<source src="external/imgs/medium.webp" media="(min-width: 400px)" type="image/webp"></source>
+			<source src="external/imgs/large.webp" media="(min-width: 800px)" type="image/webp"></source>
+			<source src="external/imgs/extralarge.webp" media="(min-width: 1000px)" type="image/webp"></source>
+
+			<!-- Otherwise, fallback on JPEGs -->
+			<source src="external/imgs/small.jpg"></div>
+			<source src="external/imgs/medium.jpg" media="(min-width: 400px)"></source>
+			<source src="external/imgs/large.jpg" media="(min-width: 800px)"></source>
+			<source src="external/imgs/extralarge.jpg" media="(min-width: 1000px)"></source>
+
+			<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+			<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
+		</picture>
+	</body>
+</html>
