@@ -9,7 +9,7 @@ Author URI: http://davidnewton.ca
 */
 
 
-add_action('wp_enqueue_scripts', 'wppf_script'); 
+add_action('wp_enqueue_scripts', 'wppf_script');
 add_filter('upload_mimes', 'wppf_upload_mimes');
 add_filter('the_content', 'wppf_content');
 add_filter("attachment_fields_to_edit", "wppf_svg_field_edit", null, 2);
@@ -92,7 +92,7 @@ if (!function_exists('wppf_svg_field_edit')) {
 	 * @return array
 	 */
 	function wppf_svg_field_edit($form_fields, $post) {
-		if (substr($post->post_mime_type, 0, 5) == 'image' && $post->post_mime_type != 'image/svg+xml') {  
+		if (substr($post->post_mime_type, 0, 5) == 'image' && $post->post_mime_type != 'image/svg+xml') {
 			$form_fields["svg"] = array(
 				"label" => __("SVG file URL"),
 				"input" => "text", // this is default if "input" is omitted
@@ -119,7 +119,7 @@ if (!function_exists('wppf_svg_field_save')) {
 }
 
 if (!function_exists('wppf_script')) {
-	function wppf_script() {  
+	function wppf_script() {
 		wp_register_script('picturefill', plugins_url( 'picturefill.pictureelement.js', __FILE__ ));
 		wp_enqueue_script('picturefill');
 	}
@@ -135,11 +135,11 @@ if (!function_exists('wppf_content')) {
 if (!function_exists('wppf_replace')) {
 	function wppf_replace($matches) {
 		$img = $matches[0];
-	
+
 		preg_match_all('/(id|class|src|alt|title)="([^"]*)"/i', $img, $matches);
 		$attributes = $matches[1];
 		$values = $matches[2];
-		
+
 		// make sure we have an image src AND that it's a WP attachment
 		$src = array_search('src', $attributes);
 		if ($src === false) { return $img; }
@@ -147,13 +147,13 @@ if (!function_exists('wppf_replace')) {
 		$src = $values[$src];
 		$attachmentID = get_attachment_id($src);
 		if (empty($attachmentID)) { return $img; }
-		
+
 		$attachment 				= wp_get_attachment_metadata($attachmentID);
 		$attachment_image			= wp_get_attachment_image_src($attachmentID, 'full');
 		$attachment_image_small		= wp_get_attachment_image_src($attachmentID, 'thumbnail');
 		$attachment_image_medium	= wp_get_attachment_image_src($attachmentID, 'medium');
 		$attachment_image_large		= wp_get_attachment_image_src($attachmentID, 'large');
-		
+
 		// picture tag
 		$output = '
 			<picture ';
@@ -163,7 +163,7 @@ if (!function_exists('wppf_replace')) {
 			}
 		}
 		$output .= '>';
-		
+
 		// svg
 		$svg = get_post_meta($attachmentID, '_svg');
 		if (!empty($svg) && is_array($svg)) {
@@ -171,23 +171,23 @@ if (!function_exists('wppf_replace')) {
 			if (!empty($svg)) {
 				$output .= '
 					<!-- If browser supports inline SVG, use image below: -->
-					<source type="image/svg+xml" src="' . $svg[0] . '">
+					<source type="image/svg+xml" src="' . $svg . '">
 				';
 			}
 		}
-		
+
 		// responsive raster images and fallback
-		$output .= '			
+		$output .= '
 				<!-- Otherwise, fallback on rasters -->
 				<source srcset="' . $attachment_image_medium[0] . ' 1x, ' . $attachment_image_large[0] . ' 2x">
 				<source media="(min-width: 50em)" srcset="' . $attachment_image_large[0] . ' 1x, ' . $attachment_image[0] . ' 2x">
 				<source media="(min-width: 100em)" src="' . $attachment_image[0] . '">
-			
+
 				<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
 				<noscript>' . $img[0] . '</noscript>
 			</picture>
 		';
-		
+
 		return $output;
 	}
 }
