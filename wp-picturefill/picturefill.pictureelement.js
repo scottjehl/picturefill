@@ -55,7 +55,7 @@
 					picImg = null,
 					matches = [],
 					lastType;
-
+				
 				// If no sources are found, they're likely erased from the DOM. Try finding them inside comments.
 				if( !sources.length ){
 					var picText =  ps[ i ].innerHTML,
@@ -103,7 +103,6 @@
 					ps[ i ].appendChild( picImg );
 				}
 
-
 				if( srcset ) {
 						var screenRes = ( prefHD && w.devicePixelRatio ) || 1, // Is it worth looping through reasonable matchMedia values here?
 							sources = srcset.split(","); // Split comma-separated `srcset` sources into an array.
@@ -138,8 +137,7 @@
 				ps[ i ].removeChild( picImg );
 			}
 		}
-		/*
-// Manual resolution switching, to simulate UA interference.
+		/* // Manual resolution switching, to simulate UA interference.
 		if( hasHD ){
 			var body = w.document.getElementsByTagName("body")[0],
 				prevSwitch = w.document.getElementById( "#toggle-res" ),

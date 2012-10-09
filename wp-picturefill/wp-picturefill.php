@@ -166,11 +166,14 @@ if (!function_exists('wppf_replace')) {
 		
 		// svg
 		$svg = get_post_meta($attachmentID, '_svg');
-		if (!empty($svg)) {
-			$output .= '
-				<!-- If browser supports inline SVG, use image below: -->
-				<source type="image/svg+xml" src="' . $svg[0] . '">
-			';
+		if (!empty($svg) && is_array($svg)) {
+			$svg = trim($svg[0]);
+			if (!empty($svg)) {
+				$output .= '
+					<!-- If browser supports inline SVG, use image below: -->
+					<source type="image/svg+xml" src="' . $svg[0] . '">
+				';
+			}
 		}
 		
 		// responsive raster images and fallback
