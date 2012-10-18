@@ -26,7 +26,7 @@ Mark up your responsive images like this.
 
 		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
 		<noscript>
-			<img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+			<img src="small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 		</noscript>
 	</div>
 ```
@@ -64,12 +64,40 @@ Picturefill natively supports HD(Retina) image replacement.  While numerous othe
 
 		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
 		<noscript>
-			<img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+			<img src="small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 		</noscript>
 	</div>
 ```
 
 * Note: Supporting this many breakpoints quickly adds size to the DOM and increases implementation and maintenance time, so use this technique sparingly.
+
+### Vector (SVG) support
+
+Picturefill also natively supports loading SVG files as replacement images, for perfect scaling at any resolution. It can detect if support for inline SVGs is available and, if so, load an SVG file when a `type` attribute is provided.
+
+```html
+	<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+		<!-- If browser supports inline SVG, use image below: -->
+		<div data-type="image/svg+xml" data-src="vector.svg"></div>
+	
+		<!-- Otherwise, fallback on JPEGs -->
+		<div data-src="small.jpg"></div>
+		<div data-src="small.jpg"         data-media="(min-device-pixel-ratio: 2.0)"></div>
+		<div data-src="medium.jpg"        data-media="(min-width: 400px)"></div>
+		<div data-src="medium_x2.jpg"     data-media="(min-width: 400px) and (min-device-pixel-ratio: 2.0)"></div>
+		<div data-src="large.jpg"         data-media="(min-width: 800px)"></div>
+		<div data-src="large_x2.jpg"      data-media="(min-width: 800px) and (min-device-pixel-ratio: 2.0)"></div>	
+		<div data-src="extralarge.jpg"    data-media="(min-width: 1000px)"></div>
+		<div data-src="extralarge_x2.jpg" data-media="(min-width: 1000px) and (min-device-pixel-ratio: 2.0)"></div>	
+	
+		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+		<noscript><img src="small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
+	</div>
+```
+
+## WordPress Plugin
+
+Also included is a WordPress plugin, *WP picturefill*. WordPress automatically resizes images to create thumbnail, medium, large, and fullsize versions. The plugin loads these conditionally using picturefill. It also allows for SVG upload, and association of an SVG file with a normal raster image, so that the SVG may be included as a `<source>`.
 
 ## Support
 
