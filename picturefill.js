@@ -1,12 +1,12 @@
 /*! Picturefill - Author: Scott Jehl, 2012 | License: MIT/GPLv2 */
 /*
 	Picturefill: A polyfill for proposed behavior of the picture element, which does not yet exist, but should. :)
-	* Notes: 
+	* Notes:
 		* For active discussion of the picture element, see http://www.w3.org/community/respimg/
 		* While this code does work, it is intended to be used only for example purposes until either:
 			A) A W3C Candidate Recommendation for <picture> is released
 			B) A major browser implements <picture>
-*/ 
+*/
 (function( w ){
 
 	// Enable strict mode
@@ -63,11 +63,11 @@
 						frag = w.document.createElement( "div" ),
 						// For IE9, convert the source elements to divs
 						srcs = picText.replace( /(<)source([^>]+>)/gmi, "$1div$2" ).match( /<div[^>]+>/gmi );
-	
+
 					frag.innerHTML = srcs.join( "" );
 					sources = frag.getElementsByTagName( "div" );
 				} */
-				
+
 				// See which sources match
 				for( var j = 0, jl = sources.length; j < jl; j++ ){
 					var media = sources[ j ].getAttribute( "data-media" ),
@@ -80,7 +80,7 @@
 
 					// if there's no type OR the type is in w.types
 					if (!type || ( w.types[type] == true) ){
-					
+
 						// if there's no media specified, OR w.matchMedia is supported
 						if( !media || ( w.matchMedia && w.matchMedia( media ).matches ) ){
 							matches.push( sources[ j ] );
@@ -119,6 +119,7 @@
 									var newImg = document.createElement("img");
 
 									newImg.src = source[0];
+									newImg.alt = picImg.alt;
 									// When the image is loaded, set a width equal to that of the original’s intrinsic width divided by the screen resolution:
 									newImg.onload = function() {
 										// Clone the original image into memory so the width is unaffected by page styles:
@@ -138,8 +139,7 @@
 				ps[ i ].removeChild( picImg );
 			}
 		}
-		/*
-// Manual resolution switching, to simulate UA interference.
+		/* // Manual resolution switching, to simulate UA interference.
 		if( hasHD ){
 			var body = w.document.getElementsByTagName("body")[0],
 				prevSwitch = w.document.getElementById( "#toggle-res" ),
@@ -160,7 +160,7 @@
 			picSwitch.onclick = function(){
 				prefHD = !prefHD;
 				if( w.localStorage ){
-					w.localStorage[ "picturefill-prefHD" ] = prefHD; 
+					w.localStorage[ "picturefill-prefHD" ] = prefHD;
 				}
 				return false;
 			};
