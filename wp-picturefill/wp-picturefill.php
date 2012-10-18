@@ -171,8 +171,8 @@ if (!function_exists('wppf_replace')) {
 			if (!empty($svg)) {
 				$output .= '
 					<!-- If browser supports inline SVG, use image below: -->
-					<!-- <source type="image/svg+xml" src="' . $svg . '"></source> -->
-					<source type="image/svg+xml" src="' . $svg . '"></source>
+					<!-- <source type="image/svg+xml" src="' . $svg . '"> -->
+					<source type="image/svg+xml" src="' . $svg . '">
 				';
 			}
 		}
@@ -180,12 +180,12 @@ if (!function_exists('wppf_replace')) {
 		// responsive raster images and fallback
 		$output .= '
 				<!-- Otherwise, fallback on rasters -->
-				<!-- <source srcset="' . $attachment_image_medium[0] . ' 1x, ' . $attachment_image_large[0] . ' 2x"></source> -->
-				<source srcset="' . $attachment_image_medium[0] . ' 1x, ' . $attachment_image_large[0] . ' 2x"></source>
-				<!-- <source media="(min-width: 44em)" srcset="' . $attachment_image_large[0] . ' 1x, ' . $attachment_image[0] . ' 2x"></source> -->
-				<source media="(min-width: 44em)" srcset="' . $attachment_image_large[0] . ' 1x, ' . $attachment_image[0] . ' 2x"></source>
-				<!-- <source media="(min-width: 85em)" src="' . $attachment_image[0] . '"></source> -->
-				<source media="(min-width: 85em)" src="' . $attachment_image[0] . '"></source>
+				<!-- <source srcset="' . $attachment_image_medium[0] . ' 1x, ' . $attachment_image_large[0] . ' 2x"> -->
+				<source srcset="' . $attachment_image_medium[0] . ' 1x, ' . $attachment_image_large[0] . ' 2x">
+				<!-- <source media="(min-width: 44em)" srcset="' . $attachment_image_large[0] . ' 1x, ' . $attachment_image[0] . ' 2x"> -->
+				<source media="(min-width: 44em)" srcset="' . $attachment_image_large[0] . ' 1x, ' . $attachment_image[0] . ' 2x">
+				<!-- <source media="(min-width: 85em)" src="' . $attachment_image[0] . '"> -->
+				<source media="(min-width: 85em)" src="' . $attachment_image[0] . '">
 
 				<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
 				<noscript><img src="' . $attachment_image_medium[0] . '"';
