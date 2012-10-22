@@ -71,6 +71,28 @@ Picturefill natively supports HD(Retina) image replacement.  While numerous othe
 
 * Note: Supporting this many breakpoints quickly adds size to the DOM and increases implementation and maintenance time, so use this technique sparingly.
 
+### Supporting IE Desktop
+
+Internet Explorer 8 and older have no support for CSS3 Media Queries, so in the examples above, IE will receive the first `data-src`
+ image reference (or the last one it finds that has no `data-media` attribute. If you'd like to serve a larger image to IE desktop
+browsers, you might consider using conditional comments, like this:
+
+```html
+	<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+		<div data-src="small.jpg"></div>
+		<div data-src="medium.jpg" data-media="(min-width: 400px)"></div>
+
+		<!--[if (lt IE 9) & (!IEMobile)]>
+		    <div data-src="medium.jpg"></div>
+		<![endif]-->
+
+		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+		<noscript>
+			<img src="small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+		</noscript>
+	</div>
+```
+
 ## Support
 
 Picturefill supports a broad range of browsers and devices (there are currently no known unsupported browsers), provided that you stick with the markup conventions provided.
