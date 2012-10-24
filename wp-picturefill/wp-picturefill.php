@@ -25,14 +25,13 @@ if (!function_exists('get_attachment_id')) {
     function get_attachment_id($url) {
         $dir = wp_upload_dir();
 
-        // baseurl never has a trailing slash
-        if (false === strpos($url, $dir['baseurl'] . '/')) {
-            // URL points to a place outside of upload directory
-            return false;
-        }
+		$home_url = home_url();
+		if (strpos($home_url, $url) !== 0) {
+			$url = trim($home_url, '/') . '/' . trim($url, '/');
+		}
 
-        $file  = basename($url);
-        $query = array(
+		$file  = basename($url);
+		$query = array(
             'post_type'  => 'attachment',
             'fields'     => 'ids',
             'meta_query' => array(
@@ -171,8 +170,8 @@ if (!function_exists('wppf_replace')) {
 			if (!empty($svg)) {
 				$output .= '
 					<!-- If browser supports inline SVG, use image below: -->
-					<!-- <source type="image/svg+xml" src="' . $svg . '"> -->
-					<source type="image/svg+xml" src="' . $svg . '">
+					<!-- <source type="image/svg+xml" src="' . $svg . '"></source> -->
+					<source type="image/svg+xml" src="' . $svg . '"></source>
 				';
 			}
 		}
