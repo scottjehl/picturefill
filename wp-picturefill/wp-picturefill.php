@@ -16,14 +16,14 @@ add_filter("attachment_fields_to_edit", "wppf_svg_field_edit", null, 2);
 add_filter("attachment_fields_to_save", "wppf_svg_field_save", null, 2);
 
 if (!function_exists('get_attachment_id')) {
-    /**
-     * Get the Attachment ID for a given image URL.
-     * @link   http://wordpress.stackexchange.com/a/7094
-     * @param  string $url
-     * @return boolean|integer
-     */
-    function get_attachment_id($url) {
-        $dir = wp_upload_dir();
+	/**
+	 * Get the Attachment ID for a given image URL.
+	 * @link   http://wordpress.stackexchange.com/a/7094
+	 * @param  string $url
+	 * @return boolean|integer
+	 */
+	function get_attachment_id($url) {
+		$dir = wp_upload_dir();
 
 		$home_url = home_url();
 		if (strpos($home_url, $url) !== 0) {
@@ -32,47 +32,47 @@ if (!function_exists('get_attachment_id')) {
 
 		$file  = basename($url);
 		$query = array(
-            'post_type'  => 'attachment',
-            'fields'     => 'ids',
-            'meta_query' => array(
-                array(
-                    'value'   => $file,
-                    'compare' => 'LIKE',
-               ),
-           )
-       );
+			'post_type'  => 'attachment',
+			'fields'	 => 'ids',
+			'meta_query' => array(
+				array(
+					'value'   => $file,
+					'compare' => 'LIKE',
+			   ),
+		   )
+	   );
 
-        $query['meta_query'][0]['key'] = '_wp_attached_file';
+		$query['meta_query'][0]['key'] = '_wp_attached_file';
 
-        // query attachments
-        $ids = get_posts($query);
+		// query attachments
+		$ids = get_posts($query);
 
-        if (! empty($ids)) {
-            foreach ($ids as $id) {
-                // first entry of returned array is the URL
-                if ($url === array_shift(wp_get_attachment_image_src($id, 'full')))
-                    return $id;
-            }
-        }
+		if (! empty($ids)) {
+			foreach ($ids as $id) {
+				// first entry of returned array is the URL
+				if ($url === array_shift(wp_get_attachment_image_src($id, 'full')))
+					return $id;
+			}
+		}
 
-        $query['meta_query'][0]['key'] = '_wp_attachment_metadata';
+		$query['meta_query'][0]['key'] = '_wp_attachment_metadata';
 
-        // query attachments again
-        $ids = get_posts($query);
+		// query attachments again
+		$ids = get_posts($query);
 
-        if (empty($ids))
-            return false;
+		if (empty($ids))
+			return false;
 
-        foreach ($ids as $id) {
-            $meta = wp_get_attachment_metadata($id);
-            foreach ($meta['sizes'] as $size => $values) {
-                if ($values['file'] === $file && $url === array_shift(wp_get_attachment_image_src($id, $size)))
-                    return $id;
-            }
-        }
+		foreach ($ids as $id) {
+			$meta = wp_get_attachment_metadata($id);
+			foreach ($meta['sizes'] as $size => $values) {
+				if ($values['file'] === $file && $url === array_shift(wp_get_attachment_image_src($id, $size)))
+					return $id;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 }
 
 if (!function_exists('wppf_upload_mimes')) {
