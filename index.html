@@ -19,11 +19,17 @@
 		
 		<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 			<div data-src="external/imgs/small.jpg"></div>
+			<div data-src="external/imgs/small@2x.jpg" data-media="(min-device-pixel-ratio: 2.0)"></div>
 			<div data-src="external/imgs/medium.jpg" data-media="(min-width: 400px)"></div>
+			<div data-src="external/imgs/medium@2x.jpg" data-media="(min-width: 400px) and (min-device-pixel-ratio: 2.0)"></div>
 			<div data-src="external/imgs/large.jpg" data-media="(min-width: 800px)"></div>
+			<div data-src="external/imgs/large@2x.jpg" data-media="(min-width: 800px) and (min-device-pixel-ratio: 2.0)"></div>
 			<div data-src="external/imgs/extralarge.jpg" data-media="(min-width: 1000px)"></div>
-
-			<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+			<div data-src="external/imgs/extralarge@2x.jpg" data-media="(min-width: 1000px) and (min-device-pixel-ratio: 2.0)"></div>
+			<!--[if (lt IE 9) & (!IEMobile)]>
+                <div data-src="external/imgs/extralarge.jpg"></div>
+            <![endif]-->
+            <!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
 			<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
 		</div>
 	</body>

@@ -49,23 +49,23 @@ Notes on the markup above...
 
 Picturefill natively supports HD(Retina) image replacement.  While numerous other solutions exist, picturefill has the added benefit of performance for the user in only getting served one image.
 
-* The `data-media` attribute supports [compound media queries](https://developer.mozilla.org/en-US/docs/CSS/Media_queries), allowing for very specific behaviors to emerge.  For example, a `data-media="(min-width: 400px) and (min-device-pixel-ratio: 2.0)` attribute can be used to serve a higher resolution version of the source instead of a standard definition image. Note you currently also need to add the `-webkit-min-device-pixel-ratio` prefix (e.g. for iOS devices).
+* The `data-media` attribute supports [compound media queries](https://developer.mozilla.org/en-US/docs/CSS/Media_queries), allowing for very specific behaviors to emerge.  For example, a `data-media="(min-width: 400px) and (min-device-pixel-ratio: 2.0)` attribute can be used to serve a higher resolution version of the source instead of a standard definition image. 
+
+Note: the need to add the `-webkit-min-device-pixel-ratio` prefix (e.g. for iOS devices) has been solved by adding it using javascript when a data-media includes `min-device-pixel-ratio`.
 
 ```html
 	<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-		<div data-src="small.jpg"></div>
-		<div data-src="small.jpg"         data-media="(min-device-pixel-ratio: 2.0)"></div>
-		<div data-src="medium.jpg"        data-media="(min-width: 400px)"></div>
-		<div data-src="medium_x2.jpg"     data-media="(min-width: 400px) and (min-device-pixel-ratio: 2.0)"></div>
-		<div data-src="large.jpg"         data-media="(min-width: 800px)"></div>
-		<div data-src="large_x2.jpg"      data-media="(min-width: 800px) and (min-device-pixel-ratio: 2.0)"></div>	
-		<div data-src="extralarge.jpg"    data-media="(min-width: 1000px)"></div>
-		<div data-src="extralarge_x2.jpg" data-media="(min-width: 1000px) and (min-device-pixel-ratio: 2.0)"></div>	
+		<div data-src="external/imgs/small.jpg"></div>
+		<div data-src="external/imgs/small@2x.jpg" data-media="(min-device-pixel-ratio: 2.0)"></div>
+		<div data-src="external/imgs/medium.jpg" data-media="(min-width: 400px)"></div>
+		<div data-src="external/imgs/medium@2x.jpg" data-media="(min-width: 400px) and (min-device-pixel-ratio: 2.0)"></div>
+		<div data-src="external/imgs/large.jpg" data-media="(min-width: 800px)"></div>
+		<div data-src="external/imgs/large@2x.jpg" data-media="(min-width: 800px) and (min-device-pixel-ratio: 2.0)"></div>
+		<div data-src="external/imgs/extralarge.jpg" data-media="(min-width: 1000px)"></div>
+		<div data-src="external/imgs/extralarge@2x.jpg" data-media="(min-width: 1000px) and (min-device-pixel-ratio: 2.0)"></div>
 
-		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
-		<noscript>
-			<img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-		</noscript>
+        <!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+		<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
 	</div>
 ```
 

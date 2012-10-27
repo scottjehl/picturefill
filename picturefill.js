@@ -18,6 +18,11 @@
 				// See if which sources match
 				for( var j = 0, jl = sources.length; j < jl; j++ ){
 					var media = sources[ j ].getAttribute( "data-media" );
+					// adds -webkit- prefix in javascript instead of HTML, for simplicity
+					if( media && media.indexOf("min-device-pixel-ratio") > -1 && media.indexOf("-webkit-min-device-pixel-ratio") == -1 ) {
+						var webkitmedia = media.replace("min-device-pixel-ratio", "-webkit-min-device-pixel-ratio");
+						media = media +","+webkitmedia;
+					}
 					// if there's no media specified, OR w.matchMedia is supported 
 					if( !media || ( w.matchMedia && w.matchMedia( media ).matches ) ){
 						matches.push( sources[ j ] );
