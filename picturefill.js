@@ -19,9 +19,11 @@
 				for( var j = 0, jl = sources.length; j < jl; j++ ){
 					var media = sources[ j ].getAttribute( "data-media" );
 					// adds -webkit- prefix in javascript instead of HTML, for simplicity
-					if( media && media.indexOf("min-device-pixel-ratio") > -1 && media.indexOf("-webkit-min-device-pixel-ratio") == -1 ) {
+					if( media && media.indexOf("min-device-pixel-ratio") > -1 ) {
 						var webkitmedia = media.replace("min-device-pixel-ratio", "-webkit-min-device-pixel-ratio");
-						media = media +","+webkitmedia;
+						var mozmedia = media.replace("min-device-pixel-ratio", "-moz-min-device-pixel-ratio");
+						var omedia = media.replace("min-device-pixel-ratio", "-o-min-device-pixel-ratio");
+						media = webkitmedia +","+ mozmedia +","+ omedia +","+ media;
 					}
 					// if there's no media specified, OR w.matchMedia is supported 
 					if( !media || ( w.matchMedia && w.matchMedia( media ).matches ) ){

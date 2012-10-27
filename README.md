@@ -51,7 +51,7 @@ Picturefill natively supports HD(Retina) image replacement.  While numerous othe
 
 * The `data-media` attribute supports [compound media queries](https://developer.mozilla.org/en-US/docs/CSS/Media_queries), allowing for very specific behaviors to emerge.  For example, a `data-media="(min-width: 400px) and (min-device-pixel-ratio: 2.0)` attribute can be used to serve a higher resolution version of the source instead of a standard definition image. 
 
-Note: the need to add the `-webkit-min-device-pixel-ratio` prefix (e.g. for iOS devices) has been solved by adding it using javascript when a data-media includes `min-device-pixel-ratio`.
+Note: the need to add the `-webkit-min-device-pixel-ratio` (-moz, -o) prefixes (e.g. for iOS devices) has been solved by adding them using javascript when a data-media includes `min-device-pixel-ratio`.
 
 ```html
 	<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
