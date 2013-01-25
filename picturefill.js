@@ -31,7 +31,17 @@
 				if( !picImg ){
 					picImg = w.document.createElement( "img" );
 					picImg.alt = ps[ i ].getAttribute( "data-alt" );
-					ps[ i ].appendChild( picImg );
+
+					// if we have an href to apply to the image
+					if( ps[ i ].getAttribute( "data-href" ) ){
+						picUrl = w.document.createElement( "a" );
+						picUrl.setAttribute( "href" , ps[ i ].getAttribute( "data-href" ) );
+						picUrl.appendChild( picImg );
+						ps[ i ].appendChild( picUrl );
+					}
+					else{
+						ps[ i ].appendChild( picImg );						
+					}
 				}
 				
 				picImg.src =  matches.pop().getAttribute( "data-src" );
