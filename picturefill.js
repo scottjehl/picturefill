@@ -28,7 +28,7 @@
 			var picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
 
 			if( matches.length ){			
-				if( !picImg ){
+				if( !picImg || picImg.parentNode.tagName.toUpperCase() == 'NOSCRIPT' ){
 					picImg = w.document.createElement( "img" );
 					picImg.alt = ps[ i ].getAttribute( "data-alt" );
 					ps[ i ].appendChild( picImg );
