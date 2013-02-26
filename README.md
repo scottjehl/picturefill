@@ -11,14 +11,14 @@ A Responsive Images approach that you can use today, that mimics the [proposed p
 
 ## Size and delivery
 
-Currently, `picturefill.js` compresses to around 498bytes (~0.5kb), after minify and gzip. To minify, you might try these online tools: [Uglify]:(http://marijnhaverbeke.nl/uglifyjs), [Yahoo Compressor]:(http://refresh-sf.com/yui/), or [Closure Compiler](http://closure-compiler.appspot.com/home). Serve with gzip compression.
+Currently, `picturefill.js` compresses to around 402bytes (~0.4kb), after minify and gzip. To minify, you might try these online tools: [Uglify](http://marijnhaverbeke.nl/uglifyjs), [Yahoo Compressor](http://refresh-sf.com/yui/), or [Closure Compiler](http://closure-compiler.appspot.com/home). Serve with gzip compression.
 
 ## Markup pattern and explanation
 
 Mark up your responsive images like this. 
 
 ```html
-	<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia" data-class="picture">
 		<div data-src="small.jpg"></div>
 		<div data-src="medium.jpg"     data-media="(min-width: 400px)"></div>
 		<div data-src="large.jpg"      data-media="(min-width: 800px)"></div>
@@ -26,7 +26,7 @@ Mark up your responsive images like this.
 
 		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
 		<noscript>
-			<img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+			<img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia" class="picture">
 		</noscript>
 	</div>
 ```
@@ -37,7 +37,8 @@ Each `div[data-src]` element’s `data-media` attribute accepts any and all CSS3
 
 Notes on the markup above...
 
-* The `div[data-picture]` element's `alt` attribute is used as alternate text for the generated `img` element.
+* The `div[data-picture]` element's `data-alt` attribute is used as alternate text for the generated `img` element.
+* The `div[data-picture]` element's `data-class` attribute is used as a way to pass along classes to the generated `img` element.
 * The `div[data-picture]` element can have any number of `source` elements. The above example may contain more than the average situation would call for.
 * Each `div[data-src]` element must have a `data-src` attribute specifying the image path. 
 * It's generally a good idea to include one source element with no `media` qualifier, so it'll apply everywhere.
