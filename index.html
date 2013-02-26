@@ -7,8 +7,25 @@
 		<script src="external/matchmedia.js"></script>
 		<script src="picturefill.js"></script>
 		<style>
-			body { font-family: sans-serif }
+			body { font-family: sans-serif; max-width: 375px; margin: 50px auto; }
 			img {  max-width: 100% }
+			div[data-picture] {
+				position: relative;
+				display: inline-block;
+			}
+			.pf-pref {
+				position: absolute;
+				right: 1em;
+				bottom: 1em;
+				background: #fff;
+				opacity: .8;
+				padding: .1em .3em;
+				color: #444;
+				font-size: .7em;
+				text-decoration: none;
+				border-radius: .2em;
+				font-weight: bold;
+			}
 		</style>
 	</head>
 	<body>
@@ -19,9 +36,8 @@
 		
 		<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 			<div data-src="external/imgs/small.jpg"></div>
-			<div data-src="external/imgs/medium.jpg" data-media="(min-width: 400px)"></div>
-			<div data-src="external/imgs/large.jpg" data-media="(min-width: 800px)"></div>
-			<div data-src="external/imgs/extralarge.jpg" data-media="(min-width: 1000px)"></div>
+			<div data-src="external/imgs/medium.jpg" data-media="(min-width: 300px)"></div>
+			<div data-src="external/imgs/extralarge.jpg" data-media="(min-width: 300px) and (-webkit-min-device-pixel-ratio: 1.5)"></div>
 
 			<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
 			<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
