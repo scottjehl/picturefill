@@ -37,13 +37,13 @@
 
 					if ( picImg.addEventListener ){
 						picImg.addEventListener( "error" , function(){
-							return window[pc.getAttribute("data-onerror")](picImg);
+							return window[pc.getAttribute("onerror")](picImg);
 						}
 						);
 					}
 					else if ( picImg.attachEvent ) {
 						picImg.attachEvent( "error" , function(){
-							return window[pc.getAttribute("data-onerror")](picImg);
+							return window[pc.getAttribute("onerror")](picImg);
 						}
 						);
 					}
