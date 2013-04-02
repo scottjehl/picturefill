@@ -31,7 +31,7 @@
 				if( !picImg ){
 					picImg = w.document.createElement( "img" );
 					picImg.alt = ps[ i ].getAttribute( "data-alt" );
-					ps[ i ].appendChild( picImg );
+					sources[ 0 ].parentNode.appendChild( picImg );
 				}
 				
 				picImg.src =  matches.pop().getAttribute( "data-src" );
