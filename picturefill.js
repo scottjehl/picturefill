@@ -19,6 +19,7 @@
 					ps.push(psTemp[ i ])
 				}
 			}
+			psTemp = null;
 		}
 		
 		// Loop the pictures
