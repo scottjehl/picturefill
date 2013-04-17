@@ -24,22 +24,25 @@
 					}
 				}
 
-			// Find any existing img element in the picture element
-			var picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
+				// Find any existing img element in the picture element
+				var picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
 
-			if( matches.length ){			
-				if( !picImg ){
-					picImg = w.document.createElement( "img" );
-					picImg.alt = ps[ i ].getAttribute( "data-alt" );
-					ps[ i ].appendChild( picImg );
+				if( matches.length ){		
+					var match = matches.pop();	
+					if( !picImg ){
+						picImg = w.document.createElement( "img" );
+						picImg.alt = ps[ i ].getAttribute( "data-alt" );
+						match.appendChild( picImg );
+					} else if (picImg.parentNode !== match) {
+						picImg.parentNode.removeChild(picImg);
+						match.appendChild( picImg );
+					}
+					picImg.src =  match.getAttribute( "data-src" );
 				}
-				
-				picImg.src =  matches.pop().getAttribute( "data-src" );
+				else if( picImg ){
+					picImg.parentNode.removeChild(picImg);
+				}
 			}
-			else if( picImg ){
-				ps[ i ].removeChild( picImg );
-			}
-		}
 		}
 	};
 	

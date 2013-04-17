@@ -20,7 +20,7 @@ Mark up your responsive images like this.
 ```html
 	<div data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 		<div data-src="small.jpg"></div>
-		<div data-src="medium.jpg"     data-media="(min-width: 400px)"></div>
+		<div data-src="medium.jpg"     data-media="(min-width: 400px)" data-class="border-img"></div>
 		<div data-src="large.jpg"      data-media="(min-width: 800px)"></div>
 		<div data-src="extralarge.jpg" data-media="(min-width: 1000px)"></div>
 
@@ -44,6 +44,7 @@ Notes on the markup above...
 * Each `data-src` element can have an optional `media` attribute to make it apply in different media settings. Both media types and queries can be used, like any `media` attribute, but support for media queries depends on the browser (unsupporting browsers fail silently).
 * The `matchMedia` polyfill (included in `/external`) is necessary to support the `media` attribute across browsers, even in browsers that support media queries, although it is becoming more widely supported in new browsers.
 * The `noscript` element wraps the fallback image for non-JavaScript environments, and including this wrapper prevents browsers from fetching the fallback image during page load (causing unnecessary overhead). Generally, it's a good idea to reference a small image here, as it's likely to be loaded in older/underpowered mobile devices.
+* The image will appear inside of the activated `data-src` element.
 	
 ### HD Media Queries
 
