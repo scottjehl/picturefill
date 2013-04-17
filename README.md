@@ -41,10 +41,10 @@ Notes on the markup above...
 * The `div[data-picture]` element can have any number of `source` elements. The above example may contain more than the average situation would call for.
 * Each `div[data-src]` element must have a `data-src` attribute specifying the image path. 
 * It's generally a good idea to include one source element with no `media` qualifier, so it'll apply everywhere.
-* Each `data-src` element can have an optional `data-class` attribute that will apply the specified class to the generated image element.
 * Each `data-src` element can have an optional `media` attribute to make it apply in different media settings. Both media types and queries can be used, like any `media` attribute, but support for media queries depends on the browser (unsupporting browsers fail silently).
 * The `matchMedia` polyfill (included in `/external`) is necessary to support the `media` attribute across browsers, even in browsers that support media queries, although it is becoming more widely supported in new browsers.
 * The `noscript` element wraps the fallback image for non-JavaScript environments, and including this wrapper prevents browsers from fetching the fallback image during page load (causing unnecessary overhead). Generally, it's a good idea to reference a small image here, as it's likely to be loaded in older/underpowered mobile devices.
+* The image will appear inside of the activated `data-src` element.
 	
 ### HD Media Queries
 

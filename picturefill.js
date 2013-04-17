@@ -37,7 +37,6 @@
 						picImg.parentNode.removeChild(picImg);
 						match.appendChild( picImg );
 					}
-					picImg.className = match.getAttribute( "data-class" );
 					picImg.src =  match.getAttribute( "data-src" );
 				}
 				else if( picImg ){
