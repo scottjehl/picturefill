@@ -11,9 +11,15 @@
 		// Loop the pictures
 		for( var i = 0, il = ps.length; i < il; i++ ){
 			if( ps[ i ].getAttribute( "data-picture" ) !== null ){
-
+				var picture_parent = 'undefined';
+				
 				var sources = ps[ i ].getElementsByTagName( "div" ),
 					matches = [];
+				
+				// get parent
+				if( undefined !== sources[0] ) {
+					picture_parent = sources[0].parentNode;
+				}
 			
 				// See if which sources match
 				for( var j = 0, jl = sources.length; j < jl; j++ ){
@@ -31,6 +37,12 @@
 				if( !picImg ){
 					picImg = w.document.createElement( "img" );
 					picImg.alt = ps[ i ].getAttribute( "data-alt" );
+
+					// Add class support for images to inherit parent styling
+					if( picture_parent !== 'undefined' && picture_parent.hasAttribute( 'data-class' ) ) {
+						picImg.className += picture_parent.getAttribute( 'data-class' );
+					}
+					
 					ps[ i ].appendChild( picImg );
 				}
 				
