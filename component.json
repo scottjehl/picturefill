@@ -2,7 +2,7 @@
     "name": "picturefill",
     "repo": "scottjehl/picturefill",
     "description": "A Responsive Images approach that you can use today!",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "main": "picturefill.js",
     "scripts": [
         "picturefill.js",
