@@ -110,7 +110,7 @@ browsers, you might consider using conditional comments, like this:
 
 		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
 		<noscript>
-			<img src="small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+			<img src="small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"  title="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 		</noscript>
 	</span>
 ```
