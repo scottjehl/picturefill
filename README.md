@@ -44,6 +44,26 @@ Notes on the markup above...
 * Each `[data-src]` element can have an optional `[data-media]` attribute to make it apply in specific media settings. Both media types and queries can be used, like a native `media` attribute, but support for media _queries_ depends on the browser (unsupporting browsers fail silently).
 * The `matchMedia` polyfill (included in the `/external` folder) is necessary to support the `data-media` attribute across browsers (such as IE9), even in browsers that support media queries, although it is becoming more widely supported in new browsers.
 * The `noscript` element wraps the fallback image for non-JavaScript environments, and including this wrapper prevents browsers from fetching the fallback image during page load (causing unnecessary overhead). Generally, it's a good idea to reference a small mobile optimized image here, as it's likely to be loaded in older/underpowered mobile devices.
+
+### How the `img` is appended
+
+Upon finding a matching `span[data-src]` element, picturefill will generate an `img` element referencing that `span`'s `data-src` attribute value and append the `img` to the active, matching `span[data-src]` element. This means you can target CSS styles specific to the active image based on the breakpoint that is in play, perhaps by adding a class to each span. For example, if you have the following markup...
+
+```html
+	<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+		<span **class="sml"** data-src="small.jpg"></span>
+		<span **class="med"** data-src="medium.jpg"     data-media="(min-width: 400px)"></span>
+		<span **class="lrg"** data-src="large.jpg"      data-media="(min-width: 800px)"></span>
+````
+
+...then you could write styles specific to each of the images, which may be handy for certain layout situations.
+
+```css
+	[data-picture] .sml { /* Styles for the small image */ }
+	[data-picture] .med { /* Styles for the medium image */ }
+	[data-picture] .lrg { /* Styles for the large image */ }
+````
+
 	
 ### HD Media Queries
 

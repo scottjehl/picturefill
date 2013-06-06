@@ -28,16 +28,17 @@
 			var picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
 
 			if( matches.length ){
+				var matchedEl = matches.pop();
 				if( !picImg ){
 					picImg = w.document.createElement( "img" );
 					picImg.alt = ps[ i ].getAttribute( "data-alt" );
-					ps[ i ].appendChild( picImg );
 				}
 
-				picImg.src =  matches.pop().getAttribute( "data-src" );
+				picImg.src =  matchedEl.getAttribute( "data-src" );
+				matchedEl.appendChild( picImg );
 			}
 			else if( picImg ){
-				ps[ i ].removeChild( picImg );
+				picImg.parentNode.removeChild( picImg );
 			}
 		}
 		}
