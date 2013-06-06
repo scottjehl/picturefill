@@ -18,7 +18,7 @@ Currently, `picturefill.js` compresses to around 498bytes (~0.5kb), after minify
 Mark up your responsive images like this. 
 
 ```html
-	<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"  data-title="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 		<span data-src="small.jpg"></span>
 		<span data-src="medium.jpg"     data-media="(min-width: 400px)"></span>
 		<span data-src="large.jpg"      data-media="(min-width: 800px)"></span>
@@ -53,7 +53,7 @@ Notes on the markup above...
 Upon finding a matching `span[data-src]` element, picturefill will generate an `img` element referencing that `span`'s `data-src` attribute value and append the `img` to the active, matching `span[data-src]` element. This means you can target CSS styles specific to the active image based on the breakpoint that is in play, perhaps by adding a class to each span. For example, if you have the following markup...
 
 ```html
-	<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia" data-title="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 		<span **class="sml"** data-src="small.jpg"></span>
 		<span **class="med"** data-src="medium.jpg"     data-media="(min-width: 400px)"></span>
 		<span **class="lrg"** data-src="large.jpg"      data-media="(min-width: 800px)"></span>
@@ -75,7 +75,7 @@ Picturefill natively supports HD(Retina) image replacement.  While numerous othe
 * The `data-media` attribute supports [compound media queries](https://developer.mozilla.org/en-US/docs/CSS/Media_queries), allowing for very specific behaviors to emerge.  For example, a `data-media="(min-width: 400px) and (min-device-pixel-ratio: 2.0)` attribute can be used to serve a higher resolution version of the source instead of a standard definition image. Note you currently also need to add the `-webkit-min-device-pixel-ratio` prefix (e.g. for iOS devices).
 
 ```html
-	<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia" data-title="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 		<span data-src="small.jpg"></span>
 		<span data-src="small.jpg"         data-media="(min-device-pixel-ratio: 2.0)"></span>
 		<span data-src="medium.jpg"        data-media="(min-width: 400px)"></span>
@@ -101,7 +101,7 @@ Internet Explorer 8 and older have no support for CSS3 Media Queries, so in the 
 browsers, you might consider using conditional comments, like this:
 
 ```html
-	<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia" data-title="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 		<span data-src="small.jpg"></span>
 		<span data-src="medium.jpg" data-media="(min-width: 400px)"></span>
 
