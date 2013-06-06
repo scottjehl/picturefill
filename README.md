@@ -40,6 +40,7 @@ Each `span[data-src]` element’s `data-media` attribute accepts any and all CSS
 Notes on the markup above...
 
 * The `span[data-picture]` element's `alt` attribute is used as alternate text for the `img` element that picturefill generates upon a successful source match.
+* The `span[data-picture]` element's `title` attribute to improve the semantic.
 * The `span[data-picture]` element can contain any number of `span[data-source]` elements. The above example may contain more than the average situation may call for.
 * Each `span[data-src]` element must have a `data-src` attribute specifying the image path. 
 * It's generally a good idea to include one source element with no `media` qualifier, so it'll apply everywhere - typically a mobile-optimized image is ideal here.
