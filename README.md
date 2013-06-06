@@ -33,6 +33,8 @@ Mark up your responsive images like this.
 
 Each `span[data-src]` element’s `data-media` attribute accepts any and all CSS3 media queries—such as `min` or `max` width, or even `min-resolution` for HD (retina) displays. 
 
+**NOTE:** if you need/prefer to use `div`s in your picturefill markup, you may want to grab v1.0.0: https://github.com/scottjehl/picturefill/tree/v1.0.0 . The current version here made the switch to `span` to better mimic an `img` element's inline nature, as well as fix a bug or two for wordpress users.
+
 ### Explained...
 
 Notes on the markup above...
