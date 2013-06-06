@@ -26,7 +26,7 @@ Mark up your responsive images like this.
 
 		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
 		<noscript>
-			<img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+			<img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"  title="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 		</noscript>
 	</span>
 ```
