@@ -1,0 +1,23 @@
+{
+  "name": "picturefill",
+  "version": "0.1.0",
+  "description": "A Responsive Images approach that you can use today!",
+  "main": "picturefill.js",
+  "keywords": [
+    "responsive images",
+    "picturefill",
+    "rwd"
+  ],
+  "homepage": "https://github.com/scottjehl/picturefill",
+  "bugs": "https://github.com/scottjehl/picturefill/issues",
+  "author": {
+    "name": "Scott Jehl",
+    "email": "scottjehl@gmail.com",
+    "url": "http://scottjehl.com/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/scottjehl/picturefill.git"
+  },
+  "licence": "MIT/GPLv2"
+}
