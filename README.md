@@ -52,18 +52,18 @@ Notes on the markup above...
 Upon finding a matching `span[data-src]` element, picturefill will generate an `img` element referencing that `span`'s `data-src` attribute value and append the `img` to the active, matching `span[data-src]` element. This means you can target CSS styles specific to the active image based on the breakpoint that is in play, perhaps by adding a class to each span. For example, if you have the following markup...
 
 ```html
-	<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-		<span **class="sml"** data-src="small.jpg"></span>
-		<span **class="med"** data-src="medium.jpg"     data-media="(min-width: 400px)"></span>
-		<span **class="lrg"** data-src="large.jpg"      data-media="(min-width: 800px)"></span>
+	<span class="picture" data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+		<span class="sml" data-src="small.jpg"></span>
+		<span class="med" data-src="medium.jpg"     data-media="(min-width: 400px)"></span>
+		<span class="lrg" data-src="large.jpg"      data-media="(min-width: 800px)"></span>
 ````
 
 ...then you could write styles specific to each of the images, which may be handy for certain layout situations.
 
 ```css
-	[data-picture] .sml { /* Styles for the small image */ }
-	[data-picture] .med { /* Styles for the medium image */ }
-	[data-picture] .lrg { /* Styles for the large image */ }
+	.picture .sml img { /* Styles for the small image */ }
+	.picture .med img { /* Styles for the medium image */ }
+	.picture .lrg img { /* Styles for the large image */ }
 ````
 
 	
