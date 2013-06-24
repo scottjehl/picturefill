@@ -76,7 +76,7 @@ Picturefill natively supports HD(Retina) image replacement.  While numerous othe
 ```html
 	<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 		<span data-src="small.jpg"></span>
-		<span data-src="small.jpg"         data-media="(min-device-pixel-ratio: 2.0)"></span>
+		<span data-src="small_x2.jpg"      data-media="(min-device-pixel-ratio: 2.0)"></span>
 		<span data-src="medium.jpg"        data-media="(min-width: 400px)"></span>
 		<span data-src="medium_x2.jpg"     data-media="(min-width: 400px) and (min-device-pixel-ratio: 2.0)"></span>
 		<span data-src="large.jpg"         data-media="(min-width: 800px)"></span>
