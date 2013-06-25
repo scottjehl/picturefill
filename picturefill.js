@@ -58,4 +58,10 @@
 		w.attachEvent( "onload", w.picturefill );
 	}
 
+	if (typeof define === 'function' && define.amd) {
+		define(function() {
+			return w.picturefill;
+		});
+	}
+
 }( this ));
