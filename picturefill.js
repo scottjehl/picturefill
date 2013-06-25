@@ -5,8 +5,9 @@
 	// Enable strict mode
 	"use strict";
 
-	w.picturefill = function() {
-		var ps = w.document.getElementsByTagName( "span" );
+	w.picturefill = function(e, ps) {
+		ps = ps || w.document.getElementsByTagName( "span" );
+		if (!("length" in ps)) ps = [ps];
 
 		// Loop the pictures
 		for( var i = 0, il = ps.length; i < il; i++ ){
