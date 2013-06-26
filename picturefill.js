@@ -29,7 +29,7 @@
 
 			if( matches.length ){
 				var matchedEl = matches.pop();
-				if( !picImg ){
+				if( !picImg || picImg.parentNode.nodeName === "NOSCRIPT" ){
 					picImg = w.document.createElement( "img" );
 					picImg.alt = ps[ i ].getAttribute( "data-alt" );
 				}
