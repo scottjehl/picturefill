@@ -31,8 +31,10 @@
 				var matchedEl = matches.pop();
 				if( !picImg ){
 					picImg = w.document.createElement( "img" );
-					picImg.alt = ps[ i ].getAttribute( "data-alt" );
-					picImg.title = ps[ i ].getAttribute( "data-title" );
+					if(ps[ i ].getAttribute( "data-alt" ))
+						picImg.alt = ps[ i ].getAttribute( "data-alt" );
+					if(ps[ i ].getAttribute( "data-title" ))
+						picImg.title = ps[ i ].getAttribute( "data-title" );
 				}
 
 				picImg.src =  matchedEl.getAttribute( "data-src" );
