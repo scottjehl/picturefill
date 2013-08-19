@@ -36,8 +36,7 @@
 					picImg.alt = ps[ i ].getAttribute( "data-alt" );
 				}
 
-
-				if( w.picturefill.srcset.supported ) {
+				if( "srcset" in w.picturefill && w.picturefill.srcset.supported ) {
 					picImg.srcset = srcset;
 				} else {
 					picImg.src = srcset || matchedEl.getAttribute( "data-src" );

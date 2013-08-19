@@ -6,6 +6,7 @@
 		<title>Picturefill</title>
 		<script src="external/matchmedia.js"></script>
 		<script src="picturefill.js"></script>
+		<script src="picturefill.srcset.js"></script>
 		<style>
 			body { font-family: sans-serif }
 			img {  max-width: 100% }
@@ -16,7 +17,7 @@
 		<h1>Picturefill: A &lt;picture&gt; element polyfill</h1>		
 		<p>For more info: <a href="http://github.com/scottjehl/picturefill">see project home.</a></p>
 
-		<h2>Using <code>srcset</code></h2>
+		<h2>Single Breakpoint</h2>
 		<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 			<span data-src="external/imgs/small.jpg"></span>
 			<span data-src="external/imgs/large.jpg" data-media="(min-width: 800px)"></span>
@@ -27,8 +28,8 @@
 
 		<h2>Using <code>srcset</code></h2>
 		<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-			<span data-srcset="external/imgs/small.jpg 1x, external/imgs/medium.jpg 2x"></span>
-			<span data-srcset="external/imgs/large.jpg 1x, external/imgs/extralarge.jpg 2x" data-media="(min-width: 600px)"></span>
+			<span data-src="external/imgs/small.jpg" data-srcset="external/imgs/small.jpg 1x, external/imgs/medium.jpg 2x"></span>
+			<span data-src="external/imgs/large.jpg" data-srcset="external/imgs/large.jpg 1x, external/imgs/extralarge.jpg 2x" data-media="(min-width: 600px)"></span>
 
 			<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
 			<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>

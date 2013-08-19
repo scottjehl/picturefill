@@ -1,16 +1,16 @@
 (function( w ){
-  
-	"use strict";
- 
-	w.picturefill.srcset = function( match ) {
-		w.picturefill.srcset.supported = "srcset" in document.createElement( "img" );
 
-		var supported = w.picturefill.srcset.supported;
-		var srcset = match.getAttribute( "data-srcset" ),
+	"use strict";
+
+	w.picturefill.srcset = function( match ) {
+		var supported = "srcset" in document.createElement( "img" ),
+			srcset = match.getAttribute( "data-srcset" ),
 			screenRes = w.devicePixelRatio || 1,
 			retRes = 1,
 			ret;
- 
+
+		w.picturefill.srcset.supported = supported;
+
 		if( srcset ) {
 			if( supported ) {
 				return srcset;
