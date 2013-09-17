@@ -28,7 +28,8 @@
 
 		<h2>Using <code>srcset</code></h2>
 		<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-			<span data-srcset="external/imgs/small.jpg .75x"></span>
+			<span data-srcset="external/imgs/small.jpg 1x, external/imgs/medium.jpg 2x"></span>
+			<span data-srcset="external/imgs/large.jpg 1x, external/imgs/extralarge.jpg 2x" data-media="(min-width: 600px)"></span>
 
 			<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
 			<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
