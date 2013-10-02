@@ -15,7 +15,7 @@ Currently, `picturefill.js` compresses to around 498bytes (~0.5kb), after minify
 
 ## Markup pattern and explanation
 
-Mark up your responsive images like this. 
+Mark up your responsive images like this.
 
 ```html
 	<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
@@ -31,9 +31,9 @@ Mark up your responsive images like this.
 	</span>
 ```
 
-Each `span[data-src]` element’s `data-media` attribute accepts any and all CSS3 media queries—such as `min` or `max` width, or even `min-resolution` for HD (retina) displays. 
+Each `span[data-src]` element’s `data-media` attribute accepts any and all CSS3 media queries—such as `min` or `max` width, or even `min-resolution` for HD (retina) displays.
 
-**NOTE:** if you need/prefer to use `div`s in your picturefill markup, you may want to grab v1.0.0: https://github.com/scottjehl/picturefill/tree/v1.0.0 . The current version here made the switch to `span` to better mimic an `img` element's inline nature, as well as fix a bug or two for wordpress users.
+**NOTE:** if you need/prefer to use `div`s in your picturefill markup, you may want to grab v1.0.0: https://github.com/scottjehl/picturefill/tree/v1.0.0 . The current version here made the switch to `span` to better mimic an `img` element's inline nature, as well as fix a bug or two for WordPress users.
 
 ### Explained...
 
@@ -41,7 +41,7 @@ Notes on the markup above...
 
 * The `span[data-picture]` element's `alt` attribute is used as alternate text for the `img` element that picturefill generates upon a successful source match.
 * The `span[data-picture]` element can contain any number of `span[data-source]` elements. The above example may contain more than the average situation may call for.
-* Each `span[data-src]` element must have a `data-src` attribute specifying the image path. 
+* Each `span[data-src]` element must have a `data-src` attribute specifying the image path.
 * It's generally a good idea to include one source element with no `media` qualifier, so it'll apply everywhere - typically a mobile-optimized image is ideal here.
 * Each `[data-src]` element can have an optional `[data-media]` attribute to make it apply in specific media settings. Both media types and queries can be used, like a native `media` attribute, but support for media _queries_ depends on the browser (unsupporting browsers fail silently).
 * The `matchMedia` polyfill (included in the `/external` folder) is necessary to support the `data-media` attribute across browsers (such as IE9), even in browsers that support media queries, although it is becoming more widely supported in new browsers.
@@ -66,7 +66,7 @@ Upon finding a matching `span[data-src]` element, picturefill will generate an `
 	.picture .lrg img { /* Styles for the large image */ }
 ````
 
-	
+
 ### HD Media Queries
 
 Picturefill natively supports HD(Retina) image replacement.  While numerous other solutions exist, picturefill has the added benefit of performance for the user in only being served one image.
@@ -80,9 +80,9 @@ Picturefill natively supports HD(Retina) image replacement.  While numerous othe
 		<span data-src="medium.jpg"        data-media="(min-width: 400px)"></span>
 		<span data-src="medium_x2.jpg"     data-media="(min-width: 400px) and (min-device-pixel-ratio: 2.0)"></span>
 		<span data-src="large.jpg"         data-media="(min-width: 800px)"></span>
-		<span data-src="large_x2.jpg"      data-media="(min-width: 800px) and (min-device-pixel-ratio: 2.0)"></span>	
+		<span data-src="large_x2.jpg"      data-media="(min-width: 800px) and (min-device-pixel-ratio: 2.0)"></span>
 		<span data-src="extralarge.jpg"    data-media="(min-width: 1000px)"></span>
-		<span data-src="extralarge_x2.jpg" data-media="(min-width: 1000px) and (min-device-pixel-ratio: 2.0)"></span>	
+		<span data-src="extralarge_x2.jpg" data-media="(min-width: 1000px) and (min-device-pixel-ratio: 2.0)"></span>
 
 		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
 		<noscript>
@@ -96,7 +96,7 @@ Picturefill natively supports HD(Retina) image replacement.  While numerous othe
 ### Supporting IE Desktop
 
 Internet Explorer 8 and older have no support for CSS3 Media Queries, so in the examples above, IE will receive the first `data-src`
- image reference (or the last one it finds that has no `data-media` attribute. If you'd like to serve a larger image to IE desktop
+ image reference (or the last one it finds that has no `data-media` attribute). If you'd like to serve a larger image to IE desktop
 browsers, you might consider using conditional comments, like this:
 
 ```html
