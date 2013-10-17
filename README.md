@@ -33,7 +33,7 @@ Mark up your responsive images like this.
 
 Each `span[data-src]` element’s `data-media` attribute accepts any and all CSS3 media queries—such as `min` or `max` width, or even `min-resolution` for HD (retina) displays.
 
-**NOTE:** if you need/prefer to use `div`s in your picturefill markup, you may want to grab v1.0.0: https://github.com/scottjehl/picturefill/tree/v1.0.0 . The current version here made the switch to `span` to better mimic an `img` element's inline nature, as well as fix a bug or two for wordpress users.
+**NOTE:** if you need/prefer to use `div`s in your picturefill markup, you may want to grab v1.0.0: https://github.com/scottjehl/picturefill/tree/v1.0.0 . The current version here made the switch to `span` to better mimic an `img` element's inline nature, as well as fix a bug or two for WordPress users.
 
 ### Explained...
 
@@ -96,7 +96,7 @@ Picturefill natively supports HD(Retina) image replacement.  While numerous othe
 ### Supporting IE Desktop
 
 Internet Explorer 8 and older have no support for CSS3 Media Queries, so in the examples above, IE will receive the first `data-src`
- image reference (or the last one it finds that has no `data-media` attribute. If you'd like to serve a larger image to IE desktop
+ image reference (or the last one it finds that has no `data-media` attribute). If you'd like to serve a larger image to IE desktop
 browsers, you might consider using conditional comments, like this:
 
 ```html
