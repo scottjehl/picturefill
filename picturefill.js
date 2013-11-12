@@ -40,6 +40,12 @@
 
 				picImg.src =  matchedEl.getAttribute( "data-src" );
 				matchedEl.appendChild( picImg );
+				if(picImg.hasAttribute("width")){
+					picImg.removeAttribute("width");
+				}
+				if(picImg.hasAttribute("height")){
+					picImg.removeAttribute("height");
+				}
 			}
 			else if( picImg ){
 				picImg.parentNode.removeChild( picImg );
