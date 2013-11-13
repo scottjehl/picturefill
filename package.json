@@ -1,0 +1,27 @@
+{
+    "name" : "picturefill",
+    "version" : "0.0.0",
+    "description" : "A Responsive Images approach that you can use today!",
+    "main" : "picturefill.js",
+    "scripts" : {
+    },
+    "repository" : {
+      "type" : "git",
+      "url" : "git://github.com/CondeNast/picturefill.git"
+    },
+    "homepage" : "https://github.com/CondeNast/picturefill",
+    "dependencies" : {
+    },
+    "devDependencies" : {
+    },
+    "keywords": [] ,
+    "author" : {
+      "name" : "Thorsten Lorenz",
+      "email" : "thlorenz@gmx.de",
+      "url" : "http://thlorenz.com"
+    },
+    "license" : {
+      "type": "MIT/GPLv2"
+    },
+    "engine" : { "node" : ">=0.6" }
+}
