@@ -1,0 +1,30 @@
+<!DOCTYPE html> 
+<html>
+	<head>
+		<meta charset=utf-8 />
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<title>Picturefill</title>
+		<script src="external/matchmedia.js"></script>
+		<script src="main.js"></script>
+		<style>
+			body { font-family: sans-serif }
+			img {  max-width: 100% }
+		</style>
+	</head>
+	<body>
+		
+		<h1>Picturefill: A &lt;picture&gt; element polyfill</h1>
+				
+		<p>For more info: <a href="http://github.com/scottjehl/picturefill">see project home.</a></p>
+		
+		<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+			<span data-src="external/imgs/small.jpg"></span>
+			<span data-src="external/imgs/medium.jpg" data-media="(min-width: 400px)"></span>
+			<span data-src="external/imgs/large.jpg" data-media="(min-width: 800px)"></span>
+			<span data-src="external/imgs/extralarge.jpg" data-media="(min-width: 1000px)"></span>
+
+			<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+			<noscript><img src="../external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
+		</span>
+	</body>
+</html>
