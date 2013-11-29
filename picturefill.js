@@ -66,7 +66,9 @@
 			var picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
 			
 			if( matches.length ){
-				var matchedEl = matches.pop();
+				var matchedEl = matches.pop(),
+					srcset = "srcset" in w.picturefill && w.picturefill.srcset( matchedEl );
+
 				if( !picImg || picImg.parentNode.nodeName === "NOSCRIPT" ){
 					picImg = w.document.createElement( "img" );
 					picImg.alt = ps[ i ].getAttribute( "data-alt" );
@@ -76,7 +78,11 @@
 					continue;
 				}
 
-				picImg.src =  matchedEl.getAttribute( "data-src" );
+				if( srcset && ( "srcset" in w.picturefill && w.picturefill.srcset.supported ) ) {
+					picImg.srcset = srcset;
+				} else {
+					picImg.src = srcset || matchedEl.getAttribute( "data-src" );
+				}
 				matchedEl.appendChild( picImg );
 				picImg.removeAttribute("width");
 				picImg.removeAttribute("height");
