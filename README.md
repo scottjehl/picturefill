@@ -66,6 +66,8 @@ Upon finding a matching `span[data-src]` element, picturefill will generate an `
 	.picture .lrg img { /* Styles for the large image */ }
 ````
 
+Alternatively, you can use the `data-class` attribute on the outer span to specify a class name to be applied to the image directly. Please note, this will not be applied to the no-script image. You will have to also specify the class name here.
+
 
 ### HD Media Queries
 
