@@ -186,7 +186,6 @@
 	            var sortedCandidates = candidates.sort(function(a, b) {
 	                return a.resolution > b.resolution;
 	            });
-	            debugger;
 	            // Determine which image to use based on image candidates array
 	            for (var j=0; j < sortedCandidates.length; j++) {
 	                var candidate = sortedCandidates[j];
