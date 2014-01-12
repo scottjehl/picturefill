@@ -5,7 +5,7 @@ A Responsive Images approach that you can use today that mimics the [proposed pi
 * Author: Scott Jehl (c) 2012 (new proposal implemented by Shawn Jansepar)
 * License: MIT/GPLv2
 
-**Demo URL:** [http://scottjehl.github.com/picturefill/](http://scottjehl.github.com/picturefill/)
+**Demo URL:** [http://jansepar.github.com/picturefill/](http://jansepar.github.com/picturefill/)
 
 **Note:** Picturefill works best in browsers that support CSS3 media queries. The demo page references (externally) the [matchMedia polyfill](https://github.com/paulirish/matchMedia.js/) which makes matchMedia work in `media-query`-supporting browsers that don't support `matchMedia`. `matchMedia` and the `matchMedia` polyfill are not required for `picturefill` to work, but they are required to support the `media` attributes on `picture` `source` elements. In non-media query-supporting browsers, the `matchMedia` polyfill will allow for querying native media types, such as `screen`, `print`, etc.	
 
