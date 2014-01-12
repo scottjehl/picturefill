@@ -1,5 +1,5 @@
 /*! Picturefill - Responsive Images that work today.
- *  Author: Scott Jehl, Filament Group, 2012
+ *  Author: Scott Jehl, Filament Group, 2012 (new proposal implemented by Shawn Jansepar)
  *  License: MIT/GPLv2
  *  Spec: http://picture.responsiveimages.org/
  */

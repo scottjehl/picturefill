@@ -2,16 +2,12 @@
 A Responsive Images approach that you can use today that mimics the [proposed picture element](http://www.w3.org/TR/2013/WD-html-picture-element-20130226/) using `span`s, for safety sake.
 
 
-* Author: Scott Jehl (c) 2012
+* Author: Scott Jehl (c) 2012 (new proposal implemented by Shawn Jansepar)
 * License: MIT/GPLv2
 
 **Demo URL:** [http://scottjehl.github.com/picturefill/](http://scottjehl.github.com/picturefill/)
 
-**Note:** Picturefill works best in browsers that support CSS3 media queries. The demo page references (externally) the [matchMedia polyfill](https://github.com/paulirish/matchMedia.js/) which makes matchMedia work in `media-query`-supporting browsers that don't support `matchMedia`. `matchMedia` and the `matchMedia` polyfill are not required for `picturefill` to work, but they are required to support the `media` attributes on `picture` `source` elements. In non-media query-supporting browsers, the `matchMedia` polyfill will allow for querying native media types, such as `screen`, `print`, etc.
-
-## Size and delivery
-
-Currently, `picturefill.js` compresses to around 498bytes (~0.5kb), after minify and gzip. To minify, you might try these online tools: [Uglify](http://marijnhaverbeke.nl/uglifyjs), [Yahoo Compressor](http://refresh-sf.com/yui/), or [Closure Compiler](http://closure-compiler.appspot.com/home). Serve with gzip compression.
+**Note:** Picturefill works best in browsers that support CSS3 media queries. The demo page references (externally) the [matchMedia polyfill](https://github.com/paulirish/matchMedia.js/) which makes matchMedia work in `media-query`-supporting browsers that don't support `matchMedia`. `matchMedia` and the `matchMedia` polyfill are not required for `picturefill` to work, but they are required to support the `media` attributes on `picture` `source` elements. In non-media query-supporting browsers, the `matchMedia` polyfill will allow for querying native media types, such as `screen`, `print`, etc.	
 
 ## Markup pattern and explanation
 
@@ -19,33 +15,40 @@ Mark up your responsive images like this.
 
 ```html
 	<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-		<span data-src="small.jpg"></span>
-		<span data-src="medium.jpg"     data-media="(min-width: 400px)"></span>
-		<span data-src="large.jpg"      data-media="(min-width: 800px)"></span>
-		<span data-src="extralarge.jpg" data-media="(min-width: 1000px)"></span>
+		<span data-srcset="images/small.jpg"></span>
+		<span data-srcset="images/medium.jpg" data-media="(min-width: 400px)"></span>
+		<span data-srcset="images/large.jpg" data-media="(min-width: 800px)"></span>
+		<span data-srcset="images/extralarge.jpg" data-media="(min-width: 1000px)"></span>
 
 		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
-		<noscript>
-			<img src="small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-		</noscript>
+		&lt;noscript&gt;<img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></img>&lt;/noscript&gt;
 	</span>
 ```
 
-Each `span[data-src]` element’s `data-media` attribute accepts any and all CSS3 media queries—such as `min` or `max` width, or even `min-resolution` for HD (retina) displays.
+Or when using `sizes`:
 
-**NOTE:** if you need/prefer to use `div`s in your picturefill markup, you may want to grab v1.0.0: https://github.com/scottjehl/picturefill/tree/v1.0.0 . The current version here made the switch to `span` to better mimic an `img` element's inline nature, as well as fix a bug or two for WordPress users.
+```html
+    <span data-picture data-alt="Obama with soldiers">
+        <span data-sizes="(max-width: 30em) 100%, (max-width: 50em) 75%, 50%"
+                 data-srcset="images/pic-small.png 400w, images/pic-medium.png 800w, images/pic-large.png 1200w">
+		<noscript><img src="images/pic-small.jpg"></noscript>
+    </span>
+```
 
 ### Explained...
 
 Notes on the markup above...
 
 * The `span[data-picture]` element's `alt` attribute is used as alternate text for the `img` element that picturefill generates upon a successful source match.
-* The `span[data-picture]` element can contain any number of `span[data-source]` elements. The above example may contain more than the average situation may call for.
-* Each `span[data-src]` element must have a `data-src` attribute specifying the image path.
+* The `span[data-picture]` element can contain any number of `span` elements. The above example may contain more than the average situation may call for.
+* Each `span[data-srcset]` element must have a `data-srcset` attribute specifying the image path.
 * It's generally a good idea to include one source element with no `media` qualifier, so it'll apply everywhere - typically a mobile-optimized image is ideal here.
-* Each `[data-src]` element can have an optional `[data-media]` attribute to make it apply in specific media settings. Both media types and queries can be used, like a native `media` attribute, but support for media _queries_ depends on the browser (unsupporting browsers fail silently).
+* The `span[data-srcset]` can take in a single image (like "images/small.jpg"), or an array of images ("images/pic-small.png 0.5x, images/pic-medium.png 1x, images/pic-large.png 1.5x).
+* The `span[data-sizes]` attribute is available to specify the size of the image at different breakpoints. Then, in `data-srcset`, an array of images at different widths are supplied, and based on the breakpoints defined in `data-sizes`, the appropriate image will be chosen. So in the example above, "images/pic-small.png 400w, images/pic-medium.png 800w, images/pic-large.png 1200w" will be converted to "images/pic-small.png 0.5x, images/pic-medium.png 1x, images/pic-large.png 1.5x" if the width of the device (in css pixels) was 800px;
+* Each `[data-srcset]` element can have an optional `[data-media]` attribute to make it apply in specific media settings. Both media types and queries can be used, like a native `media` attribute, but support for media _queries_ depends on the browser (unsupporting browsers fail silently).
 * The `matchMedia` polyfill (included in the `/external` folder) is necessary to support the `data-media` attribute across browsers (such as IE9), even in browsers that support media queries, although it is becoming more widely supported in new browsers.
 * The `noscript` element wraps the fallback image for non-JavaScript environments, and including this wrapper prevents browsers from fetching the fallback image during page load (causing unnecessary overhead). Generally, it's a good idea to reference a small mobile optimized image here, as it's likely to be loaded in older/underpowered mobile devices.
+
 
 ### How the `img` is appended
 
