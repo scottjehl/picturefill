@@ -16,15 +16,25 @@
 		<h1>Picturefill: A &lt;picture&gt; element polyfill</h1>
 				
 		<p>For more info: <a href="http://github.com/scottjehl/picturefill">see project home.</a></p>
-		
-		<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-			<span data-srcset="external/imgs/small.jpg"></span>
-			<span data-srcset="external/imgs/medium.jpg" data-media="(min-width: 400px)"></span>
-			<span data-srcset="external/imgs/large.jpg" data-media="(min-width: 800px)"></span>
-			<span data-srcset="external/imgs/extralarge.jpg" data-media="(min-width: 1000px)"></span>
 
-			<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
-			<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
-		</span>
+		<div class="sizes">
+	        <span data-picture>
+	            <span data-sizes="(max-width: 30em) 100%, (max-width: 50em) 75%, 50%"
+	                     data-srcset="images/pic-small.png 400w, images/pic-medium.png 800w, images/pic-large.png 1200w">
+				<noscript><img src="images/pic-small.jpg"></noscript>
+	        </span>
+    	</div>
+		
+		<div class="original">
+			<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+				<span data-srcset="images/small.jpg"></span>
+				<span data-srcset="images/medium.jpg" data-media="(min-width: 400px)"></span>
+				<span data-srcset="images/large.jpg" data-media="(min-width: 800px)"></span>
+				<span data-srcset="images/extralarge.jpg" data-media="(min-width: 1000px)"></span>
+
+				<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+				<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
+			</span>
+		</div>
 	</body>
 </html>

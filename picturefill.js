@@ -14,21 +14,39 @@
 		return 'srcset' in img;
 	}
 
-    // /**
-    //  * Get width of browser in CSS pixels
-    //  * http://www.howtocreate.co.uk/tutorials/javascript/browserwindow
-    //  */
-    w._getViewportWidth = function() {
-        if (typeof( window.innerWidth ) == 'number') {
-            return window.innerWidth;
-        } else {
-            return document.documentElement.clientWidth || document.body && document.body.clientWidth;
-        }
-    };
-
+    /*
+     * Shortcut method for matchMedia (for easy overriding in tests)
+     */
     w._matchesMedia = function(media) {
     	return w.matchMedia && w.matchMedia(media).matches;
     }
+
+    /*
+     * Shortcut method for `devicePixelRatio` (for easy overriding in tests)
+     */
+	w._getDpr = function() {
+		return (window.devicePixelRatio || 1);
+	}
+
+    /** 
+     * Get width in css pixel value from a "length" value
+     * http://dev.w3.org/csswg/css-values-3/#length-value
+     */
+    var lengthEl;
+    w._getCachedLengthEl = function() {
+    	lengthEl = lengthEl || document.createElement('div');
+    	if (!doc.body) {
+    		return;
+    	}
+    	doc.body.appendChild(lengthEl);
+    	return lengthEl;
+    } 
+    w._getWidthFromLength = function(length) {
+    	var lengthEl = w._getCachedLengthEl();
+        lengthEl.style.cssText = 'width: ' + length + ';';
+        // Using offsetWidth to get width from CSS
+        return lengthEl.offsetWidth;
+    };
 
     /*
      * Takes a string of sizes and returns the width in pixels as an int
@@ -40,18 +58,20 @@
 		for (var i=0, len=sourceSizeList.length; i < len; i++) {
 			// Match <media-query>? length, ie (min-width: 50em) 100%
 			var sourceSize = sourceSizeList[i];
-	        var match = sizes.match(/(\([^\s]+\))?\s*([^\s]+)/g);
+			
+			// Split "(min-width: 50em) 100%" into separate strings
+	        var match = /(\([^)]+\))?\s*([^\s]+)/g.exec(sourceSize);
 	        if (!match) {
 	        	continue;
 	        }
-	        var length = match[1];
+	        var length = match[2];
 	        var media;
-	        if (!sourceSize[0]) {
+	        if (!match[1]) {
 	        	// if there is no media query, choose this as our winning length
 	        	winningLength = length;
 	        	break;   	
 	        } else {
-	        	media = sourceSize[0];
+	        	media = match[1];
 	        }
 
 	        if (w._matchesMedia(media)) {
@@ -64,30 +84,20 @@
 
 		// default to 300px if no length was selected
 		if (!winningLength) {
-			winningLength = '300px';
+			return 300;
 		}
 
-		// if winningLength is a percentage, calculate width, else, use number
-        var winningLengthInt;
-        if (winningLength.slice(-1) === '%') {
-        	// grab the width of the viewport to determine # of pixeles based on
-        	// percentage
-        	var viewportWidth = w._getViewportWidth();
-            winningLengthInt = viewportWidth * (parseInt(winningLength.slice(0, -1), 10) / 100);
-        } else {
-            winningLengthInt = parseInt(winningLength, 10);
-        }
+		// pass the length to a method that can properly determine length
+		// in pixels based on these formats: http://dev.w3.org/csswg/css-values-3/#length-value
+		var winningLengthInt = w._getWidthFromLength(winningLength);
         return winningLengthInt;
 	};
 
-	w._getDpr = function() {
-		return (window.devicePixelRatio || 1);
-	}
-
     /**
      * Takes a srcset in the form of url/
-     * ex. images/pic-medium.png 1x, images/pic-medium-2x.png 2x and
-     *     images/pic-medium.png 400w, images/pic-medium-2x.png 800w
+     * ex. "images/pic-medium.png 1x, images/pic-medium-2x.png 2x" or
+     *     "images/pic-medium.png 400w, images/pic-medium-2x.png 800w" or
+     *     "images/pic-small.png"
      * Get an array of image candidates in the form of 
      *      {url: "/foo/bar.png", resolution: 1}
      * where resolution is http://dev.w3.org/csswg/css-values-3/#resolution-value
@@ -96,19 +106,23 @@
     w._getCandidatesFromSourceSet = function(srcset, sizes) {
         var candidates = srcset.trim().split(/\s*,\s*/);
         var formattedCandidates = [];
-        for (var i = 0; i < candidates.length; i++) {
+        if (sizes) {
+            var widthInCssPixels = w._findWidthFromSourceSize(sizes);
+        }
+        for (var i = 0, len = candidates.length; i < len; i++) {
             var candidate = candidates[i];
             var candidateArr = candidate.split(/\s+/);
             var sizeDescriptor = candidateArr[1];
             var resolution;
+            if (sizeDescriptor && (sizeDescriptor.slice(-1) === 'w' || sizeDescriptor.slice(-1) === 'x')) {
+            	sizeDescriptor = sizeDescriptor.slice(0, -1);
+            }
             if (sizes) {
-            	var width = w._findWidthFromSourceSize(sizes);
-                // get the dpr by taking the length / image width
-                // TODO: must take into account the "w" on sizeDescriptors
-                resolution = parseFloat((parseInt(sizeDescriptor, 10)/width).toFixed(2));
+                // get the dpr by taking the length / width in css pixels
+                resolution = parseFloat((parseInt(sizeDescriptor, 10)/widthInCssPixels).toFixed(2));
             } else {
                 // get the dpr by grabbing the value of Nx
-                resolution = sizeDescriptor ? parseFloat(sizeDescriptor.slice(0, -1), 10) : w._getDpr();
+                resolution = sizeDescriptor ? parseFloat(sizeDescriptor, 10) : w._getDpr();
             }
 
             var formattedCandidate = {
@@ -161,8 +175,8 @@
 				}
 	 			var srcset = matchedEl.getAttribute('data-srcset');
 	 			var candidates;
-	 			if (matchedEl.hasAttribute('sizes')) {
-	 				var sizes = matchedEl.getAttribute('sizes');
+	 			if (matchedEl.hasAttribute('data-sizes')) {
+	 				var sizes = matchedEl.getAttribute('data-sizes');
 	 				candidates = w._getCandidatesFromSourceSet(srcset, sizes);
 	 			} else {
 	 				candidates = w._getCandidatesFromSourceSet(srcset);
@@ -172,6 +186,7 @@
 	            var sortedCandidates = candidates.sort(function(a, b) {
 	                return a.resolution > b.resolution;
 	            });
+	            debugger;
 	            // Determine which image to use based on image candidates array
 	            for (var j=0; j < sortedCandidates.length; j++) {
 	                var candidate = sortedCandidates[j];
