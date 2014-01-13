@@ -23,7 +23,7 @@ Mark up your responsive images like this.
 		<span data-srcset="images/extralarge.jpg" data-media="(min-width: 1000px)"></span>
 
 		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
-		&lt;noscript&gt;<img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></img>&lt;/noscript&gt;
+		<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></img></noscript>
 	</span>
 ```
 
