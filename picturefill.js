@@ -24,35 +24,50 @@
 					}
 				}
 
-			// Find any existing img element in the picture element
-			var picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
+				// Find any existing img element in the picture element
+				var picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
 
-			if( matches.length ){
-				var matchedEl = matches.pop();
-				if( !picImg || picImg.parentNode.nodeName === "NOSCRIPT" ){
-					picImg = w.document.createElement( "img" );
-					picImg.alt = ps[ i ].getAttribute( "data-alt" );
-				}
-				else if( matchedEl === picImg.parentNode ){
-					// Skip further actions if the correct image is already in place
-					continue;
-				}
+				if( matches.length ){
+					var matchedEl = matches.pop();
+					if( !picImg || picImg.parentNode.nodeName === "NOSCRIPT" ){
+					  picImg = w.document.createElement( "img" );
+					  picImg.alt = ps[ i ].getAttribute( "data-alt" );
+					}
+					else if( matchedEl === picImg.parentNode ){
+					  // Skip further actions if the correct image is already in place
+					  continue;
+					}
 
-				picImg.src =  matchedEl.getAttribute( "data-src" );
-				matchedEl.appendChild( picImg );
-				picImg.removeAttribute("width");
-				picImg.removeAttribute("height");
-			}
-			else if( picImg ){
-				picImg.parentNode.removeChild( picImg );
+					picImg.src =  matchedEl.getAttribute( "data-src" );
+					matchedEl.appendChild( picImg );
+					picImg.removeAttribute("width");
+					picImg.removeAttribute("height");
+				}
+				else if( picImg ){
+					picImg.parentNode.removeChild( picImg );
+				}
 			}
 		}
+		if( picEvent ){
+			document.dispatchEvent(picEvent);
 		}
 	};
 
+	// Create custom event
+	if( document.createEvent ){
+		var picEvent = document.createEvent('Event');
+		picEvent.initEvent('picturefill:complete',true,true);
+	}
+
 	// Run on resize and domready (w.load as a fallback)
 	if( w.addEventListener ){
-		w.addEventListener( "resize", w.picturefill, false );
+		// Call resize only once
+		w.addEventListener( "resize", function() {
+			w.clearTimeout(w.picTimer);
+			w.picTimer = setTimeout(function() {
+			  w.picturefill();
+			}, 100);
+		}, false );
 		w.addEventListener( "DOMContentLoaded", function(){
 			w.picturefill();
 			// Run once only

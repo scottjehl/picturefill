@@ -120,6 +120,16 @@ browsers, you might consider using conditional comments, like this:
 If picturefill is deferred until after load is fired, images will not load unless the browser window is resized.
 Picturefill is intentionally exposed to the global space, in the unusual situation where you might want to defer loading of picturefill you can explicitly call window.picturefill().
 
+### Complete Callback
+
+Picturefill triggers a `picurefill:complete` callback on the document object when it has finished all picturefills. For example, you may use it as follows:
+
+```javascript
+document.addEventListener('picturefill:complete', function() {
+  // Do something here
+}, false);
+```
+
 ## Support
 
 Picturefill supports a broad range of browsers and devices (there are currently no known unsupported browsers), provided that you stick with the markup conventions provided.
