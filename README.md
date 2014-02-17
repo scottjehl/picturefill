@@ -18,17 +18,17 @@ Currently, `picturefill.js` compresses to around 498bytes (~0.5kb), after minify
 Mark up your responsive images like this.
 
 ```html
-	<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-		<span data-src="small.jpg"></span>
-		<span data-src="medium.jpg"     data-media="(min-width: 400px)"></span>
-		<span data-src="large.jpg"      data-media="(min-width: 800px)"></span>
-		<span data-src="extralarge.jpg" data-media="(min-width: 1000px)"></span>
+<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	<span data-src="small.jpg"></span>
+	<span data-src="medium.jpg"     data-media="(min-width: 400px)"></span>
+	<span data-src="large.jpg"      data-media="(min-width: 800px)"></span>
+	<span data-src="extralarge.jpg" data-media="(min-width: 1000px)"></span>
 
-		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
-		<noscript>
-			<img src="small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-		</noscript>
-	</span>
+	<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+	<noscript>
+		<img src="small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	</noscript>
+</span>
 ```
 
 Each `span[data-src]` element’s `data-media` attribute accepts any and all CSS3 media queries—such as `min` or `max` width, or even `min-resolution` for HD (retina) displays.
@@ -52,18 +52,19 @@ Notes on the markup above...
 Upon finding a matching `span[data-src]` element, picturefill will generate an `img` element referencing that `span`'s `data-src` attribute value and append the `img` to the active, matching `span[data-src]` element. This means you can target CSS styles specific to the active image based on the breakpoint that is in play, perhaps by adding a class to each span. For example, if you have the following markup...
 
 ```html
-	<span class="picture" data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-		<span class="sml" data-src="small.jpg"></span>
-		<span class="med" data-src="medium.jpg"     data-media="(min-width: 400px)"></span>
-		<span class="lrg" data-src="large.jpg"      data-media="(min-width: 800px)"></span>
+<span class="picture" data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	<span class="sml" data-src="small.jpg"></span>
+	<span class="med" data-src="medium.jpg" data-media="(min-width: 400px)"></span>
+	<span class="lrg" data-src="large.jpg"  data-media="(min-width: 800px)"></span>
+</span>
 ````
 
 ...then you could write styles specific to each of the images, which may be handy for certain layout situations.
 
 ```css
-	.picture .sml img { /* Styles for the small image */ }
-	.picture .med img { /* Styles for the medium image */ }
-	.picture .lrg img { /* Styles for the large image */ }
+.picture .sml img { /* Styles for the small image */ }
+.picture .med img { /* Styles for the medium image */ }
+.picture .lrg img { /* Styles for the large image */ }
 ````
 
 
@@ -74,21 +75,21 @@ Picturefill natively supports HD(Retina) image replacement.  While numerous othe
 * The `data-media` attribute supports [compound media queries](https://developer.mozilla.org/en-US/docs/CSS/Media_queries), allowing for very specific behaviors to emerge.  For example, a `data-media="(min-width: 400px) and (min-device-pixel-ratio: 2.0)` attribute can be used to serve a higher resolution version of the source instead of a standard definition image. Note you currently also need to add the `-webkit-min-device-pixel-ratio` prefix (e.g. for iOS devices).
 
 ```html
-	<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-		<span data-src="small.jpg"></span>
-		<span data-src="small_x2.jpg"      data-media="(min-device-pixel-ratio: 2.0)"></span>
-		<span data-src="medium.jpg"        data-media="(min-width: 400px)"></span>
-		<span data-src="medium_x2.jpg"     data-media="(min-width: 400px) and (min-device-pixel-ratio: 2.0)"></span>
-		<span data-src="large.jpg"         data-media="(min-width: 800px)"></span>
-		<span data-src="large_x2.jpg"      data-media="(min-width: 800px) and (min-device-pixel-ratio: 2.0)"></span>
-		<span data-src="extralarge.jpg"    data-media="(min-width: 1000px)"></span>
-		<span data-src="extralarge_x2.jpg" data-media="(min-width: 1000px) and (min-device-pixel-ratio: 2.0)"></span>
+<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	<span data-src="small.jpg"></span>
+	<span data-src="small_x2.jpg"      data-media="(min-device-pixel-ratio: 2.0)"></span>
+	<span data-src="medium.jpg"        data-media="(min-width: 400px)"></span>
+	<span data-src="medium_x2.jpg"     data-media="(min-width: 400px) and (min-device-pixel-ratio: 2.0)"></span>
+	<span data-src="large.jpg"         data-media="(min-width: 800px)"></span>
+	<span data-src="large_x2.jpg"      data-media="(min-width: 800px) and (min-device-pixel-ratio: 2.0)"></span>
+	<span data-src="extralarge.jpg"    data-media="(min-width: 1000px)"></span>
+	<span data-src="extralarge_x2.jpg" data-media="(min-width: 1000px) and (min-device-pixel-ratio: 2.0)"></span>
 
-		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
-		<noscript>
-			<img src="small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-		</noscript>
-	</span>
+	<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+	<noscript>
+		<img src="small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	</noscript>
+</span>
 ```
 
 * Note: Supporting this many breakpoints quickly adds size to the DOM and increases implementation and maintenance time, so use this technique sparingly.
@@ -100,19 +101,19 @@ Internet Explorer 8 and older have no support for CSS3 Media Queries, so in the 
 browsers, you might consider using conditional comments, like this:
 
 ```html
-	<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-		<span data-src="small.jpg"></span>
-		<span data-src="medium.jpg" data-media="(min-width: 400px)"></span>
+<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	<span data-src="small.jpg"></span>
+	<span data-src="medium.jpg" data-media="(min-width: 400px)"></span>
 
-		<!--[if (lt IE 9) & (!IEMobile)]>
-		    <span data-src="medium.jpg"></span>
-		<![endif]-->
+	<!--[if (lt IE 9) & (!IEMobile)]>
+	    <span data-src="medium.jpg"></span>
+	<![endif]-->
 
-		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
-		<noscript>
-			<img src="small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-		</noscript>
-	</span>
+	<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
+	<noscript>
+		<img src="small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	</noscript>
+</span>
 ```
 
 ### Deferred loading
