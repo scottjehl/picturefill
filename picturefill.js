@@ -32,6 +32,7 @@
 				if( !picImg || picImg.parentNode.nodeName === "NOSCRIPT" ){
 					picImg = w.document.createElement( "img" );
 					picImg.alt = ps[ i ].getAttribute( "data-alt" );
+					picImg.className = ps[ i ].getAttribute("data-class");
 				}
 				else if( matchedEl === picImg.parentNode ){
 					// Skip further actions if the correct image is already in place
