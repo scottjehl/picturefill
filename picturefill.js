@@ -32,6 +32,13 @@
 				if( !picImg || picImg.parentNode.nodeName === "NOSCRIPT" ){
 					picImg = w.document.createElement( "img" );
 					picImg.alt = ps[ i ].getAttribute( "data-alt" );
+
+                    if( ps[ i ].getAttribute( "data-width" ) ) {
+                        picImg.width = ps[ i ].getAttribute( "data-width" );
+                    }
+                    else {
+                        picImg.removeAttribute( "width" );
+                    }
 				}
 				else if( matchedEl === picImg.parentNode ){
 					// Skip further actions if the correct image is already in place
@@ -39,6 +46,13 @@
 				}
 
 				picImg.src =  matchedEl.getAttribute( "data-src" );
+                if( matchedEl.getAttribute( "data-width" ) ) {
+                    picImg.width = matchedEl.getAttribute( "data-width" );
+                }
+                else {
+                    picImg.removeAttribute( "width" );
+                }
+
 				matchedEl.appendChild( picImg );
 				picImg.removeAttribute("width");
 				picImg.removeAttribute("height");
