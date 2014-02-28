@@ -124,3 +124,6 @@ Picturefill is intentionally exposed to the global space, in the unusual situati
 
 Picturefill supports a broad range of browsers and devices (there are currently no known unsupported browsers), provided that you stick with the markup conventions provided.
 
+### AngularJS 
+
+Picturefill can be implementing in AngularJS apps using the [angular-picturefill directive](https://github.com/tinacious/angular-picturefill).
