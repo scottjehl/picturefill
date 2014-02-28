@@ -32,16 +32,13 @@
 				if( !picImg || picImg.parentNode.nodeName === "NOSCRIPT" ){
 					picImg = w.document.createElement( "img" );
 					picImg.alt = ps[ i ].getAttribute( "data-alt" );
-				}
-				else if( matchedEl === picImg.parentNode ){
-					// Skip further actions if the correct image is already in place
-					continue;
+					picImg.title = ps[ i ].getAttribute( "data-title" );
 				}
 
 				picImg.src =  matchedEl.getAttribute( "data-src" );
+				picImg.className = ps[ i ].getAttribute( "data-class" ) + " " + matchedEl.getAttribute( "class" );
+				picImg.id = ps[ i ].getAttribute( "data-id" )
 				matchedEl.appendChild( picImg );
-				picImg.removeAttribute("width");
-				picImg.removeAttribute("height");
 			}
 			else if( picImg ){
 				picImg.parentNode.removeChild( picImg );

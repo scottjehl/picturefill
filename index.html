@@ -17,11 +17,11 @@
 				
 		<p>For more info: <a href="http://github.com/scottjehl/picturefill">see project home.</a></p>
 		
-		<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-			<span data-src="external/imgs/small.jpg"></span>
-			<span data-src="external/imgs/medium.jpg" data-media="(min-width: 400px)"></span>
-			<span data-src="external/imgs/large.jpg" data-media="(min-width: 800px)"></span>
-			<span data-src="external/imgs/extralarge.jpg" data-media="(min-width: 1000px)"></span>
+		<span class="topSpanClass" data-picture data-class="parentSpanClass" data-id="topSpanIdSet" data-title="Statue at The Bayon temple in Cambodia" data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+			<span class="specificSpan-sml" data-src="external/imgs/small.jpg"></span>
+			<span class="specificSpan-med" data-src="external/imgs/medium.jpg" data-media="(min-width: 400px)"></span>
+			<span class="specificSpan-lrg" data-src="external/imgs/large.jpg" data-media="(min-width: 800px)"></span>
+			<span class="specificSpan-xlrg" data-src="external/imgs/extralarge.jpg" data-media="(min-width: 1000px)"></span>
 
 			<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
 			<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
