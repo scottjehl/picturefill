@@ -71,18 +71,18 @@ Upon finding a matching `span[data-src]` element, picturefill will generate an `
 
 Picturefill natively supports HD(Retina) image replacement.  While numerous other solutions exist, picturefill has the added benefit of performance for the user in only being served one image.
 
-* The `data-media` attribute supports [compound media queries](https://developer.mozilla.org/en-US/docs/CSS/Media_queries), allowing for very specific behaviors to emerge.  For example, a `data-media="(min-width: 400px) and (min-device-pixel-ratio: 2.0)` attribute can be used to serve a higher resolution version of the source instead of a standard definition image. Note you currently also need to add the `-webkit-min-device-pixel-ratio` prefix (e.g. for iOS devices).
+* The `data-media` attribute supports [compound media queries](https://developer.mozilla.org/en-US/docs/CSS/Media_queries), allowing for very specific behaviors to emerge.  For example, a `data-media="(min-width: 400px) and (min-resolution: 2dppx)` attribute can be used to serve a higher resolution version of the source instead of a standard definition image.
 
 ```html
 	<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 		<span data-src="small.jpg"></span>
-		<span data-src="small_x2.jpg"      data-media="(min-device-pixel-ratio: 2.0)"></span>
+		<span data-src="small_x2.jpg"      data-media="(min-resolution: 2dppx)"></span>
 		<span data-src="medium.jpg"        data-media="(min-width: 400px)"></span>
-		<span data-src="medium_x2.jpg"     data-media="(min-width: 400px) and (min-device-pixel-ratio: 2.0)"></span>
+		<span data-src="medium_x2.jpg"     data-media="(min-width: 400px) and (min-resolution: 2dppx)"></span>
 		<span data-src="large.jpg"         data-media="(min-width: 800px)"></span>
-		<span data-src="large_x2.jpg"      data-media="(min-width: 800px) and (min-device-pixel-ratio: 2.0)"></span>
+		<span data-src="large_x2.jpg"      data-media="(min-width: 800px) and (min-resolution: 2dppx)"></span>
 		<span data-src="extralarge.jpg"    data-media="(min-width: 1000px)"></span>
-		<span data-src="extralarge_x2.jpg" data-media="(min-width: 1000px) and (min-device-pixel-ratio: 2.0)"></span>
+		<span data-src="extralarge_x2.jpg" data-media="(min-width: 1000px) and (min-resolution: 2dppx)"></span>
 
 		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
 		<noscript>
