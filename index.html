@@ -6,6 +6,15 @@
 		<title>Picturefill</title>
 		<script src="external/matchmedia.js"></script>
 		<script src="picturefill.js"></script>
+		<script>
+			picturefill.bind("picturefill_ready", function () {
+				alert("ready now!");
+			});
+
+			picturefill.bind("picturefill_update", function () {
+				alert("updated now!");
+			});
+		</script>
 		<style>
 			body { font-family: sans-serif }
 			img {  max-width: 100% }
