@@ -144,7 +144,27 @@
                 continue;
             }
             var matches = [];
-            var sources = picture.childNodes;
+
+            // In IE9, <source> elements get removed if they aren't children of
+            // video elements. Thus, we conditionally wrap source elements
+            // using <!--[if gte IE 8]><video style="display: none;"><![endif]-->
+            // and must account for that here by moving those source elements
+            // back into the picture element.
+            var videos = picture.getElementsByTagName('video');
+            if (videos.length > 0) {
+                var video = videos[0];
+                var vsources = video.getElementsByTagName("source");
+                vsources = vsources.length ? vsources : doc.getElementsByTagName("span");
+                while (vsources.length > 0) {
+                    picture.appendChild(vsources[0]);
+                }
+                // Remove the video element once we're finished removing it's children
+                video.parentNode.removeChild(video);
+            }
+
+            var sources = picture.getElementsByTagName("source");
+            sources = sources.length ? sources : doc.getElementsByTagName("span");
+
             // Go through each child, and if they have media queries, evaluate them
             // and add them to matches
             for (var j=0, slen = sources.length; j < slen; j++) {
@@ -153,7 +173,7 @@
                     continue;
                 }
                 var media = sources[j].getAttribute( "data-media" );
- 
+
                 // if source does not have a srcset attribute, skip
                 if (!source.hasAttribute('data-srcset')) {
                     continue;

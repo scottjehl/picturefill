@@ -1,40 +1,46 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html>
 	<head>
 		<meta charset=utf-8 />
 		<meta name="viewport" content="width=device-width,initial-scale=1">
 		<title>Picturefill</title>
-		<script src="external/matchmedia.js"></script>
-		<script src="picturefill.js"></script>
 		<style>
 			body { font-family: sans-serif; margin:0; padding:0; }
 			img {  max-width: 100% }
 		</style>
 	</head>
 	<body>
-		
+
 		<h1>Picturefill: A &lt;picture&gt; element polyfill</h1>
-				
+
 		<p>For more info: <a href="http://github.com/scottjehl/picturefill">see project home.</a></p>
 
 		<div class="sizes">
-	        <span data-picture>
-	            <span data-sizes="(max-width: 30em) 100%, (max-width: 50em) 75%, 50%"
-	                     data-srcset="images/pic-small.png 400w, images/pic-medium.png 800w, images/pic-large.png 1200w">
+	        <picture data-alt="Obama with soldiers">
+                <!-- Video tag needed in order to use <source> in IE9 -->
+                <!--[if gte IE 8]><video style="display: none;"><![endif]-->
+	            <source data-sizes="(max-width: 30em) 100%, (max-width: 50em) 75%, 50%"
+	                    data-srcset="images/pic-small.png 400w, images/pic-medium.png 800w, images/pic-large.png 1200w"></source>
+                <!--[if gte IE 8]></video><![endif]-->
 				<noscript><img src="images/pic-small.jpg"></noscript>
-	        </span>
+	        </picture>
     	</div>
-		
+
 		<div class="original">
-			<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-				<span data-srcset="images/small.jpg"></span>
-				<span data-srcset="images/medium.jpg" data-media="(min-width: 400px)"></span>
-				<span data-srcset="images/large.jpg" data-media="(min-width: 800px)"></span>
-				<span data-srcset="images/extralarge.jpg" data-media="(min-width: 1000px)"></span>
+			<picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+                <!-- Video tag needed in order to use <source> in IE9 -->
+                <!--[if gte IE 8]><video style="display: none;"><![endif]-->
+				<source data-srcset="images/small.jpg"></span>
+				<source data-srcset="images/medium.jpg" data-media="(min-width: 400px)"></source>
+				<source data-srcset="images/large.jpg" data-media="(min-width: 800px)"></source>
+				<source data-srcset="images/extralarge.jpg" data-media="(min-width: 1000px)"></source>
+                <!--[if gte IE 8]></video><![endif]-->
 
 				<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
 				<noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
-			</span>
+			</picture>
 		</div>
+        <script>if (!window.matchMedia) { document.write('<script src="external/matchmedia.js"><\/script>'); }</script>
+        <script src="picturefill.js"></script>
 	</body>
 </html>
