@@ -1,7 +1,5 @@
 # Picturefill
 A Responsive Images approach that you can use today that mimics the [proposed picture element](http://www.w3.org/TR/2013/WD-html-picture-element-20130226/) using `span`s, for safety sake.
-
-
 * Author: Scott Jehl (c) 2012 (new proposal implemented by Shawn Jansepar)
 * License: MIT/GPLv2
 
@@ -13,16 +11,16 @@ A Responsive Images approach that you can use today that mimics the [proposed pi
 
 ## Markup pattern and explanation
 
-Mark up your responsive images like this.
+The following is an example based on the latest spec without using `sizes`:
 
 ```html
     <picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
         <!-- Video tag needed in order to use <source> in IE9 -->
         <!--[if gte IE 8]><video style="display: none;"><![endif]-->
-        <source data-srcset="images/small.jpg"></span>
-        <source data-srcset="images/medium.jpg" data-media="(min-width: 400px)"></span>
-        <source data-srcset="images/large.jpg" data-media="(min-width: 800px)"></span>
-        <source data-srcset="images/extralarge.jpg" data-media="(min-width: 1000px)"></span>
+        <source srcset="images/small.jpg"></source>
+        <source srcset="images/medium.jpg" media="(min-width: 400px)"></source>
+        <source srcset="images/large.jpg" media="(min-width: 800px)"></source>
+        <source srcset="images/extralarge.jpg" media="(min-width: 1000px)"></source>
         <!--[if gte IE 8]></video><![endif]-->
 
         <!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
@@ -30,33 +28,48 @@ Mark up your responsive images like this.
     </picture>
 ```
 
-Or when using `sizes`:
+And using `sizes`:
 
 ```html
     <picture data-alt="Obama with soldiers">
         <!-- Video tag needed in order to use <source> in IE9 -->
         <!--[if gte IE 8]><video style="display: none;"><![endif]-->
-        <source data-sizes="(max-width: 30em) 100%, (max-width: 50em) 75%, 50%"
-                 data-srcset="images/pic-small.png 400w, images/pic-medium.png 800w, images/pic-large.png 1200w">
-        </source>
-        <noscript><img src="images/pic-small.jpg"></noscript>
+        <source sizes="(max-width: 30em) 100%, (max-width: 50em) 75%, 50%"
+                srcset="images/pic-small.png 400w, images/pic-medium.png 800w, images/pic-large.png 1200w"></source>
         <!--[if gte IE 8]></video><![endif]-->
+        <noscript><img src="images/pic-small.jpg"></noscript>
     </picture>
 ```
+
+If you're not comfortable using `picture` as the spec has not been finalized,
+you can use `<span data-picture>` instead:
+
+```html
+    <span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+        <span srcset="images/small.jpg"></span>
+        <span srcset="images/medium.jpg" media="(min-width: 400px)"></span>
+        <span srcset="images/large.jpg" media="(min-width: 800px)"></span>
+        <span srcset="images/extralarge.jpg" media="(min-width: 1000px)"></span>
+        <noscript><img src="external/imgs/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"></noscript>
+    </span>
+```
+
 
 ### Explained...
 
 Notes on the markup above...
 
 * The `picture` element's `alt` attribute is used as alternate text for the `img` element that picturefill generates upon a successful source match.
-* The `picture` element can contain any number of `span` elements. The above example may contain more than the average situation may call for.
-* Each `picture[data-srcset]` element must have a `data-srcset` attribute specifying the image path.
+* The `picture` element can contain any number of `source` elements. The above example may contain more than the average situation may call for.
+* Each `picture[srcset]` element must have a `srcset` attribute specifying the image path.
 * It's generally a good idea to include one source element with no `media` qualifier, so it'll apply everywhere - typically a mobile-optimized image is ideal here.
-* The `picture[data-srcset]` can take in a single image (like "images/small.jpg"), or an array of images ("images/pic-small.png 0.5x, images/pic-medium.png 1x, images/pic-large.png 1.5x).
-* The `picture[data-sizes]` attribute is available to specify the size of the image at different breakpoints. Then, in `data-srcset`, an array of images at different widths are supplied, and based on the breakpoints defined in `data-sizes`, the appropriate image will be chosen. So in the example above, "images/pic-small.png 400w, images/pic-medium.png 800w, images/pic-large.png 1200w" will be converted to "images/pic-small.png 0.5x, images/pic-medium.png 1x, images/pic-large.png 1.5x" if the width of the device (in css pixels) was 800px;
-* Each `[picture-srcset]` element can have an optional `[data-media]` attribute to make it apply in specific media settings. Both media types and queries can be used, like a native `media` attribute, but support for media _queries_ depends on the browser (unsupporting browsers fail silently).
-* The `matchMedia` polyfill (included in the `/external` folder) is necessary to support the `data-media` attribute across browsers (such as IE9), even in browsers that support media queries, although it is becoming more widely supported in new browsers.
+* The `picture[srcset]` can take in a single image (like "images/small.jpg"), or an array of images ("images/pic-small.png 0.5x, images/pic-medium.png 1x, images/pic-large.png 1.5x).
+* The `picture[sizes]` attribute is available to specify the size of the image at different breakpoints. Then, in `srcset`, an array of images at different widths are supplied, and based on the breakpoints defined in `sizes`, the appropriate image will be chosen. So in the example above, "images/pic-small.png 400w, images/pic-medium.png 800w, images/pic-large.png 1200w" will be converted to "images/pic-small.png 0.5x, images/pic-medium.png 1x, images/pic-large.png 1.5x" if the width of the device (in css pixels) was 800px;
+* Each `[picture-srcset]` element can have an optional `[media]` attribute to make it apply in specific media settings. Both media types and queries can be used, like a native `media` attribute, but support for media _queries_ depends on the browser (unsupporting browsers fail silently).
+* The `matchMedia` polyfill (included in the `/external` folder) is necessary to support the `media` attribute across browsers (such as IE9), even in browsers that support media queries, although it is becoming more widely supported in new browsers.
 * The `noscript` element wraps the fallback image for non-JavaScript environments, and including this wrapper prevents browsers from fetching the fallback image during page load (causing unnecessary overhead). Generally, it's a good idea to reference a small mobile optimized image here, as it's likely to be loaded in older/underpowered mobile devices.
+* If you want to use the `picture` markup, you have to stick `<!--[if gte IE 8]><video style="display: none;"><![endif]-->`
+around the `source` elements, because in IE9 you can't have `source` as the child node of anything except for `video`.
 
 
 ### How the `img` is appended
@@ -65,10 +78,10 @@ Upon finding a matching `picture[data-src]` element, picturefill will generate a
 
 
 ```html
-	<span class="picture" data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-		<span class="sml" data-src="small.jpg"></span>
-		<span class="med" data-src="medium.jpg"     data-media="(min-width: 400px)"></span>
-		<span class="lrg" data-src="large.jpg"      data-media="(min-width: 800px)"></span>
+	<picture class="picture" data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+		<source class="sml" src="small.jpg"></source>
+		<source class="med" src="medium.jpg" media="(min-width: 400px)"></source>
+		<source class="lrg" src="large.jpg" media="(min-width: 800px)"></source>
 ````
 
 ...then you could write styles specific to each of the images, which may be handy for certain layout situations.
@@ -84,18 +97,18 @@ Upon finding a matching `picture[data-src]` element, picturefill will generate a
 
 Picturefill natively supports HD(Retina) image replacement.  While numerous other solutions exist, picturefill has the added benefit of performance for the user in only being served one image.
 
-* The `data-media` attribute supports [compound media queries](https://developer.mozilla.org/en-US/docs/CSS/Media_queries), allowing for very specific behaviors to emerge.  For example, a `data-media="(min-width: 400px) and (min-device-pixel-ratio: 2.0)` attribute can be used to serve a higher resolution version of the source instead of a standard definition image. Note you currently also need to add the `-webkit-min-device-pixel-ratio` prefix (e.g. for iOS devices).
+* The `media` attribute supports [compound media queries](https://developer.mozilla.org/en-US/docs/CSS/Media_queries), allowing for very specific behaviors to emerge.  For example, a `media="(min-width: 400px) and (min-device-pixel-ratio: 2.0)` attribute can be used to serve a higher resolution version of the source instead of a standard definition image. Note you currently also need to add the `-webkit-min-device-pixel-ratio` prefix (e.g. for iOS devices).
 
 ```html
 	<picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-		<source data-src="small.jpg"></span>
-		<source data-src="small_x2.jpg"      data-media="(min-device-pixel-ratio: 2.0)"></span>
-		<source data-src="medium.jpg"        data-media="(min-width: 400px)"></span>
-		<source data-src="medium_x2.jpg"     data-media="(min-width: 400px) and (min-device-pixel-ratio: 2.0)"></span>
-		<source data-src="large.jpg"         data-media="(min-width: 800px)"></span>
-		<source data-src="large_x2.jpg"      data-media="(min-width: 800px) and (min-device-pixel-ratio: 2.0)"></span>
-		<source data-src="extralarge.jpg"    data-media="(min-width: 1000px)"></span>
-		<source data-src="extralarge_x2.jpg" data-media="(min-width: 1000px) and (min-device-pixel-ratio: 2.0)"></span>
+		<source src="small.jpg"></span>
+		<source src="small_x2.jpg"      media="(min-device-pixel-ratio: 2.0)"></span>
+		<source src="medium.jpg"        media="(min-width: 400px)"></span>
+		<source src="medium_x2.jpg"     media="(min-width: 400px) and (min-device-pixel-ratio: 2.0)"></span>
+		<source src="large.jpg"         media="(min-width: 800px)"></span>
+		<source src="large_x2.jpg"      media="(min-width: 800px) and (min-device-pixel-ratio: 2.0)"></span>
+		<source src="extralarge.jpg"    media="(min-width: 1000px)"></span>
+		<source src="extralarge_x2.jpg" media="(min-width: 1000px) and (min-device-pixel-ratio: 2.0)"></span>
 
 		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
 		<noscript>
@@ -115,10 +128,10 @@ browsers, you might consider using conditional comments, like this:
 ```html
 	<picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 		<source data-src="small.jpg"></span>
-		<source data-src="medium.jpg" data-media="(min-width: 400px)"></span>
+		<source data-src="medium.jpg" data-media="(min-width: 400px)"></source>
 
 		<!--[if (lt IE 9) & (!IEMobile)]>
-		    <source data-src="medium.jpg"></span>
+		    <source data-src="medium.jpg"></source>
 		<![endif]-->
 
 		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->

@@ -172,10 +172,10 @@
                 if (source.nodeName !== 'SOURCE' && source.nodeName !== 'SPAN') {
                     continue;
                 }
-                var media = sources[j].getAttribute( "data-media" );
+                var media = sources[j].getAttribute( "media" );
 
                 // if source does not have a srcset attribute, skip
-                if (!source.hasAttribute('data-srcset')) {
+                if (!source.hasAttribute('srcset')) {
                     continue;
                 }
 
@@ -193,10 +193,10 @@
                     picImg = doc.createElement( "img" );
                     picImg.alt = picture.getAttribute( "data-alt" );
                 }
-                var srcset = matchedEl.getAttribute('data-srcset');
+                var srcset = matchedEl.getAttribute('srcset');
                 var candidates;
-                if (matchedEl.hasAttribute('data-sizes')) {
-                    var sizes = matchedEl.getAttribute('data-sizes');
+                if (matchedEl.hasAttribute('sizes')) {
+                    var sizes = matchedEl.getAttribute('sizes');
                     candidates = w._getCandidatesFromSourceSet(srcset, sizes);
                 } else {
                     candidates = w._getCandidatesFromSourceSet(srcset);
@@ -227,7 +227,7 @@
     };
 
     // Run on resize and domready (w.load as a fallback)
-    if( w.addEventListener ){
+    if (w.addEventListener){
         w.addEventListener( "resize", w.picturefill, false );
         w.addEventListener( "DOMContentLoaded", function(){
             w.picturefill();
@@ -236,7 +236,7 @@
         }, false );
         w.addEventListener( "load", w.picturefill, false );
     }
-    else if( w.attachEvent ){
+    else if (w.attachEvent){
         w.attachEvent( "onload", w.picturefill );
     }
 
