@@ -8,20 +8,29 @@
     // Enable strict mode
     "use strict";
 
+    /**
+     * http://jsperf.com/trim-polyfill
+     */
+    if (typeof String.prototype.trim !== 'function') {
+        String.prototype.trim = function () {
+            return this.replace(/^\s+|\s+$/g, '');
+        }
+    }
+
     var img;
     w.srcsetSupported = function() {
         img = img || new Image();
         return 'srcset' in img;
     }
 
-    /*
+    /**
      * Shortcut method for matchMedia (for easy overriding in tests)
      */
     w._matchesMedia = function(media) {
         return w.matchMedia && w.matchMedia(media).matches;
     }
 
-    /*
+    /**
      * Shortcut method for `devicePixelRatio` (for easy overriding in tests)
      */
     w._getDpr = function() {
@@ -48,7 +57,7 @@
         return lengthEl.offsetWidth;
     };
 
-    /*
+    /**
      * Takes a string of sizes and returns the width in pixels as an int
      */
     w._findWidthFromSourceSize = function(sourceSizeListStr) {
@@ -189,9 +198,9 @@
             var picImg = picture.getElementsByTagName("img")[0];
             if (matches.length) {
                 var matchedEl = matches.pop();
-                if( !picImg || picImg.parentNode.nodeName === "NOSCRIPT" ){
-                    picImg = doc.createElement( "img" );
-                    picImg.alt = picture.getAttribute( "data-alt" );
+                if (!picImg || picImg.parentNode.nodeName === "NOSCRIPT") {
+                    picImg = doc.createElement("img");
+                    picImg.alt = picture.getAttribute("data-alt");
                 }
                 var srcset = matchedEl.getAttribute('srcset');
                 var candidates;
@@ -228,16 +237,16 @@
 
     // Run on resize and domready (w.load as a fallback)
     if (w.addEventListener){
-        w.addEventListener( "resize", w.picturefill, false );
-        w.addEventListener( "DOMContentLoaded", function(){
+        w.addEventListener("resize", w.picturefill, false);
+        w.addEventListener("DOMContentLoaded", function() {
             w.picturefill();
             // Run once only
-            w.removeEventListener( "load", w.picturefill, false );
+            w.removeEventListener("load", w.picturefill, false);
         }, false );
-        w.addEventListener( "load", w.picturefill, false );
+        w.addEventListener( "load", w.picturefill, false);
     }
-    else if (w.attachEvent){
-        w.attachEvent( "onload", w.picturefill );
+    else if (w.attachEvent) {
+        w.attachEvent("onload", w.picturefill);
     }
 
 })(this, document);
