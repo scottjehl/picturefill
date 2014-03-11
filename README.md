@@ -128,12 +128,12 @@ Picturefill natively supports HD(Retina) image replacement.  While numerous othe
 		<source src="extralarge_x2.jpg" media="(min-width: 1000px) and (min-device-pixel-ratio: 2.0)"></span>
 
 		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
-        <!--[if gt IE 8]> <!-- -->
+        <!--[if gt IE 8]> <!-->
         <noscript>
         <!-- <![endif]-->
 			<img src="small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-        <!--[if gt IE 8]> <!-- -->
-        <noscript>
+        <!--[if gt IE 8]> <!-->
+        </noscript>
         <!-- <![endif]-->
 	</span>
 ```
@@ -143,7 +143,7 @@ Picturefill natively supports HD(Retina) image replacement.  While numerous othe
 ### Supporting IE Desktop
 
 Internet Explorer 9 and below have some issues rendering custom elements like `picture` and `source`.
-In order to solve this, you must use `<!--[if gt IE 8]> <!-- --><noscript><!-- <![endif]-->`
+In order to solve this, you must use `<!--[if gt IE 8]> <!--><noscript><!-- <![endif]-->`
 instead of `noscript` to fix IE8 and below. For IE9, you have to stick
 `<!--[if gte IE 8]><video style="display: none;"><![endif]-->` around the `source` elements, because in
 IE9 you can't have `source` as the child node of anything except for `video`. Or you can use the `span` syntax.
