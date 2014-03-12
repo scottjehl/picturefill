@@ -201,6 +201,7 @@
                 if (!picImg || picImg.parentNode.nodeName === "NOSCRIPT") {
                     picImg = doc.createElement("img");
                     picImg.alt = picture.getAttribute("data-alt");
+                    picImg.title = picture.getAttribute("data-title");
                 }
                 var srcset = matchedEl.getAttribute('srcset');
                 var candidates;
