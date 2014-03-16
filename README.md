@@ -9,6 +9,27 @@ A Responsive Images approach that you can use today that mimics the [proposed pi
 
 **Note:** Picturefill works best in browsers that support CSS3 media queries. The demo page references (externally) the [matchMedia polyfill](https://github.com/paulirish/matchMedia.js/) which makes matchMedia work in `media-query`-supporting browsers that don't support `matchMedia`. `matchMedia` and the `matchMedia` polyfill are not required for `picturefill` to work, but they are required to support the `media` attributes on `picture` `source` elements. In non-media query-supporting browsers, the `matchMedia` polyfill will allow for querying native media types, such as `screen`, `print`, etc.	
 
+## Usage
+
+The following snippet will load the polyfill asynchronously and poll until the document
+is ready, in order to start image downloads as fast as possible (instead of waiting)
+until DOMContentLoaded). It will also conditionally load matchMedia if the browser
+doesn't support it.
+
+```html
+    <script>if (!window.matchMedia) { document.write('<script src="external/matchmedia.js"><\/script>'); }</script>
+    <script async="true" src="picturefill.js"></script>
+```
+
+If you don't want to load the script asynchronously, still the following script right above
+the closing `</body>` tag (although not recommended, since this could take a long time
+before executing, waiting precious time that could have been spend downloading images).
+
+```html
+    <script>if (!window.matchMedia) { document.write('<script src="external/matchmedia.js"><\/script>'); }</script>
+    <script src="picturefill.js"></script>
+```
+
 ## Markup pattern and explanation
 
 The following is an example based on the latest spec without using `sizes`:

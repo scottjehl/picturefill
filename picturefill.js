@@ -17,10 +17,13 @@
         }
     }
 
-    var img;
-    w.srcsetSupported = function() {
-        img = img || new Image();
-        return 'srcset' in img;
+    /**
+     * http://stackoverflow.com/questions/280634/endswith-in-javascript
+     */
+    if (typeof String.prototype.endsWith !== 'function') {
+        String.prototype.endsWith = function(suffix) {
+            return this.indexOf(suffix, this.length - suffix.length) !== -1;
+        };
     }
 
     /**
@@ -220,7 +223,9 @@
                 for (var j=0; j < sortedCandidates.length; j++) {
                     var candidate = sortedCandidates[j];
                     if (candidate.resolution >= w._getDpr()) {
-                        picImg.src = candidate.url;
+                        if (!picImg.src.endsWith(candidate.url)) {
+                            picImg.src = candidate.url;
+                        } 
                         break;
                     }
                 }
@@ -236,18 +241,24 @@
         }
     };
 
-    // Run on resize and domready (w.load as a fallback)
-    if (w.addEventListener){
-        w.addEventListener("resize", w.picturefill, false);
-        w.addEventListener("DOMContentLoaded", function() {
+    /**
+     * Sets up picture polyfill by polling the document and running
+     * the polyfill every 250ms until the document is ready.
+     * Also attaches picturefill on resize
+     */
+    var runPicturefill = function() {
+        w.picturefill();
+        var intervalId = setInterval(function(){
+            // When the document has finished loading, stop checking for new images
+            // https://github.com/ded/domready/blob/master/ready.js#L15
             w.picturefill();
-            // Run once only
-            w.removeEventListener("load", w.picturefill, false);
-        }, false );
-        w.addEventListener( "load", w.picturefill, false);
-    }
-    else if (w.attachEvent) {
-        w.attachEvent("onload", w.picturefill);
-    }
+            if (/^loaded|^i|^c/.test(doc.readyState)) {
+                clearInterval(intervalId);
+                return;
+            }
+        }, 250);
+        w.addEventListener("resize", w.picturefill, false);
+    };
+    runPicturefill();
 
 })(this, document);
