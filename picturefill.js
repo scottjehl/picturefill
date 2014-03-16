@@ -202,9 +202,13 @@
             if (matches.length) {
                 var matchedEl = matches.pop();
                 if (!picImg || picImg.parentNode.nodeName === "NOSCRIPT") {
-                    picImg = doc.createElement("img");
-                    picImg.alt = picture.getAttribute("data-alt");
-                    picImg.title = picture.getAttribute("data-title");
+                    picImg = doc.createElement('img');
+                    if (picture.hasAttribute('alt')) {
+                        picImg.alt = picture.getAttribute('alt');
+                    }
+                    if (picture.hasAttribute('title')) {
+                        picImg.title = picture.getAttribute('title');
+                    }
                 }
                 var srcset = matchedEl.getAttribute('srcset');
                 var candidates;
