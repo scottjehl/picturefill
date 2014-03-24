@@ -1,6 +1,6 @@
 # Picturefill
 A Polyfill for the [HTML Picture Element](http://picture.responsiveimages.org/) that you can use today.
-* Authors: Scott Jehl (c) 2014, Shawn Jansepar
+* Authors: Scott Jehl, Mat Marquis, Shawn Jansepar (2.0 refactor lead), and many more: see Authors.txt
 * License: MIT
 
 **Demo URL:** [http://jansepar.github.com/picturefill/](http://jansepar.github.com/picturefill/)

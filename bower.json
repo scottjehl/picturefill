@@ -1,12 +1,12 @@
 {
     "name": "picturefill",
     "repo": "scottjehl/picturefill",
-    "description": "A Responsive Images approach that you can use today!",
+    "description": "A Polyfill for the HTML Picture Element (http://picture.responsiveimages.org/) that you can use today.",
     "version": "2.0.0",
     "main": "picturefill.js",
     "scripts": [
-        "picturefill.js",
-        "external/matchmedia.js"
+        "src/picturefill.js",
+        "src/external/matchmedia.js"
     ],
     "licence": "MIT"
 }
