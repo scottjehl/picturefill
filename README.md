@@ -45,11 +45,11 @@ The following is an example based on the latest spec without using `sizes`:
         <!--[if IE 9]></video><![endif]-->
 
         <!-- Fallback content for non-JS browsers and IE8 and older -->
-        <!--[if gt IE 8]> <!-- -->
+        <!--[if gt IE 8]> <!-->
         <noscript>
         <!-- <![endif]-->
             <img src="images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-        <!--[if gt IE 8]> <!-- -->
+        <!--[if gt IE 8]> <!-->
         <noscript>
         <!-- <![endif]-->
     </picture>
@@ -66,11 +66,11 @@ And using `sizes`:
         <!--[if IE 9]></video><![endif]-->
 
         <!-- Fallback content for non-JS browsers and IE8 and older -->
-        <!--[if gt IE 8]> <!-- -->
+        <!--[if gt IE 8]> <!-->
         <noscript>
         <!-- <![endif]-->
             <img src="images/pic-small.png">
-        <!--[if gt IE 8]> <!-- -->
+        <!--[if gt IE 8]> <!-->
         <noscript>
         <!-- <![endif]-->
     </picture>
@@ -91,7 +91,7 @@ Notes on the markup above...
 * The `noscript` element wraps the fallback image for non-JavaScript environments, and including this wrapper prevents browsers from fetching the fallback image during page load (causing unnecessary overhead). Generally, it's a good idea to reference a small mobile optimized image here, as it's likely to be loaded in older/underpowered mobile devices.
 * If you want to use the `picture` markup with IE9, you have to stick `<!--[if gte IE 8]><video style="display: none;"><![endif]-->`
 around the `source` elements, because in IE9 you can't have `source` as the child node of anything except for `video`.
-* If you want to use IE8 or less, you have to use `<!--[if gt IE 8]> <!-- --><noscript><!-- <![endif]-->` instead of `noscript`.
+* If you want to use IE8 or less, you have to use `<!--[if gt IE 8]> <!--><noscript><!-- <![endif]-->` instead of `noscript`.
 
 
 ### How the `img` is appended
@@ -167,11 +167,11 @@ larger image to IE desktop browsers, you might consider using conditional commen
 		<![endif]-->
 
 		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
-        <!--[if gt IE 8]> <!-- -->
+        <!--[if gt IE 8]> <!-->
         <noscript>
         <!-- <![endif]-->
 			<img src="small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-        <!--[if gt IE 8]> <!-- -->
+        <!--[if gt IE 8]> <!-->
         <noscript>
         <!-- <![endif]-->
 	</picture>
