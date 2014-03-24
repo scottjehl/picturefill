@@ -17,25 +17,7 @@
 
         <p>For more info: <a href="http://github.com/jansepar/picturefill">see project home.</a></p>
 
-        <p>Example using "sizes" attribute:</p>
-        <picture alt="Obama with soldiers">
-            <!-- Video tag needed in order to use <source> in IE9 -->
-            <!--[if IE 9]><video style="display: none;"><![endif]-->
-            <source sizes="(max-width: 30em) 100%, (max-width: 50em) 75%, 50%"
-                    srcset="images/pic-small.png 400w, images/pic-medium.png 800w, images/pic-large.png 1200w"></source>
-            <!--[if IE 9]></video><![endif]-->
-
-            <!-- Fallback content for non-JS browsers and IE8 and older -->
-            <!--[if gt IE 8]> <!-- -->
-            <noscript>
-            <!-- <![endif]-->
-                <img src="images/pic-small.png">
-            <!--[if gt IE 8]> <!-- -->
-            </noscript>
-            <!-- <![endif]-->
-        </picture>
-
-        <p>Example without using "sizes" attribute:</p>
+        <p>Default example:</p>
         <picture alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
             <!-- Video tag needed in order to use <source> in IE9 -->
             <!--[if IE 9]><video style="display: none;"><![endif]-->
@@ -50,6 +32,24 @@
             <noscript>
             <!-- <![endif]-->
                 <img src="images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+            <!--[if gt IE 8]> <!-- -->
+            </noscript>
+            <!-- <![endif]-->
+        </picture>
+
+        <p>Example using "sizes" attribute:</p>
+        <picture alt="Obama with soldiers">
+            <!-- Video tag needed in order to use <source> in IE9 -->
+            <!--[if IE 9]><video style="display: none;"><![endif]-->
+            <source sizes="(max-width: 30em) 100%, (max-width: 50em) 75%, 50%"
+                    srcset="images/pic-small.png 400w, images/pic-medium.png 800w, images/pic-large.png 1200w"></source>
+            <!--[if IE 9]></video><![endif]-->
+
+            <!-- Fallback content for non-JS browsers and IE8 and older -->
+            <!--[if gt IE 8]> <!-- -->
+            <noscript>
+            <!-- <![endif]-->
+                <img src="images/pic-small.png">
             <!--[if gt IE 8]> <!-- -->
             </noscript>
             <!-- <![endif]-->
