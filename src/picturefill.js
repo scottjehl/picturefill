@@ -31,16 +31,16 @@
      */
     w._matchesMedia = function(media) {
         return w.matchMedia && w.matchMedia(media).matches;
-    }
+    };
 
     /**
      * Shortcut method for `devicePixelRatio` (for easy overriding in tests)
      */
     w._getDpr = function() {
         return (window.devicePixelRatio || 1);
-    }
+    };
 
-    /** 
+    /**
      * Get width in css pixel value from a "length" value
      * http://dev.w3.org/csswg/css-values-3/#length-value
      */
@@ -52,7 +52,7 @@
         }
         doc.body.appendChild(lengthEl);
         return lengthEl;
-    } 
+    };
     w._getWidthFromLength = function(length) {
         var lengthEl = w._getCachedLengthEl();
         lengthEl.style.cssText = 'width: ' + length + ';';
@@ -70,7 +70,7 @@
         for (var i=0, len=sourceSizeList.length; i < len; i++) {
             // Match <media-query>? length, ie (min-width: 50em) 100%
             var sourceSize = sourceSizeList[i];
-            
+
             // Split "(min-width: 50em) 100%" into separate strings
             var match = /(\([^)]+\))?\s*([^\s]+)/g.exec(sourceSize);
             if (!match) {
@@ -81,7 +81,7 @@
             if (!match[1]) {
                 // if there is no media query, choose this as our winning length
                 winningLength = length;
-                break;      
+                break;
             } else {
                 media = match[1];
             }
@@ -110,7 +110,7 @@
      * ex. "images/pic-medium.png 1x, images/pic-medium-2x.png 2x" or
      *     "images/pic-medium.png 400w, images/pic-medium-2x.png 800w" or
      *     "images/pic-small.png"
-     * Get an array of image candidates in the form of 
+     * Get an array of image candidates in the form of
      *      {url: "/foo/bar.png", resolution: 1}
      * where resolution is http://dev.w3.org/csswg/css-values-3/#resolution-value
      * If sizes is specified, resolution is calculated
@@ -229,7 +229,7 @@
                     if (candidate.resolution >= w._getDpr()) {
                         if (!picImg.src.endsWith(candidate.url)) {
                             picImg.src = candidate.url;
-                        } 
+                        }
                         break;
                     }
                 }

@@ -55,7 +55,7 @@
               "eqnull": true,
               "node": true
           },
-          src: ['Gruntfile.js', 'src/**/*.js', 'tests/**/*.js']
+          src: ['Gruntfile.js', 'src/*.js']
         }
       },
       watch: {
