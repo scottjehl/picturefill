@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <title>picturefill tests</title>
-  <link rel="stylesheet" href="/tests/resources/qunit-1.10.0.css">
-  <script src="/tests/resources/qunit-1.10.0.js"></script>
-  <script src="/tests/resources/jquery-1.7.1.js"></script>
+  <link rel="stylesheet" href="resources/qunit-1.10.0.css">
+  <script src="resources/qunit-1.10.0.js"></script>
+  <script src="resources/jquery-1.7.1.js"></script>
 </head>
 <body>
 
@@ -14,11 +14,11 @@
 <div id="qunit-fixture">
 </div>
 
-<script src="/picturefill.js"></script>
+<script src="../src/picturefill.js"></script>
 <script>
     QUnit.config.autostart = false;
     QUnit.start();
-    
+
 
     test("_getWidthFromLength", function() {
         equal(window._getWidthFromLength('750px'), 750, "returns int value of width string");
@@ -39,7 +39,7 @@
         };
         var width = window._findWidthFromSourceSize(sizes);
         equal(width, 500, "returns 500 when match media returns false");
-        
+
         // restore `matchesMedia`
         window._matchesMedia = oldMatchesMedia;
     });
@@ -70,7 +70,7 @@
 
         // Test with multiple spaces
         var candidate3 = "      images/pic-medium.png    1x   ,    images/pic-medium-2x.png    2x   ";
-        deepEqual(window._getCandidatesFromSourceSet(candidate3), expectedFormattedCandidates2, "Works!")    
+        deepEqual(window._getCandidatesFromSourceSet(candidate3), expectedFormattedCandidates2, "Works!")
 
         // Test with decimals
         var candidate4 = "      images/pic-smallest.png    0.25x   ,    images/pic-small.png    0.5x   , images/pic-medium.png 1x";
@@ -93,7 +93,7 @@
          // Test with "sizes" passed with a px length specified
          var candidate5 = "      images/pic-smallest.png    250w   ,    images/pic-small.png    500w   , images/pic-medium.png 1000w";
          var sizes = "1000px";
-         deepEqual(window._getCandidatesFromSourceSet(candidate5, sizes), expectedFormattedCandidates4, "Works!");    
+         deepEqual(window._getCandidatesFromSourceSet(candidate5, sizes), expectedFormattedCandidates4, "Works!");
 
         // Test with "sizes" passed with % lengths specified
         var candidate6 = "\npic320.png 320w  , pic640.png   640w, pic768.png 768w, \
