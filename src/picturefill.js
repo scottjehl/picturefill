@@ -147,14 +147,10 @@
     };
 
     w.picturefill = function() {
-        // Loop through all images on the page that are `<picture>` or `<span data-picture>`
+        // Loop through all images on the page that are `<picture>`
         var pictures = doc.getElementsByTagName("picture");
-        pictures = pictures.length ? pictures : doc.getElementsByTagName("span");
         for (var i=0, plen = pictures.length; i < plen; i++) {
             var picture = pictures[i];
-            if (picture.nodeName !== 'PICTURE' && picture.getAttribute('data-picture') === null) {
-                continue;
-            }
             var matches = [];
 
             // In IE9, <source> elements get removed if they aren't children of
@@ -166,7 +162,6 @@
             if (videos.length > 0) {
                 var video = videos[0];
                 var vsources = video.getElementsByTagName("source");
-                vsources = vsources.length ? vsources : doc.getElementsByTagName("span");
                 while (vsources.length > 0) {
                     picture.appendChild(vsources[0]);
                 }
@@ -175,15 +170,11 @@
             }
 
             var sources = picture.getElementsByTagName("source");
-            sources = sources.length ? sources : doc.getElementsByTagName("span");
 
             // Go through each child, and if they have media queries, evaluate them
             // and add them to matches
             for (var j=0, slen = sources.length; j < slen; j++) {
                 var source = sources[j];
-                if (source.nodeName !== 'SOURCE' && source.nodeName !== 'SPAN') {
-                    continue;
-                }
                 var media = sources[j].getAttribute( "media" );
 
                 // if source does not have a srcset attribute, skip
