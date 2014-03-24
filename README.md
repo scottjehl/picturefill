@@ -1,13 +1,13 @@
 # Picturefill
-A Responsive Images approach that you can use today that mimics the [proposed picture element](http://picture.responsiveimages.org/).
-* Author: Scott Jehl (c) 2012 (new proposal implemented by Shawn Jansepar)
-* License: MIT/GPLv2
+A Polyfill for the [HTML Picture Element](http://picture.responsiveimages.org/) that you can use today.
+* Authors: Scott Jehl (c) 2014, Shawn Jansepar
+* License: MIT
 
 **Demo URL:** [http://jansepar.github.com/picturefill/](http://jansepar.github.com/picturefill/)
 
 **Draft Specification:** [http://picture.responsiveimages.org/](http://picture.responsiveimages.org/)
 
-**Note:** Picturefill works best in browsers that support CSS3 media queries. The demo page references (externally) the [matchMedia polyfill](https://github.com/paulirish/matchMedia.js/) which makes matchMedia work in `media-query`-supporting browsers that don't support `matchMedia`. `matchMedia` and the `matchMedia` polyfill are not required for `picturefill` to work, but they are required to support the `media` attributes on `picture` `source` elements. In non-media query-supporting browsers, the `matchMedia` polyfill will allow for querying native media types, such as `screen`, `print`, etc.	
+**Note:** Picturefill works best in browsers that support CSS3 media queries. The demo page references (externally) the [matchMedia polyfill](https://github.com/paulirish/matchMedia.js/) which makes matchMedia work in `media-query`-supporting browsers that don't support `matchMedia`. `matchMedia` and the `matchMedia` polyfill are not required for `picturefill` to work, but they are required to support the `media` attributes on `picture` `source` elements. In non-media query-supporting browsers, the `matchMedia` polyfill will allow for querying native media types, such as `screen`, `print`, etc.
 
 ## Usage
 
