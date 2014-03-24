@@ -8,8 +8,8 @@
             body { font-family: sans-serif; margin:0; padding:0; }
             img {  max-width: 100% }
         </style>
-        <script>if (!window.matchMedia) { document.write('<script src="external/matchmedia.js"><\/script>'); }</script>
-        <script async="true" src="picturefill.js"></script>
+        <script>if (!window.matchMedia) { document.write('<script src="src/external/matchmedia.js"><\/script>'); }</script>
+        <script async="true" src="src/picturefill.js"></script>
     </head>
     <body>
 
@@ -21,17 +21,17 @@
         <picture alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
             <!-- Video tag needed in order to use <source> in IE9 -->
             <!--[if IE 9]><video style="display: none;"><![endif]-->
-            <source srcset="images/small.jpg"></source>
-            <source srcset="images/medium.jpg" media="(min-width: 400px)"></source>
-            <source srcset="images/large.jpg" media="(min-width: 800px)"></source>
-            <source srcset="images/extralarge.jpg" media="(min-width: 1000px)"></source>
+            <source srcset="examples/images/small.jpg"></source>
+            <source srcset="examples/images/medium.jpg" media="(min-width: 400px)"></source>
+            <source srcset="examples/images/large.jpg" media="(min-width: 800px)"></source>
+            <source srcset="examples/images/extralarge.jpg" media="(min-width: 1000px)"></source>
             <!--[if IE 9]></video><![endif]-->
 
             <!-- Fallback content for non-JS browsers and IE8 and older -->
             <!--[if gt IE 8]> <!-- -->
             <noscript>
             <!-- <![endif]-->
-                <img src="images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+                <img src="examples/images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
             <!--[if gt IE 8]> <!-- -->
             </noscript>
             <!-- <![endif]-->
@@ -42,14 +42,14 @@
             <!-- Video tag needed in order to use <source> in IE9 -->
             <!--[if IE 9]><video style="display: none;"><![endif]-->
             <source sizes="(max-width: 30em) 100%, (max-width: 50em) 75%, 50%"
-                    srcset="images/pic-small.png 400w, images/pic-medium.png 800w, images/pic-large.png 1200w"></source>
+                    srcset="examples/images/pic-small.png 400w, examples/images/pic-medium.png 800w, examples/images/pic-large.png 1200w"></source>
             <!--[if IE 9]></video><![endif]-->
 
             <!-- Fallback content for non-JS browsers and IE8 and older -->
             <!--[if gt IE 8]> <!-- -->
             <noscript>
             <!-- <![endif]-->
-                <img src="images/pic-small.png">
+                <img src="examples/images/pic-small.png">
             <!--[if gt IE 8]> <!-- -->
             </noscript>
             <!-- <![endif]-->
