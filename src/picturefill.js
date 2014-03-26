@@ -175,7 +175,7 @@
             // and add them to matches
             for (var j=0, slen = sources.length; j < slen; j++) {
                 var source = sources[j];
-                var media = sources[j].getAttribute( "media" );
+                var media = source.getAttribute( "media" );
 
                 // if source does not have a srcset attribute, skip
                 if (!source.hasAttribute('srcset')) {
