@@ -155,10 +155,10 @@
             // if a picture element has already been evaluated, skip it
             // unless "forceEvaluate" is set to true (this, for example,
             // is set to true when running `picturefill` on `resize`).
-            if (picture.hasAttribute('data-evaluated') && !forceEvaluate) {
+            if (!forceEvaluate && picture.hasAttribute('data-picture-evaluated')) {
                 continue;
-            };
-            picture.setAttribute('data-evaluated', true);
+            }
+            picture.setAttribute('data-picture-evaluated', true);
             var matches = [];
 
             // In IE9, <source> elements get removed if they aren't children of
