@@ -1,3 +1,52 @@
+/*! Picturefill - v2.0.0 - 2014-03-24
+* http://scottjehl.github.io/picturefill
+* Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
+/*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
+
+window.matchMedia || (window.matchMedia = function() {
+    "use strict";
+
+    // For browsers that support matchMedium api such as IE 9 and webkit
+    var styleMedia = (window.styleMedia || window.media);
+
+    // For those that don't support matchMedium
+    if (!styleMedia) {
+        var style       = document.createElement('style'),
+            script      = document.getElementsByTagName('script')[0],
+            info        = null;
+
+        style.type  = 'text/css';
+        style.id    = 'matchmediajs-test';
+
+        script.parentNode.insertBefore(style, script);
+
+        // 'style.currentStyle' is used by IE <= 8 and 'window.getComputedStyle' for all other browsers
+        info = ('getComputedStyle' in window) && window.getComputedStyle(style, null) || style.currentStyle;
+
+        styleMedia = {
+            matchMedium: function(media) {
+                var text = '@media ' + media + '{ #matchmediajs-test { width: 1px; } }';
+
+                // 'style.styleSheet' is used by IE <= 8 and 'style.textContent' for all other browsers
+                if (style.styleSheet) {
+                    style.styleSheet.cssText = text;
+                } else {
+                    style.textContent = text;
+                }
+
+                // Test if media query is true or false
+                return info.width === '1px';
+            }
+        };
+    }
+
+    return function(media) {
+        return {
+            matches: styleMedia.matchMedium(media || 'all'),
+            media: media || 'all'
+        };
+    };
+}());
 /*! Picturefill - Responsive Images that work today.
  *  Author: Scott Jehl, Filament Group, 2012 (new proposal implemented by Shawn Jansepar)
  *  License: MIT/GPLv2
@@ -31,16 +80,16 @@
      */
     w._matchesMedia = function(media) {
         return w.matchMedia && w.matchMedia(media).matches;
-    };
+    }
 
     /**
      * Shortcut method for `devicePixelRatio` (for easy overriding in tests)
      */
     w._getDpr = function() {
         return (window.devicePixelRatio || 1);
-    };
+    }
 
-    /**
+    /** 
      * Get width in css pixel value from a "length" value
      * http://dev.w3.org/csswg/css-values-3/#length-value
      */
@@ -52,7 +101,7 @@
         }
         doc.body.appendChild(lengthEl);
         return lengthEl;
-    };
+    } 
     w._getWidthFromLength = function(length) {
         var lengthEl = w._getCachedLengthEl();
         lengthEl.style.cssText = 'width: ' + length + ';';
@@ -70,7 +119,7 @@
         for (var i=0, len=sourceSizeList.length; i < len; i++) {
             // Match <media-query>? length, ie (min-width: 50em) 100%
             var sourceSize = sourceSizeList[i];
-
+            
             // Split "(min-width: 50em) 100%" into separate strings
             var match = /(\([^)]+\))?\s*([^\s]+)/g.exec(sourceSize);
             if (!match) {
@@ -81,7 +130,7 @@
             if (!match[1]) {
                 // if there is no media query, choose this as our winning length
                 winningLength = length;
-                break;
+                break;      
             } else {
                 media = match[1];
             }
@@ -110,7 +159,7 @@
      * ex. "images/pic-medium.png 1x, images/pic-medium-2x.png 2x" or
      *     "images/pic-medium.png 400w, images/pic-medium-2x.png 800w" or
      *     "images/pic-small.png"
-     * Get an array of image candidates in the form of
+     * Get an array of image candidates in the form of 
      *      {url: "/foo/bar.png", resolution: 1}
      * where resolution is http://dev.w3.org/csswg/css-values-3/#resolution-value
      * If sizes is specified, resolution is calculated
@@ -146,21 +195,14 @@
         return formattedCandidates;
     };
 
-    w.picturefill = function(checkEvaluated) {
-        // Loop through all images on the page that are `<picture>`
+    w.picturefill = function() {
+        // Loop through all images on the page that are `<picture>` or `<span data-picture>`
         var pictures = doc.getElementsByTagName("picture");
+        pictures = pictures.length ? pictures : doc.getElementsByTagName("span");
         for (var i=0, plen = pictures.length; i < plen; i++) {
             var picture = pictures[i];
-
-            // if checkEvaluated is true, we will not re-run on picture elements
-            // that have already been evaluated. This is a useful mode to have
-            // when loading the picturefill async and polling the document
-            // as more of it downloads to fetch images as soon as possible.
-            if (checkEvaluated) {
-                if (picture.hasAttribute('evaluated')) {
-                    continue;
-                };
-                picture.setAttribute('evaluated', true);
+            if (picture.nodeName !== 'PICTURE' && picture.getAttribute('data-picture') === null) {
+                continue;
             }
             var matches = [];
 
@@ -173,6 +215,7 @@
             if (videos.length > 0) {
                 var video = videos[0];
                 var vsources = video.getElementsByTagName("source");
+                vsources = vsources.length ? vsources : doc.getElementsByTagName("span");
                 while (vsources.length > 0) {
                     picture.appendChild(vsources[0]);
                 }
@@ -181,11 +224,15 @@
             }
 
             var sources = picture.getElementsByTagName("source");
+            sources = sources.length ? sources : doc.getElementsByTagName("span");
 
             // Go through each child, and if they have media queries, evaluate them
             // and add them to matches
             for (var j=0, slen = sources.length; j < slen; j++) {
                 var source = sources[j];
+                if (source.nodeName !== 'SOURCE' && source.nodeName !== 'SPAN') {
+                    continue;
+                }
                 var media = sources[j].getAttribute( "media" );
 
                 // if source does not have a srcset attribute, skip
@@ -231,7 +278,7 @@
                     if (candidate.resolution >= w._getDpr()) {
                         if (!picImg.src.endsWith(candidate.url)) {
                             picImg.src = candidate.url;
-                        }
+                        } 
                         break;
                     }
                 }
@@ -257,15 +304,13 @@
         var intervalId = setInterval(function(){
             // When the document has finished loading, stop checking for new images
             // https://github.com/ded/domready/blob/master/ready.js#L15
-            w.picturefill(true);
+            w.picturefill();
             if (/^loaded|^i|^c/.test(doc.readyState)) {
                 clearInterval(intervalId);
                 return;
             }
         }, 250);
-        w.addEventListener("resize", function() {
-            w.picturefill();
-        }, false);
+        w.addEventListener("resize", w.picturefill, false);
     };
     runPicturefill();
 

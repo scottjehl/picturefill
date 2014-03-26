@@ -1,0 +1,23 @@
+Authors ordered by first contribution.
+
+Scott Jehl, @scottjehl
+Mat Marquis, @wilto
+David Beesley, @davebeesley
+Gordon Brander, @gordonbrander
+Max Klenk, @maxklenk
+Dennis Gaebel, @grayghostvisuals
+@codekipple
+@jelmerdemaat
+Brandon Belvin, @pizzabrandon
+Jonathan Goldsmith, @goldsmith
+Aaron Raimist, @aaronraimist
+@floriangouy
+John Albin Wilkins, @JohnAlbin
+Maxime Thirouin, @MoOx
+William Turrell, @wturrell
+Brian Muenzenmeyer, @bmuenzenmeyer
+@michaelgilley
+Tina Holly, @tinacious
+Travis Northcutt, @tnorthcutt
+@Zearin
+Shawn Jansepar, jansepar
