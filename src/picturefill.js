@@ -146,22 +146,19 @@
         return formattedCandidates;
     };
 
-    w.picturefill = function(checkEvaluated) {
+    w.picturefill = function(forceEvaluate) {
         // Loop through all images on the page that are `<picture>`
         var pictures = doc.getElementsByTagName("picture");
         for (var i=0, plen = pictures.length; i < plen; i++) {
             var picture = pictures[i];
 
-            // if checkEvaluated is true, we will not re-run on picture elements
-            // that have already been evaluated. This is a useful mode to have
-            // when loading the picturefill async and polling the document
-            // as more of it downloads to fetch images as soon as possible.
-            if (checkEvaluated) {
-                if (picture.hasAttribute('evaluated')) {
-                    continue;
-                };
-                picture.setAttribute('evaluated', true);
-            }
+            // if a picture element has already been evaluated, skip it
+            // unless "forceEvaluate" is set to true (this, for example,
+            // is set to true when running `picturefill` on `resize`).
+            if (picture.hasAttribute('data-evaluated') && !forceEvaluate) {
+                continue;
+            };
+            picture.setAttribute('data-evaluated', true);
             var matches = [];
 
             // In IE9, <source> elements get removed if they aren't children of
@@ -257,14 +254,14 @@
         var intervalId = setInterval(function(){
             // When the document has finished loading, stop checking for new images
             // https://github.com/ded/domready/blob/master/ready.js#L15
-            w.picturefill(true);
+            w.picturefill();
             if (/^loaded|^i|^c/.test(doc.readyState)) {
                 clearInterval(intervalId);
                 return;
             }
         }, 250);
         w.addEventListener("resize", function() {
-            w.picturefill();
+            w.picturefill(true);
         }, false);
     };
     runPicturefill();
