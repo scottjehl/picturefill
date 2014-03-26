@@ -146,11 +146,19 @@
         return formattedCandidates;
     };
 
-    w.picturefill = function() {
+    w.picturefill = function(forceEvaluate) {
         // Loop through all images on the page that are `<picture>`
         var pictures = doc.getElementsByTagName("picture");
         for (var i=0, plen = pictures.length; i < plen; i++) {
             var picture = pictures[i];
+
+            // if a picture element has already been evaluated, skip it
+            // unless "forceEvaluate" is set to true (this, for example,
+            // is set to true when running `picturefill` on `resize`).
+            if (!forceEvaluate && picture.hasAttribute('data-picture-evaluated')) {
+                continue;
+            }
+            picture.setAttribute('data-picture-evaluated', true);
             var matches = [];
 
             // In IE9, <source> elements get removed if they aren't children of
@@ -252,7 +260,9 @@
                 return;
             }
         }, 250);
-        w.addEventListener("resize", w.picturefill, false);
+        w.addEventListener("resize", function() {
+            w.picturefill(true);
+        }, false);
     };
     runPicturefill();
 
