@@ -252,7 +252,7 @@
         var imgs = doc.getElementsByTagName('img');
         for (var h=0, ilen = imgs.length; h < ilen; h++) {
             var img = imgs[h];
-            if (!img.hasAttribute('data-picture-src') || img.parentNode.nodeName === 'PICTURE') {
+            if (!img.hasAttribute('data-picture-src') || img.parentNode.nodeName === 'PICTURE' || img.parentNode.nodeName === 'SOURCE') {
                 continue;
             }
             // if img element has already been evaluated, skip it
