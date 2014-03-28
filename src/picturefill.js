@@ -14,7 +14,7 @@
     if (typeof String.prototype.trim !== 'function') {
         String.prototype.trim = function () {
             return this.replace(/^\s+|\s+$/g, '');
-        }
+        };
     }
 
     /**
@@ -37,7 +37,7 @@
      * Shortcut method for `devicePixelRatio` (for easy overriding in tests)
      */
     w._getDpr = function() {
-        return (window.devicePixelRatio || 1);
+        return (w.devicePixelRatio || 1);
     };
 
     /**
@@ -46,7 +46,7 @@
      */
     var lengthEl;
     w._getCachedLengthEl = function() {
-        lengthEl = lengthEl || document.createElement('div');
+        lengthEl = lengthEl || doc.createElement('div');
         if (!doc.body) {
             return;
         }
@@ -118,8 +118,9 @@
     w._getCandidatesFromSourceSet = function(srcset, sizes) {
         var candidates = srcset.trim().split(/\s*,\s*/);
         var formattedCandidates = [];
+        var widthInCssPixels;
         if (sizes) {
-            var widthInCssPixels = w._findWidthFromSourceSize(sizes);
+            widthInCssPixels = w._findWidthFromSourceSize(sizes);
         }
         for (var i = 0, len = candidates.length; i < len; i++) {
             var candidate = candidates[i];
@@ -146,9 +147,13 @@
         return formattedCandidates;
     };
 
+    var ascendingSort = function(a, b) {
+        return a.resolution > b.resolution;
+    };
+
     w.picturefill = function(forceEvaluate) {
         // Loop through all images on the page that are `<picture>`
-        var pictures = doc.getElementsByTagName("picture");
+        var pictures = doc.getElementsByTagName('picture');
         for (var i=0, plen = pictures.length; i < plen; i++) {
             var picture = pictures[i];
 
@@ -169,7 +174,7 @@
             var videos = picture.getElementsByTagName('video');
             if (videos.length > 0) {
                 var video = videos[0];
-                var vsources = video.getElementsByTagName("source");
+                var vsources = video.getElementsByTagName('source');
                 while (vsources.length > 0) {
                     picture.appendChild(vsources[0]);
                 }
@@ -219,12 +224,10 @@
                 }
 
                 // Sort image candidates before figuring out which one to use
-                var sortedCandidates = candidates.sort(function(a, b) {
-                    return a.resolution > b.resolution;
-                });
+                var sortedCandidates = candidates.sort(ascendingSort);
                 // Determine which image to use based on image candidates array
-                for (var j=0; j < sortedCandidates.length; j++) {
-                    var candidate = sortedCandidates[j];
+                for (var k=0; k < sortedCandidates.length; k++) {
+                    var candidate = sortedCandidates[k];
                     if (candidate.resolution >= w._getDpr()) {
                         if (!picImg.src.endsWith(candidate.url)) {
                             picImg.src = candidate.url;
@@ -234,14 +237,34 @@
                 }
 
                 // If none of the image candidates worked out,
-                // set src to data-src
-                if (!picImg.src && picImg.hasAttribute('data-src')) {
-                    picImg.src = picImg.getAttribute('data-src');
+                // set src to data-picture-src
+                if (!picImg.src && picImg.hasAttribute('data-picture-src')) {
+                    picImg.src = picImg.getAttribute('data-picture-src');
                 }
                 matchedEl.appendChild(picImg);
             }
 
         }
+
+        // This is a fallback for IE8 and below. On those browsers, <picture> is not
+        // allowed to have any children elements, thus the img fallback in it becomes
+        // a sibling to <picture>
+        var imgs = doc.getElementsByTagName('img');
+        for (var h=0, ilen = imgs.length; h < ilen; h++) {
+            var img = imgs[h];
+            if (!img.hasAttribute('data-picture-src') || img.parentNode.nodeName === 'PICTURE') {
+                continue;
+            }
+            // if img element has already been evaluated, skip it
+            // unless "forceEvaluate" is set to true (this, for example,
+            // is set to true when running `picturefill` on `resize`).
+            if (!forceEvaluate && img.hasAttribute('data-picture-evaluated')) {
+                continue;
+            }
+            img.setAttribute('data-picture-evaluated', true);
+            img.src = img.getAttribute('data-picture-src');
+        }
+
     };
 
     /**
@@ -266,4 +289,4 @@
     };
     runPicturefill();
 
-})(this, document);
+})(this, this.document);

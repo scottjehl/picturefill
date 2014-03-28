@@ -17,18 +17,13 @@ until DOMContentLoaded). It will also conditionally load matchMedia if the brows
 doesn't support it.
 
 ```html
-    <script>if (!window.matchMedia) { document.write('<script src="external/matchmedia.js"><\/script>'); }</script>
+    <head>
     <script async="true" src="picturefill.js"></script>
 ```
 
-If you don't want to load the script asynchronously, still the following script right above
+If you don't want to load the script asynchronously, you can still insert the following script right above
 the closing `</body>` tag (although not recommended, since this could take a long time
 before executing, waiting precious time that could have been spend downloading images).
-
-```html
-    <script>if (!window.matchMedia) { document.write('<script src="external/matchmedia.js"><\/script>'); }</script>
-    <script src="picturefill.js"></script>
-```
 
 ## Markup pattern and explanation
 
@@ -44,14 +39,8 @@ The following is an example based on the latest spec without using `sizes`:
         <source srcset="images/extralarge.jpg" media="(min-width: 1000px)"></source>
         <!--[if IE 9]></video><![endif]-->
 
-        <!-- Fallback content for non-JS browsers and IE8 and older -->
-        <!--[if gt IE 8]> <!-->
-        <noscript>
-        <!-- <![endif]-->
-            <img src="images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-        <!--[if gt IE 8]> <!-->
-        <noscript>
-        <!-- <![endif]-->
+        <!-- Fallback content for IE8 and older -->
+        <img data-picture-src="images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
     </picture>
 ```
 
@@ -65,14 +54,8 @@ And using `sizes`:
                 srcset="images/pic-small.png 400w, images/pic-medium.png 800w, images/pic-large.png 1200w"></source>
         <!--[if IE 9]></video><![endif]-->
 
-        <!-- Fallback content for non-JS browsers and IE8 and older -->
-        <!--[if gt IE 8]> <!-->
-        <noscript>
-        <!-- <![endif]-->
-            <img src="images/pic-small.png">
-        <!--[if gt IE 8]> <!-->
-        <noscript>
-        <!-- <![endif]-->
+        <!-- Fallback content for IE8 and older -->
+        <img data-picture-src="images/pic-small.png" alt="Obama with soldiers">
     </picture>
 ```
 
@@ -91,12 +74,12 @@ Notes on the markup above...
 * The `noscript` element wraps the fallback image for non-JavaScript environments, and including this wrapper prevents browsers from fetching the fallback image during page load (causing unnecessary overhead). Generally, it's a good idea to reference a small mobile optimized image here, as it's likely to be loaded in older/underpowered mobile devices.
 * If you want to use the `picture` markup with IE9, you have to stick `<!--[if gte IE 8]><video style="display: none;"><![endif]-->`
 around the `source` elements, because in IE9 you can't have `source` as the child node of anything except for `video`.
-* If you want to use IE8 or less, you have to use `<!--[if gt IE 8]> <!--><noscript><!-- <![endif]-->` instead of `noscript`.
+* If you want to use IE8 or less, you must specify a fallback `<img data-picture-src="foo.jpg">`.
 
 
 ### How the `img` is appended
 
-Upon finding a matching `picture[data-src]` element, picturefill will generate an `img` element referencing that `picture`'s `srcset` attribute value and append the `img` to the picture element. This means you can target CSS styles specific to the active image based on the breakpoint that is in play, perhaps by adding a class to each `picture`. For example, if you have the following markup...
+Upon finding a matching `picture` element, picturefill will generate an `img` element referencing that `picture`'s `srcset` attribute value and append the `img` to the picture element. This means you can target CSS styles specific to the active image based on the breakpoint that is in play, perhaps by adding a class to each `picture`. For example, if you have the following markup...
 
 
 ```html
@@ -132,14 +115,7 @@ Picturefill natively supports HD(Retina) image replacement.  While numerous othe
 		<source src="extralarge.jpg"    media="(min-width: 1000px)"></source>
 		<source src="extralarge_x2.jpg" media="(min-width: 1000px) and (min-device-pixel-ratio: 2.0)"></source>
 
-		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
-        <!--[if gt IE 8]> <!-->
-        <noscript>
-        <!-- <![endif]-->
-			<img src="small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-        <!--[if gt IE 8]> <!-->
-        </noscript>
-        <!-- <![endif]-->
+		<img data-picture-src="small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 	</picture>
 ```
 
@@ -147,33 +123,27 @@ Picturefill natively supports HD(Retina) image replacement.  While numerous othe
 
 ### Supporting IE Desktop
 
-Internet Explorer 9 and below have some issues rendering custom elements like `picture` and `source`.
-In order to solve this, you must use `<!--[if gt IE 8]> <!--><noscript><!-- <![endif]-->`
-instead of `noscript` to fix IE8 and below. For IE9, you have to stick
-`<!--[if gte IE 8]><video style="display: none;"><![endif]-->` around the `source` elements, because in
-IE9 you can't have `source` as the child node of anything except for `video`.
+Internet Explorer 9 has some issues rendering custom elements like `picture` and `source`.
+For IE9, you have to stick `<!--[if gte IE 8]><video style="display: none;"><![endif]-->`
+around the `source` elements, because in IE9 you can't have `source` as the child node of
+anything except for `video`. For IE8 and less, `picture` cannot have any children, and thus
+we must fall back to an `<img data-picture-src>` element.
 
 Internet Explorer 8 and older have no support for CSS3 Media Queries, so in the examples above, IE will receive the
-first `data-src` image reference (or the last one it finds that has no `data-media` attribute). If you'd like to serve a
+first `data-picture-src` image reference (or the last one it finds that has no `data-media` attribute). If you'd like to serve a
 larger image to IE desktop browsers, you might consider using conditional comments, like this:
 
 ```html
 	<picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-		<source data-src="small.jpg"></source>
-		<source data-src="medium.jpg" data-media="(min-width: 400px)"></source>
+		<source srcset="small.jpg"></source>
+		<source srcset="medium.jpg" data-media="(min-width: 400px)"></source>
 
 		<!--[if (lt IE 9) & (!IEMobile)]>
-		    <source data-src="medium.jpg"></source>
+		    <source srcset="medium.jpg"></source>
 		<![endif]-->
 
-		<!-- Fallback content for non-JS browsers. Same img src as the initial, unqualified source element. -->
-        <!--[if gt IE 8]> <!-->
-        <noscript>
-        <!-- <![endif]-->
-			<img src="small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-        <!--[if gt IE 8]> <!-->
-        <noscript>
-        <!-- <![endif]-->
+		<!-- Fallback content for IE8 and below. Same img src as the initial, unqualified source element. -->
+		<img data-picture-src="small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 	</picture>
 ```
 

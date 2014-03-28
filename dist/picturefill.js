@@ -1,4 +1,4 @@
-/*! Picturefill - v2.0.0 - 2014-03-24
+/*! Picturefill - v2.0.0 - 2014-03-28
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -63,7 +63,7 @@ window.matchMedia || (window.matchMedia = function() {
     if (typeof String.prototype.trim !== 'function') {
         String.prototype.trim = function () {
             return this.replace(/^\s+|\s+$/g, '');
-        }
+        };
     }
 
     /**
@@ -80,28 +80,28 @@ window.matchMedia || (window.matchMedia = function() {
      */
     w._matchesMedia = function(media) {
         return w.matchMedia && w.matchMedia(media).matches;
-    }
+    };
 
     /**
      * Shortcut method for `devicePixelRatio` (for easy overriding in tests)
      */
     w._getDpr = function() {
-        return (window.devicePixelRatio || 1);
-    }
+        return (w.devicePixelRatio || 1);
+    };
 
-    /** 
+    /**
      * Get width in css pixel value from a "length" value
      * http://dev.w3.org/csswg/css-values-3/#length-value
      */
     var lengthEl;
     w._getCachedLengthEl = function() {
-        lengthEl = lengthEl || document.createElement('div');
+        lengthEl = lengthEl || doc.createElement('div');
         if (!doc.body) {
             return;
         }
         doc.body.appendChild(lengthEl);
         return lengthEl;
-    } 
+    };
     w._getWidthFromLength = function(length) {
         var lengthEl = w._getCachedLengthEl();
         lengthEl.style.cssText = 'width: ' + length + ';';
@@ -119,7 +119,7 @@ window.matchMedia || (window.matchMedia = function() {
         for (var i=0, len=sourceSizeList.length; i < len; i++) {
             // Match <media-query>? length, ie (min-width: 50em) 100%
             var sourceSize = sourceSizeList[i];
-            
+
             // Split "(min-width: 50em) 100%" into separate strings
             var match = /(\([^)]+\))?\s*([^\s]+)/g.exec(sourceSize);
             if (!match) {
@@ -130,7 +130,7 @@ window.matchMedia || (window.matchMedia = function() {
             if (!match[1]) {
                 // if there is no media query, choose this as our winning length
                 winningLength = length;
-                break;      
+                break;
             } else {
                 media = match[1];
             }
@@ -159,7 +159,7 @@ window.matchMedia || (window.matchMedia = function() {
      * ex. "images/pic-medium.png 1x, images/pic-medium-2x.png 2x" or
      *     "images/pic-medium.png 400w, images/pic-medium-2x.png 800w" or
      *     "images/pic-small.png"
-     * Get an array of image candidates in the form of 
+     * Get an array of image candidates in the form of
      *      {url: "/foo/bar.png", resolution: 1}
      * where resolution is http://dev.w3.org/csswg/css-values-3/#resolution-value
      * If sizes is specified, resolution is calculated
@@ -167,8 +167,9 @@ window.matchMedia || (window.matchMedia = function() {
     w._getCandidatesFromSourceSet = function(srcset, sizes) {
         var candidates = srcset.trim().split(/\s*,\s*/);
         var formattedCandidates = [];
+        var widthInCssPixels;
         if (sizes) {
-            var widthInCssPixels = w._findWidthFromSourceSize(sizes);
+            widthInCssPixels = w._findWidthFromSourceSize(sizes);
         }
         for (var i = 0, len = candidates.length; i < len; i++) {
             var candidate = candidates[i];
@@ -195,15 +196,23 @@ window.matchMedia || (window.matchMedia = function() {
         return formattedCandidates;
     };
 
-    w.picturefill = function() {
-        // Loop through all images on the page that are `<picture>` or `<span data-picture>`
-        var pictures = doc.getElementsByTagName("picture");
-        pictures = pictures.length ? pictures : doc.getElementsByTagName("span");
+    var ascendingSort = function(a, b) {
+        return a.resolution > b.resolution;
+    };
+
+    w.picturefill = function(forceEvaluate) {
+        // Loop through all images on the page that are `<picture>`
+        var pictures = doc.getElementsByTagName('picture');
         for (var i=0, plen = pictures.length; i < plen; i++) {
             var picture = pictures[i];
-            if (picture.nodeName !== 'PICTURE' && picture.getAttribute('data-picture') === null) {
+
+            // if a picture element has already been evaluated, skip it
+            // unless "forceEvaluate" is set to true (this, for example,
+            // is set to true when running `picturefill` on `resize`).
+            if (!forceEvaluate && picture.hasAttribute('data-picture-evaluated')) {
                 continue;
             }
+            picture.setAttribute('data-picture-evaluated', true);
             var matches = [];
 
             // In IE9, <source> elements get removed if they aren't children of
@@ -214,8 +223,7 @@ window.matchMedia || (window.matchMedia = function() {
             var videos = picture.getElementsByTagName('video');
             if (videos.length > 0) {
                 var video = videos[0];
-                var vsources = video.getElementsByTagName("source");
-                vsources = vsources.length ? vsources : doc.getElementsByTagName("span");
+                var vsources = video.getElementsByTagName('source');
                 while (vsources.length > 0) {
                     picture.appendChild(vsources[0]);
                 }
@@ -224,15 +232,11 @@ window.matchMedia || (window.matchMedia = function() {
             }
 
             var sources = picture.getElementsByTagName("source");
-            sources = sources.length ? sources : doc.getElementsByTagName("span");
 
             // Go through each child, and if they have media queries, evaluate them
             // and add them to matches
             for (var j=0, slen = sources.length; j < slen; j++) {
                 var source = sources[j];
-                if (source.nodeName !== 'SOURCE' && source.nodeName !== 'SPAN') {
-                    continue;
-                }
                 var media = sources[j].getAttribute( "media" );
 
                 // if source does not have a srcset attribute, skip
@@ -269,29 +273,47 @@ window.matchMedia || (window.matchMedia = function() {
                 }
 
                 // Sort image candidates before figuring out which one to use
-                var sortedCandidates = candidates.sort(function(a, b) {
-                    return a.resolution > b.resolution;
-                });
+                var sortedCandidates = candidates.sort(ascendingSort);
                 // Determine which image to use based on image candidates array
-                for (var j=0; j < sortedCandidates.length; j++) {
-                    var candidate = sortedCandidates[j];
+                for (var k=0; k < sortedCandidates.length; k++) {
+                    var candidate = sortedCandidates[k];
                     if (candidate.resolution >= w._getDpr()) {
                         if (!picImg.src.endsWith(candidate.url)) {
                             picImg.src = candidate.url;
-                        } 
+                        }
                         break;
                     }
                 }
 
                 // If none of the image candidates worked out,
-                // set src to data-src
-                if (!picImg.src && picImg.hasAttribute('data-src')) {
-                    picImg.src = picImg.getAttribute('data-src');
+                // set src to data-picture-src
+                if (!picImg.src && picImg.hasAttribute('data-picture-src')) {
+                    picImg.src = picImg.getAttribute('data-picture-src');
                 }
                 matchedEl.appendChild(picImg);
             }
 
         }
+
+        // This is a fallback for IE8 and below. On those browsers, <picture> is not
+        // allowed to have any children elements, thus the img fallback in it becomes
+        // a sibling to <picture>
+        var imgs = doc.getElementsByTagName('img');
+        for (var h=0, ilen = imgs.length; h < ilen; h++) {
+            var img = imgs[h];
+            if (!img.hasAttribute('data-picture-src') || img.parentNode.nodeName !== 'PICTURE') {
+                continue;
+            }
+            // if img element has already been evaluated, skip it
+            // unless "forceEvaluate" is set to true (this, for example,
+            // is set to true when running `picturefill` on `resize`).
+            if (!forceEvaluate && img.hasAttribute('data-picture-evaluated')) {
+                continue;
+            }
+            img.setAttribute('data-picture-evaluated', true);
+            img.src = img.getAttribute('data-picture-src');
+        }
+
     };
 
     /**
@@ -310,8 +332,10 @@ window.matchMedia || (window.matchMedia = function() {
                 return;
             }
         }, 250);
-        w.addEventListener("resize", w.picturefill, false);
+        w.addEventListener("resize", function() {
+            w.picturefill(true);
+        }, false);
     };
     runPicturefill();
 
-})(this, document);
+})(this, this.document);
