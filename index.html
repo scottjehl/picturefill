@@ -27,14 +27,8 @@
             <source srcset="examples/images/extralarge.jpg" media="(min-width: 1000px)"></source>
             <!--[if IE 9]></video><![endif]-->
 
-            <!-- Fallback content for non-JS browsers and IE8 and older -->
-            <!--[if gt IE 8]> <!-->
-            <noscript>
-            <!-- <![endif]-->
-                <img src="examples/images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-            <!--[if gt IE 8]> <!-->
-            </noscript>
-            <!-- <![endif]-->
+            <!-- Fallback content for IE8 and older -->
+            <img data-picture-src="examples/images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
         </picture>
 
         <p>Example using "sizes" attribute:</p>
@@ -45,14 +39,8 @@
                     srcset="examples/images/pic-small.png 400w, examples/images/pic-medium.png 800w, examples/images/pic-large.png 1200w"></source>
             <!--[if IE 9]></video><![endif]-->
 
-            <!-- Fallback content for non-JS browsers and IE8 and older -->
-            <!--[if gt IE 8]> <!-->
-            <noscript>
-            <!-- <![endif]-->
-                <img src="examples/images/pic-small.png" alt="Obama with soldiers">
-            <!--[if gt IE 8]> <!-->
-            </noscript>
-            <!-- <![endif]-->
+            <!-- Fallback content for IE8 and older -->
+            <img data-picture-src="examples/images/pic-small.png" alt="Obama with soldiers">
         </picture>
 
     </body>
