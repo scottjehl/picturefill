@@ -69,7 +69,7 @@ Alternatively to apply specific classes directly to the generated image tags the
 
 ```html
     <span class="picture" data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-		<span class="sml" data-img-class="spcific" data-src="small.jpg"></span>
+		<span class="sml" data-img-class="specific" data-src="small.jpg"></span>
 		<span class="med" data-src="medium.jpg"     data-media="(min-width: 400px)"></span>
 		<span class="lrg" data-src="large.jpg"      data-media="(min-width: 800px)"></span>
 ````
