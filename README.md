@@ -18,7 +18,7 @@ Currently, `picturefill.js` compresses to around 498bytes (~0.5kb), after minify
 Mark up your responsive images like this.
 
 ```html
-	<span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+    <span data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 		<span data-src="small.jpg"></span>
 		<span data-src="medium.jpg"     data-media="(min-width: 400px)"></span>
 		<span data-src="large.jpg"      data-media="(min-width: 800px)"></span>
@@ -65,7 +65,22 @@ Upon finding a matching `span[data-src]` element, picturefill will generate an `
 	.picture .med img { /* Styles for the medium image */ }
 	.picture .lrg img { /* Styles for the large image */ }
 ````
+Alternatively to apply specific classes directly to the generated image tags then use the data-img-class attribute on the span[data-src] element.
 
+```html
+    <span class="picture" data-picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+		<span class="sml" data-img-class="spcific" data-src="small.jpg"></span>
+		<span class="med" data-src="medium.jpg"     data-media="(min-width: 400px)"></span>
+		<span class="lrg" data-src="large.jpg"      data-media="(min-width: 800px)"></span>
+````
+
+...then you could write styles specific to each of the images, which may be handy for certain layout situations.
+
+```css
+	.picture .sml .specific { /* Styles for the small image */ }
+	.picture .med img { /* Styles for the medium image */ }
+	.picture .lrg img { /* Styles for the large image */ }
+````
 
 ### HD Media Queries
 
@@ -124,6 +139,6 @@ Picturefill is intentionally exposed to the global space, in the unusual situati
 
 Picturefill supports a broad range of browsers and devices (there are currently no known unsupported browsers), provided that you stick with the markup conventions provided.
 
-### AngularJS 
+### AngularJS
 
 Picturefill can be implementing in AngularJS apps using the [angular-picturefill directive](https://github.com/tinacious/angular-picturefill).
