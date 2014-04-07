@@ -59,23 +59,14 @@ window.matchMedia || (window.matchMedia = function() {
 	// local object for method references and testing exposure
 	var pf = {};
 
-	/**
-	 * http://jsperf.com/trim-polyfill
-	 */
-	if ( typeof String.prototype.trim !== "function" ) {
-		String.prototype.trim = function() {
-			return this.replace( /^\s+|\s+$/g, "" );
-		};
-	}
+	// just a string trim workaround
+	pf.trim = function( str ){
+		return str.trim ? str.trim() : str.replace( /^\s+|\s+$/g, "" );
+	};
 
-	/**
-	 * http://stackoverflow.com/questions/280634/endswith-in-javascript
-	 */
-	if ( typeof String.prototype.endsWith !== "function" ) {
-		String.prototype.endsWith = function( suffix ) {
-			return this.indexOf( suffix, this.length - suffix.length ) !== -1;
-		};
-	}
+	pf.endsWith = function( str, suffix ){
+		return str.endsWith ? str.endsWith( suffix ) : str.indexOf( suffix, str.length - suffix.length ) !== -1;
+	};
 
 	/**
 	 * Shortcut method for matchMedia ( for easy overriding in tests )
@@ -118,7 +109,7 @@ window.matchMedia || (window.matchMedia = function() {
 	 */
 	pf.findWidthFromSourceSize = function( sourceSizeListStr ) {
 		// Split up source size list, ie ( max-width: 30em ) 100%, ( max-width: 50em ) 50%, 33%
-		var sourceSizeList = sourceSizeListStr.trim().split( /\s*,\s*/ );
+		var sourceSizeList = pf.trim( sourceSizeListStr ).split( /\s*,\s*/ );
 		var winningLength;
 		for ( var i=0, len=sourceSizeList.length; i < len; i++ ) {
 			// Match <media-query>? length, ie ( min-width: 50em ) 100%
@@ -169,7 +160,7 @@ window.matchMedia || (window.matchMedia = function() {
 	 * If sizes is specified, resolution is calculated
 	 */
 	pf.getCandidatesFromSourceSet = function( srcset, sizes ) {
-		var candidates = srcset.trim().split( /\s*,\s*/ );
+		var candidates = pf.trim( srcset ).split( /\s*,\s*/ );
 		var formattedCandidates = [];
 		var widthInCssPixels;
 		if ( sizes ) {
@@ -282,7 +273,7 @@ window.matchMedia || (window.matchMedia = function() {
 				for ( var k=0; k < sortedCandidates.length; k++ ) {
 					var candidate = sortedCandidates[k];
 					if ( candidate.resolution >= pf.getDpr() ) {
-						if ( !picImg.src.endsWith( candidate.url )) {
+						if ( !pf.endsWith( picImg.src, candidate.url ) ) {
 							picImg.src = candidate.url;
 						}
 						break;
