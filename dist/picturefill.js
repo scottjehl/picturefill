@@ -330,9 +330,11 @@ window.matchMedia || (window.matchMedia = function() {
 				return;
 			}
 		}, 250 );
-		w.addEventListener( "resize", function() {
-			w.picturefill( true );
-		}, false );
+		if( w.addEventListener ){
+			w.addEventListener( "resize", function() {
+				w.picturefill( true );
+			}, false );
+		}
 	}
 
 	runPicturefill();
