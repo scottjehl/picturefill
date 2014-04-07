@@ -205,7 +205,7 @@
 			var picImg = picture.getElementsByTagName( "img" )[0];
 			if ( matches.length ) {
 				var matchedEl = matches.pop();
-				if ( !picImg || picImg.parentNode.nodeName === "NOSCRIPT" ) {
+				if ( !picImg ) {
 					picImg = doc.createElement( "img" );
 					if ( picture.hasAttribute( "alt" )) {
 						picImg.alt = picture.getAttribute( "alt" );
