@@ -21,6 +21,16 @@ doesn't support it.
 	<script async="true" src="picturefill.js"></script>
 ```
 
+If you're loading picturefill.js asynchronously, be sure to place the following in the `head` of your page to ensure old IE support:
+
+```html
+<script>
+// Picture element HTML shim|v it for old IE (pairs with Picturefill.js)
+document.createElement( "picture" );
+document.createElement( "source" );
+</script>
+```
+
 If you don't want to load the script asynchronously, you can still insert the following script right above
 the closing `</body>` tag (although not recommended, since this could take a long time
 before executing, waiting precious time that could have been spend downloading images).
