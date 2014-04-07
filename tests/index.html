@@ -16,9 +16,15 @@
 
 <script src="../src/picturefill.js"></script>
 <script>
+
+if( window.HTMLPictureElement ){
+	test( "Picture is natively supported", function() {
+			ok( window.HTMLPictureElement );
+	});
+}
+else {
 		QUnit.config.autostart = false;
 		QUnit.start();
-
 
 		test("_getWidthFromLength", function() {
 				equal(picturefill._.getWidthFromLength('750px'), 750, "returns int value of width string");
@@ -136,6 +142,7 @@
 				picturefill._.getWidthFromLength = oldGetWidthFromLength;
 
 		});
+}
 </script>
 </body>
 </html>

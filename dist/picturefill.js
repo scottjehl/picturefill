@@ -56,6 +56,11 @@ window.matchMedia || (window.matchMedia = function() {
 	// Enable strict mode
 	"use strict";
 
+	// If picture is supported, well, that's awesome. Let's get outta here...
+	if( w.HTMLPictureElement ){
+		return;
+	}
+
 	// local object for method references and testing exposure
 	var pf = {};
 
