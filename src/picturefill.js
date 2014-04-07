@@ -241,31 +241,11 @@
 				}
 
 				// If none of the image candidates worked out,
-				// set src to data-picture-src
-				if ( !picImg.src && picImg.hasAttribute( "data-picture-src" ) ) {
-					picImg.src = picImg.getAttribute( "data-picture-src" );
-				}
+				// evaluate img element's srcset attribute, if present
+				// TODO TODO ^
+
 				matchedEl.appendChild( picImg );
 			}
-		}
-
-		// This is a fallback for IE8 and below. On those browsers, <picture> is not
-		// allowed to have any children elements, thus the img fallback in it becomes
-		// a sibling to <picture>
-		var imgs = doc.getElementsByTagName( "img" );
-		for ( var h=0, ilen = imgs.length; h < ilen; h++ ) {
-			var img = imgs[h];
-			if ( !img.hasAttribute( "data-picture-src" ) || img.parentNode.nodeName === "PICTURE" || img.parentNode.nodeName === "SOURCE" ) {
-				continue;
-			}
-			// if img element has already been evaluated, skip it
-			// unless "forceEvaluate" is set to true ( this, for example,
-			// is set to true when running `picturefill` on `resize` ).
-			if ( !forceEvaluate && img.hasAttribute( "data-picture-evaluated" ) ) {
-				continue;
-			}
-			img.setAttribute( "data-picture-evaluated", true );
-			img.src = img.getAttribute( "data-picture-src" );
 		}
 	}
 
