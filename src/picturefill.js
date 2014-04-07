@@ -163,7 +163,7 @@
 
 			// In IE9, <source> elements get removed if they aren"t children of
 			// video elements. Thus, we conditionally wrap source elements
-			// using <!--[if gte IE 8]><video style="display: none;"><![endif]-->
+			// using <!--[if IE 9]><video style="display: none;"><![endif]-->
 			// and must account for that here by moving those source elements
 			// back into the picture element.
 			var videos = picture.getElementsByTagName( "video" );
