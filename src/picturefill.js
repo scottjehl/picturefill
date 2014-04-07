@@ -131,7 +131,7 @@
 			var candidateArr = candidate.split( /\s+/ );
 			var sizeDescriptor = candidateArr[ 1 ];
 			var resolution;
-			if ( sizeDescriptor && ( sizeDescriptor.slice( -1 ) === "w" || sizeDescriptor.slice( -1 ) === "x" )) {
+			if ( sizeDescriptor && ( sizeDescriptor.slice( -1 ) === "w" || sizeDescriptor.slice( -1 ) === "x" ) ) {
 				sizeDescriptor = sizeDescriptor.slice( 0, -1 );
 			}
 			if ( sizes ) {
@@ -211,16 +211,16 @@
 				var matchedEl = matches.pop();
 				if ( !picImg ) {
 					picImg = doc.createElement( "img" );
-					if ( picture.hasAttribute( "alt" )) {
+					if ( picture.hasAttribute( "alt" ) ) {
 						picImg.alt = picture.getAttribute( "alt" );
 					}
-					if ( picture.hasAttribute( "title" )) {
+					if ( picture.hasAttribute( "title" ) ) {
 						picImg.title = picture.getAttribute( "title" );
 					}
 				}
 				var srcset = matchedEl.getAttribute( "srcset" );
 				var candidates;
-				if ( matchedEl.hasAttribute( "sizes" )) {
+				if ( matchedEl.hasAttribute( "sizes" ) ) {
 					var sizes = matchedEl.getAttribute( "sizes" );
 					candidates = pf.getCandidatesFromSourceSet( srcset, sizes );
 				} else {
@@ -231,7 +231,7 @@
 				var sortedCandidates = candidates.sort( pf.ascendingSort );
 				// Determine which image to use based on image candidates array
 				for ( var k=0; k < sortedCandidates.length; k++ ) {
-					var candidate = sortedCandidates[k];
+					var candidate = sortedCandidates[ k ];
 					if ( candidate.resolution >= pf.getDpr() ) {
 						if ( !pf.endsWith( picImg.src, candidate.url ) ) {
 							picImg.src = candidate.url;
@@ -242,7 +242,7 @@
 
 				// If none of the image candidates worked out,
 				// set src to data-picture-src
-				if ( !picImg.src && picImg.hasAttribute( "data-picture-src" )) {
+				if ( !picImg.src && picImg.hasAttribute( "data-picture-src" ) ) {
 					picImg.src = picImg.getAttribute( "data-picture-src" );
 				}
 				matchedEl.appendChild( picImg );
@@ -261,7 +261,7 @@
 			// if img element has already been evaluated, skip it
 			// unless "forceEvaluate" is set to true ( this, for example,
 			// is set to true when running `picturefill` on `resize` ).
-			if ( !forceEvaluate && img.hasAttribute( "data-picture-evaluated" )) {
+			if ( !forceEvaluate && img.hasAttribute( "data-picture-evaluated" ) ) {
 				continue;
 			}
 			img.setAttribute( "data-picture-evaluated", true );
@@ -280,7 +280,7 @@
 			// When the document has finished loading, stop checking for new images
 			// https://github.com/ded/domready/blob/master/ready.js#L15
 			w.picturefill();
-			if ( /^loaded|^i|^c/.test( doc.readyState )) {
+			if ( /^loaded|^i|^c/.test( doc.readyState ) ) {
 				clearInterval( intervalId );
 				return;
 			}
