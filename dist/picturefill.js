@@ -62,7 +62,7 @@ window.matchMedia || (window.matchMedia = function() {
 		 */
 		if ( typeof String.prototype.trim !== "function" ) {
 				String.prototype.trim = function() {
-						return this.replace(/^\s+|\s+$/g, "" );
+						return this.replace( /^\s+|\s+$/g, "" );
 				};
 		}
 
@@ -118,21 +118,21 @@ window.matchMedia || (window.matchMedia = function() {
 				var winningLength;
 				for ( var i=0, len=sourceSizeList.length; i < len; i++ ) {
 						// Match <media-query>? length, ie ( min-width: 50em ) 100%
-						var sourceSize = sourceSizeList[i];
+						var sourceSize = sourceSizeList[ i ];
 
 						// Split "( min-width: 50em ) 100%" into separate strings
 						var match = /(\([^)]+\))?\s*([^\s]+)/g.exec( sourceSize );
 						if ( !match ) {
 								continue;
 						}
-						var length = match[2];
+						var length = match[ 2 ];
 						var media;
-						if ( !match[1] ) {
+						if ( !match[ 1 ] ) {
 								// if there is no media query, choose this as our winning length
 								winningLength = length;
 								break;
 						} else {
-								media = match[1];
+								media = match[ 1 ];
 						}
 
 						if ( w._matchesMedia( media )) {
@@ -172,9 +172,9 @@ window.matchMedia || (window.matchMedia = function() {
 						widthInCssPixels = w._findWidthFromSourceSize( sizes );
 				}
 				for ( var i = 0, len = candidates.length; i < len; i++ ) {
-						var candidate = candidates[i];
+						var candidate = candidates[ i ];
 						var candidateArr = candidate.split( /\s+/ );
-						var sizeDescriptor = candidateArr[1];
+						var sizeDescriptor = candidateArr[ 1 ];
 						var resolution;
 						if ( sizeDescriptor && ( sizeDescriptor.slice( -1 ) === "w" || sizeDescriptor.slice( -1 ) === "x" )) {
 								sizeDescriptor = sizeDescriptor.slice( 0, -1 );
