@@ -21,27 +21,27 @@
 
 
 		test("_getWidthFromLength", function() {
-				equal(window._getWidthFromLength('750px'), 750, "returns int value of width string");
+				equal(picturefill._.getWidthFromLength('750px'), 750, "returns int value of width string");
 		})
 
 		test("_findWidthFromSourceSize", function() {
 				var sizes = "  (max-width: 30em) 1000px,   (max-width: 50em) 750px, 500px  ";
 				// mock match media
-				var oldMatchesMedia = window._matchesMedia;
-				window._matchesMedia = function(media) {
+				var oldMatchesMedia = picturefill._.matchesMedia;
+				picturefill._.matchesMedia = function(media) {
 						return true;
 				};
-				var width = window._findWidthFromSourceSize(sizes);
+				var width = picturefill._.findWidthFromSourceSize(sizes);
 				equal(width, 1000, "returns 1000 when match media returns true");
 
-				window._matchesMedia = function(media) {
+				picturefill._.matchesMedia = function(media) {
 						return false;
 				};
-				var width = window._findWidthFromSourceSize(sizes);
+				var width = picturefill._.findWidthFromSourceSize(sizes);
 				equal(width, 500, "returns 500 when match media returns false");
 
 				// restore `matchesMedia`
-				window._matchesMedia = oldMatchesMedia;
+				picturefill._.matchesMedia = oldMatchesMedia;
 		});
 
 		test("_getCandidatesFromSourceSet", function() {
@@ -53,7 +53,7 @@
 								url: "images/pic-medium.png"
 						}
 				];
-				deepEqual(window._getCandidatesFromSourceSet(candidate1), expectedFormattedCandidates1, "Works!");
+				deepEqual(picturefill._.getCandidatesFromSourceSet(candidate1), expectedFormattedCandidates1, "Works!");
 
 				var candidate2 = "images/pic-medium.png 1x, images/pic-medium-2x.png 2x";
 				var expectedFormattedCandidates2 = [
@@ -66,11 +66,11 @@
 								url: "images/pic-medium-2x.png"
 						}
 				];
-				deepEqual(window._getCandidatesFromSourceSet(candidate2), expectedFormattedCandidates2, "Works!");
+				deepEqual(picturefill._.getCandidatesFromSourceSet(candidate2), expectedFormattedCandidates2, "Works!");
 
 				// Test with multiple spaces
 				var candidate3 = "      images/pic-medium.png    1x   ,    images/pic-medium-2x.png    2x   ";
-				deepEqual(window._getCandidatesFromSourceSet(candidate3), expectedFormattedCandidates2, "Works!")
+				deepEqual(picturefill._.getCandidatesFromSourceSet(candidate3), expectedFormattedCandidates2, "Works!")
 
 				// Test with decimals
 				var candidate4 = "      images/pic-smallest.png    0.25x   ,    images/pic-small.png    0.5x   , images/pic-medium.png 1x";
@@ -88,12 +88,12 @@
 								url: "images/pic-medium.png"
 						}
 				];
-				deepEqual(window._getCandidatesFromSourceSet(candidate4), expectedFormattedCandidates4, "Works!");
+				deepEqual(picturefill._.getCandidatesFromSourceSet(candidate4), expectedFormattedCandidates4, "Works!");
 
 				 // Test with "sizes" passed with a px length specified
 				 var candidate5 = "      images/pic-smallest.png    250w   ,    images/pic-small.png    500w   , images/pic-medium.png 1000w";
 				 var sizes = "1000px";
-				 deepEqual(window._getCandidatesFromSourceSet(candidate5, sizes), expectedFormattedCandidates4, "Works!");
+				 deepEqual(picturefill._.getCandidatesFromSourceSet(candidate5, sizes), expectedFormattedCandidates4, "Works!");
 
 				// Test with "sizes" passed with % lengths specified
 				var candidate6 = "\npic320.png 320w  , pic640.png   640w, pic768.png 768w, \
@@ -121,19 +121,19 @@
 								url: "pic2048.png"
 						}
 				];
-				var oldMatchesMedia = window._matchesMedia;
-				window._matchesMedia = function(media) {
+				var oldMatchesMedia = picturefill._.matchesMedia;
+				picturefill._.matchesMedia = function(media) {
 						return true;
 				};
-				var oldGetWidthFromLength = window._getWidthFromLength;
-				window._getWidthFromLength = function(width) {
+				var oldGetWidthFromLength = picturefill._.getWidthFromLength;
+				picturefill._.getWidthFromLength = function(width) {
 						return 640;
 				}
-				deepEqual(window._getCandidatesFromSourceSet(candidate6, sizes), expectedCandidates, "Works!");
+				deepEqual(picturefill._.getCandidatesFromSourceSet(candidate6, sizes), expectedCandidates, "Works!");
 
 				// restores `matchesMedia` and `getWidthFromLength`
-				window._matchesMedia = oldMatchesMedia;
-				window._getWidthFromLength = oldGetWidthFromLength;
+				picturefill._.matchesMedia = oldMatchesMedia;
+				picturefill._.getWidthFromLength = oldGetWidthFromLength;
 
 		});
 </script>

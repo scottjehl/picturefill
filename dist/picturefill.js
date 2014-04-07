@@ -56,6 +56,9 @@ window.matchMedia || (window.matchMedia = function() {
 	// Enable strict mode
 	"use strict";
 
+	// local object for method references and testing exposure
+	var pf = {};
+
 	/**
 	 * http://jsperf.com/trim-polyfill
 	 */
@@ -77,14 +80,14 @@ window.matchMedia || (window.matchMedia = function() {
 	/**
 	 * Shortcut method for matchMedia ( for easy overriding in tests )
 	 */
-	w._matchesMedia = function( media ) {
+	pf.matchesMedia = function( media ) {
 		return w.matchMedia && w.matchMedia( media ).matches;
 	};
 
 	/**
 	 * Shortcut method for `devicePixelRatio` ( for easy overriding in tests )
 	 */
-	w._getDpr = function() {
+	pf.getDpr = function() {
 		return ( w.devicePixelRatio || 1 );
 	};
 
@@ -93,7 +96,8 @@ window.matchMedia || (window.matchMedia = function() {
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
 	 */
 	var lengthEl;
-	w._getCachedLengthEl = function() {
+
+	pf.getCachedLengthEl = function() {
 		lengthEl = lengthEl || doc.createElement( "div" );
 		if ( !doc.body ) {
 			return;
@@ -102,8 +106,8 @@ window.matchMedia || (window.matchMedia = function() {
 		return lengthEl;
 	};
 
-	w._getWidthFromLength = function( length ) {
-		var lengthEl = w._getCachedLengthEl();
+	pf.getWidthFromLength = function( length ) {
+		var lengthEl = pf.getCachedLengthEl();
 		lengthEl.style.cssText = "width: " + length + ";";
 		// Using offsetWidth to get width from CSS
 		return lengthEl.offsetWidth;
@@ -112,7 +116,7 @@ window.matchMedia || (window.matchMedia = function() {
 	/**
 	 * Takes a string of sizes and returns the width in pixels as an int
 	 */
-	w._findWidthFromSourceSize = function( sourceSizeListStr ) {
+	pf.findWidthFromSourceSize = function( sourceSizeListStr ) {
 		// Split up source size list, ie ( max-width: 30em ) 100%, ( max-width: 50em ) 50%, 33%
 		var sourceSizeList = sourceSizeListStr.trim().split( /\s*,\s*/ );
 		var winningLength;
@@ -135,7 +139,7 @@ window.matchMedia || (window.matchMedia = function() {
 				media = match[ 1 ];
 			}
 
-			if ( w._matchesMedia( media )) {
+			if ( pf.matchesMedia( media ) ) {
 				// if the media query matches, choose this as our winning length
 				// and end algorithm
 				winningLength = length;
@@ -150,7 +154,7 @@ window.matchMedia || (window.matchMedia = function() {
 
 		// pass the length to a method that can properly determine length
 		// in pixels based on these formats: http://dev.w3.org/csswg/css-values-3/#length-value
-		var winningLengthInt = w._getWidthFromLength( winningLength );
+		var winningLengthInt = pf.getWidthFromLength( winningLength );
 		return winningLengthInt;
 	};
 
@@ -164,12 +168,12 @@ window.matchMedia || (window.matchMedia = function() {
 	 * where resolution is http://dev.w3.org/csswg/css-values-3/#resolution-value
 	 * If sizes is specified, resolution is calculated
 	 */
-	w._getCandidatesFromSourceSet = function( srcset, sizes ) {
+	pf.getCandidatesFromSourceSet = function( srcset, sizes ) {
 		var candidates = srcset.trim().split( /\s*,\s*/ );
 		var formattedCandidates = [];
 		var widthInCssPixels;
 		if ( sizes ) {
-			widthInCssPixels = w._findWidthFromSourceSize( sizes );
+			widthInCssPixels = pf.findWidthFromSourceSize( sizes );
 		}
 		for ( var i = 0, len = candidates.length; i < len; i++ ) {
 			var candidate = candidates[ i ];
@@ -181,10 +185,10 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 			if ( sizes ) {
 				// get the dpr by taking the length / width in css pixels
-				resolution = parseFloat( (parseInt( sizeDescriptor, 10 )/widthInCssPixels ).toFixed( 2 ));
+				resolution = parseFloat( ( parseInt( sizeDescriptor, 10 ) / widthInCssPixels ).toFixed( 2 ) );
 			} else {
 				// get the dpr by grabbing the value of Nx
-				resolution = sizeDescriptor ? parseFloat( sizeDescriptor, 10 ) : w._getDpr();
+				resolution = sizeDescriptor ? parseFloat( sizeDescriptor, 10 ) : pf.getDpr();
 			}
 
 			var formattedCandidate = {
@@ -196,11 +200,11 @@ window.matchMedia || (window.matchMedia = function() {
 		return formattedCandidates;
 	};
 
-	var ascendingSort = function( a, b ) {
+	pf.ascendingSort = function( a, b ) {
 		return a.resolution > b.resolution;
 	};
 
-	w.picturefill = function( forceEvaluate ) {
+	function picturefill( forceEvaluate ) {
 		// Loop through all images on the page that are `<picture>`
 		var pictures = doc.getElementsByTagName( "picture" );
 		for ( var i=0, plen = pictures.length; i < plen; i++ ) {
@@ -245,7 +249,7 @@ window.matchMedia || (window.matchMedia = function() {
 				}
 
 				// if there"s no media specified, OR w.matchMedia is supported
-				if( !media || w._matchesMedia( media )){
+				if( !media || pf.matchesMedia( media )){
 					matches.push( source );
 				}
 			}
@@ -267,17 +271,17 @@ window.matchMedia || (window.matchMedia = function() {
 				var candidates;
 				if ( matchedEl.hasAttribute( "sizes" )) {
 					var sizes = matchedEl.getAttribute( "sizes" );
-					candidates = w._getCandidatesFromSourceSet( srcset, sizes );
+					candidates = pf.getCandidatesFromSourceSet( srcset, sizes );
 				} else {
-					candidates = w._getCandidatesFromSourceSet( srcset );
+					candidates = pf.getCandidatesFromSourceSet( srcset );
 				}
 
 				// Sort image candidates before figuring out which one to use
-				var sortedCandidates = candidates.sort( ascendingSort );
+				var sortedCandidates = candidates.sort( pf.ascendingSort );
 				// Determine which image to use based on image candidates array
 				for ( var k=0; k < sortedCandidates.length; k++ ) {
 					var candidate = sortedCandidates[k];
-					if ( candidate.resolution >= w._getDpr() ) {
+					if ( candidate.resolution >= pf.getDpr() ) {
 						if ( !picImg.src.endsWith( candidate.url )) {
 							picImg.src = candidate.url;
 						}
@@ -312,15 +316,15 @@ window.matchMedia || (window.matchMedia = function() {
 			img.setAttribute( "data-picture-evaluated", true );
 			img.src = img.getAttribute( "data-picture-src" );
 		}
-	};
+	}
 
 	/**
 	 * Sets up picture polyfill by polling the document and running
 	 * the polyfill every 250ms until the document is ready.
 	 * Also attaches picturefill on resize
 	 */
-	var runPicturefill = function() {
-		w.picturefill();
+	function runPicturefill() {
+		picturefill();
 		var intervalId = setInterval( function(){
 			// When the document has finished loading, stop checking for new images
 			// https://github.com/ded/domready/blob/master/ready.js#L15
@@ -331,10 +335,16 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 		}, 250 );
 		w.addEventListener( "resize", function() {
-				w.picturefill( true );
+			w.picturefill( true );
 		}, false );
-	};
+	}
 
 	runPicturefill();
+
+	/* expose methods for testing */
+	picturefill._ = pf;
+
+	/* expose picturefill */
+	w.picturefill = picturefill;
 
 } )( this, this.document );
