@@ -61,6 +61,10 @@ window.matchMedia || (window.matchMedia = function() {
 		return;
 	}
 
+	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
+	doc.createElement( "picture" );
+	doc.createElement( "source" );
+
 	// local object for method references and testing exposure
 	var pf = {};
 
@@ -176,7 +180,7 @@ window.matchMedia || (window.matchMedia = function() {
 			var candidateArr = candidate.split( /\s+/ );
 			var sizeDescriptor = candidateArr[ 1 ];
 			var resolution;
-			if ( sizeDescriptor && ( sizeDescriptor.slice( -1 ) === "w" || sizeDescriptor.slice( -1 ) === "x" )) {
+			if ( sizeDescriptor && ( sizeDescriptor.slice( -1 ) === "w" || sizeDescriptor.slice( -1 ) === "x" ) ) {
 				sizeDescriptor = sizeDescriptor.slice( 0, -1 );
 			}
 			if ( sizes ) {
@@ -252,20 +256,11 @@ window.matchMedia || (window.matchMedia = function() {
 
 			// Find any existing img element in the picture element
 			var picImg = picture.getElementsByTagName( "img" )[0];
-			if ( matches.length ) {
+			if ( picImg && matches.length ) {
 				var matchedEl = matches.pop();
-				if ( !picImg ) {
-					picImg = doc.createElement( "img" );
-					if ( picture.hasAttribute( "alt" )) {
-						picImg.alt = picture.getAttribute( "alt" );
-					}
-					if ( picture.hasAttribute( "title" )) {
-						picImg.title = picture.getAttribute( "title" );
-					}
-				}
 				var srcset = matchedEl.getAttribute( "srcset" );
 				var candidates;
-				if ( matchedEl.hasAttribute( "sizes" )) {
+				if ( matchedEl.hasAttribute( "sizes" ) ) {
 					var sizes = matchedEl.getAttribute( "sizes" );
 					candidates = pf.getCandidatesFromSourceSet( srcset, sizes );
 				} else {
@@ -276,7 +271,7 @@ window.matchMedia || (window.matchMedia = function() {
 				var sortedCandidates = candidates.sort( pf.ascendingSort );
 				// Determine which image to use based on image candidates array
 				for ( var k=0; k < sortedCandidates.length; k++ ) {
-					var candidate = sortedCandidates[k];
+					var candidate = sortedCandidates[ k ];
 					if ( candidate.resolution >= pf.getDpr() ) {
 						if ( !pf.endsWith( picImg.src, candidate.url ) ) {
 							picImg.src = candidate.url;
@@ -286,31 +281,9 @@ window.matchMedia || (window.matchMedia = function() {
 				}
 
 				// If none of the image candidates worked out,
-				// set src to data-picture-src
-				if ( !picImg.src && picImg.hasAttribute( "data-picture-src" )) {
-					picImg.src = picImg.getAttribute( "data-picture-src" );
-				}
-				matchedEl.appendChild( picImg );
+				// evaluate img element's srcset attribute, if present
+				// TODO TODO ^
 			}
-		}
-
-		// This is a fallback for IE8 and below. On those browsers, <picture> is not
-		// allowed to have any children elements, thus the img fallback in it becomes
-		// a sibling to <picture>
-		var imgs = doc.getElementsByTagName( "img" );
-		for ( var h=0, ilen = imgs.length; h < ilen; h++ ) {
-			var img = imgs[h];
-			if ( !img.hasAttribute( "data-picture-src" ) || img.parentNode.nodeName === "PICTURE" || img.parentNode.nodeName === "SOURCE" ) {
-				continue;
-			}
-			// if img element has already been evaluated, skip it
-			// unless "forceEvaluate" is set to true ( this, for example,
-			// is set to true when running `picturefill` on `resize` ).
-			if ( !forceEvaluate && img.hasAttribute( "data-picture-evaluated" )) {
-				continue;
-			}
-			img.setAttribute( "data-picture-evaluated", true );
-			img.src = img.getAttribute( "data-picture-src" );
 		}
 	}
 
@@ -325,7 +298,7 @@ window.matchMedia || (window.matchMedia = function() {
 			// When the document has finished loading, stop checking for new images
 			// https://github.com/ded/domready/blob/master/ready.js#L15
 			w.picturefill();
-			if ( /^loaded|^i|^c/.test( doc.readyState )) {
+			if ( /^loaded|^i|^c/.test( doc.readyState ) ) {
 				clearInterval( intervalId );
 				return;
 			}

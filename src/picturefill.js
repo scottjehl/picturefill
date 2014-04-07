@@ -207,17 +207,8 @@
 
 			// Find any existing img element in the picture element
 			var picImg = picture.getElementsByTagName( "img" )[0];
-			if ( matches.length ) {
+			if ( picImg && matches.length ) {
 				var matchedEl = matches.pop();
-				if ( !picImg ) {
-					picImg = doc.createElement( "img" );
-					if ( picture.hasAttribute( "alt" ) ) {
-						picImg.alt = picture.getAttribute( "alt" );
-					}
-					if ( picture.hasAttribute( "title" ) ) {
-						picImg.title = picture.getAttribute( "title" );
-					}
-				}
 				var srcset = matchedEl.getAttribute( "srcset" );
 				var candidates;
 				if ( matchedEl.hasAttribute( "sizes" ) ) {
@@ -243,8 +234,6 @@
 				// If none of the image candidates worked out,
 				// evaluate img element's srcset attribute, if present
 				// TODO TODO ^
-
-				matchedEl.appendChild( picImg );
 			}
 		}
 	}
