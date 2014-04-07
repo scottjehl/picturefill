@@ -1,47 +1,47 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset=utf-8 />
-        <meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>Picturefill</title>
-        <style>
-            body { font-family: sans-serif; margin:0; padding:0; }
-            img {  max-width: 100% }
-        </style>
-        <script>if (!window.matchMedia) { document.write('<script src="src/external/matchmedia.js"><\/script>'); }</script>
-        <script async="true" src="src/picturefill.js"></script>
-    </head>
-    <body>
+		<head>
+				<meta charset=utf-8 />
+				<meta name="viewport" content="width=device-width,initial-scale=1">
+				<title>Picturefill</title>
+				<style>
+						body { font-family: sans-serif; margin:0; padding:0; }
+						img {  max-width: 100% }
+				</style>
+				<script>if (!window.matchMedia) { document.write('<script src="src/external/matchmedia.js"><\/script>'); }</script>
+				<script async="true" src="src/picturefill.js"></script>
+		</head>
+		<body>
 
-        <h1>Picturefill: A &lt;picture&gt; element polyfill</h1>
+				<h1>Picturefill: A &lt;picture&gt; element polyfill</h1>
 
-        <p>For more info: <a href="http://github.com/jansepar/picturefill">see project home.</a></p>
+				<p>For more info: <a href="http://github.com/jansepar/picturefill">see project home.</a></p>
 
-        <p>Default example:</p>
-        <picture alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-            <!-- Video tag needed in order to use <source> in IE9 -->
-            <!--[if IE 9]><video style="display: none;"><![endif]-->
-            <source srcset="examples/images/small.jpg"></source>
-            <source srcset="examples/images/medium.jpg" media="(min-width: 400px)"></source>
-            <source srcset="examples/images/large.jpg" media="(min-width: 800px)"></source>
-            <source srcset="examples/images/extralarge.jpg" media="(min-width: 1000px)"></source>
-            <!--[if IE 9]></video><![endif]-->
+				<p>Default example:</p>
+				<picture alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+						<!-- Video tag needed in order to use <source> in IE9 -->
+						<!--[if IE 9]><video style="display: none;"><![endif]-->
+						<source srcset="examples/images/small.jpg"></source>
+						<source srcset="examples/images/medium.jpg" media="(min-width: 400px)"></source>
+						<source srcset="examples/images/large.jpg" media="(min-width: 800px)"></source>
+						<source srcset="examples/images/extralarge.jpg" media="(min-width: 1000px)"></source>
+						<!--[if IE 9]></video><![endif]-->
 
-            <!-- Fallback content for IE8 and older -->
-            <img data-picture-src="examples/images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-        </picture>
+						<!-- Fallback content for IE8 and older -->
+						<img data-picture-src="examples/images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+				</picture>
 
-        <p>Example using "sizes" attribute:</p>
-        <picture alt="Obama with soldiers">
-            <!-- Video tag needed in order to use <source> in IE9 -->
-            <!--[if IE 9]><video style="display: none;"><![endif]-->
-            <source sizes="(max-width: 30em) 100%, (max-width: 50em) 75%, 50%"
-                    srcset="examples/images/pic-small.png 400w, examples/images/pic-medium.png 800w, examples/images/pic-large.png 1200w"></source>
-            <!--[if IE 9]></video><![endif]-->
+				<p>Example using "sizes" attribute:</p>
+				<picture alt="Obama with soldiers">
+						<!-- Video tag needed in order to use <source> in IE9 -->
+						<!--[if IE 9]><video style="display: none;"><![endif]-->
+						<source sizes="(max-width: 30em) 100%, (max-width: 50em) 75%, 50%"
+										srcset="examples/images/pic-small.png 400w, examples/images/pic-medium.png 800w, examples/images/pic-large.png 1200w"></source>
+						<!--[if IE 9]></video><![endif]-->
 
-            <!-- Fallback content for IE8 and older -->
-            <img data-picture-src="examples/images/pic-small.png" alt="Obama with soldiers">
-        </picture>
+						<!-- Fallback content for IE8 and older -->
+						<img data-picture-src="examples/images/pic-small.png" alt="Obama with soldiers">
+				</picture>
 
-    </body>
+		</body>
 </html>

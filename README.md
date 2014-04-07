@@ -17,8 +17,8 @@ until DOMContentLoaded). It will also conditionally load matchMedia if the brows
 doesn't support it.
 
 ```html
-    <head>
-    <script async="true" src="picturefill.js"></script>
+	<head>
+	<script async="true" src="picturefill.js"></script>
 ```
 
 If you don't want to load the script asynchronously, you can still insert the following script right above
@@ -30,33 +30,33 @@ before executing, waiting precious time that could have been spend downloading i
 The following is an example based on the latest spec without using `sizes`:
 
 ```html
-    <picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-        <!-- Video tag needed in order to use <source> in IE9 -->
-        <!--[if IE 9]><video style="display: none;"><![endif]-->
-        <source srcset="images/small.jpg"></source>
-        <source srcset="images/medium.jpg" media="(min-width: 400px)"></source>
-        <source srcset="images/large.jpg" media="(min-width: 800px)"></source>
-        <source srcset="images/extralarge.jpg" media="(min-width: 1000px)"></source>
-        <!--[if IE 9]></video><![endif]-->
+	<picture data-alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+		<!-- Video tag needed in order to use <source> in IE9 -->
+		<!--[if IE 9]><video style="display: none;"><![endif]-->
+		<source srcset="images/small.jpg"></source>
+		<source srcset="images/medium.jpg" media="(min-width: 400px)"></source>
+		<source srcset="images/large.jpg" media="(min-width: 800px)"></source>
+		<source srcset="images/extralarge.jpg" media="(min-width: 1000px)"></source>
+		<!--[if IE 9]></video><![endif]-->
 
-        <!-- Fallback content for IE8 and older -->
-        <img data-picture-src="images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-    </picture>
+		<!-- Fallback content for IE8 and older -->
+		<img data-picture-src="images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	</picture>
 ```
 
 And using `sizes`:
 
 ```html
-    <picture data-alt="Obama with soldiers">
-        <!-- Video tag needed in order to use <source> in IE9 -->
-        <!--[if IE 9]><video style="display: none;"><![endif]-->
-        <source sizes="(max-width: 30em) 100%, (max-width: 50em) 75%, 50%"
-                srcset="images/pic-small.png 400w, images/pic-medium.png 800w, images/pic-large.png 1200w"></source>
-        <!--[if IE 9]></video><![endif]-->
+	<picture data-alt="Obama with soldiers">
+		<!-- Video tag needed in order to use <source> in IE9 -->
+		<!--[if IE 9]><video style="display: none;"><![endif]-->
+		<source sizes="(max-width: 30em) 100%, (max-width: 50em) 75%, 50%"
+				srcset="images/pic-small.png 400w, images/pic-medium.png 800w, images/pic-large.png 1200w"></source>
+		<!--[if IE 9]></video><![endif]-->
 
-        <!-- Fallback content for IE8 and older -->
-        <img data-picture-src="images/pic-small.png" alt="Obama with soldiers">
-    </picture>
+		<!-- Fallback content for IE8 and older -->
+		<img data-picture-src="images/pic-small.png" alt="Obama with soldiers">
+	</picture>
 ```
 
 ### Explained...
@@ -139,7 +139,7 @@ larger image to IE desktop browsers, you might consider using conditional commen
 		<source srcset="medium.jpg" data-media="(min-width: 400px)"></source>
 
 		<!--[if (lt IE 9) & (!IEMobile)]>
-		    <source srcset="medium.jpg"></source>
+			<source srcset="medium.jpg"></source>
 		<![endif]-->
 
 		<!-- Fallback content for IE8 and below. Same img src as the initial, unqualified source element. -->
