@@ -151,6 +151,36 @@
 		return formattedCandidates;
 	};
 
+	pf.processSourceSet = function( el ) {
+		var srcset = el.getAttribute( "srcset" ),
+			sizes = el.getAttribute( "sizes" ),
+			candidates;
+
+		if( srcset ) {
+			if ( sizes ) {
+				candidates = pf.getCandidatesFromSourceSet( srcset, sizes );
+			} else {
+				candidates = pf.getCandidatesFromSourceSet( srcset );
+			}
+		}
+		return candidates;
+	};
+
+	pf.applyBestCandidate = function( candidates, picImg ) {
+		var sortedImgCandidates = candidates.sort( pf.ascendingSort ),
+			candidate;
+
+		for ( var l=0; l < sortedImgCandidates.length; l++ ) {
+			candidate = sortedImgCandidates[ l ];
+			if ( candidate.resolution >= pf.getDpr() ) {
+				if ( !pf.endsWith( picImg.src, candidate.url ) ) {
+					picImg.src = candidate.url;
+				}
+				break;
+			}
+		}
+	};
+
 	pf.ascendingSort = function( a, b ) {
 		return a.resolution > b.resolution;
 	};
@@ -206,34 +236,23 @@
 			}
 
 			// Find any existing img element in the picture element
-			var picImg = picture.getElementsByTagName( "img" )[0];
+			var picImg = picture.getElementsByTagName( "img" )[0],
+				candidates;
+
 			if ( picImg && matches.length ) {
 				var matchedEl = matches.pop();
-				var srcset = matchedEl.getAttribute( "srcset" );
-				var candidates;
-				if ( matchedEl.hasAttribute( "sizes" ) ) {
-					var sizes = matchedEl.getAttribute( "sizes" );
-					candidates = pf.getCandidatesFromSourceSet( srcset, sizes );
-				} else {
-					candidates = pf.getCandidatesFromSourceSet( srcset );
-				}
 
-				// Sort image candidates before figuring out which one to use
-				var sortedCandidates = candidates.sort( pf.ascendingSort );
-				// Determine which image to use based on image candidates array
-				for ( var k=0; k < sortedCandidates.length; k++ ) {
-					var candidate = sortedCandidates[ k ];
-					if ( candidate.resolution >= pf.getDpr() ) {
-						if ( !pf.endsWith( picImg.src, candidate.url ) ) {
-							picImg.src = candidate.url;
-						}
-						break;
-					}
-				}
+				candidates = pf.processSourceSet( matchedEl );
+				pf.applyBestCandidate( candidates, picImg );
 
-				// If none of the image candidates worked out,
-				// evaluate img element's srcset attribute, if present
-				// TODO TODO ^
+			} else if ( picImg && !matches.length ) {
+				// No sources matched, so we’re down to processing the inner `img` as a source.
+				candidates = pf.processSourceSet( picImg );
+
+				if( picImg.srcset === undefined || picImg.hasAttribute( "sizes" ) ) {
+					// Either `srcset` is completely unsupported, or we need to polyfill `sizes` functionality.
+					pf.applyBestCandidate( candidates, picImg );
+				} // Else, resolution-only `srcset` is supported natively.
 			}
 		}
 	}
