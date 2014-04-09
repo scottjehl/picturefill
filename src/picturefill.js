@@ -154,7 +154,7 @@
 	pf.processSourceSet = function( el ) {
 		var srcset = el.getAttribute( "srcset" ),
 			sizes = el.getAttribute( "sizes" ),
-			candidates;
+			candidates = [];
 
 		if( srcset ) {
 			if ( sizes ) {
