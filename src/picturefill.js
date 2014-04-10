@@ -170,7 +170,11 @@
 			candidate = sortedImgCandidates[ l ];
 			if ( candidate.resolution >= pf.getDpr() ) {
 				if ( !pf.endsWith( picImg.src, candidate.url ) ) {
-					picImg.src = candidate.url;
+					if( picImg.srcset === undefined ) {
+						picImg.src = candidate.url;
+					} else {
+						picImg.srcset = candidate.url;
+					}
 				}
 				break;
 			}
