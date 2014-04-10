@@ -31,7 +31,10 @@
 					var matchedEl = matches.pop();
 					if( !picImg || picImg.parentNode.nodeName === "NOSCRIPT" ){
 						picImg = w.document.createElement( "img" );
-						picImg.alt = ps[ i ].getAttribute( "data-alt" );
+						var alt = ps[ i ].getAttribute( "data-alt" );
+						if (alt !== null) {
+							picImg.alt = alt;
+						}
 					}
 					else if( matchedEl === picImg.parentNode ){
 						// Skip further actions if the correct image is already in place
