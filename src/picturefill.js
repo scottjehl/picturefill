@@ -151,6 +151,32 @@
 		return formattedCandidates;
 	};
 
+	pf.processSourceSet = function( el ) {
+		var srcset = el.getAttribute( "srcset" ),
+			sizes = el.getAttribute( "sizes" ),
+			candidates = [];
+
+		if( srcset ) {
+			candidates = pf.getCandidatesFromSourceSet( srcset, sizes );
+		}
+		return candidates;
+	};
+
+	pf._applyBestCandidate = function( candidates, picImg ) {
+		var sortedImgCandidates = candidates.sort( pf.ascendingSort ),
+			candidate;
+
+		for ( var l=0; l < sortedImgCandidates.length; l++ ) {
+			candidate = sortedImgCandidates[ l ];
+			if ( candidate.resolution >= pf.getDpr() ) {
+				if ( !pf.endsWith( picImg.src, candidate.url ) ) {
+					picImg.srcset = candidate.url;
+				}
+				break;
+			}
+		}
+	};
+
 	pf.ascendingSort = function( a, b ) {
 		return a.resolution > b.resolution;
 	};
@@ -168,7 +194,6 @@
 				continue;
 			}
 			picture.setAttribute( "data-picture-evaluated", true );
-			var matches = [];
 
 			// In IE9, <source> elements get removed if they aren"t children of
 			// video elements. Thus, we conditionally wrap source elements
@@ -186,7 +211,8 @@
 				video.parentNode.removeChild( video );
 			}
 
-			var sources = picture.getElementsByTagName( "source" );
+			var sources = picture.getElementsByTagName( "source" ),
+				firstMatch, candidates;
 
 			// Go through each child, and if they have media queries, evaluate them
 			// and add them to matches
@@ -201,39 +227,25 @@
 
 				// if there"s no media specified, OR w.matchMedia is supported
 				if( !media || pf.matchesMedia( media )){
-					matches.push( source );
+					firstMatch = source;
+					break;
 				}
 			}
 
 			// Find any existing img element in the picture element
 			var picImg = picture.getElementsByTagName( "img" )[0];
-			if ( picImg && matches.length ) {
-				var matchedEl = matches.pop();
-				var srcset = matchedEl.getAttribute( "srcset" );
-				var candidates;
-				if ( matchedEl.hasAttribute( "sizes" ) ) {
-					var sizes = matchedEl.getAttribute( "sizes" );
-					candidates = pf.getCandidatesFromSourceSet( srcset, sizes );
-				} else {
-					candidates = pf.getCandidatesFromSourceSet( srcset );
-				}
+			if ( picImg && firstMatch ) {
+				candidates = pf.processSourceSet( firstMatch );
+				pf._applyBestCandidate( candidates, picImg );
 
-				// Sort image candidates before figuring out which one to use
-				var sortedCandidates = candidates.sort( pf.ascendingSort );
-				// Determine which image to use based on image candidates array
-				for ( var k=0; k < sortedCandidates.length; k++ ) {
-					var candidate = sortedCandidates[ k ];
-					if ( candidate.resolution >= pf.getDpr() ) {
-						if ( !pf.endsWith( picImg.src, candidate.url ) ) {
-							picImg.src = candidate.url;
-						}
-						break;
-					}
-				}
+			} else if ( picImg && !firstMatch ) {
+				// No sources matched, so we’re down to processing the inner `img` as a source.
+				candidates = pf.processSourceSet( picImg );
 
-				// If none of the image candidates worked out,
-				// evaluate img element's srcset attribute, if present
-				// TODO TODO ^
+				if( picImg.srcset === undefined || picImg.hasAttribute( "sizes" ) ) {
+					// Either `srcset` is completely unsupported, or we need to polyfill `sizes` functionality.
+					pf._applyBestCandidate( candidates, picImg );
+				} // Else, resolution-only `srcset` is supported natively.
 			}
 		}
 	}
