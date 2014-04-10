@@ -75,8 +75,7 @@
 		// based on Modernizr's img-webp test
 		// note: asynchronous
 		var img = new Image(),
-			type = "image/webp",
-			ret = false;
+			type = "image/webp";
 
 		img.onerror = function(){
 			pf.types[ type ] = false;
