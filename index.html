@@ -74,5 +74,20 @@
 				<img sizes="(max-width: 30em) 100%, (max-width: 50em) 75%, 50%" srcset="examples/images/pic-small.png 400w, examples/images/pic-medium.png 800w, examples/images/pic-large.png 1200w" alt="Obama with soldiers">
 			</picture>
 
+			<p>`media` only example with a webp source:</p>
+			<picture>
+					<!-- Video tag needed in order to use <source> in IE9 -->
+					<!--[if IE 9]><video style="display: none;"><![endif]-->
+					<source srcset="examples/images/small.jpg"></source>
+					<source srcset="examples/images/medium.jpg" media="(min-width: 400px)"></source>
+					<source srcset="examples/images/large.jpg" media="(min-width: 800px)"></source>
+					<source srcset="examples/images/large.webp" media="(min-width: 800px)" type="image/webp"></source>
+					<source srcset="examples/images/extralarge.jpg" media="(min-width: 1000px)"></source>
+					<!--[if IE 9]></video><![endif]-->
+
+					<!-- Fallback content. Note that using `srcset` will result in a duplicate request in browsers that have native support for resolution-only `srcset` but *not* `picture`. This is apt to be very few versions of evergreen browsers. -->
+					<img srcset="examples/images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+			</picture>
+
 	</body>
 </html>
