@@ -157,11 +157,7 @@
 			candidates = [];
 
 		if( srcset ) {
-			if ( sizes ) {
-				candidates = pf.getCandidatesFromSourceSet( srcset, sizes );
-			} else {
-				candidates = pf.getCandidatesFromSourceSet( srcset );
-			}
+			candidates = pf.getCandidatesFromSourceSet( srcset, sizes );
 		}
 		return candidates;
 	};

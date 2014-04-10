@@ -1,4 +1,4 @@
-/*! Picturefill - v2.0.0 - 2014-04-09
+/*! Picturefill - v2.0.0 - 2014-04-10
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -203,19 +203,15 @@ window.matchMedia || (window.matchMedia = function() {
 	pf.processSourceSet = function( el ) {
 		var srcset = el.getAttribute( "srcset" ),
 			sizes = el.getAttribute( "sizes" ),
-			candidates;
+			candidates = [];
 
 		if( srcset ) {
-			if ( sizes ) {
-				candidates = pf.getCandidatesFromSourceSet( srcset, sizes );
-			} else {
-				candidates = pf.getCandidatesFromSourceSet( srcset );
-			}
+			candidates = pf.getCandidatesFromSourceSet( srcset, sizes );
 		}
 		return candidates;
 	};
 
-	pf.applyBestCandidate = function( candidates, picImg ) {
+	pf._applyBestCandidate = function( candidates, picImg ) {
 		var sortedImgCandidates = candidates.sort( pf.ascendingSort ),
 			candidate;
 
@@ -292,7 +288,7 @@ window.matchMedia || (window.matchMedia = function() {
 				var matchedEl = matches.pop();
 
 				candidates = pf.processSourceSet( matchedEl );
-				pf.applyBestCandidate( candidates, picImg );
+				pf._applyBestCandidate( candidates, picImg );
 
 			} else if ( picImg && !matches.length ) {
 				// No sources matched, so we’re down to processing the inner `img` as a source.
@@ -300,7 +296,7 @@ window.matchMedia || (window.matchMedia = function() {
 
 				if( picImg.srcset === undefined || picImg.hasAttribute( "sizes" ) ) {
 					// Either `srcset` is completely unsupported, or we need to polyfill `sizes` functionality.
-					pf.applyBestCandidate( candidates, picImg );
+					pf._applyBestCandidate( candidates, picImg );
 				} // Else, resolution-only `srcset` is supported natively.
 			}
 		}
