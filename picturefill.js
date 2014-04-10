@@ -5,6 +5,12 @@
 	// Enable strict mode
 	"use strict";
 
+	// Configuration: set any options before loading picturefill.js
+	var c = w.picturefillConfig = w.picturefillConfig || {};
+	c.onresize = typeof c.onresize == 'undefined' ? true : c.onresize;
+	c.onready = typeof c.onready == 'undefined' ? true : c.onready;
+	c.onload = typeof c.onload == 'undefined' ? true : c.onload;
+
 	w.picturefill = function() {
 		var ps = w.document.getElementsByTagName( "span" );
 
@@ -55,16 +61,24 @@
 
 	// Run on resize and domready (w.load as a fallback)
 	if( w.addEventListener ){
-		w.addEventListener( "resize", w.picturefill, false );
-		w.addEventListener( "DOMContentLoaded", function(){
-			w.picturefill();
-			// Run once only
-			w.removeEventListener( "load", w.picturefill, false );
-		}, false );
-		w.addEventListener( "load", w.picturefill, false );
+		if (w.picturefillConfig.onresize) {
+			w.addEventListener( "resize", w.picturefill, false );
+		}
+		if (w.picturefillConfig.onready) {
+			w.addEventListener( "DOMContentLoaded", function(){
+				w.picturefill();
+				// Run once only
+				w.removeEventListener( "load", w.picturefill, false );
+			}, false );
+		}
+		if (w.picturefillConfig.onload) {
+			w.addEventListener( "load", w.picturefill, false );
+		}
 	}
 	else if( w.attachEvent ){
-		w.attachEvent( "onload", w.picturefill );
+		if (w.picturefillConfig.onload || w.picturefillConfig.onready) {
+			w.attachEvent( "onload", w.picturefill );
+		}
 	}
 
 }( this ));
