@@ -24,6 +24,7 @@
 		return str.trim ? str.trim() : str.replace( /^\s+|\s+$/g, "" );
 	};
 
+	// just a string endsWith workaround
 	pf.endsWith = function( str, suffix ){
 		return str.endsWith ? str.endsWith( suffix ) : str.indexOf( suffix, str.length - suffix.length ) !== -1;
 	};
@@ -219,6 +220,8 @@
 			if ( candidate.resolution >= pf.getDpr() ) {
 				if ( !pf.endsWith( picImg.src, candidate.url ) ) {
 					picImg.src = candidate.url;
+					// currentSrc attribute and property to match http://picture.responsiveimages.org/#the-img-element
+					picImg.currentSrc = candidate.url;
 				}
 				break;
 			}
