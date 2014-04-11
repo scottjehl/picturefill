@@ -20,10 +20,10 @@
 			<picture>
 					<!-- Video tag needed in order to use <source> in IE9 -->
 					<!--[if IE 9]><video style="display: none;"><![endif]-->
-					<source srcset="examples/images/small.jpg"></source>
-					<source srcset="examples/images/medium.jpg" media="(min-width: 400px)"></source>
-					<source srcset="examples/images/large.jpg" media="(min-width: 800px)"></source>
 					<source srcset="examples/images/extralarge.jpg" media="(min-width: 1000px)"></source>
+					<source srcset="examples/images/large.jpg" media="(min-width: 800px)"></source>
+					<source srcset="examples/images/medium.jpg" media="(min-width: 400px)"></source>
+					<source srcset="examples/images/small.jpg"></source>
 					<!--[if IE 9]></video><![endif]-->
 
 					<!-- Fallback content. Note that using `srcset` will result in a duplicate request in browsers that have native support for resolution-only `srcset` but *not* `picture`. This is apt to be very few versions of evergreen browsers. -->
@@ -34,8 +34,8 @@
 			<picture>
 					<!-- Video tag needed in order to use <source> in IE9 -->
 					<!--[if IE 9]><video style="display: none;"><![endif]-->
-					<source srcset="examples/images/small.jpg, examples/images/medium.jpg 2x"></source>
 					<source srcset="examples/images/large.jpg, examples/images/extralarge.jpg 2x" media="(min-width: 800px)"></source>
+					<source srcset="examples/images/small.jpg, examples/images/medium.jpg 2x"></source>
 					<!--[if IE 9]></video><![endif]-->
 
 					<!-- Fallback content for IE8 and older -->
@@ -78,11 +78,11 @@
 			<picture>
 					<!-- Video tag needed in order to use <source> in IE9 -->
 					<!--[if IE 9]><video style="display: none;"><![endif]-->
-					<source srcset="examples/images/small.jpg"></source>
-					<source srcset="examples/images/medium.jpg" media="(min-width: 400px)"></source>
-					<source srcset="examples/images/large.jpg" media="(min-width: 800px)"></source>
-					<source srcset="examples/images/large.webp" media="(min-width: 800px)" type="image/webp"></source>
 					<source srcset="examples/images/extralarge.jpg" media="(min-width: 1000px)"></source>
+					<source srcset="examples/images/large.webp" media="(min-width: 800px)" type="image/webp"></source>
+					<source srcset="examples/images/large.jpg" media="(min-width: 800px)"></source>
+					<source srcset="examples/images/medium.jpg" media="(min-width: 400px)"></source>
+					<source srcset="examples/images/small.jpg"></source>
 					<!--[if IE 9]></video><![endif]-->
 
 					<!-- Fallback content. Note that using `srcset` will result in a duplicate request in browsers that have native support for resolution-only `srcset` but *not* `picture`. This is apt to be very few versions of evergreen browsers. -->
