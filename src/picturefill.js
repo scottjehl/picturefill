@@ -19,6 +19,9 @@
 	// local object for method references and testing exposure
 	var pf = {};
 
+	// namespace
+	pf.ns = "picturefill";
+
 	// just a string trim workaround
 	pf.trim = function( str ){
 		return str.trim ? str.trim() : str.replace( /^\s+|\s+$/g, "" );
@@ -200,10 +203,31 @@
 		return formattedCandidates;
 	};
 
+	/*
+	 * if it's an img element and it has a srcset property,
+	 * we need to remove the attribute so we can minipulate src
+	 * (the property's existence infers native srcset support, and a srcset-supporting browser will prioritize srcset's value over our winning picture candidate)
+	 * this moves srcset's value to memory for later use and removes the attr
+	 */
+	pf.dodgeSrcset = function( img ){
+		if( img.srcset ){
+			img[ pf.ns ].srcset = img.srcset;
+			img.removeAttribute( "srcset" );
+		}
+	};
+
+	/*
+	 * Accept a source or img element and process its srcset and sizes attrs
+	 */
 	pf.processSourceSet = function( el ) {
 		var srcset = el.getAttribute( "srcset" ),
 			sizes = el.getAttribute( "sizes" ),
 			candidates = [];
+
+		// if it's an img element, use the cached srcset property (defined or not)
+		if( el.nodeName === "IMG" ){
+			srcset = el[ pf.ns ].srcset;
+		}
 
 		if( srcset ) {
 			candidates = pf.getCandidatesFromSourceSet( srcset, sizes );
@@ -308,6 +332,14 @@
 				candidates;
 
 			if( picImg ) {
+
+				// expando for caching data on the img
+				if( !picImg[ pf.ns ] ){
+					picImg[ pf.ns ] = {};
+					// cache and remove srcset if present
+					pf.dodgeSrcset( picImg );
+				}
+
 				if ( firstMatch ) {
 					candidates = pf.processSourceSet( firstMatch );
 					pf.applyBestCandidate( candidates, picImg );
@@ -353,6 +385,6 @@
 	picturefill._ = pf;
 
 	/* expose picturefill */
-	w.picturefill = picturefill;
+	w[ pf.ns ] = picturefill;
 
 } )( this, this.document );
