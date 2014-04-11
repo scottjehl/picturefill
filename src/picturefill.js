@@ -286,13 +286,18 @@
 		for ( var i=0, plen = pictures.length; i < plen; i++ ) {
 			var picture = pictures[ i ];
 
+			// expando for caching data on the img
+			if( !picture[ pf.ns ] ){
+				picture[ pf.ns ] = {};
+			}
+
 			// if a picture element has already been evaluated, skip it
 			// unless `options.force` is set to true ( this, for example,
 			// is set to true when running `picturefill` on `resize` ).
-			if ( !options.reevaluate && picture.hasAttribute( "data-picture-evaluated" ) ) {
+			if ( !options.reevaluate && picture[ pf.ns ].evaluated ) {
 				continue;
 			}
-			picture.setAttribute( "data-picture-evaluated", true );
+
 			var firstMatch;
 
 			// IE9 video workaround
@@ -327,7 +332,6 @@
 
 			// if any sources are pending in this picture due to async type test(s), remove the evaluated attr and skip for now ( the pending test will rerun picturefill on this element when complete)
 			if( sourcesPending ){
-				picture.removeAttribute( "data-picture-evaluated" );
 				continue;
 			}
 
@@ -356,6 +360,9 @@
 						pf.applyBestCandidate( candidates, picImg );
 					} // Else, resolution-only `srcset` is supported natively.
 				}
+
+				// set evaluated to true to avoid unnecessary reparsing
+				picture[ pf.ns ].evaluated = true;
 			}
 		}
 	}
