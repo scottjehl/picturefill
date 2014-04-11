@@ -1,4 +1,4 @@
-/*! Picturefill - v2.0.0 - 2014-04-10
+/*! Picturefill - v2.0.0 - 2014-04-11
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -111,6 +111,54 @@ window.matchMedia || (window.matchMedia = function() {
 		lengthEl.style.cssText = "width: " + length + ";";
 		// Using offsetWidth to get width from CSS
 		return lengthEl.offsetWidth;
+	};
+
+	// container of supported mime types that one might need to qualify before using
+	pf.types =  {};
+
+	// test svg support
+	pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature('http://www.w3.org/TR/SVG11/feature#Image', '1.1');
+
+	// test webp support, only when the markup calls for it
+	pf.types[ "image/webp" ] = function(){
+		// based on Modernizr's img-webp test
+		// note: asynchronous
+		var img = new w.Image(),
+			type = "image/webp";
+
+		img.onerror = function(){
+			pf.types[ type ] = false;
+			picturefill();
+		};
+		img.onload = function(){
+			pf.types[ type ] = img.width === 1;
+			picturefill();
+		};
+		img.src = 'data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA=';
+	};
+
+	/**
+	 * Takes a source element and checks if its type attribute is present and if so, supported
+	 * Note: for type tests that require a async logic,
+	 * you can define them as a function that'll run only if that type needs to be tested. Just make the test function call picturefill again when it is complete.
+	 * see the async webp test above for example
+	 */
+	pf.verifyTypeSupport = function( source ){
+		var type = source.getAttribute( "type" );
+		// if type attribute exists, return test result, otherwise return true
+		if( type === null || type === "" ){
+			return true;
+		}
+		else {
+			// if the type test is a function, run it and return "pending" status. The function will rerun picturefill on pending elements once finished.
+			if( typeof( pf.types[ type ] ) === "function" ){
+				pf.types[ type ]();
+				return "pending";
+			}
+			else {
+				return pf.types[ type ];
+			}
+		}
 	};
 
 	/**
@@ -262,6 +310,7 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 
 			var sources = picture.getElementsByTagName( "source" );
+			var sourcesPending = false;
 
 			// Go through each child, and if they have media queries, evaluate them
 			// and add them to matches
@@ -275,9 +324,21 @@ window.matchMedia || (window.matchMedia = function() {
 				}
 
 				// if there"s no media specified, OR w.matchMedia is supported
-				if( !media || pf.matchesMedia( media )){
-					matches.push( source );
+				if( ( !media || pf.matchesMedia( media ) ) ){
+					var typeSupported = pf.verifyTypeSupport( source );
+					if( typeSupported === true ){
+						matches.push( source );
+					}
+					else if( typeSupported === "pending" ){
+						sourcesPending = true;
+					}
 				}
+			}
+
+			// if any sources are pending in this picture due to async type test(s), remove the evaluated attr and skip for now ( the pending test will rerun picturefill on this element when complete)
+			if( sourcesPending ){
+				picture.removeAttribute( "data-picture-evaluated" );
+				continue;
 			}
 
 			// Find any existing img element in the picture element

@@ -68,13 +68,13 @@
 	pf.types =  {};
 
 	// test svg support
-	pf.types[ "image/svg+xml" ] = document.implementation.hasFeature('http://www.w3.org/TR/SVG11/feature#Image', '1.1');
+	pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature('http://www.w3.org/TR/SVG11/feature#Image', '1.1');
 
 	// test webp support, only when the markup calls for it
 	pf.types[ "image/webp" ] = function(){
 		// based on Modernizr's img-webp test
 		// note: asynchronous
-		var img = new Image(),
+		var img = new w.Image(),
 			type = "image/webp";
 
 		img.onerror = function(){
