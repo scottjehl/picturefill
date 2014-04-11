@@ -240,7 +240,7 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 
 			var formattedCandidate = {
-				url: candidateArr[0],
+				url: candidateArr[ 0 ],
 				resolution: resolution
 			};
 			formattedCandidates.push( formattedCandidate );
@@ -302,12 +302,12 @@ window.matchMedia || (window.matchMedia = function() {
 		// Loop through all images on the page that are `<picture>`
 		var pictures = doc.getElementsByTagName( "picture" );
 		for ( var i=0, plen = pictures.length; i < plen; i++ ) {
-			var picture = pictures[i];
+			var picture = pictures[ i ];
 
 			// if a picture element has already been evaluated, skip it
 			// unless "forceEvaluate" is set to true ( this, for example,
 			// is set to true when running `picturefill` on `resize` ).
-			if ( !forceEvaluate && picture.hasAttribute( "data-picture-evaluated" )) {
+			if ( !forceEvaluate && picture.hasAttribute( "data-picture-evaluated" ) ) {
 				continue;
 			}
 			picture.setAttribute( "data-picture-evaluated", true );
@@ -322,11 +322,11 @@ window.matchMedia || (window.matchMedia = function() {
 			// Go through each child, and if they have media queries, evaluate them
 			// and add them to matches
 			for ( var j=0, slen = sources.length; j < slen; j++ ) {
-				var source = sources[j];
+				var source = sources[ j ];
 				var media = source.getAttribute( "media" );
 
 				// if source does not have a srcset attribute, skip
-				if ( !source.hasAttribute( "srcset" )) {
+				if ( !source.hasAttribute( "srcset" ) ) {
 					continue;
 				}
 
@@ -349,7 +349,7 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 
 			// Find any existing img element in the picture element
-			var picImg = picture.getElementsByTagName( "img" )[0],
+			var picImg = picture.getElementsByTagName( "img" )[ 0 ],
 				candidates;
 
 			if ( picImg && matches.length ) {
