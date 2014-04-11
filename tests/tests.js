@@ -13,13 +13,26 @@
 				img = pic.find( "img" );
 
 		equal( img[ 0 ].getAttribute( "src" ), firstsource[ 0 ].getAttribute( "srcset" ) );
-	})
+	});
 
-	test("method: _getWidthFromLength", function() {
+	var originalDprMethod;
+
+	// reset stubbing
+	module( "method", {
+		setup: function() {
+			originalDprMethod = picturefill._.getDpr;
+		},
+
+		teardown: function() {
+			picturefill._.getDpr = originalDprMethod;
+		}
+	});
+
+	test("getWidthFromLength", function() {
 		equal(picturefill._.getWidthFromLength('750px'), 750, "returns int value of width string");
-	})
+	});
 
-	test("method: _findWidthFromSourceSize", function() {
+	test("findWidthFromSourceSize", function() {
 		var sizes = "	 (max-width: 30em) 1000px,	 (max-width: 50em) 750px, 500px	 ";
 		// mock match media
 		var oldMatchesMedia = picturefill._.matchesMedia;
@@ -39,7 +52,7 @@
 		picturefill._.matchesMedia = oldMatchesMedia;
 	});
 
-	test("method: _getCandidatesFromSourceSet", function() {
+	test("getCandidatesFromSourceSet", function() {
 		// Basic test
 		var candidate1 = "images/pic-medium.png";
 		var expectedFormattedCandidates1 = [
@@ -131,7 +144,7 @@
 		picturefill._.getWidthFromLength = oldGetWidthFromLength;
 	});
 
-	test("method: verifyTypeSupport", function() {
+	test("verifyTypeSupport", function() {
 		expect( 4 );
 
 		// if the type attribute is supported it should return true
@@ -165,5 +178,28 @@
 				return "bar";
 			}
 		}));
+	});
+
+	test("applyBestCandidate", function() {
+		var image, candidates;
+
+		candidates = [
+			{ resolution: 100, url: "100" },
+			{ resolution: 200, url: "200" },
+			{ resolution: 300, url: "300" }
+		];
+
+		image = {
+			src: "not one of the urls"
+		};
+
+		picturefill._.getDpr = function() {
+			return 300;
+		};
+
+		picturefill._.applyBestCandidate( candidates, image );
+
+		deepEqual(image.src, candidates[2].url, "uses the url from the best px fit" );
+		deepEqual(image.currentSrc, candidates[2].url, "uses the url from the best px fit" );
 	});
 })( window, jQuery );

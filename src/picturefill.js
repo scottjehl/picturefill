@@ -211,7 +211,7 @@
 		return candidates;
 	};
 
-	pf._applyBestCandidate = function( candidates, picImg ) {
+	pf.applyBestCandidate = function( candidates, picImg ) {
 		var sortedImgCandidates = candidates.sort( pf.ascendingSort ),
 			candidate;
 
@@ -310,14 +310,14 @@
 			if( picImg ) {
 				if ( firstMatch ) {
 					candidates = pf.processSourceSet( firstMatch );
-					pf._applyBestCandidate( candidates, picImg );
+					pf.applyBestCandidate( candidates, picImg );
 				} else {
 					// No sources matched, so we’re down to processing the inner `img` as a source.
 					candidates = pf.processSourceSet( picImg );
 
 					if( picImg.srcset === undefined || picImg.hasAttribute( "sizes" ) ) {
 						// Either `srcset` is completely unsupported, or we need to polyfill `sizes` functionality.
-						pf._applyBestCandidate( candidates, picImg );
+						pf.applyBestCandidate( candidates, picImg );
 					} // Else, resolution-only `srcset` is supported natively.
 				}
 			}
