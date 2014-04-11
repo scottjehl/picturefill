@@ -276,17 +276,19 @@
 		}
 	};
 
-	function picturefill( forceEvaluate, pictures ) {
-		var pictures = pictures || doc.getElementsByTagName( "picture" );
+	function picturefill( options ) {
+		var force, pictures, options = options || {};
+
+    pictures = options.pictures || doc.getElementsByTagName( "picture" );
 
 		// Loop through all images on the page that are `<picture>`
 		for ( var i=0, plen = pictures.length; i < plen; i++ ) {
 			var picture = pictures[ i ];
 
 			// if a picture element has already been evaluated, skip it
-			// unless "forceEvaluate" is set to true ( this, for example,
+			// unless `options.force` is set to true ( this, for example,
 			// is set to true when running `picturefill` on `resize` ).
-			if ( !forceEvaluate && picture.hasAttribute( "data-picture-evaluated" ) ) {
+			if ( !options.force && picture.hasAttribute( "data-picture-evaluated" ) ) {
 				continue;
 			}
 			picture.setAttribute( "data-picture-evaluated", true );
@@ -375,7 +377,7 @@
 		}, 250 );
 		if( w.addEventListener ){
 			w.addEventListener( "resize", function() {
-				w.picturefill( true );
+				w.picturefill({ force: true });
 			}, false );
 		}
 	}

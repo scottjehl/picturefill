@@ -235,12 +235,12 @@
 			}
 		};
 
-		picturefill(false, [mockPicture]);
+		picturefill({ force: false, pictures: [mockPicture] });
 	});
 
 	test( "picturefill marks with an attr", function() {
 		var mockPicture = $( ".attr-check" )[0];
-		picturefill(false, [ mockPicture ]);
+		picturefill({ force: false, pictures: [ mockPicture ] });
 
 		ok( mockPicture.hasAttribute( "data-picture-evaluated" ) );
 	});
