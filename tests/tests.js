@@ -7,9 +7,6 @@
 		return;
 	}
 
-	QUnit.config.autostart = false;
-	QUnit.start();
-
 	test("functional: The first matching `source` is selected.", function() {
 		var pic = $( ".first-match" ),
 				firstsource = pic.find( "source" ).eq( 0 ),
@@ -132,6 +129,41 @@
 		// restores `matchesMedia` and `getWidthFromLength`
 		picturefill._.matchesMedia = oldMatchesMedia;
 		picturefill._.getWidthFromLength = oldGetWidthFromLength;
+	});
 
+	test("method: verifyTypeSupport", function() {
+		expect( 4 );
+
+		// if the type attribute is supported it should return true
+		ok(picturefill._.verifyTypeSupport({
+			getAttribute: function() {
+				return "";
+			}
+		}));
+
+		// if the type attribute is supported it should return true
+		ok(picturefill._.verifyTypeSupport({
+			getAttribute: function() {
+				return null;
+			}
+		}));
+
+		picturefill._.types[ "foo" ] = function() {
+			ok( true, "foo type function executed" );
+		};
+
+		picturefill._.verifyTypeSupport({
+			getAttribute: function() {
+				return "foo";
+			}
+		});
+
+		picturefill._.types[ "bar" ] = "baz";
+
+		equal( "baz", picturefill._.verifyTypeSupport({
+			getAttribute: function() {
+				return "bar";
+			}
+		}));
 	});
 })( window, jQuery );
