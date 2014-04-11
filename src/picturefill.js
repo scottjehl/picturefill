@@ -276,9 +276,10 @@
 		}
 	};
 
-	function picturefill( forceEvaluate ) {
+	function picturefill( forceEvaluate, pictures ) {
+		var pictures = pictures || doc.getElementsByTagName( "picture" );
+
 		// Loop through all images on the page that are `<picture>`
-		var pictures = doc.getElementsByTagName( "picture" );
 		for ( var i=0, plen = pictures.length; i < plen; i++ ) {
 			var picture = pictures[ i ];
 

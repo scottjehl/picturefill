@@ -222,4 +222,26 @@
 		equal( $videoShim.find( "video" ).length, 0 );
 		equal( $videoShim.find( "source" ).length, 2 );
 	});
+
+	test( "picturefill ignores elements when they are marked with an attr", function() {
+		expect( 0 );
+		var mockPicture = {
+			hasAttribute: function() {
+				return true
+			},
+
+			setAttribute: function() {
+				ok( false, "should not be called" );
+			}
+		};
+
+		picturefill(false, [mockPicture]);
+	});
+
+	test( "picturefill ignores elements when they are marked with an attr", function() {
+		var mockPicture = $( ".attr-check" )[0];
+		picturefill(false, [ mockPicture ]);
+
+		ok( mockPicture.hasAttribute( "data-picture-evaluated" ) );
+	});
 })( window, jQuery );
