@@ -210,4 +210,16 @@
 		deepEqual(image.src, "foo300", "src left alone when matched" );
 		deepEqual(image.currentSrc, "foo300", "currentSrc left alone when matched" );
 	});
+
+	test( "removeVideoShim", function() {
+		var $videoShim = $( ".video-shim" );
+
+		equal( $videoShim.find( "video" ).length, 1 );
+		equal( $videoShim.find( "source" ).length, 2 );
+
+		picturefill._.removeVideoShim( $videoShim[0] );
+
+		equal( $videoShim.find( "video" ).length, 0 );
+		equal( $videoShim.find( "source" ).length, 2 );
+	});
 })( window, jQuery );
