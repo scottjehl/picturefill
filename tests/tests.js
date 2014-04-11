@@ -238,7 +238,7 @@
 		picturefill(false, [mockPicture]);
 	});
 
-	test( "picturefill ignores elements when they are marked with an attr", function() {
+	test( "picturefill marks with an attr", function() {
 		var mockPicture = $( ".attr-check" )[0];
 		picturefill(false, [ mockPicture ]);
 
