@@ -277,8 +277,9 @@
 	};
 
 	function picturefill( options ) {
-		var pictures, options = options || {};
+		var pictures;
 
+		options = options || {};
 		pictures = options.elements || doc.getElementsByTagName( "picture" );
 
 		// Loop through all images on the page that are `<picture>`
