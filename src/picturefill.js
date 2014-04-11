@@ -277,9 +277,9 @@
 	};
 
 	function picturefill( options ) {
-		var force, pictures, options = options || {};
+		var pictures, options = options || {};
 
-    pictures = options.pictures || doc.getElementsByTagName( "picture" );
+		pictures = options.elements || doc.getElementsByTagName( "picture" );
 
 		// Loop through all images on the page that are `<picture>`
 		for ( var i=0, plen = pictures.length; i < plen; i++ ) {
@@ -288,7 +288,7 @@
 			// if a picture element has already been evaluated, skip it
 			// unless `options.force` is set to true ( this, for example,
 			// is set to true when running `picturefill` on `resize` ).
-			if ( !options.force && picture.hasAttribute( "data-picture-evaluated" ) ) {
+			if ( !options.reevaluate && picture.hasAttribute( "data-picture-evaluated" ) ) {
 				continue;
 			}
 			picture.setAttribute( "data-picture-evaluated", true );
@@ -377,7 +377,7 @@
 		}, 250 );
 		if( w.addEventListener ){
 			w.addEventListener( "resize", function() {
-				w.picturefill({ force: true });
+				w.picturefill({ reevaluate: true });
 			}, false );
 		}
 	}
