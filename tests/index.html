@@ -12,6 +12,11 @@
 <div id="qunit"></div>
 
 <div id="qunit-fixture">
+	<picture class="first-match">
+		<source srcset="examples/images/small.jpg"></source>
+		<source srcset="examples/images/extralarge.jpg"></source>
+		<img>
+	</picture>
 </div>
 
 <script src="../src/picturefill.js"></script>
@@ -26,11 +31,19 @@ else {
 		QUnit.config.autostart = false;
 		QUnit.start();
 
-		test("_getWidthFromLength", function() {
+		test("functional: The first matching `source` is selected.", function() {
+			var pic = $( ".first-match" ),
+				firstsource = pic.find( "source" ).eq( 0 ),
+				img = pic.find( "img" );
+
+			equal( img[ 0 ].getAttribute( "src" ), firstsource[ 0 ].getAttribute( "srcset" ) );
+		})
+
+		test("method: _getWidthFromLength", function() {
 				equal(picturefill._.getWidthFromLength('750px'), 750, "returns int value of width string");
 		})
 
-		test("_findWidthFromSourceSize", function() {
+		test("method: _findWidthFromSourceSize", function() {
 				var sizes = "  (max-width: 30em) 1000px,   (max-width: 50em) 750px, 500px  ";
 				// mock match media
 				var oldMatchesMedia = picturefill._.matchesMedia;
@@ -50,7 +63,7 @@ else {
 				picturefill._.matchesMedia = oldMatchesMedia;
 		});
 
-		test("_getCandidatesFromSourceSet", function() {
+		test("method: _getCandidatesFromSourceSet", function() {
 				// Basic test
 				var candidate1 = "images/pic-medium.png";
 				var expectedFormattedCandidates1 = [

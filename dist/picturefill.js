@@ -314,7 +314,7 @@ window.matchMedia || (window.matchMedia = function() {
 				continue;
 			}
 			picture.setAttribute( "data-picture-evaluated", true );
-			var matches = [];
+			var firstMatch;
 
 			// IE9 video workaround
 			pf.removeVideoShim( picture );
@@ -337,7 +337,8 @@ window.matchMedia || (window.matchMedia = function() {
 				if( ( !media || pf.matchesMedia( media ) ) ){
 					var typeSupported = pf.verifyTypeSupport( source );
 					if( typeSupported === true ){
-						matches.push( source );
+						firstMatch = source;
+						break;
 					}
 					else if( typeSupported === "pending" ){
 						sourcesPending = true;
@@ -355,20 +356,19 @@ window.matchMedia || (window.matchMedia = function() {
 			var picImg = picture.getElementsByTagName( "img" )[ 0 ],
 				candidates;
 
-			if ( picImg && matches.length ) {
-				var matchedEl = matches.pop();
-
-				candidates = pf.processSourceSet( matchedEl );
-				pf._applyBestCandidate( candidates, picImg );
-
-			} else if ( picImg && !matches.length ) {
-				// No sources matched, so we’re down to processing the inner `img` as a source.
-				candidates = pf.processSourceSet( picImg );
-
-				if( picImg.srcset === undefined || picImg.hasAttribute( "sizes" ) ) {
-					// Either `srcset` is completely unsupported, or we need to polyfill `sizes` functionality.
+			if( picImg ) {
+				if ( firstMatch ) {
+					candidates = pf.processSourceSet( firstMatch );
 					pf._applyBestCandidate( candidates, picImg );
-				} // Else, resolution-only `srcset` is supported natively.
+				} else {
+					// No sources matched, so we’re down to processing the inner `img` as a source.
+					candidates = pf.processSourceSet( picImg );
+
+					if( picImg.srcset === undefined || picImg.hasAttribute( "sizes" ) ) {
+						// Either `srcset` is completely unsupported, or we need to polyfill `sizes` functionality.
+						pf._applyBestCandidate( candidates, picImg );
+					} // Else, resolution-only `srcset` is supported natively.
+				}
 			}
 		}
 	}
