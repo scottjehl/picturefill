@@ -1,93 +1,170 @@
 <!DOCTYPE html>
 <html>
-		<head>
-				<meta charset=utf-8 />
-				<meta name="viewport" content="width=device-width,initial-scale=1">
-				<title>Picturefill</title>
-				<style>
-						body { font-family: sans-serif; margin:0; padding:0; }
-						img {  max-width: 100% }
-				</style>
-				<script>if (!window.matchMedia) { document.write('<script src="src/external/matchmedia.js"><\/script>'); }</script>
-				<script async="true" src="src/picturefill.js"></script>
-		</head>
-		<body>
-			<h1>Picturefill: A &lt;picture&gt; element polyfill</h1>
+	<head>
+		<meta charset=utf-8 />
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<title>Picturefill</title>
+		<style>
+				body {
+					font-family: sans-serif;
+					margin: 5%;
+				}
+				h1 em {
+					display: block;
+					font-size: .7em;
+					color: #666;
+					font-style: normal;
+					margin: .5em 0;
+				}
+				pre {
+					overflow: auto;
+					background: #fafafa;
+					font-size: 1em;
+					border: 2px solid #ddd;
+					padding: .5em 1em;
+					width: 100%;
+					font-family: "monaco", monospace;
+				}
+				pre code {
+					margin: 0;
+					padding: 0;
+				}
+				img {
+					max-width: 100%
+				}
+		</style>
+		<script>
+			// Picture element HTML shim|v it for old IE (pairs with Picturefill.js)
+			document.createElement( "picture" );
+			document.createElement( "source" );
+		</script>
+		<script async="true" src="src/picturefill.js"></script>
+	</head>
+	<body>
+		<h1>Picturefill <em>A &lt;picture&gt; element polyfill</em></h1>
+		<p>...with support for srcset, sizes, and type attributes too!</p>
 
-			<p>For more info: <a href="http://github.com/jansepar/picturefill">see project home.</a></p>
+		<p>The <a href="http://picture.responsiveimages.org/">picture element</a> allows web developers to deliver an appropriate image to the user depending on a variety of conditions like screen size, viewport size, screen resolution, and more. Picturefill is a JavaScript file that enables support for the <code>picture</code> element in browsers that do not yet support it, so you can reliably use it today!</p>
 
-			<p>`media` only example:</p>
-			<picture>
-					<!-- Video tag needed in order to use <source> in IE9 -->
-					<!--[if IE 9]><video style="display: none;"><![endif]-->
-					<source srcset="examples/images/extralarge.jpg" media="(min-width: 1000px)"></source>
-					<source srcset="examples/images/large.jpg" media="(min-width: 800px)"></source>
-					<source srcset="examples/images/medium.jpg" media="(min-width: 400px)"></source>
-					<source srcset="examples/images/small.jpg"></source>
-					<!--[if IE 9]></video><![endif]-->
+		<h2>Basic markup pattern</h2>
 
-					<!-- Fallback content. Note that using `srcset` will result in a duplicate request in browsers that have native support for resolution-only `srcset` but *not* `picture`. This is apt to be very few versions of evergreen browsers. -->
-					<img srcset="examples/images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-			</picture>
+		<p>Your <code>picture</code> element should contain a series of <code>source</code> elements followed by an <code>img</code> element. Each <code>source</code> element must have a<code>srcset</code> attribute specifying one or more image url sources (which can use expanded srcset syntax if desired for resolution switching). Additionally, you may add a  <code>media</code> attribute containing CSS3 Media Queries, and/or a <code>sizes</code> attribute to pair with <code>srcset</code>.</p>
 
-			<p>`media` and `srcset`:</p>
-			<picture>
-					<!-- Video tag needed in order to use <source> in IE9 -->
-					<!--[if IE 9]><video style="display: none;"><![endif]-->
-					<source srcset="examples/images/large.jpg, examples/images/extralarge.jpg 2x" media="(min-width: 800px)"></source>
-					<source srcset="examples/images/small.jpg, examples/images/medium.jpg 2x"></source>
-					<!--[if IE 9]></video><![endif]-->
+		<p>Here's one with <code>srcset</code> and <code>media</code>. The first source that matches will determine the src of the <code>img</code> element at the end.</p>
 
-					<!-- Fallback content for IE8 and older -->
-					<img srcset="examples/images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-			</picture>
+<pre><code>&lt;picture&gt;
+	&lt;source srcset=&quot;examples/images/extralarge.jpg&quot; media=&quot;(min-width: 1000px)&quot;&gt;&lt;/source&gt;
+	&lt;source srcset=&quot;examples/images/large.jpg&quot; media=&quot;(min-width: 800px)&quot;&gt;&lt;/source&gt;
+	&lt;source srcset=&quot;examples/images/medium.jpg&quot;&gt;&lt;/source&gt;
+	&lt;img alt=&quot;A giant stone face at The Bayon temple in Angkor Thom, Cambodia&quot;&gt;
+&lt;/picture&gt;
+</code></pre>
 
-			<p>Example using "sizes" attribute:</p>
-			<picture>
-				<!-- Video tag needed in order to use <source> in IE9 -->
+		<h3>IE9 Support</h3>
+		<p>To support IE9, you will need to wrap a <code>video</code> element wrapper around the source elements in your <code>picture</code> tag. You can do this using conditional comments, like so:</p>
+
+<pre><code>&lt;picture&gt;
+	&lt;!--[if IE 9]&gt;&lt;video style=&quot;display: none;&quot;&gt;&lt;![endif]--&gt;
+	&lt;source srcset=&quot;examples/images/extralarge.jpg&quot; media=&quot;(min-width: 1000px)&quot;&gt;&lt;/source&gt;
+	&lt;source srcset=&quot;examples/images/large.jpg&quot; media=&quot;(min-width: 800px)&quot;&gt;&lt;/source&gt;
+	&lt;source srcset=&quot;examples/images/medium.jpg&quot;&gt;&lt;/source&gt;
+	&lt;!--[if IE 9]&gt;&lt;/video&gt;&lt;![endif]--&gt;
+	&lt;img alt=&quot;A giant stone face at The Bayon temple in Angkor Thom, Cambodia&quot;&gt;
+&lt;/picture&gt;
+</code></pre>
+
+		<p>Here's how that renders in the browser. Feel free to resize to see it change.</p>
+
+		<picture>
 				<!--[if IE 9]><video style="display: none;"><![endif]-->
-				<source sizes="(max-width: 30em) 100%, (max-width: 50em) 75%, 50%"
-					srcset="examples/images/pic-small.png 400w, examples/images/pic-medium.png 800w, examples/images/pic-large.png 1200w"></source>
+				<source srcset="examples/images/extralarge.jpg" media="(min-width: 1000px)"></source>
+				<source srcset="examples/images/large.jpg" media="(min-width: 800px)"></source>
+				<source srcset="examples/images/medium.jpg" media="(min-width: 400px)"></source>
+				<source srcset="examples/images/small.jpg"></source>
 				<!--[if IE 9]></video><![endif]-->
+				<img alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+		</picture>
 
-				<!-- Fallback content for IE8 and older -->
-				<img srcset="examples/images/pic-small.png" alt="Obama with soldiers">
-			</picture>
+		<h2>More examples</h2>
 
-			<p>Falling back to inner `img` with `srcset` attribute:</p>
-			<picture>
-				<!-- Video tag needed in order to use <source> in IE9 -->
+		<h3>`media` and expanded `srcset` syntax:</h3>
+<pre><code>&lt;picture&gt;
+	&lt;!--[if IE 9]&gt;&lt;video style=&quot;display: none;&quot;&gt;&lt;![endif]--&gt;
+	&lt;source srcset=&quot;examples/images/large.jpg, examples/images/extralarge.jpg 2x&quot; media=&quot;(min-width: 800px)&quot;&gt;&lt;/source&gt;
+	&lt;source srcset=&quot;examples/images/small.jpg, examples/images/medium.jpg 2x&quot;&gt;&lt;/source&gt;
+	&lt;!--[if IE 9]&gt;&lt;/video&gt;&lt;![endif]--&gt;
+	&lt;img alt=&quot;A giant stone face at The Bayon temple in Angkor Thom, Cambodia&quot;&gt;
+&lt;/picture&gt;
+</code></pre>
+		<picture>
 				<!--[if IE 9]><video style="display: none;"><![endif]-->
-				<source media="(min-width: 9999px)" srcset="examples/images/pic-large.png"></source>
+				<source srcset="examples/images/large.jpg, examples/images/extralarge.jpg 2x" media="(min-width: 800px)"></source>
+				<source srcset="examples/images/small.jpg, examples/images/medium.jpg 2x"></source>
 				<!--[if IE 9]></video><![endif]-->
+				<img alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+		</picture>
 
-				<img srcset="examples/images/pic-small.png, examples/images/pic-medium.png 2x" alt="Obama with soldiers">
-			</picture>
 
-			<p>Falling back to inner `img` with `srcset` and `sizes` attributes:</p>
-			<picture>
-				<!-- Video tag needed in order to use <source> in IE9 -->
+		<h3>"sizes" attribute:</h3>
+<pre><code>&lt;picture&gt;
+	&lt;!--[if IE 9]&gt;&lt;video style=&quot;display: none;&quot;&gt;&lt;![endif]--&gt;
+	&lt;source sizes=&quot;(max-width: 30em) 100%, (max-width: 50em) 75%, 50%&quot;
+		srcset=&quot;examples/images/pic-small.png 400w, examples/images/pic-medium.png 800w, examples/images/pic-large.png 1200w&quot;&gt;&lt;/source&gt;
+	&lt;!--[if IE 9]&gt;&lt;/video&gt;&lt;![endif]--&gt;
+	&lt;img alt=&quot;Obama with soldiers&quot;&gt;
+&lt;/picture&gt;
+</code></pre>
+
+		<picture>
+			<!--[if IE 9]><video style="display: none;"><![endif]-->
+			<source sizes="(max-width: 30em) 100%, (max-width: 50em) 75%, 50%"
+				srcset="examples/images/pic-small.png 400w, examples/images/pic-medium.png 800w, examples/images/pic-large.png 1200w"></source>
+			<!--[if IE 9]></video><![endif]-->
+			<img alt="Obama with soldiers">
+		</picture>
+
+
+		<h3>`media` example with one webp source qualified with a type attribute.</h3>
+		<p>Note: Picturefill supports SVG and WebP types on any source element, and will disregard a <code>source</code> if its type is not supported in a particular environment:</p>
+
+<pre><code>&lt;picture&gt;
+	&lt;!--[if IE 9]&gt;&lt;video style=&quot;display: none;&quot;&gt;&lt;![endif]--&gt;
+	&lt;source srcset=&quot;examples/images/large.webp&quot; media=&quot;(min-width: 800px)&quot; type=&quot;image/webp&quot;&gt;&lt;/source&gt;
+	&lt;source srcset=&quot;examples/images/large.jpg&quot; media=&quot;(min-width: 800px)&quot;&gt;&lt;/source&gt;
+	&lt;source srcset=&quot;examples/images/medium.jpg&quot; media=&quot;(min-width: 400px)&quot;&gt;&lt;/source&gt;
+	&lt;source srcset=&quot;examples/images/small.jpg&quot;&gt;&lt;/source&gt;
+	&lt;!--[if IE 9]&gt;&lt;/video&gt;&lt;![endif]--&gt;
+	&lt;img alt=&quot;A giant stone face at The Bayon temple in Angkor Thom, Cambodia&quot;&gt;
+&lt;/picture&gt;
+</code></pre>
+
+		<picture>
 				<!--[if IE 9]><video style="display: none;"><![endif]-->
-				<source media="(min-width: 9999px)" srcset="examples/images/pic-large.png"></source>
+				<source srcset="examples/images/large.webp" media="(min-width: 800px)" type="image/webp"></source>
+				<source srcset="examples/images/large.jpg" media="(min-width: 800px)"></source>
+				<source srcset="examples/images/medium.jpg" media="(min-width: 400px)"></source>
+				<source srcset="examples/images/small.jpg"></source>
 				<!--[if IE 9]></video><![endif]-->
+				<img alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+		</picture>
 
-				<img sizes="(max-width: 30em) 100%, (max-width: 50em) 75%, 50%" srcset="examples/images/pic-small.png 400w, examples/images/pic-medium.png 800w, examples/images/pic-large.png 1200w" alt="Obama with soldiers">
-			</picture>
-
-			<p>`media` only example with a webp source:</p>
-			<picture>
-					<!-- Video tag needed in order to use <source> in IE9 -->
-					<!--[if IE 9]><video style="display: none;"><![endif]-->
-					<source srcset="examples/images/extralarge.jpg" media="(min-width: 1000px)"></source>
-					<source srcset="examples/images/large.webp" media="(min-width: 800px)" type="image/webp"></source>
-					<source srcset="examples/images/large.jpg" media="(min-width: 800px)"></source>
-					<source srcset="examples/images/medium.jpg" media="(min-width: 400px)"></source>
-					<source srcset="examples/images/small.jpg"></source>
-					<!--[if IE 9]></video><![endif]-->
-
-					<!-- Fallback content. Note that using `srcset` will result in a duplicate request in browsers that have native support for resolution-only `srcset` but *not* `picture`. This is apt to be very few versions of evergreen browsers. -->
-					<img srcset="examples/images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-			</picture>
+		<h3>Inner img with fallback srcset attribute:</h3>
+		<p>(NOTE: This pattern is probably not recommended due to a potential double-request in browsers that support srcset and not picture (a short-term problem, admittedly). See the first and second examples for a source-based catch-all fallback src.</p>
+<pre><code>&lt;picture&gt;
+	&lt;!--[if IE 9]&gt;&lt;video style=&quot;display: none;&quot;&gt;&lt;![endif]--&gt;
+	&lt;source media=&quot;(min-width: 9999px)&quot; srcset=&quot;examples/images/pic-large.png&quot;&gt;&lt;/source&gt;
+	&lt;!--[if IE 9]&gt;&lt;/video&gt;&lt;![endif]--&gt;
+	&lt;!-- Fallback content. Note that using `srcset` will result in a duplicate request in browsers that have native support for resolution-only `srcset` but *not* `picture`. This is apt to be very few versions of evergreen browsers. --&gt;
+	&lt;img srcset=&quot;examples/images/pic-small.png, examples/images/pic-medium.png 2x&quot; alt=&quot;Obama with soldiers&quot;&gt;
+&lt;/picture&gt;
+</code></pre>
+		<picture>
+			<!--[if IE 9]><video style="display: none;"><![endif]-->
+			<source media="(min-width: 9999px)" srcset="examples/images/pic-large.png"></source>
+			<!--[if IE 9]></video><![endif]-->
+			<!-- Fallback content. Note that using `srcset` will result in a duplicate request in browsers that have native support for resolution-only `srcset` but *not* `picture`. This is apt to be very few versions of evergreen browsers. -->
+			<img srcset="examples/images/pic-small.png, examples/images/pic-medium.png 2x" alt="Obama with soldiers">
+		</picture>
 
 	</body>
 </html>

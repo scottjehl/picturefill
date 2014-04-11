@@ -68,6 +68,9 @@ window.matchMedia || (window.matchMedia = function() {
 	// local object for method references and testing exposure
 	var pf = {};
 
+	// namespace
+	pf.ns = "picturefill";
+
 	// just a string trim workaround
 	pf.trim = function( str ){
 		return str.trim ? str.trim() : str.replace( /^\s+|\s+$/g, "" );
@@ -249,10 +252,31 @@ window.matchMedia || (window.matchMedia = function() {
 		return formattedCandidates;
 	};
 
+	/*
+	 * if it's an img element and it has a srcset property,
+	 * we need to remove the attribute so we can minipulate src
+	 * (the property's existence infers native srcset support, and a srcset-supporting browser will prioritize srcset's value over our winning picture candidate)
+	 * this moves srcset's value to memory for later use and removes the attr
+	 */
+	pf.dodgeSrcset = function( img ){
+		if( img.srcset ){
+			img[ pf.ns ].srcset = img.srcset;
+			img.removeAttribute( "srcset" );
+		}
+	};
+
+	/*
+	 * Accept a source or img element and process its srcset and sizes attrs
+	 */
 	pf.processSourceSet = function( el ) {
 		var srcset = el.getAttribute( "srcset" ),
 			sizes = el.getAttribute( "sizes" ),
 			candidates = [];
+
+		// if it's an img element, use the cached srcset property (defined or not)
+		if( el.nodeName === "IMG" ){
+			srcset = el[ pf.ns ].srcset;
+		}
 
 		if( srcset ) {
 			candidates = pf.getCandidatesFromSourceSet( srcset, sizes );
@@ -260,7 +284,7 @@ window.matchMedia || (window.matchMedia = function() {
 		return candidates;
 	};
 
-	pf._applyBestCandidate = function( candidates, picImg ) {
+	pf.applyBestCandidate = function( candidates, picImg ) {
 		var sortedImgCandidates = candidates.sort( pf.ascendingSort ),
 			candidate;
 
@@ -301,16 +325,20 @@ window.matchMedia || (window.matchMedia = function() {
 		}
 	};
 
-	function picturefill( forceEvaluate ) {
+	function picturefill( options ) {
+		var pictures;
+
+		options = options || {};
+		pictures = options.elements || doc.getElementsByTagName( "picture" );
+
 		// Loop through all images on the page that are `<picture>`
-		var pictures = doc.getElementsByTagName( "picture" );
 		for ( var i=0, plen = pictures.length; i < plen; i++ ) {
 			var picture = pictures[ i ];
 
 			// if a picture element has already been evaluated, skip it
-			// unless "forceEvaluate" is set to true ( this, for example,
+			// unless `options.force` is set to true ( this, for example,
 			// is set to true when running `picturefill` on `resize` ).
-			if ( !forceEvaluate && picture.hasAttribute( "data-picture-evaluated" ) ) {
+			if ( !options.reevaluate && picture.hasAttribute( "data-picture-evaluated" ) ) {
 				continue;
 			}
 			picture.setAttribute( "data-picture-evaluated", true );
@@ -357,16 +385,24 @@ window.matchMedia || (window.matchMedia = function() {
 				candidates;
 
 			if( picImg ) {
+
+				// expando for caching data on the img
+				if( !picImg[ pf.ns ] ){
+					picImg[ pf.ns ] = {};
+					// cache and remove srcset if present
+					pf.dodgeSrcset( picImg );
+				}
+
 				if ( firstMatch ) {
 					candidates = pf.processSourceSet( firstMatch );
-					pf._applyBestCandidate( candidates, picImg );
+					pf.applyBestCandidate( candidates, picImg );
 				} else {
 					// No sources matched, so we’re down to processing the inner `img` as a source.
 					candidates = pf.processSourceSet( picImg );
 
 					if( picImg.srcset === undefined || picImg.hasAttribute( "sizes" ) ) {
 						// Either `srcset` is completely unsupported, or we need to polyfill `sizes` functionality.
-						pf._applyBestCandidate( candidates, picImg );
+						pf.applyBestCandidate( candidates, picImg );
 					} // Else, resolution-only `srcset` is supported natively.
 				}
 			}
@@ -391,7 +427,7 @@ window.matchMedia || (window.matchMedia = function() {
 		}, 250 );
 		if( w.addEventListener ){
 			w.addEventListener( "resize", function() {
-				w.picturefill( true );
+				w.picturefill({ reevaluate: true });
 			}, false );
 		}
 	}
@@ -402,6 +438,6 @@ window.matchMedia || (window.matchMedia = function() {
 	picturefill._ = pf;
 
 	/* expose picturefill */
-	w.picturefill = picturefill;
+	w[ pf.ns ] = picturefill;
 
 } )( this, this.document );
