@@ -21,14 +21,30 @@
 	<!-- dummy elements used as a mock pictures -->
 	<div class="video-shim">
 		<video>
-			<source class="source-one">
-			<source class="source-two">
+			<source class="source-one"/>
+			<source class="source-two"/>
 		</video>
 	</div>
 
 	<div class="prop-check">
 		<img/>
 	</div>
+
+  <div class="pending-check">
+    <source type="foo" srcset="foo"/>
+  </div>
+
+  <div class="match-check">
+    <source srcset="foo" media="bar"/>
+  </div>
+
+  <div class="no-match-check">
+    <source srcset="foo" media="bar"/>
+  </div>
+
+  <div class="no-srcset-check">
+    <source media="bar"/>
+  </div>
 </div>
 
 <script src="../src/picturefill.js"></script>

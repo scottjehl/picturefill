@@ -306,6 +306,38 @@
 			}
 			return elems;
 		}
+  };
+
+	pf.getMatch = function( picture ) {
+		var sources = picture.getElementsByTagName( "source" );
+		var sourcesPending = false;
+
+		// Go through each child, and if they have media queries, evaluate them
+		// and add them to matches
+		for ( var j=0, slen = sources.length; j < slen; j++ ) {
+			var source = sources[ j ];
+			var media = source.getAttribute( "media" );
+			var match;
+
+			// if source does not have a srcset attribute, skip
+			if ( !source.hasAttribute( "srcset" ) ) {
+				continue;
+			}
+
+			// if there"s no media specified, OR w.matchMedia is supported
+			if( ( !media || pf.matchesMedia( media ) ) ){
+				var typeSupported = pf.verifyTypeSupport( source );
+
+				if( typeSupported === true ){
+					match = source;
+					break;
+				} else if( typeSupported === "pending" ){
+					return false;
+				}
+			}
+		}
+
+		return match;
 	};
 
 	function picturefill( options ) {
@@ -332,7 +364,7 @@
 			}
 
 			var firstMatch,
-				candidates;
+					candidates;
 
 			// if element is a picture element
 			if( elemType === "PICTURE" ){
@@ -340,46 +372,21 @@
 				// IE9 video workaround
 				pf.removeVideoShim( element );
 
-				var sources = element.getElementsByTagName( "source" );
-				var sourcesPending = false;
-
-				// Go through each child, and if they have media queries, evaluate them
-				// and add them to matches
-				for ( var j=0, slen = sources.length; j < slen; j++ ) {
-					var source = sources[ j ];
-					var media = source.getAttribute( "media" );
-
-					// if source does not have a srcset attribute, skip
-					if ( !source.hasAttribute( "srcset" ) ) {
-						continue;
-					}
-
-					// if there"s no media specified, OR w.matchMedia is supported
-					if( ( !media || pf.matchesMedia( media ) ) ){
-						var typeSupported = pf.verifyTypeSupport( source );
-						if( typeSupported === true ){
-							firstMatch = source;
-							break;
-						}
-						else if( typeSupported === "pending" ){
-							sourcesPending = true;
-						}
-					}
-				}
+				// return the first match which might undefined
+				// returns false if there is a pending source
+				var firstMatch = pf.getMatch( element );
 
 				// if any sources are pending in this picture due to async type test(s), remove the evaluated attr and skip for now ( the pending test will rerun picturefill on this element when complete)
-				if( sourcesPending ){
+				if( firstMatch === false ) {
 					continue;
 				}
 
 				// Find any existing img element in the picture element
 				var picImg = element.getElementsByTagName( "img" )[ 0 ];
-			}
-			// if it's an img element
-			else {
+			} else {
+				// if it's an img element
 				var picImg = element;
 			}
-
 
 			if( picImg ) {
 
