@@ -15,43 +15,47 @@
 		equal( img[ 0 ].getAttribute( "src" ), firstsource[ 0 ].getAttribute( "srcset" ) );
 	});
 
-	var originalDprMethod, originalVideoShimMethod;
+	var pf, originalDprMethod, originalVideoShimMethod, originalMatchesMedia;
+
+	pf = picturefill._;
 
 	// reset stubbing
 	module( "method", {
 		setup: function() {
-			originalDprMethod = picturefill._.getDpr;
-			originalVideoShimMethod = picturefill._.removeVideoShim;
+			originalDprMethod = pf.getDpr;
+			originalVideoShimMethod = pf.removeVideoShim;
+			originalMatchesMedia = pf.matchesMedia;
 		},
 
 		teardown: function() {
-			picturefill._.getDpr = originalDprMethod;
-			picturefill._.removeVideoShim = originalVideoShimMethod;
+			pf.getDpr = originalDprMethod;
+			pf.removeVideoShim = originalVideoShimMethod;
+			pf.matchesMedia = originalMatchesMedia;
 		}
 	});
 
 	test("getWidthFromLength", function() {
-		equal(picturefill._.getWidthFromLength('750px'), 750, "returns int value of width string");
+		equal(pf.getWidthFromLength('750px'), 750, "returns int value of width string");
 	});
 
 	test("findWidthFromSourceSize", function() {
 		var sizes = "	 (max-width: 30em) 1000px,	 (max-width: 50em) 750px, 500px	 ";
 		// mock match media
-		var oldMatchesMedia = picturefill._.matchesMedia;
-		picturefill._.matchesMedia = function(media) {
+		var oldMatchesMedia = pf.matchesMedia;
+		pf.matchesMedia = function(media) {
 			return true;
 		};
-		var width = picturefill._.findWidthFromSourceSize(sizes);
+		var width = pf.findWidthFromSourceSize(sizes);
 		equal(width, 1000, "returns 1000 when match media returns true");
 
-		picturefill._.matchesMedia = function(media) {
+		pf.matchesMedia = function(media) {
 			return false;
 		};
-		var width = picturefill._.findWidthFromSourceSize(sizes);
+		var width = pf.findWidthFromSourceSize(sizes);
 		equal(width, 500, "returns 500 when match media returns false");
 
 		// restore `matchesMedia`
-		picturefill._.matchesMedia = oldMatchesMedia;
+		pf.matchesMedia = oldMatchesMedia;
 	});
 
 	test("getCandidatesFromSourceSet", function() {
@@ -63,7 +67,7 @@
 				url: "images/pic-medium.png"
 			}
 		];
-		deepEqual(picturefill._.getCandidatesFromSourceSet(candidate1), expectedFormattedCandidates1, "Works!");
+		deepEqual(pf.getCandidatesFromSourceSet(candidate1), expectedFormattedCandidates1, "Works!");
 
 		var candidate2 = "images/pic-medium.png 1x, images/pic-medium-2x.png 2x";
 		var expectedFormattedCandidates2 = [
@@ -76,11 +80,11 @@
 				url: "images/pic-medium-2x.png"
 			}
 		];
-		deepEqual(picturefill._.getCandidatesFromSourceSet(candidate2), expectedFormattedCandidates2, "Works!");
+		deepEqual(pf.getCandidatesFromSourceSet(candidate2), expectedFormattedCandidates2, "Works!");
 
 		// Test with multiple spaces
 		var candidate3 = "			images/pic-medium.png		 1x		,		 images/pic-medium-2x.png		 2x		";
-		deepEqual(picturefill._.getCandidatesFromSourceSet(candidate3), expectedFormattedCandidates2, "Works!")
+		deepEqual(pf.getCandidatesFromSourceSet(candidate3), expectedFormattedCandidates2, "Works!")
 
 		// Test with decimals
 		var candidate4 = "			images/pic-smallest.png		 0.25x	 ,		images/pic-small.png		0.5x	 , images/pic-medium.png 1x";
@@ -98,12 +102,12 @@
 				url: "images/pic-medium.png"
 			}
 		];
-		deepEqual(picturefill._.getCandidatesFromSourceSet(candidate4), expectedFormattedCandidates4, "Works!");
+		deepEqual(pf.getCandidatesFromSourceSet(candidate4), expectedFormattedCandidates4, "Works!");
 
 		// Test with "sizes" passed with a px length specified
 		var candidate5 = "			images/pic-smallest.png		 250w		,		 images/pic-small.png		 500w		, images/pic-medium.png 1000w";
 		var sizes = "1000px";
-		deepEqual(picturefill._.getCandidatesFromSourceSet(candidate5, sizes), expectedFormattedCandidates4, "Works!");
+		deepEqual(pf.getCandidatesFromSourceSet(candidate5, sizes), expectedFormattedCandidates4, "Works!");
 
 		// Test with "sizes" passed with % lengths specified
 		var candidate6 = "\npic320.png 320w	 , pic640.png		640w, pic768.png 768w, \
@@ -131,51 +135,51 @@
 				url: "pic2048.png"
 			}
 		];
-		var oldMatchesMedia = picturefill._.matchesMedia;
-		picturefill._.matchesMedia = function(media) {
+		var oldMatchesMedia = pf.matchesMedia;
+		pf.matchesMedia = function(media) {
 			return true;
 		};
-		var oldGetWidthFromLength = picturefill._.getWidthFromLength;
-		picturefill._.getWidthFromLength = function(width) {
+		var oldGetWidthFromLength = pf.getWidthFromLength;
+		pf.getWidthFromLength = function(width) {
 			return 640;
 		}
-		deepEqual(picturefill._.getCandidatesFromSourceSet(candidate6, sizes), expectedCandidates, "Works!");
+		deepEqual(pf.getCandidatesFromSourceSet(candidate6, sizes), expectedCandidates, "Works!");
 
 		// restores `matchesMedia` and `getWidthFromLength`
-		picturefill._.matchesMedia = oldMatchesMedia;
-		picturefill._.getWidthFromLength = oldGetWidthFromLength;
+		pf.matchesMedia = oldMatchesMedia;
+		pf.getWidthFromLength = oldGetWidthFromLength;
 	});
 
 	test("verifyTypeSupport", function() {
 		expect( 4 );
 
 		// if the type attribute is supported it should return true
-		ok(picturefill._.verifyTypeSupport({
+		ok(pf.verifyTypeSupport({
 			getAttribute: function() {
 				return "";
 			}
 		}));
 
 		// if the type attribute is supported it should return true
-		ok(picturefill._.verifyTypeSupport({
+		ok(pf.verifyTypeSupport({
 			getAttribute: function() {
 				return null;
 			}
 		}));
 
-		picturefill._.types[ "foo" ] = function() {
+		pf.types[ "foo" ] = function() {
 			ok( true, "foo type function executed" );
 		};
 
-		picturefill._.verifyTypeSupport({
+		pf.verifyTypeSupport({
 			getAttribute: function() {
 				return "foo";
 			}
 		});
 
-		picturefill._.types[ "bar" ] = "baz";
+		pf.types[ "bar" ] = "baz";
 
-		equal( "baz", picturefill._.verifyTypeSupport({
+		equal( "baz", pf.verifyTypeSupport({
 			getAttribute: function() {
 				return "bar";
 			}
@@ -195,11 +199,11 @@
 			src: "not one of the urls"
 		};
 
-		picturefill._.getDpr = function() {
+		pf.getDpr = function() {
 			return 300;
 		};
 
-		picturefill._.applyBestCandidate( candidates, image );
+		pf.applyBestCandidate( candidates, image );
 
 		deepEqual(image.src, candidates[2].url, "uses the url from the best px fit" );
 		deepEqual(image.currentSrc, candidates[2].url, "uses the url from the best px fit" );
@@ -207,7 +211,7 @@
 		image.src = "foo300";
 		image.currentSrc = "foo300";
 
-		picturefill._.applyBestCandidate( candidates, image );
+		pf.applyBestCandidate( candidates, image );
 
 		deepEqual(image.src, "foo300", "src left alone when matched" );
 		deepEqual(image.currentSrc, "foo300", "currentSrc left alone when matched" );
@@ -219,21 +223,52 @@
 		equal( $videoShim.find( "video" ).length, 1 );
 		equal( $videoShim.find( "source" ).length, 2 );
 
-		picturefill._.removeVideoShim( $videoShim[0] );
+		pf.removeVideoShim( $videoShim[0] );
 
 		equal( $videoShim.find( "video" ).length, 0 );
 		equal( $videoShim.find( "source" ).length, 2 );
+	});
+
+	test( "getMatch returns false when a source type is pending", function() {
+		pf.types["foo"] = function() {};
+
+		equal( pf.getMatch($(".pending-check")[0]), false, "pending type should be false" );
+	});
+
+	test( "getMatch returns source when it matches the media", function() {
+		var $match = $( ".match-check ");
+		pf.matchesMedia = function() {
+			return true;
+		};
+
+		equal( pf.getMatch( $match[0] ), $match.find( "source" )[0] );
+	});
+
+	test( "getMatch returns undefined when no match is found", function() {
+		pf.matchesMedia = function() {
+			return false;
+		};
+
+		var $noMatch = $( ".no-match-check ");
+
+		equal( pf.getMatch( $noMatch[0] ), undefined );
+	});
+
+	test( "getMatch returns undefined when no srcset is found", function() {
+		var $noSrcset = $( ".no-srcset-check ");
+
+		equal( pf.getMatch( $noSrcset[0] ), undefined );
 	});
 
 	test( "picturefill ignores elements when they are marked with a property", function() {
 		expect( 0 );
 		var mockPicture = {};
 
-		mockPicture[ picturefill._.ns ] = {
+		mockPicture[ pf.ns ] = {
 			evaluated: true
 		};
 
-		picturefill._.removeVideoShim = function() {
+		pf.removeVideoShim = function() {
 			ok( false );
 		};
 
@@ -241,9 +276,10 @@
 	});
 
 	test( "picturefill marks elements with a property", function() {
+		// NOTE requires at least one child image for the propery to be set
 		var mockPicture = $( ".prop-check" )[0];
 		picturefill({ reevaluate: false, elements: [ mockPicture ] });
 
-		ok( mockPicture[ picturefill._.ns ].evaluated );
+		ok( mockPicture[ pf.ns ].evaluated );
 	});
 })( window, jQuery );
