@@ -15,16 +15,18 @@
 		equal( img[ 0 ].getAttribute( "src" ), firstsource[ 0 ].getAttribute( "srcset" ) );
 	});
 
-	var originalDprMethod;
+	var originalDprMethod, originalVideoShimMethod;
 
 	// reset stubbing
 	module( "method", {
 		setup: function() {
 			originalDprMethod = picturefill._.getDpr;
+			originalVideoShimMethod = picturefill._.removeVideoShim;
 		},
 
 		teardown: function() {
 			picturefill._.getDpr = originalDprMethod;
+			picturefill._.removeVideoShim = originalVideoShimMethod;
 		}
 	});
 
@@ -223,27 +225,25 @@
 		equal( $videoShim.find( "source" ).length, 2 );
 	});
 
-/* commented until we can find another way to test
 	test( "picturefill ignores elements when they are marked with a property", function() {
 		expect( 0 );
-		var mockPicture = {
-			hasProperty: function() {
-				return true
-			},
+		var mockPicture = {};
 
-			setProperty: function() {
-				ok( false, "should not be called" );
-			}
+		mockPicture[ picturefill._.ns ] = {
+			evaluated: true
+		};
+
+		picturefill._.removeVideoShim = function() {
+			ok( false );
 		};
 
 		picturefill({ reevaluate: false, elements: [mockPicture] });
 	});
 
-	test( "picturefill marks with an attr", function() {
-		var mockPicture = $( ".attr-check" )[0];
+	test( "picturefill marks elements with a property", function() {
+		var mockPicture = $( ".prop-check" )[0];
 		picturefill({ reevaluate: false, elements: [ mockPicture ] });
 
-		ok( mockPicture.hasProperty( "data-picture-evaluated" ) );
+		ok( mockPicture[ picturefill._.ns ].evaluated );
 	});
-*/
 })( window, jQuery );
