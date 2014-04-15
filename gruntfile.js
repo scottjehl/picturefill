@@ -55,21 +55,13 @@
               "eqnull": true,
               "node": true
           },
-          src: ['Gruntfile.js', 'src/*.js']
+          src: [ 'Gruntfile.js', 'src/*.js' ]
         }
       },
       watch: {
         gruntfile: {
-          files: '<%= jshint.gruntfile.src %>',
-          tasks: ['jshint:gruntfile']
-        },
-        src: {
-          files: '<%= jshint.src.src %>',
-          tasks: ['jshint:src', 'qunit']
-        },
-        test: {
-          files: '<%= jshint.test.src %>',
-          tasks: ['jshint:test', 'qunit']
+          files: [ 'Gruntfile.js', 'src/*.js'],
+          tasks: [ 'jshint', 'qunit', 'clean', 'concat', 'uglify' ]
         }
       }
     });
