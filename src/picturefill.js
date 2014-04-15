@@ -60,7 +60,7 @@
 		if ( !doc.body ) {
 			return;
 		}
-		doc.body.insertBefore( lengthEl, null );
+		doc.body.insertBefore( lengthEl, doc.body.firstChild );
 		return lengthEl;
 	};
 
