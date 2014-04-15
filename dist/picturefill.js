@@ -1,4 +1,4 @@
-/*! Picturefill - v2.0.0 - 2014-04-11
+/*! Picturefill - v2.0.0 - 2014-04-15
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -71,6 +71,9 @@ window.matchMedia || (window.matchMedia = function() {
 	// namespace
 	pf.ns = "picturefill";
 
+	// srcset support test
+	pf.srcsetSupported = new w.Image().srcset !== undefined;
+
 	// just a string trim workaround
 	pf.trim = function( str ){
 		return str.trim ? str.trim() : str.replace( /^\s+|\s+$/g, "" );
@@ -99,22 +102,15 @@ window.matchMedia || (window.matchMedia = function() {
 	 * Get width in css pixel value from a "length" value
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
 	 */
-	var lengthEl;
-
-	pf.getCachedLengthEl = function() {
-		lengthEl = lengthEl || doc.createElement( "div" );
-		if ( !doc.body ) {
-			return;
-		}
-		doc.body.appendChild( lengthEl );
-		return lengthEl;
-	};
-
 	pf.getWidthFromLength = function( length ) {
-		var lengthEl = pf.getCachedLengthEl();
-		lengthEl.style.cssText = "width: " + length + ";";
+		// Create a cached element for getting length value widths
+		if( !pf.lengthEl ){
+			pf.lengthEl = doc.createElement( "div" );
+			doc.documentElement.insertBefore( pf.lengthEl, doc.documentElement.firstChild );
+		}
+		pf.lengthEl.style.cssText = "width: " + length + ";";
 		// Using offsetWidth to get width from CSS
-		return lengthEl.offsetWidth;
+		return pf.lengthEl.offsetWidth;
 	};
 
 	// container of supported mime types that one might need to qualify before using
@@ -274,7 +270,7 @@ window.matchMedia || (window.matchMedia = function() {
 			candidates = [];
 
 		// if it's an img element, use the cached srcset property (defined or not)
-		if( el.nodeName === "IMG" ){
+		if( el.nodeName === "IMG" && el[ pf.ns ] && el[ pf.ns ].srcset ){
 			srcset = el[ pf.ns ].srcset;
 		}
 
@@ -318,81 +314,130 @@ window.matchMedia || (window.matchMedia = function() {
 			var video = videos[ 0 ];
 			var vsources = video.getElementsByTagName( "source" );
 			while ( vsources.length ) {
-				picture.appendChild( vsources[ 0 ] );
+				picture.insertBefore( vsources[ 0 ], video );
 			}
 			// Remove the video element once we're finished removing its children
 			video.parentNode.removeChild( video );
 		}
 	};
 
-	function picturefill( options ) {
-		var pictures;
+	/*
+	 * Find all picture elements and,
+	 * in browsers that don't natively support srcset, find all img elements with srcset attrs that don't have picture parents
+	 */
+	pf.getAllElements = function(){
+		var pictures = doc.getElementsByTagName( "picture" );
 
-		options = options || {};
-		pictures = options.elements || doc.getElementsByTagName( "picture" );
+		if( pf.srcsetSupported ){
+			return pictures;
+		}
+		else {
+			var elems = [],
+				imgs = doc.getElementsByTagName( "img" );
 
-		// Loop through all images on the page that are `<picture>`
-		for ( var i=0, plen = pictures.length; i < plen; i++ ) {
-			var picture = pictures[ i ];
-
-			// expando for caching data on the img
-			if( !picture[ pf.ns ] ){
-				picture[ pf.ns ] = {};
+			for ( var h = 0, len = pictures.length + imgs.length; h < len; h++ ){
+				if( h < pictures.length ){
+					elems[ h ] = pictures[ h ];
+				}
+				else {
+					var currImg = imgs[ h - pictures.length ];
+					if( currImg.parentNode.nodeName !== "PICTURE" && currImg.getAttribute( "srcset" ) !== null ){
+						elems.push( currImg );
+					}
+				}
 			}
+			return elems;
+		}
+  };
 
-			// if a picture element has already been evaluated, skip it
-			// unless `options.force` is set to true ( this, for example,
-			// is set to true when running `picturefill` on `resize` ).
-			if ( !options.reevaluate && picture[ pf.ns ].evaluated ) {
+	pf.getMatch = function( picture ) {
+		var sources = picture.getElementsByTagName( "source" );
+		var match;
+
+		// Go through each child, and if they have media queries, evaluate them
+		// and add them to matches
+		for ( var j=0, slen = sources.length; j < slen; j++ ) {
+			var source = sources[ j ];
+			var media = source.getAttribute( "media" );
+
+			// if source does not have a srcset attribute, skip
+			if ( !source.hasAttribute( "srcset" ) ) {
 				continue;
 			}
 
-			var firstMatch;
+			// if there"s no media specified, OR w.matchMedia is supported
+			if( ( !media || pf.matchesMedia( media ) ) ){
+				var typeSupported = pf.verifyTypeSupport( source );
 
-			// IE9 video workaround
-			pf.removeVideoShim( picture );
+				if( typeSupported === true ){
+					match = source;
+					break;
+				} else if( typeSupported === "pending" ){
+					return false;
+				}
+			}
+		}
 
-			var sources = picture.getElementsByTagName( "source" );
-			var sourcesPending = false;
+		return match;
+	};
 
-			// Go through each child, and if they have media queries, evaluate them
-			// and add them to matches
-			for ( var j=0, slen = sources.length; j < slen; j++ ) {
-				var source = sources[ j ];
-				var media = source.getAttribute( "media" );
+	function picturefill( options ) {
+		var elements;
 
-				// if source does not have a srcset attribute, skip
-				if ( !source.hasAttribute( "srcset" ) ) {
+		options = options || {};
+		elements = options.elements || pf.getAllElements();
+
+		// Loop through all elements
+		for ( var i=0, plen = elements.length; i < plen; i++ ) {
+			var element = elements[ i ];
+			var elemType = element.nodeName;
+
+			// expando for caching data on the img
+			if( !element[ pf.ns ] ){
+				element[ pf.ns ] = {};
+			}
+
+			// if the element has already been evaluated, skip it
+			// unless `options.force` is set to true ( this, for example,
+			// is set to true when running `picturefill` on `resize` ).
+			if ( !options.reevaluate && element[ pf.ns ].evaluated ) {
+				continue;
+			}
+
+			var firstMatch,
+				candidates,
+				picImg;
+
+			// if element is a picture element
+			if( elemType === "PICTURE" ){
+
+				// IE9 video workaround
+				pf.removeVideoShim( element );
+
+				// return the first match which might undefined
+				// returns false if there is a pending source
+				firstMatch = pf.getMatch( element );
+
+				// if any sources are pending in this picture due to async type test(s), remove the evaluated attr and skip for now ( the pending test will rerun picturefill on this element when complete)
+				if( firstMatch === false ) {
 					continue;
 				}
 
-				// if there"s no media specified, OR w.matchMedia is supported
-				if( ( !media || pf.matchesMedia( media ) ) ){
-					var typeSupported = pf.verifyTypeSupport( source );
-					if( typeSupported === true ){
-						firstMatch = source;
-						break;
-					}
-					else if( typeSupported === "pending" ){
-						sourcesPending = true;
-					}
-				}
+				// Find any existing img element in the picture element
+				picImg = element.getElementsByTagName( "img" )[ 0 ];
+			} else {
+				// if it's an img element
+				picImg = element;
 			}
-
-			// if any sources are pending in this picture due to async type test(s), remove the evaluated attr and skip for now ( the pending test will rerun picturefill on this element when complete)
-			if( sourcesPending ){
-				continue;
-			}
-
-			// Find any existing img element in the picture element
-			var picImg = picture.getElementsByTagName( "img" )[ 0 ],
-				candidates;
 
 			if( picImg ) {
 
 				// expando for caching data on the img
 				if( !picImg[ pf.ns ] ){
 					picImg[ pf.ns ] = {};
+				}
+
+				if( picImg.srcset ){
 					// cache and remove srcset if present
 					pf.dodgeSrcset( picImg );
 				}
@@ -411,7 +456,7 @@ window.matchMedia || (window.matchMedia = function() {
 				}
 
 				// set evaluated to true to avoid unnecessary reparsing
-				picture[ pf.ns ].evaluated = true;
+				element[ pf.ns ].evaluated = true;
 			}
 		}
 	}

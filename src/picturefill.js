@@ -303,7 +303,6 @@
 
 	pf.getMatch = function( picture ) {
 		var sources = picture.getElementsByTagName( "source" );
-		var sourcesPending = false;
 		var match;
 
 		// Go through each child, and if they have media queries, evaluate them
@@ -357,7 +356,8 @@
 			}
 
 			var firstMatch,
-				candidates;
+				candidates,
+				picImg;
 
 			// if element is a picture element
 			if( elemType === "PICTURE" ){
@@ -375,10 +375,10 @@
 				}
 
 				// Find any existing img element in the picture element
-				var picImg = element.getElementsByTagName( "img" )[ 0 ];
+				picImg = element.getElementsByTagName( "img" )[ 0 ];
 			} else {
 				// if it's an img element
-				var picImg = element;
+				picImg = element;
 			}
 
 			if( picImg ) {
