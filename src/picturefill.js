@@ -60,7 +60,7 @@
 		if ( !doc.body ) {
 			return;
 		}
-		doc.body.appendChild( lengthEl );
+		doc.body.insertBefore( lengthEl, null );
 		return lengthEl;
 	};
 
@@ -272,7 +272,7 @@
 			var video = videos[ 0 ];
 			var vsources = video.getElementsByTagName( "source" );
 			while ( vsources.length ) {
-				picture.appendChild( vsources[ 0 ] );
+				picture.insertBefore( vsources[ 0 ], null );
 			}
 			// Remove the video element once we're finished removing its children
 			video.parentNode.removeChild( video );
