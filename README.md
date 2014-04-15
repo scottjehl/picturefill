@@ -33,9 +33,9 @@ If you aren’t loading the script asynchronously, you can still
 load picturefill.js as usual just before the `</body>` tag—though we don’t recommend this. It could take a long time
 before executing, causing a visible delay before images are rendered.
 
-## Markup pattern and explanation
+## Markup Pattern and Explanation
 
-*Using media queries:*
+### Using Media Queries
 
 ```html
 	<picture>
@@ -60,7 +60,7 @@ Each `source` element must have a `srcset` attribute specifying one or more imag
 
 _Though media queries are well supported in modern browsers, the `matchMedia` polyfill (included in the `/external` folder) is necessary for parsing media queries in `media` attributes in browser without native media query support._
 
-*Resolution options*
+### Resolution Options
 
 ```html
 	<picture>
@@ -79,7 +79,7 @@ The `1x`, `2x` syntax in `source[srcset]` acts as a shorthand for more complex r
 
 Resolution options can be presented via [compound media queries](https://developer.mozilla.org/en-US/docs/CSS/Media_queries) as well (`(min-width: 600px) and (min-device-pixel-ratio: 2.0)`, for example) though this will mean _significantly_ more verbose sets of `source` elements, may require vendor prefixes for full support, and will not allow the user to override requests for higher resolution sources.
 
-*`sizes`/`srcset`*
+### `sizes`/`srcset`
 
 ```html
 	<picture>
