@@ -52,13 +52,15 @@ before executing, causing a visible delay before images are rendered.
 	</picture>
 ```
 
-The `picture` element can contain any number of `source` elements. The above example likely contains more sources than you’ll need.
+The `picture` element can contain any number of `source` elements. The above example likely contains more sources than you’ll need. Each `source` element accepts a `media` attribute, which tells the UA the most appropriate source file to load in the inner `img`. Both media types and queries can be used, like a native `media` attribute, but support for media _queries_ depends on the browser (unsupporting browsers fail silently).
 
 `source` selection is based on the first matching `media` attribute. You’ll want to present the larger options first when using `min-width` media queries, and last when using `max-width` media queries.
 
 Each `source` element must have a `srcset` attribute specifying one or more image paths. `source[srcset]` accepts a single image source to be served based entirely on the media query within the `media` attribute (`srcset="images/small.jpg"`), or a set of sources and resolution options (`srcset="images/small.png 0.5x, images/medium.png 1x, images/large.png 2x"`).
 
-*resolution options*
+_Though media queries are well supported in modern browsers, the `matchMedia` polyfill (included in the `/external` folder) is necessary for parsing media queries in `media` attributes in browser without native media query support._
+
+*Resolution options*
 
 ```html
 	<picture>
@@ -97,16 +99,6 @@ The `source[sizes]` syntax is used to define the size of the image across a numb
 Based on the breakpoints defined in `sizes`, appropriate image will be chosen based on the size of the image source divided against the user’s viewport size and the appropriate source will be loaded for their resolution.
 
 In the example above: given a 800 CSS pixel wide viewport, `"images/small.png 400w, images/medium.png 800w, images/large.png 1600w"` will be calculated to `"images/small.png 0.5x, images/medium.png 1x, images/large.png 2x"`. If that 800px viewport is on a 1x display, the user will recieve `medium.png`—if on a 2x display, `large.png`.
-
-*Additional notes:*
-
-* Each `[picture-srcset]` element can have an optional `[media]` attribute to make it apply in specific media settings. Both media types and queries can be used, like a native `media` attribute, but support for media _queries_ depends on the browser (unsupporting browsers fail silently).
-* The `matchMedia` polyfill (included in the `/external` folder) is necessary to support the `media` attribute across browsers (such as IE9), even in browsers that support media queries, although it is becoming more widely supported in new browsers.
-* The `noscript` element wraps the fallback image for non-JavaScript environments, and including this wrapper prevents browsers from fetching the fallback image during page load (causing unnecessary overhead). Generally, it's a good idea to reference a small mobile optimized image here, as it's likely to be loaded in older/underpowered mobile devices.
-* If you want to use the `picture` markup with IE9, you have to stick `<!--[if gte IE 8]><video style="display: none;"><![endif]-->`
-around the `source` elements, because in IE9 you can't have `source` as the child node of anything except for `video`.
-* If you want to use IE8 or less, you must specify a fallback `<img data-picture-src="foo.jpg">`.
-
 
 ### Supporting IE Desktop
 
