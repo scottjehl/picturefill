@@ -21,13 +21,17 @@
 						margin: 3em auto;
 					}
 				}
+				.ricg {
+					float: right;
+				}
 				h1 {
+					clear: both;
 					font-family: 'Raleway', sans-serif;
 					text-align: center;
 					font-size: 2.8em;
 					border-bottom: 1px solid papayawhip;
 					margin: 0;
-					color: #111;
+					color: #951c19;
 				}
 				h1 em {
 					display: block;
@@ -95,8 +99,9 @@
 		<script async="true" src="dist/picturefill.js"></script>
 	</head>
 	<body>
-		<h1>Picturefill <em>A <span class="picture">&lt;picture&gt;</span> element polyfill</em></h1>
-		<p class="h-more">...with support for srcset, sizes, and type attributes too!</p>
+		<a href="http://responsiveimages.org/" class="ricg"><img src="https://raw.github.com/ResponsiveImagesCG/meta/master/logo/Web/RICG_logo_small.png"></a>
+		<h1>Picturefill <em>A responsive image polyfill</em></h1>
+		<p>...with support for <code>srcset</code>, <code>sizes</code>, and <code>type</code> attributes too!</p>
 
 		<p>The <a href="http://picture.responsiveimages.org/">picture element</a> allows web developers to deliver an appropriate image to each user depending on a variety of conditions like screen size, viewport size, screen resolution, and more. Picturefill is a JavaScript file that enables support for the <code>picture</code> element in browsers that do not yet support it, so you can reliably use it today!</p>
 
