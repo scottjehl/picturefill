@@ -1,4 +1,5 @@
-# Picturefill
+
+# Picturefill ![build-status](https://api.travis-ci.org/scottjehl/picturefill.svg)
 A Polyfill for the [HTML Picture Element](http://picture.responsiveimages.org/) that you can use today.
 * Authors: Scott Jehl, Mat Marquis, Shawn Jansepar (2.0 refactor lead), and many more: see Authors.txt
 * License: MIT
