@@ -23,7 +23,7 @@
 	pf.ns = "picturefill";
 
 	// srcset support test
-	pf.srcsetSupported = new Image().srcset !== undefined;
+	pf.srcsetSupported = new w.Image().srcset !== undefined;
 
 	// just a string trim workaround
 	pf.trim = function( str ){
