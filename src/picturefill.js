@@ -304,13 +304,13 @@
 	pf.getMatch = function( picture ) {
 		var sources = picture.getElementsByTagName( "source" );
 		var sourcesPending = false;
+		var match;
 
 		// Go through each child, and if they have media queries, evaluate them
 		// and add them to matches
 		for ( var j=0, slen = sources.length; j < slen; j++ ) {
 			var source = sources[ j ];
 			var media = source.getAttribute( "media" );
-			var match;
 
 			// if source does not have a srcset attribute, skip
 			if ( !source.hasAttribute( "srcset" ) ) {
