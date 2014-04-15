@@ -53,25 +53,15 @@
 	 * Get width in css pixel value from a "length" value
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
 	 */
-	var lengthEl;
-
-	pf.getCachedLengthEl = function() {
-		if( lengthEl ){
-			return lengthEl;
-		}
-		lengthEl = doc.createElement( "div" );
-		if ( !doc.body ) {
-			return;
-		}
-		doc.body.insertBefore( lengthEl, doc.body.firstChild );
-		return lengthEl;
-	};
-
 	pf.getWidthFromLength = function( length ) {
-		var lengthEl = pf.getCachedLengthEl();
-		lengthEl.style.cssText = "width: " + length + ";";
+		// Create a cached element for getting length value widths
+		if( !pf.lengthEl ){
+			pf.lengthEl = doc.createElement( "div" );
+			doc.documentElement.insertBefore( pf.lengthEl, doc.documentElement.firstChild );
+		}
+		pf.lengthEl.style.cssText = "width: " + length + ";";
 		// Using offsetWidth to get width from CSS
-		return lengthEl.offsetWidth;
+		return pf.lengthEl.offsetWidth;
 	};
 
 	// container of supported mime types that one might need to qualify before using
