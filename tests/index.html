@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>picturefill tests</title>
+	<link rel="stylesheet" href="resources/qunit-1.10.0.css">
+	<script src="resources/qunit-1.10.0.js"></script>
+	<script src="resources/jquery-1.7.1.js"></script>
+</head>
+<body>
+
+<div id="qunit"></div>
+
+<div id="qunit-fixture">
+	<picture class="first-match">
+		<source srcset="../examples/images/small.jpg"></source>
+		<source srcset="../examples/images/extralarge.jpg"></source>
+		<img>
+	</picture>
+
+	<!-- dummy elements used as a mock pictures -->
+	<div class="video-shim">
+		<video>
+			<source class="source-one"/>
+			<source class="source-two"/>
+		</video>
+	</div>
+
+	<div class="prop-check">
+		<img/>
+	</div>
+
+  <div class="pending-check">
+    <source type="foo" srcset="foo"/>
+  </div>
+
+  <div class="match-check">
+    <source srcset="foo" media="bar"/>
+  </div>
+
+  <div class="no-match-check">
+    <source srcset="foo" media="bar"/>
+  </div>
+
+  <div class="no-srcset-check">
+    <source media="bar"/>
+  </div>
+</div>
+
+<script src="../src/picturefill.js"></script>
+<script src="tests.js"></script>
+</body>
+</html>
