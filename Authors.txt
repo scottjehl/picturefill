@@ -20,4 +20,5 @@ Brian Muenzenmeyer, @bmuenzenmeyer
 Tina Holly, @tinacious
 Travis Northcutt, @tnorthcutt
 @Zearin
-Shawn Jansepar, jansepar
+Shawn Jansepar, @jansepar
+John Bender, @jansepar
