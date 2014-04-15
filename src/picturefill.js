@@ -22,6 +22,9 @@
 	// namespace
 	pf.ns = "picturefill";
 
+	// srcset support test
+	pf.srcsetSupported = new Image().srcset !== undefined;
+
 	// just a string trim workaround
 	pf.trim = function( str ){
 		return str.trim ? str.trim() : str.replace( /^\s+|\s+$/g, "" );
@@ -225,7 +228,7 @@
 			candidates = [];
 
 		// if it's an img element, use the cached srcset property (defined or not)
-		if( el.nodeName === "IMG" ){
+		if( el.nodeName === "IMG" && el[ pf.ns ] && el[ pf.ns ].srcset ){
 			srcset = el[ pf.ns ].srcset;
 		}
 
@@ -276,79 +279,121 @@
 		}
 	};
 
+	/*
+	 * Find all picture elements and,
+	 * in browsers that don't natively support srcset, find all img elements with srcset attrs that don't have picture parents
+	 */
+	pf.getAllElements = function(){
+		var pictures = doc.getElementsByTagName( "picture" );
+
+		if( pf.srcsetSupported ){
+			return pictures;
+		}
+		else {
+			var elems = [],
+				imgs = doc.getElementsByTagName( "img" );
+
+			for ( var h = 0, len = pictures.length + imgs.length; h < len; h++ ){
+				if( h < pictures.length ){
+					elems[ h ] = pictures[ h ];
+				}
+				else {
+					var currImg = imgs[ h - pictures.length ];
+					if( currImg.parentNode.nodeName !== "PICTURE" && currImg.getAttribute( "srcset" ) !== null ){
+						elems.push( currImg );
+					}
+				}
+			}
+			return elems;
+		}
+	};
+
 	function picturefill( options ) {
-		var pictures;
+		var elements;
 
 		options = options || {};
-		pictures = options.elements || doc.getElementsByTagName( "picture" );
+		elements = options.elements || pf.getAllElements();
 
-		// Loop through all images on the page that are `<picture>`
-		for ( var i=0, plen = pictures.length; i < plen; i++ ) {
-			var picture = pictures[ i ];
+		// Loop through all elements
+		for ( var i=0, plen = elements.length; i < plen; i++ ) {
+			var element = elements[ i ];
+			var elemType = element.nodeName;
 
 			// expando for caching data on the img
-			if( !picture[ pf.ns ] ){
-				picture[ pf.ns ] = {};
+			if( !element[ pf.ns ] ){
+				element[ pf.ns ] = {};
 			}
 
-			// if a picture element has already been evaluated, skip it
+			// if the element has already been evaluated, skip it
 			// unless `options.force` is set to true ( this, for example,
 			// is set to true when running `picturefill` on `resize` ).
-			if ( !options.reevaluate && picture[ pf.ns ].evaluated ) {
+			if ( !options.reevaluate && element[ pf.ns ].evaluated ) {
 				continue;
 			}
 
-			var firstMatch;
+			var firstMatch,
+				candidates;
 
-			// IE9 video workaround
-			pf.removeVideoShim( picture );
+			// if element is a picture element
+			if( elemType === "PICTURE" ){
 
-			var sources = picture.getElementsByTagName( "source" );
-			var sourcesPending = false;
+				// IE9 video workaround
+				pf.removeVideoShim( element );
 
-			// Go through each child, and if they have media queries, evaluate them
-			// and add them to matches
-			for ( var j=0, slen = sources.length; j < slen; j++ ) {
-				var source = sources[ j ];
-				var media = source.getAttribute( "media" );
+				var sources = element.getElementsByTagName( "source" );
+				var sourcesPending = false;
 
-				// if source does not have a srcset attribute, skip
-				if ( !source.hasAttribute( "srcset" ) ) {
+				// Go through each child, and if they have media queries, evaluate them
+				// and add them to matches
+				for ( var j=0, slen = sources.length; j < slen; j++ ) {
+					var source = sources[ j ];
+					var media = source.getAttribute( "media" );
+
+					// if source does not have a srcset attribute, skip
+					if ( !source.hasAttribute( "srcset" ) ) {
+						continue;
+					}
+
+					// if there"s no media specified, OR w.matchMedia is supported
+					if( ( !media || pf.matchesMedia( media ) ) ){
+						var typeSupported = pf.verifyTypeSupport( source );
+						if( typeSupported === true ){
+							firstMatch = source;
+							break;
+						}
+						else if( typeSupported === "pending" ){
+							sourcesPending = true;
+						}
+					}
+				}
+
+				// if any sources are pending in this picture due to async type test(s), remove the evaluated attr and skip for now ( the pending test will rerun picturefill on this element when complete)
+				if( sourcesPending ){
 					continue;
 				}
 
-				// if there"s no media specified, OR w.matchMedia is supported
-				if( ( !media || pf.matchesMedia( media ) ) ){
-					var typeSupported = pf.verifyTypeSupport( source );
-					if( typeSupported === true ){
-						firstMatch = source;
-						break;
-					}
-					else if( typeSupported === "pending" ){
-						sourcesPending = true;
-					}
-				}
+				// Find any existing img element in the picture element
+				var picImg = element.getElementsByTagName( "img" )[ 0 ];
+			}
+			// if it's an img element
+			else {
+				var picImg = element;
 			}
 
-			// if any sources are pending in this picture due to async type test(s), remove the evaluated attr and skip for now ( the pending test will rerun picturefill on this element when complete)
-			if( sourcesPending ){
-				continue;
-			}
-
-			// Find any existing img element in the picture element
-			var picImg = picture.getElementsByTagName( "img" )[ 0 ],
-				candidates;
 
 			if( picImg ) {
 
 				// expando for caching data on the img
 				if( !picImg[ pf.ns ] ){
 					picImg[ pf.ns ] = {};
+				}
+
+				if( picImg.srcset ){
 					// cache and remove srcset if present
 					pf.dodgeSrcset( picImg );
 				}
 
-				if ( firstMatch ) {
+				if ( firstMatch && elemType === "PICTURE" ) {
 					candidates = pf.processSourceSet( firstMatch );
 					pf.applyBestCandidate( candidates, picImg );
 				} else {
@@ -362,7 +407,7 @@
 				}
 
 				// set evaluated to true to avoid unnecessary reparsing
-				picture[ pf.ns ].evaluated = true;
+				element[ pf.ns ].evaluated = true;
 			}
 		}
 	}
