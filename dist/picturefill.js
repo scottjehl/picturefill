@@ -418,7 +418,9 @@ window.matchMedia || (window.matchMedia = function() {
 				// returns false if there is a pending source
 				firstMatch = pf.getMatch( element );
 
-				// if any sources are pending in this picture due to async type test(s), remove the evaluated attr and skip for now ( the pending test will rerun picturefill on this element when complete)
+				// if any sources are pending in this picture due to async type test(s)
+				// remove the evaluated attr and skip for now ( the pending test will
+				// rerun picturefill on this element when complete)
 				if( firstMatch === false ) {
 					continue;
 				}
