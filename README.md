@@ -1,6 +1,6 @@
 
 # Picturefill ![build-status](https://api.travis-ci.org/scottjehl/picturefill.svg)
-A Polyfill for the [HTML Picture Element](http://picture.responsiveimages.org/) that you can use today.
+A Polyfill for the [responsive images](http://picture.responsiveimages.org/) that you can use today.
 * Authors: Scott Jehl, Mat Marquis, Shawn Jansepar (2.0 refactor lead), and many more: see Authors.txt
 * License: MIT
 
@@ -38,67 +38,72 @@ before executing, causing a visible delay before images are rendered.
 ### Using Media Queries
 
 ```html
-	<picture>
-		<!-- Video tag needed in order to use <source> in IE9 -->
-		<!--[if IE 9]><video style="display: none;"><![endif]-->
-		<source srcset="images/extralarge.jpg" media="(min-width: 1000px)"></source>
-		<source srcset="images/large.jpg" media="(min-width: 800px)"></source>
-		<source srcset="images/medium.jpg" media="(min-width: 400px)"></source>
-		<source srcset="images/small.jpg"></source>
-		<!--[if IE 9]></video><![endif]-->
+<picture>
+	<!-- Video tag needed in order to use <source> in IE9 -->
+	<!--[if IE 9]><video style="display: none;"><![endif]-->
+	<source srcset="extralarge.jpg" media="(min-width: 1000px)"></source>
+	<source srcset="large.jpg" media="(min-width: 800px)"></source>
+	<source srcset="medium.jpg" media="(min-width: 400px)"></source>
+	<source srcset="small.jpg"></source>
+	<!--[if IE 9]></video><![endif]-->
 
-		<!-- Fallback content: -->
-		<img srcset="images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-	</picture>
+	<!-- Fallback content: -->
+	<img srcset="small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+</picture>
 ```
 
 The `picture` element can contain any number of `source` elements. The above example likely contains more sources than you’ll need. Each `source` element accepts a `media` attribute, which tells the UA the most appropriate source file to load in the inner `img`. Both media types and queries can be used, like a native `media` attribute, but support for media _queries_ depends on the browser (unsupporting browsers fail silently).
 
-`source` selection is based on the first matching `media` attribute. You’ll want to present the larger options first when using `min-width` media queries, and last when using `max-width` media queries.
+Each `source` element must have a `srcset` attribute specifying one or more image paths.
 
-Each `source` element must have a `srcset` attribute specifying one or more image paths. `source[srcset]` accepts a single image source to be served based entirely on the media query within the `media` attribute (`srcset="images/small.jpg"`), or a set of sources and resolution options (`srcset="images/small.png 0.5x, images/medium.png 1x, images/large.png 2x"`).
+`source` selection is based on the first matching `media` attribute. You’ll want to present the larger options first when using `min-width` media queries, and last when using `max-width` media queries.
 
 _Though media queries are well supported in modern browsers, the `matchMedia` polyfill (included in the `/external` folder) is necessary for parsing media queries in `media` attributes in browser without native media query support._
 
 ### Resolution Options
 
 ```html
-	<picture>
-		<!-- Video tag needed in order to use <source> in IE9 -->
-		<!--[if IE 9]><video style="display: none;"><![endif]-->
-		<source srcset="images/large.jpg 1x, images/extralarge.jpg 2x" media="(min-width: 800px)"></source>
-		<source srcset="images/small.jpg 1x, images/medium.jpg 2x"></source>
-		<!--[if IE 9]></video><![endif]-->
-
-		<!-- Fallback content: -->
-		<img srcset="images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-	</picture>
+<img src="small.jpg" srcset="large.jpg 2x" alt="…">
 ```
 
-The `1x`, `2x` syntax in `source[srcset]` acts as a shorthand for more complex resolution media queries, but the native markup will allow the UA to override requests for higher-resolution options based on a bandwidth limitations or a user preference (see #9 in the [Responsive Images Use Cases and Requirements](http://usecases.responsiveimages.org/#h2_requirements)).
+```html
+<picture>
+	<!--[if IE 9]><video style="display: none;"><![endif]-->
+	<source srcset="large.jpg 1x, extralarge.jpg 2x" media="(min-width: 800px)"></source>
+	<source srcset="small.jpg 1x, medium.jpg 2x"></source>
+	<!--[if IE 9]></video><![endif]-->
 
-Resolution options can be presented via [compound media queries](https://developer.mozilla.org/en-US/docs/CSS/Media_queries) as well (`(min-width: 600px) and (min-device-pixel-ratio: 2.0)`, for example) though this will mean _significantly_ more verbose sets of `source` elements, may require vendor prefixes for full support, and will not allow the user to override requests for higher resolution sources.
+	<img srcset="small.jpg" alt="…">
+</picture>
+```
+
+The `1x`, `2x` syntax in `srcset` acts as a shorthand for more complex resolution media queries, but the native markup will allow the UA to override requests for higher-resolution options based on a bandwidth limitations or a user preference (see #9 in the [Responsive Images Use Cases and Requirements](http://usecases.responsiveimages.org/#h2_requirements)).
 
 ### `sizes`/`srcset`
 
-```html
-	<picture>
-		<!-- Video tag needed in order to use <source> in IE9 -->
-		<!--[if IE 9]><video style="display: none;"><![endif]-->
-		<source sizes="(max-width: 30em) 100%, (max-width: 50em) 75%, 50%"
-				srcset="images/pic-small.png 400w, images/pic-medium.png 800w, images/pic-large.png 1200w"></source>
-		<!--[if IE 9]></video><![endif]-->
 
-		<!-- Fallback content for IE8 and older -->
-		<img srcset="images/pic-small.png" alt="Obama with soldiers">
-	</picture>
+```html
+<img sizes="100%, (min-width: 50em) 75%"
+     srcset="large.jpg 1024w, medium.jpg 640w, small.jpg 320w"
+     alt="…">
+```
+
+```html
+<picture>
+	<!--[if IE 9]><video style="display: none;"><![endif]-->
+	<source sizes="100%, (min-width: 50em) 75%"
+			srcset="large.jpg 1024w, medium.jpg 640w, small.jpg 320w"></source>
+	<!--[if IE 9]></video><![endif]-->
+
+	<img srcset="small.png" alt="…">
+</picture>
 ```
 
 The `source[sizes]` syntax is used to define the size of the image across a number of breakpoints. Then, `srcset` defines an array of images and their inherent widths.
 
 Based on the breakpoints defined in `sizes`, appropriate image will be chosen based on the size of the image source divided against the user’s viewport size and the appropriate source will be loaded for their resolution.
 
-In the example above: given a 800 CSS pixel wide viewport, `"images/small.png 400w, images/medium.png 800w, images/large.png 1600w"` will be calculated to `"images/small.png 0.5x, images/medium.png 1x, images/large.png 2x"`. If that 800px viewport is on a 1x display, the user will recieve `medium.png`—if on a 2x display, `large.png`.
+In the example above: given a 800 CSS pixel wide viewport, `"small.png 400w, medium.png 800w, large.png 1600w"` will be calculated to `"small.png 0.5x, medium.png 1x, large.png 2x"`. If that 800px viewport is on a 1x display, the user will recieve `medium.png`—if on a 2x display, `large.png`.
 
 ### Supporting IE Desktop
 
