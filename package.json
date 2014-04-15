@@ -5,9 +5,10 @@
 		"node": ">= 0.8.0"
 	},
 	"scripts": {
-		"test": "grunt qunit"
+		"test": "grunt test --verbose"
 	},
 	"devDependencies": {
+		"grunt-cli": "~0.1",
 		"grunt-contrib-jshint": "~0.6.0",
 		"grunt-contrib-qunit": "~0.2.0",
 		"grunt-contrib-concat": "~0.3.0",
