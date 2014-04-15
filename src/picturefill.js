@@ -431,8 +431,12 @@
 			}
 		}, 250 );
 		if( w.addEventListener ){
+			var resizeThrottle;
 			w.addEventListener( "resize", function() {
-				w.picturefill({ reevaluate: true });
+				w.clearTimeout( resizeThrottle );
+				resizeThrottle = w.setTimeout( function(){
+					picturefill({ reevaluate: true });
+				}, 60 );
 			}, false );
 		}
 	}
