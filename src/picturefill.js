@@ -357,7 +357,7 @@
 			}
 
 			var firstMatch,
-					candidates;
+				candidates;
 
 			// if element is a picture element
 			if( elemType === "PICTURE" ){
@@ -367,7 +367,7 @@
 
 				// return the first match which might undefined
 				// returns false if there is a pending source
-				var firstMatch = pf.getMatch( element );
+				firstMatch = pf.getMatch( element );
 
 				// if any sources are pending in this picture due to async type test(s), remove the evaluated attr and skip for now ( the pending test will rerun picturefill on this element when complete)
 				if( firstMatch === false ) {
@@ -393,7 +393,7 @@
 					pf.dodgeSrcset( picImg );
 				}
 
-				if ( firstMatch && elemType === "PICTURE" ) {
+				if ( firstMatch ) {
 					candidates = pf.processSourceSet( firstMatch );
 					pf.applyBestCandidate( candidates, picImg );
 				} else {
