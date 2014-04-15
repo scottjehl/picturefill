@@ -299,7 +299,7 @@
 			}
 			return elems;
 		}
-  };
+	};
 
 	pf.getMatch = function( picture ) {
 		var sources = picture.getElementsByTagName( "source" );
