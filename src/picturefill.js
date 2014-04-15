@@ -377,6 +377,7 @@
 
 				// return the first match which might undefined
 				// returns false if there is a pending source
+				// TODO the return type here is brutal, cleanup
 				firstMatch = pf.getMatch( element );
 
 				// if any sources are pending in this picture due to async type test(s)
