@@ -272,7 +272,7 @@
 			var video = videos[ 0 ];
 			var vsources = video.getElementsByTagName( "source" );
 			while ( vsources.length ) {
-				picture.insertBefore( vsources[ 0 ], null );
+				picture.insertBefore( vsources[ 0 ], video );
 			}
 			// Remove the video element once we're finished removing its children
 			video.parentNode.removeChild( video );
