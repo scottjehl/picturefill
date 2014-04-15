@@ -56,7 +56,10 @@
 	var lengthEl;
 
 	pf.getCachedLengthEl = function() {
-		lengthEl = lengthEl || doc.createElement( "div" );
+		if( lengthEl ){
+			return lengthEl;
+		}
+		lengthEl = doc.createElement( "div" );
 		if ( !doc.body ) {
 			return;
 		}
