@@ -326,14 +326,9 @@ window.matchMedia || (window.matchMedia = function() {
 	 * in browsers that don't natively support srcset, find all img elements with srcset attrs that don't have picture parents
 	 */
 	pf.getAllElements = function(){
-		var pictures = doc.getElementsByTagName( "picture" );
-
-		if( pf.srcsetSupported ){
-			return pictures;
-		}
-		else {
-			var elems = [],
-				imgs = doc.getElementsByTagName( "img" );
+		var pictures = doc.getElementsByTagName( "picture" ),
+			elems = [],
+			imgs = doc.getElementsByTagName( "img" );
 
 			for ( var h = 0, len = pictures.length + imgs.length; h < len; h++ ){
 				if( h < pictures.length ){
@@ -341,13 +336,14 @@ window.matchMedia || (window.matchMedia = function() {
 				}
 				else {
 					var currImg = imgs[ h - pictures.length ];
-					if( currImg.parentNode.nodeName !== "PICTURE" && currImg.getAttribute( "srcset" ) !== null ){
-						elems.push( currImg );
+					if(currImg.parentNode.nodeName !== "PICTURE" &&
+						((pf.srcsetSupported && currImg.getAttribute( "sizes" ))
+						|| currImg.getAttribute( "srcset" ) !== null)) {
+							elems.push( currImg );
 					}
 				}
 			}
 			return elems;
-		}
 	};
 
 	pf.getMatch = function( picture ) {
