@@ -292,31 +292,26 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	pf.applyBestCandidate = function( candidates, picImg ) {
-		var candidate, length, bestCandidate;
-
-		candidates.sort( pf.ascendingSort );
-
-		length = candidates.length;
-		bestCandidate = candidates[ length - 1 ];
-
-		for ( var l=0; l < length; l++ ) {
+		candidates.sort( pf.descendingSort );
+		var candidate, bestCandidate = candidates[0];
+		for ( var l=1; l < candidates.length; l++ ) {
 			candidate = candidates[ l ];
-			if ( candidate.resolution >= pf.getDpr() ) {
+			if ( candidate.resolution >= pf.getDpr() && candidate.resolution <= bestCandidate.resolution) {
 				bestCandidate = candidate;
+			} else {
 				break;
 			}
 		}
-
 		if ( !pf.endsWith( picImg.src, bestCandidate.url ) ) {
 			picImg.src = bestCandidate.url;
 			// currentSrc attribute and property to match
 			// http://picture.responsiveimages.org/#the-img-element
-			picImg.currentSrc = picImg.src;
+			picImg.currentSrc = bestCandidate.url;
 		}
 	};
 
-	pf.ascendingSort = function( a, b ) {
-		return a.resolution - b.resolution;
+	pf.descendingSort = function( a, b ) {
+		return b.resolution - a.resolution;
 	};
 
 	/*
