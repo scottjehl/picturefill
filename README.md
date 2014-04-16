@@ -8,8 +8,6 @@ A Polyfill for the [responsive images](http://picture.responsiveimages.org/) tha
 
 **Draft Specification:** [http://picture.responsiveimages.org/](http://picture.responsiveimages.org/)
 
-**Note:** Picturefill works best in browsers that support CSS3 media queries. The demo page references (externally) the [matchMedia polyfill](https://github.com/paulirish/matchMedia.js/) which makes matchMedia work in media query-supporting browsers that don’t support `matchMedia`. `matchMedia` and the `matchMedia` polyfill are not required for `picturefill` to work, but they are required to support the `media` attributes on `picture` `source` elements. In browsers that don’t have native support for media queries, the `matchMedia` polyfill will allow for querying native media types, such as `screen`, `print`, etc.
-
 ## Usage
 
 The following snippet will load the polyfill asynchronously and poll until the document is ready, in order to start image downloads as fast as possible (instead of waiting) until DOMContentLoaded). It will also conditionally load matchMedia if the browser doesn’t support it.
@@ -29,7 +27,7 @@ document.createElement( "source" );
 </script>
 ```
 
-If you aren’t loading the script asynchronously, you can still 
+If you aren’t loading the script asynchronously, you can still
 load picturefill.js as usual just before the `</body>` tag—though we don’t recommend this. It could take a long time
 before executing, causing a visible delay before images are rendered.
 
@@ -108,7 +106,7 @@ In the example above: given a 800 CSS pixel wide viewport, `"small.png 400w, med
 ### Supporting IE Desktop
 
 Internet Explorer 9 has some issues rendering custom elements like `picture` and `source`.
-For IE9, you have to stick `<!--[if gte IE 8]><video style="display: none;"><![endif]-->`
+For IE9, you have to stick `<!--[if IE 9]><video style="display: none;"><![endif]-->`
 around the `source` elements, because in IE9 you can't have `source` as the child node of
 anything except for `video`. For IE8 and less, `picture` will fall back to an `<img srcset>` element.
 
