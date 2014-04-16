@@ -25,10 +25,6 @@
 						width: 54em;
 						margin: 3em auto;
 					}
-					/*.ricg img {
-						margin: 0;
-						float: right;
-					}*/
 				}
 				h1 {
 					clear: both;
@@ -48,7 +44,9 @@
 				}
 				p, li {
 					font-size: 1.1em;
+					margin: .6em 0 .8em;
 				}
+
 				h1 .picture,
 				p code {
 					background: papayawhip;
@@ -97,7 +95,7 @@
 				.nav li a:hover {
 					background: papayawhip;
 				}
-				@media (min-width: 30em){
+				@media (min-width: 40em){
 					.nav {
 						display: table;
 						border: 1px solid papayawhip;
@@ -180,7 +178,7 @@
 
 		<h2 id="download">Downloading Picturefill</h2>
 		<h3>Picturefill Version 2 (Alpha)</h3>
-		<p>For native <code>picture</code> element support, you'll want Picturefill version 2:</p>
+		<p>For native <code>picture</code> element support, you'll want Picturefill version 2. These downloads include the <a href="https://github.com/paulirish/matchMedia.js/">matchMedia polyfill</a> for browsers that need it (like IE9).</p>
 		<ul>
 			<li><a href="dist/picturefill.js">picturefill.js</a> (development version, unminified code)</li>
 			<li><a href="dist/picturefill.min.js">picturefill.min.js</a> (production version, minified code)</li>
@@ -322,9 +320,9 @@ srcset=&quot;examples/images/pic-small.png 400w, examples/images/pic-medium.png 
 
 		<p>Picturefill is tested broadly and works in a large number of browsers. That said, it does have some browser support considerations to keep in mind:</p>
 		<ul>
-			<li><strong>Temporary extra HTTP Requests for Picture usage in some browsers:</strong> In browsers that natively support <code>srcset</code> but do not yet support the <code>picture</code> element, users may experience a wasted HTTP request for each <code>picture</code> element on a page. This is because the browser's preparser will fetch one of the URLs listed in the 	<code>picture</code> element's child <code>img</code>'s <code>srcset</code> attribute as soon as possible during page load, before the JavaScript can evaluate the potential <code>picture</code> <code>source</code> elements for a better match. This problem will only affect browsers that have implemented <code>srcset</code> but not <code>picture</code>, which will hopefully be short-lived.</li>
+			<li><strong>Temporary extra HTTP Requests for Picture usage in some browsers:</strong> In browsers that natively support <code>srcset</code> but do not yet support the <code>picture</code> element, users may experience a wasted HTTP request for each <code>picture</code> element on a page. This is because the browser's preparser will fetch one of the URLs listed in the <code>picture</code> element's child <code>img</code>'s <code>srcset</code> attribute as soon as possible during page load, before the JavaScript can evaluate the potential <code>picture</code> <code>source</code> elements for a better match. This problem will only affect browsers that have implemented <code>srcset</code> but not <code>picture</code>, which will hopefully be short-lived.</li>
 			<li><strong>Source element limitations:</strong> Browsers like Android 2.3 and Internet Explorer 9 can not see the <code>source</code> elements inside a <code>picture</code> element. For IE, the <code>video</code> tag workaround helps us avoid this problem, but Android will still have no access to <code>source</code> elements. Be sure to provide a <code>srcset</code> attribute on your enclosed <code>img</code> to ensure an image will show in this browser.</li>
-			<li>The <code>picture</code> element (paired with picturefill) works best in browsers that support CSS3 media queries. The demo page references (externally) the [matchMedia polyfill](https://github.com/paulirish/matchMedia.js/) which makes matchMedia work in media query-supporting browsers that don’t support `matchMedia`. `matchMedia` and the `matchMedia` polyfill are not required for `picturefill` to work, but they are required to support the `media` attributes on `picture` `source` elements. In browsers that don’t have native support for media queries, the `matchMedia` polyfill will allow for querying native media types, such as `screen`, `print`, etc.</li>
+			<li><strong>Media attribute support requires native media query support</strong>The <code>picture</code> element (paired with picturefill) works best in browsers that support CSS3 media queries. Picturefill includes  the <a href="https://github.com/paulirish/matchMedia.js/">matchMedia polyfill</a> by default, which makes matchMedia work in media query-supporting browsers that don’t support <code>matchMedia</code>.</li>
 		</ul>
 
 	</body>
