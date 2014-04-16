@@ -287,6 +287,7 @@ window.matchMedia || (window.matchMedia = function() {
 			candidate = candidates[ l ];
 			if ( candidate.resolution >= pf.getDpr() && candidate.resolution <= bestCandidate.resolution) {
 				bestCandidate = candidate;
+			} else {
 				break;
 			}
 		}
