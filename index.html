@@ -15,6 +15,12 @@
 					color: #333;
 					line-height: 1.4;
 				}
+				a {
+					color: #e6615e;
+				}
+				a:hover {
+					text-decoration: none;
+				}
 				.ricg img {
 					display: block;
 					margin: 0 auto 1em;
@@ -164,7 +170,7 @@
 				<li><a href="#getting-started">Getting Started</a></li>
 				<li><a href="#examples">Examples</a></li>
 				<li><a href="#support">Browser support</a></li>
-				<li><a href="#support">Contributing</a></li>
+				<li><a href="#contributing">Contributing</a></li>
 			</ul>
 		</nav>
 
@@ -218,7 +224,7 @@ document.createElement( &quot;picture&quot; );
 
 		<h3>Using <code>img</code> with <code>srcset</code> &amp; <code>sizes</code> attributes</h3>
 
-		<p>It's beyond the scope of this guide to get into much detail about how to use the new <code>srcset</code> &amp; <code>sizes</code> attributes, so we'd recommend reading the following post by Eric Portis: <a href="http://ericportis.com/posts/2014/srcset-sizes/">Srcset and Sizes</a>. Read that first, then check out the demos below!</p>
+		<p>The <code>sizes</code> syntax is used to define the size of the image across a number of breakpoints. Mcode>srcset</code> then defines an array of images and their inherent sizes. It's beyond the scope of this guide to get into much detail about how to use the new <code>srcset</code> &amp; <code>sizes</code> attributes, so we'd recommend reading the following post by Eric Portis: <a href="http://ericportis.com/posts/2014/srcset-sizes/">Srcset and Sizes</a>. Read that first, then check out the demos below!</p>
 
 		<h3>An img with "srcset" and sizes" attributes:</h3>
 <pre><code>&lt;img sizes=&quot;(max-width: 30em) 100%, (max-width: 50em) 75%, 50%&quot;
@@ -236,7 +242,7 @@ srcset=&quot;examples/images/pic-small.png 400w, examples/images/pic-medium.png 
 
 		<p>Your <code>picture</code> element should contain a series of <code>source</code> elements followed by an <code>img</code> element. Each <code>source</code> element must have a<code>srcset</code> attribute specifying one or more image url sources (which can use expanded srcset syntax if desired for resolution switching), and the <code>img</code> element should have a srcset attribute for fallback purposes as well (some browsers like Android 2.3's won't see the <code>source</code> elements). Additionally, you may add a  <code>media</code> attribute containing CSS3 Media Queries, and/or a <code>sizes</code> attribute to pair with <code>srcset</code>.</p>
 
-		<p>Here's one with <code>srcset</code> and <code>media</code>. The first source that matches will determine the src of the <code>img</code> element at the end.</p>
+		<p>Here's one with <code>srcset</code> and <code>media</code>. The first <code>source</code> with a <code>media</code> attribute that matches the user’s context will determine the src of the <code>img</code> element at the end, so you’ll want to present larger options first when using <code>min-width</code> media queries (like in the examples below), and larger options last when using <code>max-width</code> media queries.</p>
 
 <pre><code>&lt;picture&gt;
 	&lt;source srcset=&quot;examples/images/extralarge.jpg&quot; media=&quot;(min-width: 1000px)&quot;&gt;
@@ -272,7 +278,8 @@ srcset=&quot;examples/images/pic-small.png 400w, examples/images/pic-medium.png 
 
 		<h2>More Picture markup examples</h2>
 
-		<h3><code>media</code> and expanded <code>srcset</code> syntax:</h3>
+		<h3><code>media</code> and <code>srcset</code> syntax:</h3>
+		<p>The <code>1x</code>, <code>2x</code> syntax in <code>srcset</code> acts as a shorthand for more complex resolution media queries. When natively supported, <code>srcset</code> will allow the UA to override requests for higher-resolution options based on a bandwidth limitations or a user preference (see #9 in the <a href="http://usecases.responsiveimages.org/#h2_requirements">Responsive Images Use Cases and Requirements</a>).</p>
 <pre><code>&lt;picture&gt;
 	&lt;!--[if IE 9]&gt;&lt;video style=&quot;display: none;&quot;&gt;&lt;![endif]--&gt;
 	&lt;source srcset=&quot;examples/images/large.jpg, examples/images/extralarge.jpg 2x&quot; media=&quot;(min-width: 800px)&quot;&gt;
