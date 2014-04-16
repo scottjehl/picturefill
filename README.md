@@ -1,54 +1,31 @@
 
-# Picturefill ![build-status](https://api.travis-ci.org/scottjehl/picturefill.svg)
-A Polyfill for the [responsive images](http://picture.responsiveimages.org/) that you can use today.
+# Picturefill
+A [responsive image](http://picture.responsiveimages.org/) polyfill.
 * Authors: Scott Jehl, Mat Marquis, Shawn Jansepar (2.0 refactor lead), and many more: see Authors.txt
 * License: MIT
 
-**Demo URL:** [http://scottjehl.github.com/picturefill/](http://scottjehl.github.com/picturefill/)
+![build-status](https://api.travis-ci.org/scottjehl/picturefill.svg)
 
-**Draft Specification:** [http://picture.responsiveimages.org/](http://picture.responsiveimages.org/)
+Picturefill has two versions:
+* Version 2 is a strict polyfill of the (Picture element draft specification](http://picture.responsiveimages.org/) and is the main version in development.
+* Version 1 mimics the Picture element pattern with `span` elements. It is maintained in the 1.2 branch.
 
-## Usage
+## Usage, Demos, Docs
+To find out how to use Picturefill on your sites, visit the project and demo site:
 
-The following snippet will load the polyfill asynchronously and poll until the document is ready, in order to start image downloads as fast as possible (instead of waiting) until DOMContentLoaded). It will also conditionally load matchMedia if the browser doesn’t support it.
+[Picturefill Documentation, Downloads, and Demos Site](http://scottjehl.github.com/picturefill/)
 
-```html
-	<head>
-	<script async="true" src="picturefill.js"></script>
-```
+## contributing
+For information on how to contribute code to Picturefill, check out `Contributing.md`
 
-If you're loading picturefill.js asynchronously—and not already using a recent version of the [HTML5 Shiv](https://github.com/aFarkas/html5shiv) with support for `picture`—be sure to place the following in the `head` of your page to ensure old IE support:
+## issues
+If you find a bug in Picturefill, please add it to [the issue tracker](https://github.com/scottjehl/picturefill/issues)
 
-```html
-<script>
-// Picture element HTML shim|v it for old IE (pairs with Picturefill.js)
-document.createElement( "picture" );
-document.createElement( "source" );
-</script>
-```
 
-If you aren’t loading the script asynchronously, you can still
-load picturefill.js as usual just before the `</body>` tag—though we don’t recommend this. It could take a long time
-before executing, causing a visible delay before images are rendered.
 
-## Markup Pattern and Explanation
 
-### Using Media Queries
 
-```html
-<picture>
-	<!-- Video tag needed in order to use <source> in IE9 -->
-	<!--[if IE 9]><video style="display: none;"><![endif]-->
-	<source srcset="extralarge.jpg" media="(min-width: 1000px)"></source>
-	<source srcset="large.jpg" media="(min-width: 800px)"></source>
-	<source srcset="medium.jpg" media="(min-width: 400px)"></source>
-	<source srcset="small.jpg"></source>
-	<!--[if IE 9]></video><![endif]-->
-
-	<!-- Fallback content: -->
-	<img srcset="small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-</picture>
-```
+TODO: move content below to index.html or delete
 
 The `picture` element can contain any number of `source` elements. The above example likely contains more sources than you’ll need. Each `source` element accepts a `media` attribute, which tells the UA the most appropriate source file to load in the inner `img`. Both media types and queries can be used, like a native `media` attribute, but support for media _queries_ depends on the browser (unsupporting browsers fail silently).
 
@@ -103,14 +80,6 @@ Based on the breakpoints defined in `sizes`, appropriate image will be chosen ba
 
 In the example above: given a 800 CSS pixel wide viewport, `"small.png 400w, medium.png 800w, large.png 1600w"` will be calculated to `"small.png 0.5x, medium.png 1x, large.png 2x"`. If that 800px viewport is on a 1x display, the user will recieve `medium.png`—if on a 2x display, `large.png`.
 
-### Supporting IE Desktop
-
-Internet Explorer 9 has some issues rendering custom elements like `picture` and `source`.
-For IE9, you have to stick `<!--[if IE 9]><video style="display: none;"><![endif]-->`
-around the `source` elements, because in IE9 you can't have `source` as the child node of
-anything except for `video`. For IE8 and less, `picture` will fall back to an `<img srcset>` element.
-
-Internet Explorer 8 and older have no support for CSS3 Media Queries, so in the examples above, that feature will be ignored.
 
 ## Support
 
