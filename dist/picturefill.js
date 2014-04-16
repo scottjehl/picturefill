@@ -281,24 +281,25 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	pf.applyBestCandidate = function( candidates, picImg ) {
-		var sortedImgCandidates = candidates.sort( pf.ascendingSort ),
-			candidate;
-
-		for ( var l=0; l < sortedImgCandidates.length; l++ ) {
-			candidate = sortedImgCandidates[ l ];
-			if ( candidate.resolution >= pf.getDpr() ) {
-				if ( !pf.endsWith( picImg.src, candidate.url ) ) {
-					picImg.src = candidate.url;
-					// currentSrc attribute and property to match http://picture.responsiveimages.org/#the-img-element
-					picImg.currentSrc = candidate.url;
-				}
+		candidates.sort( pf.descendingSort );
+		var candidate, bestCandidate = candidates[0];
+		for ( var l=1; l < candidates.length; l++ ) {
+			candidate = candidates[ l ];
+			if ( candidate.resolution >= pf.getDpr() && candidate.resolution <= bestCandidate.resolution) {
+				bestCandidate = candidate;
 				break;
 			}
 		}
+		if ( !pf.endsWith( picImg.src, bestCandidate.url ) ) {
+			picImg.src = bestCandidate.url;
+			// currentSrc attribute and property to match
+			// http://picture.responsiveimages.org/#the-img-element
+			picImg.currentSrc = bestCandidate.url;
+		}
 	};
 
-	pf.ascendingSort = function( a, b ) {
-		return a.resolution > b.resolution;
+	pf.descendingSort = function( a, b ) {
+		return b.resolution - a.resolution;
 	};
 
 	/*
