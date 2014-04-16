@@ -108,7 +108,7 @@ In the example above: given a 800 CSS pixel wide viewport, `"small.png 400w, med
 ### Supporting IE Desktop
 
 Internet Explorer 9 has some issues rendering custom elements like `picture` and `source`.
-For IE9, you have to stick `<!--[if gte IE 8]><video style="display: none;"><![endif]-->`
+For IE9, you have to stick `<!--[if IE 9]><video style="display: none;"><![endif]-->`
 around the `source` elements, because in IE9 you can't have `source` as the child node of
 anything except for `video`. For IE8 and less, `picture` will fall back to an `<img srcset>` element.
 
