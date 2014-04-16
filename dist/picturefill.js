@@ -395,7 +395,7 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 
 			// if the element has already been evaluated, skip it
-			// unless `options.force` is set to true ( this, for example,
+			// unless `options.reevaluate` is set to true ( this, for example,
 			// is set to true when running `picturefill` on `resize` ).
 			if ( !options.reevaluate && element[ pf.ns ].evaluated ) {
 				continue;
