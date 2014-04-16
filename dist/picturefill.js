@@ -282,12 +282,11 @@ window.matchMedia || (window.matchMedia = function() {
 
 	pf.applyBestCandidate = function( candidates, picImg ) {
 		candidates.sort( pf.descendingSort );
-		var candidate, bestCandidate = candidates[0];
+		var candidate, bestCandidate = pop(candidates);
 		for ( var l=1; l < candidates.length; l++ ) {
 			candidate = candidates[ l ];
-			if ( candidate.resolution >= pf.getDpr() && candidate.resolution <= bestCandidate.resolution) {
+			if (candidate.resolution >= pf.getDpr()) {
 				bestCandidate = candidate;
-			} else {
 				break;
 			}
 		}
@@ -299,7 +298,7 @@ window.matchMedia || (window.matchMedia = function() {
 		}
 	};
 
-	pf.descendingSort = function( a, b ) {
+	pf.ascendingSort = function( a, b ) {
 		return b.resolution - a.resolution;
 	};
 
