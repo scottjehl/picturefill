@@ -120,7 +120,7 @@
         return {
             media: match && match[1],
             length: match && match[2]
-        }
+        };
     };
 
 	/**
