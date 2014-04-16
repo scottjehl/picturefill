@@ -128,7 +128,7 @@
 	 */
 	pf.findWidthFromSourceSize = function( sourceSizeListStr ) {
 		// Split up source size list, ie ( max-width: 30em ) 100%, ( max-width: 50em ) 50%, 33%
-        //                            or (min-width:30em) calc(30% - 15px)
+		//                            or (min-width:30em) calc(30% - 15px) 
 		var sourceSizeList = pf.trim( sourceSizeListStr ).split( /\s*,\s*/ );
 		var winningLength;
 		for ( var i=0, len=sourceSizeList.length; i < len; i++ ) {
@@ -138,7 +138,7 @@
 			// Split "( min-width: 50em ) 100%" into separate strings
 			var parsedSize = pf.parseSize( sourceSize );
 			var length = parsedSize.length;
-            var media = parsedSize.media;
+			var media = parsedSize.media;
 
 			if ( !length ) {
 					continue;
