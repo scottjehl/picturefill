@@ -112,11 +112,23 @@
 		}
 	};
 
+    /**
+     * Parses an individual `size` and returns the length, and optional media query
+     */
+    pf.parseSize = function( sourceSizeStr ) {
+        var match = /(\([^)]+\))?\s*(.+)/g.exec( sourceSizeStr );
+        return {
+            media: match && match[1],
+            length: match && match[2]
+        }
+    };
+
 	/**
 	 * Takes a string of sizes and returns the width in pixels as an int
 	 */
 	pf.findWidthFromSourceSize = function( sourceSizeListStr ) {
 		// Split up source size list, ie ( max-width: 30em ) 100%, ( max-width: 50em ) 50%, 33%
+        //                            or (min-width:30em) calc(30% - 15px)
 		var sourceSizeList = pf.trim( sourceSizeListStr ).split( /\s*,\s*/ );
 		var winningLength;
 		for ( var i=0, len=sourceSizeList.length; i < len; i++ ) {
@@ -124,18 +136,17 @@
 			var sourceSize = sourceSizeList[ i ];
 
 			// Split "( min-width: 50em ) 100%" into separate strings
-			var match = /(\([^)]+\))?\s*([^\s]+)/g.exec( sourceSize );
-			if ( !match ) {
+			var parsedSize = pf.parseSize( sourceSize );
+			var length = parsedSize.length;
+            var media = parsedSize.media;
+
+			if ( !length ) {
 					continue;
 			}
-			var length = match[ 2 ];
-			var media;
-			if ( !match[ 1 ] ) {
+			if ( !media ) {
 				// if there is no media query, choose this as our winning length
 				winningLength = length;
 				break;
-			} else {
-				media = match[ 1 ];
 			}
 
 			if ( pf.matchesMedia( media ) ) {
