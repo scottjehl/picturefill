@@ -317,7 +317,6 @@
 		var match;
 
 		// Go through each child, and if they have media queries, evaluate them
-		// and add them to matches
 		for ( var j=0, slen = sources.length; j < slen; j++ ) {
 			var source = sources[ j ];
 			var media = source.getAttribute( "media" );
