@@ -6,6 +6,9 @@ Please don't edit files in the `dist` subdirectory as they are generated via Gru
 ### Code style
 Regarding code style like indentation and whitespace, **follow the conventions you see used in the source already.**
 
+### Project Scope
+Picturefill aims to polyfill the standard features of the `picture` element and related `srcset`, `sizes`, `type`, and `media` attributes (some of which work on `img` elements without a `picture` parent as well). Issues and contributions that fall outside of this scope are not likely to be accepted by the project. Some exceptions include workarounds that improve browser support for standard features.
+
 ### PhantomJS
 While Grunt can run the included unit tests via [PhantomJS](http://phantomjs.org/), this shouldn't be considered a substitute for the real thing. Please be sure to test the `test/*.html` unit test file(s) in _actual_ browsers.
 
