@@ -173,7 +173,7 @@ window.matchMedia || (window.matchMedia = function() {
 			var sourceSize = sourceSizeList[ i ];
 
 			// Split "( min-width: 50em ) 100%" into separate strings
-			var match = /(\([^)]+\))?\s*([^\s]+)/g.exec( sourceSize );
+			var match = /(\([^)]+\))?\s*(.+)/g.exec( sourceSize );
 			if ( !match ) {
 					continue;
 			}
@@ -283,13 +283,16 @@ window.matchMedia || (window.matchMedia = function() {
 	pf.applyBestCandidate = function( candidates, picImg ) {
 		candidates.sort( pf.descendingSort );
 		var candidate, bestCandidate = candidates[0];
+
 		for ( var l=1; l < candidates.length; l++ ) {
 			candidate = candidates[ l ];
 			if ( candidate.resolution >= pf.getDpr() && candidate.resolution <= bestCandidate.resolution) {
 				bestCandidate = candidate;
+			} else {
 				break;
 			}
 		}
+
 		if ( !pf.endsWith( picImg.src, bestCandidate.url ) ) {
 			picImg.src = bestCandidate.url;
 			// currentSrc attribute and property to match
