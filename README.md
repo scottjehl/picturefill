@@ -1,10 +1,9 @@
-
 # Picturefill
 A [responsive image](http://picture.responsiveimages.org/) polyfill.
 * Authors: Scott Jehl, Mat Marquis, Shawn Jansepar (2.0 refactor lead), and many more: see Authors.txt
 * License: MIT
 
-![build-status](https://api.travis-ci.org/scottjehl/picturefill.svg)
+[![build-status](https://api.travis-ci.org/scottjehl/picturefill.svg)](https://travis-ci.org/scottjehl/picturefill)
 
 Picturefill has two versions:
 * Version 2 is a strict polyfill of the (Picture element draft specification](http://picture.responsiveimages.org/) and is the main version in development.
