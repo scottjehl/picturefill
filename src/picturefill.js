@@ -348,15 +348,23 @@
 	};
 
 	function picturefill( options ) {
-		var elements;
+		var elements,
+			element,
+			elemType,
+			firstMatch,
+			candidates,
+			picImg;
 
 		options = options || {};
 		elements = options.elements || pf.getAllElements();
 
 		// Loop through all elements
 		for ( var i=0, plen = elements.length; i < plen; i++ ) {
-			var element = elements[ i ];
-			var elemType = element.nodeName;
+			element = elements[ i ];
+			elemType = element.nodeName;
+			firstMatch = undefined;
+			candidates = undefined;
+			picImg = undefined;
 
 			// expando for caching data on the img
 			if( !element[ pf.ns ] ){
@@ -369,10 +377,6 @@
 			if ( !options.reevaluate && element[ pf.ns ].evaluated ) {
 				continue;
 			}
-
-			var firstMatch,
-				candidates,
-				picImg;
 
 			// if element is a picture element
 			if( elemType === "PICTURE" ){
