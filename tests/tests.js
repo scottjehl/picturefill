@@ -101,7 +101,7 @@
 		];
 		deepEqual(pf.getCandidatesFromSourceSet(candidate1a), expectedFormattedCandidates1a, "Works!");
 
-		var candidate2 = "images/pic-medium.png 1x, images/pic-medium-2x.png 2x";
+		var candidate2 = "images/pic-medium.png, images/pic-medium-2x.png 2x";
 		var expectedFormattedCandidates2 = [
 			{
 				resolution: 1,
@@ -113,6 +113,19 @@
 			}
 		];
 		deepEqual(pf.getCandidatesFromSourceSet(candidate2), expectedFormattedCandidates2, "Works!");
+
+		var candidate2a = "images/pic-medium.png 1x, images/pic-medium-2x.png 2x";
+		var expectedFormattedCandidates2a = [
+			{
+				resolution: 1,
+				url: "images/pic-medium.png"
+			},
+			{
+				resolution: 2,
+				url: "images/pic-medium-2x.png"
+			}
+		];
+		deepEqual(pf.getCandidatesFromSourceSet(candidate2a), expectedFormattedCandidates2a, "Works!");
 
 		// Test with multiple spaces
 		var candidate3 = "			images/pic-medium.png		 1x		,		 images/pic-medium-2x.png		 2x		";
