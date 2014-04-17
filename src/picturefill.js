@@ -243,10 +243,14 @@
 	};
 
 	pf.applyBestCandidate = function( candidates, picImg ) {
-		candidates.sort( pf.ascendingSort );
-		var candidate, bestCandidate = candidates.pop();
+		var candidate, length, bestCandidate;
 
-		for ( var l=0; l < candidates.length; l++ ) {
+		candidates.sort( pf.ascendingSort );
+
+		length = candidates.length;
+		bestCandidate = candidates[ length - 1 ];
+
+		for ( var l=0; l < length; l++ ) {
 			candidate = candidates[ l ];
 			if ( candidate.resolution >= pf.getDpr() ) {
 				bestCandidate = candidate;

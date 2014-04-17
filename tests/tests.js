@@ -15,7 +15,10 @@
 		equal( img[ 0 ].getAttribute( "src" ), firstsource[ 0 ].getAttribute( "srcset" ) );
 	});
 
-	var pf, originalDprMethod, originalVideoShimMethod, originalMatchesMedia;
+	var pf, originalDprMethod,
+		originalVideoShimMethod,
+		originalMatchesMedia,
+		originalProcessSourceSet;
 
 	pf = picturefill._;
 
@@ -25,12 +28,14 @@
 			originalDprMethod = pf.getDpr;
 			originalVideoShimMethod = pf.removeVideoShim;
 			originalMatchesMedia = pf.matchesMedia;
+			originalProcessSourceSet = pf.processSourceSet;
 		},
 
 		teardown: function() {
 			pf.getDpr = originalDprMethod;
 			pf.removeVideoShim = originalVideoShimMethod;
 			pf.matchesMedia = originalMatchesMedia;
+			pf.processSourceSet = originalProcessSourceSet;
 		}
 	});
 
@@ -65,14 +70,14 @@
             media: null
         };
         deepEqual(pf.parseSize(size1), expected1, "Length and Media are empty");
- 
+
         var size2 = "( max-width: 50em ) 50%";
         var expected2 = {
             length: "50%",
             media: "( max-width: 50em )"
         };
         deepEqual(pf.parseSize(size2), expected2, "Length and Media are properly parsed");
-        
+
         var size3 = "(min-width:30em) calc(30% - 15px)";
         var expected3 = {
             length: "calc(30% - 15px)",
@@ -323,6 +328,12 @@
 	test( "picturefill marks elements with a property", function() {
 		// NOTE requires at least one child image for the propery to be set
 		var mockPicture = $( ".prop-check" )[0];
+
+		// make sure there are candidates to consider
+		pf.processSourceSet = function() {
+			return [ { url: "foo" } ];
+		};
+
 		picturefill({ reevaluate: false, elements: [ mockPicture ] });
 
 		ok( mockPicture[ pf.ns ].evaluated );
