@@ -243,24 +243,27 @@
 	};
 
 	pf.applyBestCandidate = function( candidates, picImg ) {
-		var sortedImgCandidates = candidates.sort( pf.ascendingSort ),
-			candidate;
+		candidates.sort( pf.ascendingSort );
+		var candidate, bestCandidate = candidates.pop();
 
-		for ( var l=0; l < sortedImgCandidates.length; l++ ) {
-			candidate = sortedImgCandidates[ l ];
+		for ( var l=0; l < candidates.length; l++ ) {
+			candidate = candidates[ l ];
 			if ( candidate.resolution >= pf.getDpr() ) {
-				if ( !pf.endsWith( picImg.src, candidate.url ) ) {
-					picImg.src = candidate.url;
-					// currentSrc attribute and property to match http://picture.responsiveimages.org/#the-img-element
-					picImg.currentSrc = candidate.url;
-				}
+				bestCandidate = candidate;
 				break;
 			}
+		}
+		
+		if ( !pf.endsWith( picImg.src, bestCandidate.url ) ) {
+			picImg.src = bestCandidate.url;
+			// currentSrc attribute and property to match
+			// http://picture.responsiveimages.org/#the-img-element
+			picImg.currentSrc = picImg.src;
 		}
 	};
 
 	pf.ascendingSort = function( a, b ) {
-		return a.resolution > b.resolution;
+		return a.resolution - b.resolution;
 	};
 
 	/*
@@ -285,31 +288,29 @@
 
 	/*
 	 * Find all picture elements and,
-	 * in browsers that don't natively support srcset, find all img elements with srcset attrs that don't have picture parents
+	 * in browsers that don't natively support srcset, find all img elements 
+	 * with srcset attrs that don't have picture parents
 	 */
-	pf.getAllElements = function(){
-		var pictures = doc.getElementsByTagName( "picture" );
+	pf.getAllElements = function() {
+		var pictures = doc.getElementsByTagName( "picture" ),
+			elems = [],
+			imgs = doc.getElementsByTagName( "img" );
 
-		if( pf.srcsetSupported ){
-			return pictures;
-		}
-		else {
-			var elems = [],
-				imgs = doc.getElementsByTagName( "img" );
+		for ( var h = 0, len = pictures.length + imgs.length; h < len; h++ ) {
+			if ( h < pictures.length ){
+				elems[ h ] = pictures[ h ];
+			}
+			else {
+				var currImg = imgs[ h - pictures.length ];
 
-			for ( var h = 0, len = pictures.length + imgs.length; h < len; h++ ){
-				if( h < pictures.length ){
-					elems[ h ] = pictures[ h ];
-				}
-				else {
-					var currImg = imgs[ h - pictures.length ];
-					if( currImg.parentNode.nodeName !== "PICTURE" && currImg.getAttribute( "srcset" ) !== null ){
+				if ( currImg.parentNode.nodeName !== "PICTURE" &&
+					( ( pf.srcsetSupported && currImg.getAttribute( "sizes" ) ) ||
+					currImg.getAttribute( "srcset" ) !== null ) ) {
 						elems.push( currImg );
-					}
 				}
 			}
-			return elems;
 		}
+		return elems;
 	};
 
 	pf.getMatch = function( picture ) {
