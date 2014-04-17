@@ -198,7 +198,7 @@
 				resolution = parseFloat( ( parseInt( sizeDescriptor, 10 ) / widthInCssPixels ).toFixed( 2 ) );
 			} else {
 				// get the dpr by grabbing the value of Nx
-				resolution = sizeDescriptor ? parseFloat( sizeDescriptor, 10 ) : pf.getDpr();
+				resolution = sizeDescriptor ? parseFloat( sizeDescriptor, 10 ) : 1;
 			}
 
 			var formattedCandidate = {
@@ -244,11 +244,12 @@
 
 	pf.applyBestCandidate = function( candidates, picImg ) {
 		var sortedImgCandidates = candidates.sort( pf.ascendingSort ),
-			candidate;
+			candidate, lastresort;
 
 		for ( var l=0; l < sortedImgCandidates.length; l++ ) {
 			candidate = sortedImgCandidates[ l ];
-			if ( candidate.resolution >= pf.getDpr() ) {
+			lastresort = l === sortedImgCandidates.length - 1 && candidate.resolution === 1;
+			if ( candidate.resolution >= pf.getDpr() || lastresort ) {
 				if ( !pf.endsWith( picImg.src, candidate.url ) ) {
 					picImg.src = candidate.url;
 					// currentSrc attribute and property to match http://picture.responsiveimages.org/#the-img-element
