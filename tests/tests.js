@@ -92,6 +92,15 @@
 		];
 		deepEqual(pf.getCandidatesFromSourceSet(candidate1), expectedFormattedCandidates1, "Works!");
 
+		var candidate1a = "images/pic-medium.png 1x";
+		var expectedFormattedCandidates1a = [
+			{
+				resolution: 1,
+				url: "images/pic-medium.png"
+			}
+		];
+		deepEqual(pf.getCandidatesFromSourceSet(candidate1a), expectedFormattedCandidates1a, "Works!");
+
 		var candidate2 = "images/pic-medium.png 1x, images/pic-medium-2x.png 2x";
 		var expectedFormattedCandidates2 = [
 			{
