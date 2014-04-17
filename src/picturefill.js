@@ -244,12 +244,11 @@
 
 	pf.applyBestCandidate = function( candidates, picImg ) {
 		var sortedImgCandidates = candidates.sort( pf.ascendingSort ),
-			candidate, lastresort;
+			candidate;
 
 		for ( var l=0; l < sortedImgCandidates.length; l++ ) {
 			candidate = sortedImgCandidates[ l ];
-			lastresort = l === sortedImgCandidates.length - 1 && candidate.resolution === 1;
-			if ( candidate.resolution >= pf.getDpr() || lastresort ) {
+			if ( candidate.resolution >= pf.getDpr() || candidate.resolution === 1 ) {
 				if ( !pf.endsWith( picImg.src, candidate.url ) ) {
 					picImg.src = candidate.url;
 					// currentSrc attribute and property to match http://picture.responsiveimages.org/#the-img-element
