@@ -255,10 +255,10 @@
 		}
 		
 		if ( !pf.endsWith( picImg.src, bestCandidate.url ) ) {
-					picImg.src = bestCandidate.url;
-					// currentSrc attribute and property to match
-					// http://picture.responsiveimages.org/#the-img-element
-					picImg.currentSrc = picImg.url;
+			picImg.src = bestCandidate.url;
+			// currentSrc attribute and property to match
+			// http://picture.responsiveimages.org/#the-img-element
+			picImg.currentSrc = picImg.url;
 		}
 	};
 
