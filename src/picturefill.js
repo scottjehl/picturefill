@@ -396,7 +396,7 @@
 				picImg = element.getElementsByTagName( "img" )[ 0 ];
 			} else {
 				// if it's an img element
-				firstMatch = pf.getMatch( element );
+				firstMatch = undefined;
 				picImg = element;
 			}
 
