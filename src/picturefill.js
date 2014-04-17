@@ -288,31 +288,29 @@
 
 	/*
 	 * Find all picture elements and,
-	 * in browsers that don't natively support srcset, find all img elements with srcset attrs that don't have picture parents
+	 * in browsers that don't natively support srcset, find all img elements 
+	 * with srcset attrs that don't have picture parents
 	 */
-	pf.getAllElements = function(){
-		var pictures = doc.getElementsByTagName( "picture" );
+	pf.getAllElements = function() {
+		var pictures = doc.getElementsByTagName( "picture" ),
+			elems = [],
+			imgs = doc.getElementsByTagName( "img" );
 
-		if( pf.srcsetSupported ){
-			return pictures;
-		}
-		else {
-			var elems = [],
-				imgs = doc.getElementsByTagName( "img" );
+		for ( var h = 0, len = pictures.length + imgs.length; h < len; h++ ) {
+			if ( h < pictures.length ){
+				elems[ h ] = pictures[ h ];
+			}
+			else {
+				var currImg = imgs[ h - pictures.length ];
 
-			for ( var h = 0, len = pictures.length + imgs.length; h < len; h++ ){
-				if( h < pictures.length ){
-					elems[ h ] = pictures[ h ];
-				}
-				else {
-					var currImg = imgs[ h - pictures.length ];
-					if( currImg.parentNode.nodeName !== "PICTURE" && currImg.getAttribute( "srcset" ) !== null ){
+				if ( currImg.parentNode.nodeName !== "PICTURE" &&
+					( ( pf.srcsetSupported && currImg.getAttribute( "sizes" ) ) ||
+					currImg.getAttribute( "srcset" ) !== null ) ) {
 						elems.push( currImg );
-					}
 				}
 			}
-			return elems;
 		}
+		return elems;
 	};
 
 	pf.getMatch = function( picture ) {
