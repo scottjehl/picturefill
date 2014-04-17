@@ -1,4 +1,4 @@
-/*! Picturefill - v2.0.0 - 2014-04-15
+/*! Picturefill - v2.0.0 - 2014-04-17
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -162,10 +162,22 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	/**
+	* Parses an individual `size` and returns the length, and optional media query
+	*/
+	pf.parseSize = function( sourceSizeStr ) {
+		var match = /(\([^)]+\))?\s*(.+)/g.exec( sourceSizeStr );
+		return {
+			media: match && match[1],
+			length: match && match[2]
+		};
+	};
+
+	/**
 	 * Takes a string of sizes and returns the width in pixels as an int
 	 */
 	pf.findWidthFromSourceSize = function( sourceSizeListStr ) {
 		// Split up source size list, ie ( max-width: 30em ) 100%, ( max-width: 50em ) 50%, 33%
+		//                            or (min-width:30em) calc(30% - 15px)
 		var sourceSizeList = pf.trim( sourceSizeListStr ).split( /\s*,\s*/ );
 		var winningLength;
 		for ( var i=0, len=sourceSizeList.length; i < len; i++ ) {
@@ -173,18 +185,17 @@ window.matchMedia || (window.matchMedia = function() {
 			var sourceSize = sourceSizeList[ i ];
 
 			// Split "( min-width: 50em ) 100%" into separate strings
-			var match = /(\([^)]+\))?\s*([^\s]+)/g.exec( sourceSize );
-			if ( !match ) {
+			var parsedSize = pf.parseSize( sourceSize );
+			var length = parsedSize.length;
+			var media = parsedSize.media;
+
+			if ( !length ) {
 					continue;
 			}
-			var length = match[ 2 ];
-			var media;
-			if ( !match[ 1 ] ) {
+			if ( !media ) {
 				// if there is no media query, choose this as our winning length
 				winningLength = length;
 				break;
-			} else {
-				media = match[ 1 ];
 			}
 
 			if ( pf.matchesMedia( media ) ) {
@@ -236,7 +247,7 @@ window.matchMedia || (window.matchMedia = function() {
 				resolution = parseFloat( ( parseInt( sizeDescriptor, 10 ) / widthInCssPixels ).toFixed( 2 ) );
 			} else {
 				// get the dpr by grabbing the value of Nx
-				resolution = sizeDescriptor ? parseFloat( sizeDescriptor, 10 ) : pf.getDpr();
+				resolution = sizeDescriptor ? parseFloat( sizeDescriptor, 10 ) : 1;
 			}
 
 			var formattedCandidate = {
@@ -281,26 +292,31 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	pf.applyBestCandidate = function( candidates, picImg ) {
-		candidates.sort( pf.descendingSort );
-		var candidate, bestCandidate = candidates[0];
-		for ( var l=1; l < candidates.length; l++ ) {
+		var candidate, length, bestCandidate;
+
+		candidates.sort( pf.ascendingSort );
+
+		length = candidates.length;
+		bestCandidate = candidates[ length - 1 ];
+
+		for ( var l=0; l < length; l++ ) {
 			candidate = candidates[ l ];
-			if ( candidate.resolution >= pf.getDpr() && candidate.resolution <= bestCandidate.resolution) {
+			if ( candidate.resolution >= pf.getDpr() ) {
 				bestCandidate = candidate;
-			} else {
 				break;
 			}
 		}
+
 		if ( !pf.endsWith( picImg.src, bestCandidate.url ) ) {
 			picImg.src = bestCandidate.url;
 			// currentSrc attribute and property to match
 			// http://picture.responsiveimages.org/#the-img-element
-			picImg.currentSrc = bestCandidate.url;
+			picImg.currentSrc = picImg.src;
 		}
 	};
 
-	pf.descendingSort = function( a, b ) {
-		return b.resolution - a.resolution;
+	pf.ascendingSort = function( a, b ) {
+		return a.resolution - b.resolution;
 	};
 
 	/*
@@ -325,27 +341,29 @@ window.matchMedia || (window.matchMedia = function() {
 
 	/*
 	 * Find all picture elements and,
-	 * in browsers that don't natively support srcset, find all img elements with srcset attrs that don't have picture parents
+	 * in browsers that don't natively support srcset, find all img elements
+	 * with srcset attrs that don't have picture parents
 	 */
-	pf.getAllElements = function(){
+	pf.getAllElements = function() {
 		var pictures = doc.getElementsByTagName( "picture" ),
 			elems = [],
 			imgs = doc.getElementsByTagName( "img" );
 
-			for ( var h = 0, len = pictures.length + imgs.length; h < len; h++ ){
-				if( h < pictures.length ){
-					elems[ h ] = pictures[ h ];
-				}
-				else {
-					var currImg = imgs[ h - pictures.length ];
-					if(currImg.parentNode.nodeName !== "PICTURE" &&
-						((pf.srcsetSupported && currImg.getAttribute( "sizes" ))
-						|| currImg.getAttribute( "srcset" ) !== null)) {
-							elems.push( currImg );
-					}
+		for ( var h = 0, len = pictures.length + imgs.length; h < len; h++ ) {
+			if ( h < pictures.length ){
+				elems[ h ] = pictures[ h ];
+			}
+			else {
+				var currImg = imgs[ h - pictures.length ];
+
+				if ( currImg.parentNode.nodeName !== "PICTURE" &&
+					( ( pf.srcsetSupported && currImg.getAttribute( "sizes" ) ) ||
+					currImg.getAttribute( "srcset" ) !== null ) ) {
+						elems.push( currImg );
 				}
 			}
-			return elems;
+		}
+		return elems;
 	};
 
 	pf.getMatch = function( picture ) {
@@ -353,7 +371,6 @@ window.matchMedia || (window.matchMedia = function() {
 		var match;
 
 		// Go through each child, and if they have media queries, evaluate them
-		// and add them to matches
 		for ( var j=0, slen = sources.length; j < slen; j++ ) {
 			var source = sources[ j ];
 			var media = source.getAttribute( "media" );
@@ -380,15 +397,23 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	function picturefill( options ) {
-		var elements;
+		var elements,
+			element,
+			elemType,
+			firstMatch,
+			candidates,
+			picImg;
 
 		options = options || {};
 		elements = options.elements || pf.getAllElements();
 
 		// Loop through all elements
 		for ( var i=0, plen = elements.length; i < plen; i++ ) {
-			var element = elements[ i ];
-			var elemType = element.nodeName;
+			element = elements[ i ];
+			elemType = element.nodeName;
+			firstMatch = undefined;
+			candidates = undefined;
+			picImg = undefined;
 
 			// expando for caching data on the img
 			if( !element[ pf.ns ] ){
@@ -396,15 +421,11 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 
 			// if the element has already been evaluated, skip it
-			// unless `options.reevaluate` is set to true ( this, for example,
+			// unless `options.force` is set to true ( this, for example,
 			// is set to true when running `picturefill` on `resize` ).
 			if ( !options.reevaluate && element[ pf.ns ].evaluated ) {
 				continue;
 			}
-
-			var firstMatch,
-				candidates,
-				picImg;
 
 			// if element is a picture element
 			if( elemType === "PICTURE" ){
@@ -414,6 +435,7 @@ window.matchMedia || (window.matchMedia = function() {
 
 				// return the first match which might undefined
 				// returns false if there is a pending source
+				// TODO the return type here is brutal, cleanup
 				firstMatch = pf.getMatch( element );
 
 				// if any sources are pending in this picture due to async type test(s)
@@ -427,6 +449,7 @@ window.matchMedia || (window.matchMedia = function() {
 				picImg = element.getElementsByTagName( "img" )[ 0 ];
 			} else {
 				// if it's an img element
+				firstMatch = undefined;
 				picImg = element;
 			}
 
