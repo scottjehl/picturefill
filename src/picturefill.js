@@ -243,24 +243,27 @@
 	};
 
 	pf.applyBestCandidate = function( candidates, picImg ) {
-		var sortedImgCandidates = candidates.sort( pf.ascendingSort ),
-			candidate;
+		candidates.sort( pf.ascendingSort );
+		var candidate, bestCandidate = candidates.pop();
 
-		for ( var l=0; l < sortedImgCandidates.length; l++ ) {
-			candidate = sortedImgCandidates[ l ];
+		for ( var l=0; l < candidates.length; l++ ) {
+			candidate = candidates[ l ];
 			if ( candidate.resolution >= pf.getDpr() ) {
-				if ( !pf.endsWith( picImg.src, candidate.url ) ) {
-					picImg.src = candidate.url;
-					// currentSrc attribute and property to match http://picture.responsiveimages.org/#the-img-element
-					picImg.currentSrc = candidate.url;
-				}
+				bestCandidate = candidate;
 				break;
 			}
+		}
+		
+		if ( !pf.endsWith( picImg.src, bestCandidate.url ) ) {
+					picImg.src = bestCandidate.url;
+					// currentSrc attribute and property to match
+					// http://picture.responsiveimages.org/#the-img-element
+					picImg.currentSrc = picImg.url;
 		}
 	};
 
 	pf.ascendingSort = function( a, b ) {
-		return a.resolution > b.resolution;
+		return a.resolution - b.resolution;
 	};
 
 	/*
