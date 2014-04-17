@@ -2,12 +2,14 @@
 (function(){
   'use strict';
 
+  var pkg;
+
   module.exports = function(grunt) {
 
     // Project configuration.
     grunt.initConfig({
       // Metadata.
-      pkg: grunt.file.readJSON('picturefill.json'),
+      pkg: pkg = grunt.file.readJSON('picturefill.json'),
       banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
         '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
         '<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
@@ -65,6 +67,16 @@
           tasks: [ 'jshint', 'qunit', 'clean', 'concat', 'uglify' ]
         }
       }
+    });
+
+    // because the compress plugin is insane
+    grunt.task.registerTask( "compress", "compress the dist folder", function() {
+      var childProc = require('child_process');
+      var done = this.async();
+
+      childProc.exec( "zip -r dist-" + pkg.version + ".zip dist", function() {
+        done();
+      });
     });
 
     // These plugins provide necessary tasks.
