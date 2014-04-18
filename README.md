@@ -6,7 +6,7 @@ A [responsive image](http://picture.responsiveimages.org/) polyfill.
 [![build-status](https://api.travis-ci.org/scottjehl/picturefill.svg)](https://travis-ci.org/scottjehl/picturefill)
 
 Picturefill has two versions:
-* Version 2 is a strict polyfill of the (Picture element draft specification](http://picture.responsiveimages.org/) and is the main version in development.
+* Version 2 is a strict polyfill of the [Picture element draft specification](http://picture.responsiveimages.org/) and is the main version in development.
 * Version 1 mimics the Picture element pattern with `span` elements. It is maintained in the 1.2 branch.
 
 ## Usage, Demos, Docs
