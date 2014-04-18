@@ -63,28 +63,28 @@
 		pf.matchesMedia = oldMatchesMedia;
 	});
 
-    test("parseSize", function() {
-        var size1 = "";
-        var expected1 = {
-            length: null,
-            media: null
-        };
-        deepEqual(pf.parseSize(size1), expected1, "Length and Media are empty");
+	test("parseSize", function() {
+		var size1 = "";
+		var expected1 = {
+			length: null,
+			media: null
+		};
+		deepEqual(pf.parseSize(size1), expected1, "Length and Media are empty");
 
-        var size2 = "( max-width: 50em ) 50%";
-        var expected2 = {
-            length: "50%",
-            media: "( max-width: 50em )"
-        };
-        deepEqual(pf.parseSize(size2), expected2, "Length and Media are properly parsed");
+		var size2 = "( max-width: 50em ) 50%";
+		var expected2 = {
+			length: "50%",
+			media: "( max-width: 50em )"
+		};
+		deepEqual(pf.parseSize(size2), expected2, "Length and Media are properly parsed");
 
-        var size3 = "(min-width:30em) calc(30% - 15px)";
-        var expected3 = {
-            length: "calc(30% - 15px)",
-            media: "(min-width:30em)"
-        };
-        deepEqual(pf.parseSize(size3), expected3, "Length and Media are properly parsed");
-    });
+		var size3 = "(min-width:30em) calc(30% - 15px)";
+		var expected3 = {
+			length: "calc(30% - 15px)",
+			media: "(min-width:30em)"
+		};
+		deepEqual(pf.parseSize(size3), expected3, "Length and Media are properly parsed");
+	});
 
 	test("getCandidatesFromSourceSet", function() {
 		// Basic test
