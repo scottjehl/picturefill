@@ -318,12 +318,23 @@
 	};
 
 	pf.getMatch = function( picture ) {
-		var sources = picture.getElementsByTagName( "source" );
+		var sources = picture.childNodes;
 		var match;
 
 		// Go through each child, and if they have media queries, evaluate them
 		for ( var j=0, slen = sources.length; j < slen; j++ ) {
 			var source = sources[ j ];
+
+      // skip non element nodes
+			if( source.nodeType !== 1 ){
+				continue;
+			}
+
+			// any element that is not a source, stops the search
+			if( source.nodeName.toUpperCase() !== "SOURCE" ) {
+				return match;
+			}
+
 			var media = source.getAttribute( "media" );
 
 			// if source does not have a srcset attribute, skip
@@ -372,7 +383,7 @@
 			}
 
 			// if the element has already been evaluated, skip it
-			// unless `options.reevaluate` is set to true ( this, for example,
+			// unless `options.force` is set to true ( this, for example,
 			// is set to true when running `picturefill` on `resize` ).
 			if ( !options.reevaluate && element[ pf.ns ].evaluated ) {
 				continue;

@@ -310,6 +310,17 @@
 		equal( pf.getMatch( $noSrcset[0] ), undefined );
 	});
 
+	test( "getMatch returns only sources preceding fallback img", function() {
+		var $ignoredSource = $( ".ignored-source-check" );
+
+		// ensure the construction of the fixture
+		equal($ignoredSource.children()[0].nodeName, "IMG" );
+		equal($ignoredSource.children()[1].nodeName, "SOURCE" );
+
+		// ensure that the result is undefined so the picture is grabbed later
+		equal( pf.getMatch( $ignoredSource[0] ), undefined, "no source found" );
+	});
+
 	test( "picturefill ignores elements when they are marked with a property", function() {
 		expect( 0 );
 
