@@ -312,7 +312,10 @@
 
 	test( "picturefill ignores elements when they are marked with a property", function() {
 		expect( 0 );
-		var mockPicture = {};
+
+		var mockPicture = {
+			nodeName: "PICTURE"
+		};
 
 		mockPicture[ pf.ns ] = {
 			evaluated: true

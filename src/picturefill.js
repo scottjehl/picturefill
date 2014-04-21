@@ -361,7 +361,7 @@
 		// Loop through all elements
 		for ( var i=0, plen = elements.length; i < plen; i++ ) {
 			element = elements[ i ];
-			elemType = element.nodeName.toUpperCase(),
+			elemType = element.nodeName.toUpperCase();
 			firstMatch = undefined;
 			candidates = undefined;
 			picImg = undefined;
