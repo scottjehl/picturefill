@@ -1,4 +1,4 @@
-/*! Picturefill - v2.0.0-alpha - 2014-04-17
+/*! Picturefill - v2.0.0-alpha - 2014-04-21
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -281,7 +281,7 @@ window.matchMedia || (window.matchMedia = function() {
 			candidates = [];
 
 		// if it's an img element, use the cached srcset property (defined or not)
-		if( el.nodeName === "IMG" && el[ pf.ns ] && el[ pf.ns ].srcset ){
+		if( el.nodeName.toUpperCase() === "IMG" && el[ pf.ns ] && el[ pf.ns ].srcset ){
 			srcset = el[ pf.ns ].srcset;
 		}
 
@@ -356,7 +356,7 @@ window.matchMedia || (window.matchMedia = function() {
 			else {
 				var currImg = imgs[ h - pictures.length ];
 
-				if ( currImg.parentNode.nodeName !== "PICTURE" &&
+				if ( currImg.parentNode.nodeName.toUpperCase() !== "PICTURE" &&
 					( ( pf.srcsetSupported && currImg.getAttribute( "sizes" ) ) ||
 					currImg.getAttribute( "srcset" ) !== null ) ) {
 						elems.push( currImg );
@@ -410,7 +410,7 @@ window.matchMedia || (window.matchMedia = function() {
 		// Loop through all elements
 		for ( var i=0, plen = elements.length; i < plen; i++ ) {
 			element = elements[ i ];
-			elemType = element.nodeName;
+			elemType = element.nodeName.toUpperCase();
 			firstMatch = undefined;
 			candidates = undefined;
 			picImg = undefined;
@@ -421,7 +421,7 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 
 			// if the element has already been evaluated, skip it
-			// unless `options.force` is set to true ( this, for example,
+			// unless `options.reevaluate` is set to true ( this, for example,
 			// is set to true when running `picturefill` on `resize` ).
 			if ( !options.reevaluate && element[ pf.ns ].evaluated ) {
 				continue;
