@@ -232,7 +232,7 @@
 			candidates = [];
 
 		// if it's an img element, use the cached srcset property (defined or not)
-		if( el.nodeName === "IMG" && el[ pf.ns ] && el[ pf.ns ].srcset ){
+		if( el.nodeName.toUpperCase() === "IMG" && el[ pf.ns ] && el[ pf.ns ].srcset ){
 			srcset = el[ pf.ns ].srcset;
 		}
 
@@ -307,7 +307,7 @@
 			else {
 				var currImg = imgs[ h - pictures.length ];
 
-				if ( currImg.parentNode.nodeName !== "PICTURE" &&
+				if ( currImg.parentNode.nodeName.toUpperCase() !== "PICTURE" &&
 					( ( pf.srcsetSupported && currImg.getAttribute( "sizes" ) ) ||
 					currImg.getAttribute( "srcset" ) !== null ) ) {
 						elems.push( currImg );
@@ -361,7 +361,7 @@
 		// Loop through all elements
 		for ( var i=0, plen = elements.length; i < plen; i++ ) {
 			element = elements[ i ];
-			elemType = element.nodeName;
+			elemType = element.nodeName.toUpperCase(),
 			firstMatch = undefined;
 			candidates = undefined;
 			picImg = undefined;
