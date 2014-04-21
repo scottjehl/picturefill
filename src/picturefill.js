@@ -131,7 +131,7 @@
 		var sourceSizeList = pf.trim( sourceSizeListStr ).split( /\s*,\s*/ );
 		var winningLength;
 		for ( var i=0, len=sourceSizeList.length; i < len; i++ ) {
-			// Match <media-query>? length, ie ( min-width: 50em ) 100%
+			// Match <media-condition>? length, ie ( min-width: 50em ) 100%
 			var sourceSize = sourceSizeList[ i ];
 
 			// Split "( min-width: 50em ) 100%" into separate strings
