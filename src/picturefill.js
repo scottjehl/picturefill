@@ -130,6 +130,8 @@
 		//                            or (min-width:30em) calc(30% - 15px)
 		var sourceSizeList = pf.trim( sourceSizeListStr ).split( /\s*,\s*/ );
 		var winningLength;
+		var winningLengthInt;
+
 		for ( var i=0, len=sourceSizeList.length; i < len; i++ ) {
 			// Match <media-condition>? length, ie ( min-width: 50em ) 100%
 			var sourceSize = sourceSizeList[ i ];
@@ -156,14 +158,14 @@
 			}
 		}
 
-		// default to 300px if no length was selected
+		// If no length was selected, default to `100vw` (per the spec). Using 100% here for the sake of compatibility in older browsers.
 		if ( !winningLength ) {
-			return 300;
+			winningLengthInt = pf.getWidthFromLength( "100%" );
 		}
 
 		// pass the length to a method that can properly determine length
 		// in pixels based on these formats: http://dev.w3.org/csswg/css-values-3/#length-value
-		var winningLengthInt = pf.getWidthFromLength( winningLength );
+		winningLengthInt = pf.getWidthFromLength( winningLength );
 		return winningLengthInt;
 	};
 
