@@ -337,15 +337,13 @@ picturefill();
 
 		<ul>
 			<li><strong>Elements:</strong> An array of <code>picture</code> and <code>img[srcset]</code> elements you'd like picturefill to evaluate. The Default value for <code>options.elements</code> is all <code>picture</code> and <code>img[srcset]</code> elements in the page.
-<pre><code>
-picturefill( {
+<pre><code>picturefill( {
 	elements: [ document.getElementById( "myPicture" ) ]
 } );
 </code></pre>
 			</li>
 			<li><strong>Reevaluate:</strong> Force picturefill to evaluate all elements in the <code>options.elements</code> array, even if they've already been evaluated. The default is <code>false</code>, except when a resize event triggers Picturefill to run (<code>options.reevaluate</code> is <code>true</code> in that case).
-<pre><code>
-picturefill( {
+<pre><code>picturefill( {
 	reevaluate: true
 } );
 </code></pre>
