@@ -367,16 +367,27 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	pf.getMatch = function( picture ) {
-		var sources = picture.getElementsByTagName( "source" );
+		var sources = picture.childNodes;
 		var match;
 
 		// Go through each child, and if they have media queries, evaluate them
 		for ( var j=0, slen = sources.length; j < slen; j++ ) {
 			var source = sources[ j ];
+
+      // skip non element nodes
+			if( source.nodeType !== 1 ){
+				continue;
+			}
+
+			// any element that is not a source, stops the search
+			if( source.nodeName.toUpperCase() !== "SOURCE" ) {
+				return match;
+			}
+
 			var media = source.getAttribute( "media" );
 
 			// if source does not have a srcset attribute, skip
-			if ( !source.hasAttribute( "srcset" ) ) {
+			if ( !source.getAttribute( "srcset" ) ) {
 				continue;
 			}
 
@@ -421,7 +432,7 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 
 			// if the element has already been evaluated, skip it
-			// unless `options.reevaluate` is set to true ( this, for example,
+			// unless `options.force` is set to true ( this, for example,
 			// is set to true when running `picturefill` on `resize` ).
 			if ( !options.reevaluate && element[ pf.ns ].evaluated ) {
 				continue;
@@ -472,7 +483,7 @@ window.matchMedia || (window.matchMedia = function() {
 					// No sources matched, so we’re down to processing the inner `img` as a source.
 					candidates = pf.processSourceSet( picImg );
 
-					if( picImg.srcset === undefined || picImg.hasAttribute( "sizes" ) ) {
+					if( picImg.srcset === undefined || picImg.getAttribute( "sizes" ) ) {
 						// Either `srcset` is completely unsupported, or we need to polyfill `sizes` functionality.
 						pf.applyBestCandidate( candidates, picImg );
 					} // Else, resolution-only `srcset` is supported natively.
