@@ -63,7 +63,6 @@ window.matchMedia || (window.matchMedia = function() {
 
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
 	doc.createElement( "picture" );
-	doc.createElement( "source" );
 
 	// local object for method references and testing exposure
 	var pf = {};
