@@ -318,6 +318,38 @@ srcset=&quot;examples/images/pic-small.png 400w, examples/images/pic-medium.png 
 				<img srcset="examples/images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 		</picture>
 
+		<h2 id="api">Picturefill JavaScript API</h2>
+
+		<p>Under ordinary circumstances, you likely won't need to do more than include picturefill.js in your page, but in some situations you may want to run picturefill's function manually yourself, and there are a few options to keep in mind:</p>
+
+		<h3>The picturefill function</h3>
+
+		<p>Picturefill.js exposes a single global function: the <code>picturefill()</code> function. <code>picturefill()</code> is automatically called one or more times while a page is loading, and it also is triggered when the browser window is resized (or on orientation change). You can run the <code>picturefill()</code> function at any time in JavaScript yourself as well, which may be useful after making updates to the DOM, or when conditions relevant to your application change:</p>
+
+<pre><code>
+picturefill();
+</code></pre>
+
+		<h3>Picturefill function options</h3>
+
+		<p>When running the <code>picturefill()</code> function, you can pass options specifying the following settings:</p>
+
+		<ul>
+			<li><strong>Elements:</strong> An array of <code>picture</code> and <code>img[srcset]</code> elements you'd like picturefill to evaluate. The Default value for <code>options.elements</code> is all <code>picture</code> and <code>img[srcset]</code> elements in the page.
+<pre><code>
+picturefill( {
+	elements: [ document.getElementById( "myPicture" ) ]
+} );
+</code></pre>
+			</li>
+			<li><strong>Reevaluate:</strong> Force picturefill to evaluate all elements in the <code>options.elements</code> array, even if they've already been evaluated. The default is <code>false</code>, except when a resize event triggers Picturefill to run (<code>options.reevaluate</code> is <code>true</code> in that case).
+<pre><code>
+picturefill( {
+	reevaluate: true
+} );
+</code></pre>
+			</li>
+		</ul>
 
 		<h2 id="support">Browser Support</h2>
 		<p>Picturefill supports a broad range of browsers and devices, provided that you stick with the standard markup conventions documented above. </p>
