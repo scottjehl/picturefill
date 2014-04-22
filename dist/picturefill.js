@@ -1,4 +1,4 @@
-/*! Picturefill - v2.0.0 - 2014-04-17
+/*! Picturefill - v2.0.0-alpha - 2014-04-22
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -63,7 +63,6 @@ window.matchMedia || (window.matchMedia = function() {
 
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
 	doc.createElement( "picture" );
-	doc.createElement( "source" );
 
 	// local object for method references and testing exposure
 	var pf = {};
@@ -180,8 +179,10 @@ window.matchMedia || (window.matchMedia = function() {
 		//                            or (min-width:30em) calc(30% - 15px)
 		var sourceSizeList = pf.trim( sourceSizeListStr ).split( /\s*,\s*/ );
 		var winningLength;
+		var winningLengthInt;
+
 		for ( var i=0, len=sourceSizeList.length; i < len; i++ ) {
-			// Match <media-query>? length, ie ( min-width: 50em ) 100%
+			// Match <media-condition>? length, ie ( min-width: 50em ) 100%
 			var sourceSize = sourceSizeList[ i ];
 
 			// Split "( min-width: 50em ) 100%" into separate strings
@@ -206,14 +207,14 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 		}
 
-		// default to 300px if no length was selected
+		// If no length was selected, default to `100vw` (per the spec). Using 100% here for the sake of compatibility in older browsers.
 		if ( !winningLength ) {
-			return 300;
+			winningLengthInt = pf.getWidthFromLength( "100%" );
 		}
 
 		// pass the length to a method that can properly determine length
 		// in pixels based on these formats: http://dev.w3.org/csswg/css-values-3/#length-value
-		var winningLengthInt = pf.getWidthFromLength( winningLength );
+		winningLengthInt = pf.getWidthFromLength( winningLength );
 		return winningLengthInt;
 	};
 
@@ -228,7 +229,7 @@ window.matchMedia || (window.matchMedia = function() {
 	 * If sizes is specified, resolution is calculated
 	 */
 	pf.getCandidatesFromSourceSet = function( srcset, sizes ) {
-		var candidates = pf.trim( srcset ).split( /\s*,\s*/ );
+		var candidates = pf.trim( srcset ).split( /,\s+/ );
 		var formattedCandidates = [];
 		var widthInCssPixels;
 		if ( sizes ) {
@@ -281,7 +282,7 @@ window.matchMedia || (window.matchMedia = function() {
 			candidates = [];
 
 		// if it's an img element, use the cached srcset property (defined or not)
-		if( el.nodeName === "IMG" && el[ pf.ns ] && el[ pf.ns ].srcset ){
+		if( el.nodeName.toUpperCase() === "IMG" && el[ pf.ns ] && el[ pf.ns ].srcset ){
 			srcset = el[ pf.ns ].srcset;
 		}
 
@@ -351,7 +352,7 @@ window.matchMedia || (window.matchMedia = function() {
 			else {
 				var currImg = imgs[ h - pictures.length ];
 
-				if ( currImg.parentNode.nodeName !== "PICTURE" &&
+				if ( currImg.parentNode.nodeName.toUpperCase() !== "PICTURE" &&
 					( ( pf.srcsetSupported && currImg.getAttribute( "sizes" ) ) ||
 					currImg.getAttribute( "srcset" ) !== null ) ) {
 						elems.push( currImg );
@@ -362,16 +363,27 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	pf.getMatch = function( picture ) {
-		var sources = picture.getElementsByTagName( "source" );
+		var sources = picture.childNodes;
 		var match;
 
 		// Go through each child, and if they have media queries, evaluate them
 		for ( var j=0, slen = sources.length; j < slen; j++ ) {
 			var source = sources[ j ];
+
+      // skip non element nodes
+			if( source.nodeType !== 1 ){
+				continue;
+			}
+
+			// any element that is not a source, stops the search
+			if( source.nodeName.toUpperCase() !== "SOURCE" ) {
+				return match;
+			}
+
 			var media = source.getAttribute( "media" );
 
 			// if source does not have a srcset attribute, skip
-			if ( !source.hasAttribute( "srcset" ) ) {
+			if ( !source.getAttribute( "srcset" ) ) {
 				continue;
 			}
 
@@ -405,7 +417,7 @@ window.matchMedia || (window.matchMedia = function() {
 		// Loop through all elements
 		for ( var i=0, plen = elements.length; i < plen; i++ ) {
 			element = elements[ i ];
-			elemType = element.nodeName;
+			elemType = element.nodeName.toUpperCase();
 			firstMatch = undefined;
 			candidates = undefined;
 			picImg = undefined;
@@ -467,7 +479,7 @@ window.matchMedia || (window.matchMedia = function() {
 					// No sources matched, so we’re down to processing the inner `img` as a source.
 					candidates = pf.processSourceSet( picImg );
 
-					if( picImg.srcset === undefined || picImg.hasAttribute( "sizes" ) ) {
+					if( picImg.srcset === undefined || picImg.getAttribute( "sizes" ) ) {
 						// Either `srcset` is completely unsupported, or we need to polyfill `sizes` functionality.
 						pf.applyBestCandidate( candidates, picImg );
 					} // Else, resolution-only `srcset` is supported natively.

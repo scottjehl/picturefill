@@ -18,7 +18,8 @@
 	var pf, originalDprMethod,
 		originalVideoShimMethod,
 		originalMatchesMedia,
-		originalProcessSourceSet;
+		originalProcessSourceSet,
+		originalGetWidthFromLength;
 
 	pf = picturefill._;
 
@@ -29,6 +30,7 @@
 			originalVideoShimMethod = pf.removeVideoShim;
 			originalMatchesMedia = pf.matchesMedia;
 			originalProcessSourceSet = pf.processSourceSet;
+			originalGetWidthFromLength = pf.getWidthFromLength;
 		},
 
 		teardown: function() {
@@ -45,8 +47,7 @@
 
 	test("findWidthFromSourceSize", function() {
 		var sizes = "	 (max-width: 30em) 1000px,	 (max-width: 50em) 750px, 500px	 ";
-		// mock match media
-		var oldMatchesMedia = pf.matchesMedia;
+
 		pf.matchesMedia = function(media) {
 			return true;
 		};
@@ -58,33 +59,30 @@
 		};
 		var width = pf.findWidthFromSourceSize(sizes);
 		equal(width, 500, "returns 500 when match media returns false");
-
-		// restore `matchesMedia`
-		pf.matchesMedia = oldMatchesMedia;
 	});
 
-    test("parseSize", function() {
-        var size1 = "";
-        var expected1 = {
-            length: null,
-            media: null
-        };
-        deepEqual(pf.parseSize(size1), expected1, "Length and Media are empty");
+	test("parseSize", function() {
+		var size1 = "";
+		var expected1 = {
+			length: null,
+			media: null
+		};
+		deepEqual(pf.parseSize(size1), expected1, "Length and Media are empty");
 
-        var size2 = "( max-width: 50em ) 50%";
-        var expected2 = {
-            length: "50%",
-            media: "( max-width: 50em )"
-        };
-        deepEqual(pf.parseSize(size2), expected2, "Length and Media are properly parsed");
+		var size2 = "( max-width: 50em ) 50%";
+		var expected2 = {
+			length: "50%",
+			media: "( max-width: 50em )"
+		};
+		deepEqual(pf.parseSize(size2), expected2, "Length and Media are properly parsed");
 
-        var size3 = "(min-width:30em) calc(30% - 15px)";
-        var expected3 = {
-            length: "calc(30% - 15px)",
-            media: "(min-width:30em)"
-        };
-        deepEqual(pf.parseSize(size3), expected3, "Length and Media are properly parsed");
-    });
+		var size3 = "(min-width:30em) calc(30% - 15px)";
+		var expected3 = {
+			length: "calc(30% - 15px)",
+			media: "(min-width:30em)"
+		};
+		deepEqual(pf.parseSize(size3), expected3, "Length and Media are properly parsed");
+	});
 
 	test("getCandidatesFromSourceSet", function() {
 		// Basic test
@@ -185,19 +183,29 @@
 				url: "pic2048.png"
 			}
 		];
-		var oldMatchesMedia = pf.matchesMedia;
-		pf.matchesMedia = function(media) {
-			return true;
-		};
-		var oldGetWidthFromLength = pf.getWidthFromLength;
+
 		pf.getWidthFromLength = function(width) {
 			return 640;
 		}
+
+		pf.matchesMedia = function(media) {
+			return true;
+		};
+
 		deepEqual(pf.getCandidatesFromSourceSet(candidate6, sizes), expectedCandidates, "Works!");
 
-		// restores `matchesMedia` and `getWidthFromLength`
-		pf.matchesMedia = oldMatchesMedia;
-		pf.getWidthFromLength = oldGetWidthFromLength;
+		var expected, candidate;
+
+		candidate = "foo,bar.png 320w, bar,baz.png 320w";
+		expected = [{
+			url: "foo,bar.png",
+			resolution: 320
+		},{
+			url: "bar,baz.png",
+			resolution: 320
+		}];
+
+		deepEqual(pf.getCandidatesFromSourceSet(candidate), expected, "comma urls split");
 	});
 
 	test("verifyTypeSupport", function() {
@@ -310,9 +318,23 @@
 		equal( pf.getMatch( $noSrcset[0] ), undefined );
 	});
 
+	test( "getMatch returns only sources preceding fallback img", function() {
+		var $ignoredSource = $( ".ignored-source-check" );
+
+		// ensure the construction of the fixture
+		equal($ignoredSource.children()[0].nodeName, "IMG" );
+		equal($ignoredSource.children()[1].nodeName, "SOURCE" );
+
+		// ensure that the result is undefined so the picture is grabbed later
+		equal( pf.getMatch( $ignoredSource[0] ), undefined, "no source found" );
+	});
+
 	test( "picturefill ignores elements when they are marked with a property", function() {
 		expect( 0 );
-		var mockPicture = {};
+
+		var mockPicture = {
+			nodeName: "PICTURE"
+		};
 
 		mockPicture[ pf.ns ] = {
 			evaluated: true

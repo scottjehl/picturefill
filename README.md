@@ -97,7 +97,7 @@ The `1x`, `2x` syntax in `srcset` acts as a shorthand for more complex resolutio
 ```
 
 Picturefill has two versions:
-* Version 2 is a strict polyfill of the (Picture element draft specification](http://picture.responsiveimages.org/) and is the main version in development.
+* Version 2 is a strict polyfill of the [Picture element draft specification](http://picture.responsiveimages.org/) and is the main version in development.
 * Version 1 mimics the Picture element pattern with `span` elements. It is maintained in the 1.2 branch.
 
 ## Usage, Demos, Docs
@@ -105,14 +105,11 @@ To find out how to use Picturefill on your sites, visit the project and demo sit
 
 [Picturefill Documentation, Downloads, and Demos Site](http://scottjehl.github.com/picturefill/)
 
-## contributing
+## Contributing
 For information on how to contribute code to Picturefill, check out `Contributing.md`
 
-Internet Explorer 9 has some issues rendering custom elements like `picture` and `source`.
-For IE9, you have to stick `<!--[if IE 9]><video style="display: none;"><![endif]-->`
-around the `source` elements, because in IE9 you can't have `source` as the child node of
-anything except for `video`. For IE8 and less, `picture` will fall back to an `<img srcset>` element.
-
+## Issues
+If you find a bug in Picturefill, please add it to [the issue tracker](https://github.com/scottjehl/picturefill/issues)
 
 ## Support
 

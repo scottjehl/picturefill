@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset=utf-8 />
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<title>Picturefill - Demo</title>
+		<link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400' rel='stylesheet' type='text/css'>
+		<link href='../examples/styles.css' rel='stylesheet' type='text/css'>
+
+		<script>
+			// Picture element HTML shim|v it for old IE (pairs with Picturefill.js)
+			document.createElement( "picture" );
+		</script>
+		<script async="true" src="../dist/picturefill.js"></script>
+	</head>
+	<body>
+		<a href="http://responsiveimages.org/" class="ricg"><img src="https://raw.github.com/ResponsiveImagesCG/meta/master/logo/Web/RICG_logo_small.png"></a>
+
+
+
+		<h3><code>media</code> and <code>srcset</code> syntax:</h3>
+		<p>The <code>1x</code>, <code>2x</code> syntax in <code>srcset</code> acts as a shorthand for more complex resolution media queries. When natively supported, <code>srcset</code> will allow the UA to override requests for higher-resolution options based on a bandwidth limitations or a user preference (see #9 in the <a href="http://usecases.responsiveimages.org/#h2_requirements">Responsive Images Use Cases and Requirements</a>).</p>
+
+<pre><code>&lt;picture&gt;
+	&lt;!--[if IE 9]&gt;&lt;video style=&quot;display: none;&quot;&gt;&lt;![endif]--&gt;
+	&lt;source srcset=&quot;../examples/images/large.jpg, ../examples/images/extralarge.jpg 2x&quot; media=&quot;(min-width: 800px)&quot;&gt;
+	&lt;source srcset=&quot;../examples/images/small.jpg, ../examples/images/medium.jpg 2x&quot;&gt;
+	&lt;!--[if IE 9]&gt;&lt;/video&gt;&lt;![endif]--&gt;
+	&lt;img srcset=&quot;../examples/images/small.jpg, ../examples/images/medium.jpg 2x&quot; alt=&quot;A giant stone face at The Bayon temple in Angkor Thom, Cambodia&quot;&gt;
+&lt;/picture&gt;
+</code></pre>
+
+		<picture>
+			<!--[if IE 9]><video style="display: none;"><![endif]-->
+			<source srcset="../examples/images/large.jpg, ../examples/images/extralarge.jpg 2x" media="(min-width: 800px)">
+			<source srcset="../examples/images/small.jpg, ../examples/images/medium.jpg 2x">
+			<!--[if IE 9]></video><![endif]-->
+			<img srcset="../examples/images/small.jpg, ../examples/images/medium.jpg 2x" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+		</picture>
+
+
+
+	</body>
+</html>

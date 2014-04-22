@@ -6,157 +6,11 @@
 		<title>Picturefill</title>
 		<link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400' rel='stylesheet' type='text/css'>
-
-
-		<style>
-				body {
-					font-family: 'Source Sans Pro', sans-serif;
-					margin: 3em 5%;
-					color: #333;
-					line-height: 1.4;
-				}
-				a {
-					color: #e6615e;
-				}
-				a:hover {
-					text-decoration: none;
-				}
-				.ricg img {
-					display: block;
-					margin: 0 auto 1em;
-					max-width: 8em;
-				}
-				@media (min-width: 60em){
-					body {
-						width: 54em;
-						margin: 3em auto;
-					}
-				}
-				h1 {
-					clear: both;
-					font-family: 'Raleway', sans-serif;
-					text-align: center;
-					font-size: 2.8em;
-					margin: 0;
-					color: #951c19;
-				}
-				h1 em {
-					display: block;
-					font-size: .36em;
-					color: #444;
-					font-style: normal;
-					margin: .1em 0 1em;
-					font-weight: normal;
-				}
-				p, li {
-					font-size: 1.1em;
-					margin: .6em 0 .8em;
-				}
-
-				h1 .picture,
-				p code {
-					background: papayawhip;
-					border-radius: .3em;
-					padding: 0 .2em;
-					border: 1px solid rgba(0,0,0,.1);
-				}
-				.filament-logo {
-					display: inline;
-					background: #247201;
-					padding: .1em .3em;
-					margin: 0 .1em 0;
-					max-width: 7em;
-					border-radius: 3px;
-					position: relative;
-					top: .3em;
-				}
-				.nav {
-					text-align: center;
-					display: block;
-					padding: 0 5%;
-					border-top: 1px solid papayawhip;
-					border-bottom: 1px solid papayawhip;
-					margin: 0 auto 2em;
-					background: #fafafa;
-					font-size: 1em;
-					color: #444;
-					width: 90%;
-
-				}
-				.nav li {
-					display: block;
-					font-size: .9em;
-					padding: .4em 0;
-					margin: 0;
-					border-top: 1px solid #fff;
-				}
-				.nav li:first-child {
-					border: none;
-				}
-				.nav li a {
-					display: inline-block;
-					text-decoration: none;
-					color: #222;
-				}
-				.nav li a:hover {
-					background: papayawhip;
-				}
-				@media (min-width: 40em){
-					.nav {
-						display: table;
-						border: 1px solid papayawhip;
-						width: 80%;
-						padding: 0;
-					}
-					.nav li {
-						display: table-cell;
-						padding: 0;
-						border: 0;
-						font-size: 1em;
-					}
-					.nav li a {
-						padding: .8em 0;
-						display: block;
-					}
-				}
-				pre {
-					overflow: auto;
-					background: #fafafa;
-					font-size: 1em;
-					border: 2px solid #ddd;
-					padding: .5em 1em;
-					width: 100%;
-					box-sizing: border-box;
-					font-family: "monaco", monospace;
-				}
-				pre code {
-					margin: 0;
-					padding: 0;
-				}
-				img {
-					max-width: 100%
-				}
-				h2 {
-					margin: 2em 0;
-					font-family: 'Raleway', sans-serif;
-					font-size: 1.2em;
-					border-bottom: 1px solid papayawhip;
-					text-align: center;
-					padding: .3em 0 .4em;
-				}
-				.note {
-					font-style: italic;
-					font-size: .9em;
-				}
-				h3 {
-					font-size: 1.1em;
-					font-weight: bold;
-				}
-		</style>
+		<link href='examples/styles.css' rel='stylesheet' type='text/css'>
+		<link href="https://raw.githubusercontent.com/ResponsiveImagesCG/responsiveimages.org/master/img/favicon.ico" rel="icon">
 		<script>
 			// Picture element HTML shim|v it for old IE (pairs with Picturefill.js)
 			document.createElement( "picture" );
-			document.createElement( "source" );
 		</script>
 		<script async="true" src="dist/picturefill.js"></script>
 	</head>
@@ -169,12 +23,13 @@
 				<li><a href="#download">Download</a></li>
 				<li><a href="#getting-started">Getting Started</a></li>
 				<li><a href="#examples">Examples</a></li>
+				<li><a href="#api">API</a></li>
 				<li><a href="#support">Browser support</a></li>
 				<li><a href="#support">Contributing</a></li>
 			</ul>
 		</nav>
 
-		<p>The <a href="http://picture.responsiveimages.org/">picture element</a> and associated features are W3C standard HTML features allow web developers to deliver an appropriate image to every user depending on a variety of conditions like screen size, viewport size, screen resolution, and more. Picturefill is a JavaScript file (or a <em>polyfill</em> to be more specific) that enables support for the <code>picture</code> element and associated features in browsers that do not yet support them, so you can start using them today!</p>
+		<p>The <a href="http://picture.responsiveimages.org/">picture element</a> and associated features are W3C standard HTML features that allow web developers to deliver an appropriate image to every user depending on a variety of conditions like screen size, viewport size, screen resolution, and more. Picturefill is a JavaScript file (or a <em>polyfill</em> to be more specific) that enables support for the <code>picture</code> element and associated features in browsers that do not yet support them, so you can start using them today!</p>
 
 		<p>Picturefill is developed and maintained by <a href="http://filamentgroup.com"><img src="http://filamentgroup.com/images/fg-logo-icon-lrg.png" class="filament-logo" alt="Filament Group"></a>, with help from the members of the <a href="http://picture.responsiveimages.org/">Responsive Images Community Group</a> and the developer community at large. For Picturefill version 2, a special thanks goes to <a href="https://github.com/jansepar">Shawn Jansepar</a> for all his work on polyfilling the new spec.</p>
 
@@ -215,7 +70,7 @@ document.createElement( &quot;picture&quot; );
 &lt;script src=&quot;picturefill.js&quot; async&gt;&lt;/script&gt;
 </code></pre>
 
-		<p class="note">Note that if you are already including a recent version of the HTML5 Shiv (sometimes packaged with Modernizr), you may not need this line as it is included there as well. Also, more advanced users may not need thismay choose to load Picturefill dynamically using a script loader like Require.js, (AMD and CommonJS support is included in the script).</p>
+		<p class="note">Note that if you are already including a recent version of the HTML5 Shiv (sometimes packaged with Modernizr), you may not need this line as it is included there as well. Also, more advanced users may not need this may choose to load Picturefill dynamically using a script loader like Require.js, (AMD and CommonJS support is included in the script).</p>
 
 
 		<h2 id="examples">Basic markup patterns</h2>
@@ -224,7 +79,7 @@ document.createElement( &quot;picture&quot; );
 
 		<h3>Using <code>img</code> with <code>srcset</code> &amp; <code>sizes</code> attributes</h3>
 
-		<p>It's beyond the scope of this guide to get into much detail about how to use the new <code>srcset</code> &amp; <code>sizes</code> attributes, so we'd recommend reading the following post by Eric Portis: <a href="http://ericportis.com/posts/2014/srcset-sizes/">Srcset and Sizes</a>. Read that first, then check out the demos below!</p>
+		<p>The <code>sizes</code> syntax is used to define the size of the image across a number of breakpoints. <code>srcset</code> then defines an array of images and their inherent sizes. It's beyond the scope of this guide to get into much detail about how to use the new <code>srcset</code> &amp; <code>sizes</code> attributes, so we'd recommend reading the following post by Eric Portis: <a href="http://ericportis.com/posts/2014/srcset-sizes/">Srcset and Sizes</a>. Read that first, then check out the demos below!</p>
 
 		<h3>An img with "srcset" and sizes" attributes:</h3>
 <pre><code>&lt;img sizes=&quot;(max-width: 30em) 100%, (max-width: 50em) 75%, 50%&quot;
@@ -235,6 +90,8 @@ srcset=&quot;examples/images/pic-small.png 400w, examples/images/pic-medium.png 
 
 		<img sizes="(max-width: 30em) 100%, (max-width: 50em) 75%, 50%"
 				srcset="examples/images/pic-small.png 400w, examples/images/pic-medium.png 800w, examples/images/pic-large.png 1200w" alt="Obama with soldiers">
+
+		<p><a href="examples/demo-01.html">View standalone demo</a></p>
 
 		<h2>Using the <code>picture</code> element</h2>
 
@@ -252,7 +109,7 @@ srcset=&quot;examples/images/pic-small.png 400w, examples/images/pic-medium.png 
 &lt;/picture&gt;
 </code></pre>
 
-		<h3>Supporting Internet Explorer 9</h3>
+		<h3>Supporting Picture in Internet Explorer 9</h3>
 		<p>While most versions of IE (even older ones!) are supported well, IE9 has a little conflict to work around. To support IE9, you will need to wrap a <code>video</code> element wrapper around the source elements in your <code>picture</code> tag. You can do this using conditional comments, like so:</p>
 
 <pre><code>&lt;picture&gt;
@@ -276,10 +133,13 @@ srcset=&quot;examples/images/pic-small.png 400w, examples/images/pic-medium.png 
 			<img srcset="examples/images/medium.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 		</picture>
 
+		<p><a href="examples/demo-02.html">View standalone demo</a></p>
+
 		<h2>More Picture markup examples</h2>
 
 		<h3><code>media</code> and <code>srcset</code> syntax:</h3>
 		<p>The <code>1x</code>, <code>2x</code> syntax in <code>srcset</code> acts as a shorthand for more complex resolution media queries. When natively supported, <code>srcset</code> will allow the UA to override requests for higher-resolution options based on a bandwidth limitations or a user preference (see #9 in the <a href="http://usecases.responsiveimages.org/#h2_requirements">Responsive Images Use Cases and Requirements</a>).</p>
+
 <pre><code>&lt;picture&gt;
 	&lt;!--[if IE 9]&gt;&lt;video style=&quot;display: none;&quot;&gt;&lt;![endif]--&gt;
 	&lt;source srcset=&quot;examples/images/large.jpg, examples/images/extralarge.jpg 2x&quot; media=&quot;(min-width: 800px)&quot;&gt;
@@ -288,6 +148,7 @@ srcset=&quot;examples/images/pic-small.png 400w, examples/images/pic-medium.png 
 	&lt;img srcset=&quot;examples/images/small.jpg, examples/images/medium.jpg 2x&quot; alt=&quot;A giant stone face at The Bayon temple in Angkor Thom, Cambodia&quot;&gt;
 &lt;/picture&gt;
 </code></pre>
+
 		<picture>
 			<!--[if IE 9]><video style="display: none;"><![endif]-->
 			<source srcset="examples/images/large.jpg, examples/images/extralarge.jpg 2x" media="(min-width: 800px)">
@@ -296,7 +157,9 @@ srcset=&quot;examples/images/pic-small.png 400w, examples/images/pic-medium.png 
 			<img srcset="examples/images/small.jpg, examples/images/medium.jpg 2x" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 		</picture>
 
-	<h3><code>media</code> example with one webp source qualified with a <code>type</code> attribute.</h3>
+	<p><a href="examples/demo-03.html">View standalone demo</a></p>
+
+	<h3 id="types"><code>media</code> example with one webp source qualified with a <code>type</code> attribute.</h3>
 		<p>Note: Picturefill supports SVG and WebP types on any source element, and will disregard a <code>source</code> if its type is not supported in a particular environment:</p>
 
 <pre><code>&lt;picture&gt;
@@ -318,6 +181,38 @@ srcset=&quot;examples/images/pic-small.png 400w, examples/images/pic-medium.png 
 				<img srcset="examples/images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 		</picture>
 
+		<p><a href="examples/demo-04.html">View standalone demo</a></p>
+
+		<h2 id="api">Picturefill JavaScript API</h2>
+
+		<p>Under ordinary circumstances, you likely won't need to do more than include picturefill.js in your page, but in some situations you may want to run picturefill's function manually yourself, and there are a few options to keep in mind:</p>
+
+		<h3>The picturefill function</h3>
+
+		<p>Picturefill.js exposes a single global function: the <code>picturefill()</code> function. <code>picturefill()</code> is automatically called one or more times while a page is loading, and it also is triggered when the browser window is resized (or on orientation change). You can run the <code>picturefill()</code> function at any time in JavaScript yourself as well, which may be useful after making updates to the DOM, or when conditions relevant to your application change:</p>
+
+<pre><code>
+picturefill();
+</code></pre>
+
+		<h3>Picturefill function options</h3>
+
+		<p>When running the <code>picturefill()</code> function, you can pass options specifying the following settings:</p>
+
+		<ul>
+			<li><strong>Elements:</strong> An array of <code>picture</code> and <code>img[srcset]</code> elements you'd like picturefill to evaluate. The Default value for <code>options.elements</code> is all <code>picture</code> and <code>img[srcset]</code> elements in the page.
+<pre><code>picturefill( {
+	elements: [ document.getElementById( "myPicture" ) ]
+} );
+</code></pre>
+			</li>
+			<li><strong>Reevaluate:</strong> Force picturefill to evaluate all elements in the <code>options.elements</code> array, even if they've already been evaluated. The default is <code>false</code>, except when a resize event triggers Picturefill to run (<code>options.reevaluate</code> is <code>true</code> in that case).
+<pre><code>picturefill( {
+	reevaluate: true
+} );
+</code></pre>
+			</li>
+		</ul>
 
 		<h2 id="support">Browser Support</h2>
 		<p>Picturefill supports a broad range of browsers and devices, provided that you stick with the standard markup conventions documented above. </p>
@@ -327,7 +222,9 @@ srcset=&quot;examples/images/pic-small.png 400w, examples/images/pic-medium.png 
 
 		<p>Picturefill is tested broadly and works in a large number of browsers. That said, it does have some browser support considerations to keep in mind:</p>
 		<ul>
+			<li><strong>JS-Disabled Browsers only see alt text:</strong> When using the <code>picture</code> element, non-<code>picture</code> supporting browsers will only see <code>alt</code> attribute text as a fallback when JavaScript fails or is disabled. This is because any <code>noscript</code>-based workarounds (such as the one used in Picturefill version 1) will cause future browsers that support the <code>picture</code> element to show two images instead of one when JavaScript is off. Unfortunately, choosing to add a <code>src</code> attribute to the <code>img</code> element in your <code>picture</code> element isn't a good workaround either, as any browser that exists today will fetch that <code>src</code> url even if it is not going to be used (which is wasteful). If you absolutely need an image to appear in non-JS environments, Picturefill 1.2 is a fine choice.</li>
 			<li><strong>Temporary extra HTTP Requests for Picture usage in some browsers:</strong> In browsers that natively support <code>srcset</code> but do not yet support the <code>picture</code> element, users may experience a wasted HTTP request for each <code>picture</code> element on a page. This is because the browser's preparser will fetch one of the URLs listed in the <code>picture</code> element's child <code>img</code>'s <code>srcset</code> attribute as soon as possible during page load, before the JavaScript can evaluate the potential <code>picture</code> <code>source</code> elements for a better match. This problem will only affect browsers that have implemented <code>srcset</code> but not <code>picture</code>, which will hopefully be short-lived.</li>
+
 			<li><strong>Source element limitations:</strong> Browsers like Android 2.3 and Internet Explorer 9 can not see the <code>source</code> elements inside a <code>picture</code> element. For IE, the <code>video</code> tag workaround helps us avoid this problem, but Android will still have no access to <code>source</code> elements. Be sure to provide a <code>srcset</code> attribute on your enclosed <code>img</code> to ensure an image will show in this browser.</li>
 			<li><strong>Media attribute support requires native media query support</strong>The <code>picture</code> element (paired with picturefill) works best in browsers that support CSS3 media queries. Picturefill includes  the <a href="https://github.com/paulirish/matchMedia.js/">matchMedia polyfill</a> by default, which makes matchMedia work in media query-supporting browsers that don’t support <code>matchMedia</code>.</li>
 		</ul>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset=utf-8 />
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<title>Picturefill - Demo</title>
+		<link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400' rel='stylesheet' type='text/css'>
+		<link href='../examples/styles.css' rel='stylesheet' type='text/css'>
+
+		<script>
+			// Picture element HTML shim|v it for old IE (pairs with Picturefill.js)
+			document.createElement( "picture" );
+		</script>
+		<script async="true" src="../dist/picturefill.js"></script>
+	</head>
+	<body>
+		<a href="http://responsiveimages.org/" class="ricg"><img src="https://raw.github.com/ResponsiveImagesCG/meta/master/logo/Web/RICG_logo_small.png"></a>
+
+
+
+		<h3>Supporting Picture in Internet Explorer 9</h3>
+		<p>While most versions of IE (even older ones!) are supported well, IE9 has a little conflict to work around. To support IE9, you will need to wrap a <code>video</code> element wrapper around the source elements in your <code>picture</code> tag. You can do this using conditional comments, like so:</p>
+
+<pre><code>&lt;picture&gt;
+	&lt;!--[if IE 9]&gt;&lt;video style=&quot;display: none;&quot;&gt;&lt;![endif]--&gt;
+	&lt;source srcset=&quot;../examples/images/extralarge.jpg&quot; media=&quot;(min-width: 1000px)&quot;&gt;
+	&lt;source srcset=&quot;../examples/images/large.jpg&quot; media=&quot;(min-width: 800px)&quot;&gt;
+	&lt;source srcset=&quot;../examples/images/medium.jpg&quot;&gt;
+	&lt;!--[if IE 9]&gt;&lt;/video&gt;&lt;![endif]--&gt;
+	&lt;img srcset=&quot;../examples/images/medium.jpg&quot; alt=&quot;A giant stone face at The Bayon temple in Angkor Thom, Cambodia&quot;&gt;
+&lt;/picture&gt;
+</code></pre>
+
+		<p>Here's how that renders in the browser. Feel free to resize to see it change.</p>
+
+		<picture>
+			<!--[if IE 9]><video style="display: none;"><![endif]-->
+			<source srcset="../examples/images/extralarge.jpg" media="(min-width: 1000px)">
+			<source srcset="../examples/images/large.jpg" media="(min-width: 800px)">
+			<source srcset="../examples/images/medium.jpg">
+			<!--[if IE 9]></video><![endif]-->
+			<img srcset="../examples/images/medium.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+		</picture>
+
+
+
+	</body>
+</html>
