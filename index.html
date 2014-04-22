@@ -77,7 +77,7 @@ document.createElement( &quot;picture&quot; );
 
 		<p>Once you've included picturefill.js, you can start adding responsive image elements to your site. Picturefill adds support for both the <code>picture</code> element and also new responsive attributes to the <code>img</code> element. You may find that the new <code>img</code> features may be all you need. Let's cover those first.</p>
 
-		<h3>Using <code>img</code> with <code>srcset</code> &amp; <code>sizes</code> attributes</h3>
+		<h3 id="img-sizes">Using <code>img</code> with <code>srcset</code> &amp; <code>sizes</code> attributes</h3>
 
 		<p>The <code>sizes</code> syntax is used to define the size of the image across a number of breakpoints. <code>srcset</code> then defines an array of images and their inherent sizes. It's beyond the scope of this guide to get into much detail about how to use the new <code>srcset</code> &amp; <code>sizes</code> attributes, so we'd recommend reading the following post by Eric Portis: <a href="http://ericportis.com/posts/2014/srcset-sizes/">Srcset and Sizes</a>. Read that first, then check out the demos below!</p>
 
@@ -93,7 +93,7 @@ srcset=&quot;examples/images/pic-small.png 400w, examples/images/pic-medium.png 
 
 		<p><a href="examples/demo-01.html">View standalone demo</a></p>
 
-		<h2>Using the <code>picture</code> element</h2>
+		<h2 id="using-picture">Using the <code>picture</code> element</h2>
 
 		<p>The <code>picture</code> element requires a little more markup than the example above, but it allows you to use features like CSS3 Media Queries to pair image sources with other layout conditions in your designs. </p>
 
@@ -109,7 +109,7 @@ srcset=&quot;examples/images/pic-small.png 400w, examples/images/pic-medium.png 
 &lt;/picture&gt;
 </code></pre>
 
-		<h3>Supporting Picture in Internet Explorer 9</h3>
+		<h3 id="ie9">Supporting Picture in Internet Explorer 9</h3>
 		<p>While most versions of IE (even older ones!) are supported well, IE9 has a little conflict to work around. To support IE9, you will need to wrap a <code>video</code> element wrapper around the source elements in your <code>picture</code> tag. You can do this using conditional comments, like so:</p>
 
 <pre><code>&lt;picture&gt;
@@ -137,7 +137,7 @@ srcset=&quot;examples/images/pic-small.png 400w, examples/images/pic-medium.png 
 
 		<h2>More Picture markup examples</h2>
 
-		<h3><code>media</code> and <code>srcset</code> syntax:</h3>
+		<h3 id="media-and-srcset"><code>media</code> and <code>srcset</code> syntax:</h3>
 		<p>The <code>1x</code>, <code>2x</code> syntax in <code>srcset</code> acts as a shorthand for more complex resolution media queries. When natively supported, <code>srcset</code> will allow the UA to override requests for higher-resolution options based on a bandwidth limitations or a user preference (see #9 in the <a href="http://usecases.responsiveimages.org/#h2_requirements">Responsive Images Use Cases and Requirements</a>).</p>
 
 <pre><code>&lt;picture&gt;
@@ -218,7 +218,7 @@ picturefill();
 		<p>Picturefill supports a broad range of browsers and devices, provided that you stick with the standard markup conventions documented above. </p>
 
 
-		<h3>Support caveats to keep in mind</h3>
+		<h3 id="gotchas">Support caveats to keep in mind</h3>
 
 		<p>Picturefill is tested broadly and works in a large number of browsers. That said, it does have some browser support considerations to keep in mind:</p>
 		<ul>
