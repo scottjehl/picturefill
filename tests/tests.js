@@ -195,6 +195,19 @@
 		}
 		deepEqual(pf.getCandidatesFromSourceSet(candidate6, sizes), expectedCandidates, "Works!");
 
+		var expected, candidate;
+
+		candidate = "foo,bar.png 320w, bar,baz.png 320w";
+		expected = [{
+			url: "foo,bar.png",
+			resolution: 320
+		},{
+			url: "bar,baz.png",
+			resolution: 320
+		}];
+
+		deepEqual(pf.getCandidatesFromSourceSet(candidate), expected, "comma urls split");
+
 		// restores `matchesMedia` and `getWidthFromLength`
 		pf.matchesMedia = oldMatchesMedia;
 		pf.getWidthFromLength = oldGetWidthFromLength;

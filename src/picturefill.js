@@ -180,7 +180,7 @@
 	 * If sizes is specified, resolution is calculated
 	 */
 	pf.getCandidatesFromSourceSet = function( srcset, sizes ) {
-		var candidates = pf.trim( srcset ).split( /\s*,\s*/ );
+		var candidates = pf.trim( srcset ).split( /,\s+/ );
 		var formattedCandidates = [];
 		var widthInCssPixels;
 		if ( sizes ) {
