@@ -224,11 +224,9 @@ window.matchMedia || (window.matchMedia = function() {
 	 */
 	pf.getCandidatesFromSourceSet = function( srcset, sizes ) {
 		var candidates = pf.trim( srcset ).split( /,\s+/ );
+		var widthInCssPixels = sizes ? pf.findWidthFromSourceSize( sizes ) : "100%";
 		var formattedCandidates = [];
-		var widthInCssPixels;
-		if ( sizes ) {
-			widthInCssPixels = pf.findWidthFromSourceSize( sizes );
-		}
+
 		for ( var i = 0, len = candidates.length; i < len; i++ ) {
 			var candidate = candidates[ i ];
 			var candidateArr = candidate.split( /\s+/ );
