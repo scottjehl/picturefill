@@ -1,0 +1,143 @@
+body {
+    font-family: 'Source Sans Pro', sans-serif;
+    margin: 3em 5%;
+    color: #333;
+    line-height: 1.4;
+}
+a {
+    color: #e6615e;
+}
+a:hover {
+    text-decoration: none;
+}
+.ricg img {
+    display: block;
+    margin: 0 auto 1em;
+    max-width: 8em;
+}
+@media (min-width: 60em){
+    body {
+        width: 54em;
+        margin: 3em auto;
+    }
+}
+h1 {
+    clear: both;
+    font-family: 'Raleway', sans-serif;
+    text-align: center;
+    font-size: 2.8em;
+    margin: 0;
+    color: #951c19;
+}
+h1 em {
+    display: block;
+    font-size: .36em;
+    color: #444;
+    font-style: normal;
+    margin: .1em 0 1em;
+    font-weight: normal;
+}
+p, li {
+    font-size: 1.1em;
+    margin: .6em 0 .8em;
+}
+
+h1 .picture,
+p code {
+    background: papayawhip;
+    border-radius: .3em;
+    padding: 0 .2em;
+    border: 1px solid rgba(0,0,0,.1);
+}
+.filament-logo {
+    display: inline;
+    background: #247201;
+    padding: .1em .3em;
+    margin: 0 .1em 0;
+    max-width: 7em;
+    border-radius: 3px;
+    position: relative;
+    top: .3em;
+}
+.nav {
+    text-align: center;
+    display: block;
+    padding: 0 5%;
+    border-top: 1px solid papayawhip;
+    border-bottom: 1px solid papayawhip;
+    margin: 0 auto 2em;
+    background: #fafafa;
+    font-size: 1em;
+    color: #444;
+    width: 90%;
+
+}
+.nav li {
+    display: block;
+    font-size: .9em;
+    padding: .4em 0;
+    margin: 0;
+    border-top: 1px solid #fff;
+}
+.nav li:first-child {
+    border: none;
+}
+.nav li a {
+    display: inline-block;
+    text-decoration: none;
+    color: #222;
+}
+.nav li a:hover {
+    background: papayawhip;
+}
+@media (min-width: 44em){
+    .nav {
+        display: table;
+        border: 1px solid papayawhip;
+        width: 80%;
+        padding: 0;
+    }
+    .nav li {
+        display: table-cell;
+        padding: 0;
+        border: 0;
+        font-size: 1em;
+    }
+    .nav li a {
+        padding: .8em 0;
+        display: block;
+    }
+}
+pre {
+    overflow: auto;
+    background: #fafafa;
+    font-size: 1em;
+    border: 2px solid #ddd;
+    padding: .5em 1em;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: "monaco", monospace;
+}
+pre code {
+    margin: 0;
+    padding: 0;
+}
+img {
+    max-width: 100%
+}
+h2 {
+    margin: 2em 0;
+    font-family: 'Raleway', sans-serif;
+    font-size: 1.2em;
+    border-bottom: 1px solid papayawhip;
+    text-align: center;
+    padding: .3em 0 .4em;
+}
+.note {
+    font-style: italic;
+    font-size: .9em;
+}
+h3 {
+    font-size: 1.1em;
+    font-weight: bold;
+}
