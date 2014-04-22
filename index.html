@@ -29,7 +29,7 @@
 			</ul>
 		</nav>
 
-		<p>The <a href="http://picture.responsiveimages.org/">picture element</a> and associated features are W3C standard HTML features allow web developers to deliver an appropriate image to every user depending on a variety of conditions like screen size, viewport size, screen resolution, and more. Picturefill is a JavaScript file (or a <em>polyfill</em> to be more specific) that enables support for the <code>picture</code> element and associated features in browsers that do not yet support them, so you can start using them today!</p>
+		<p>The <a href="http://picture.responsiveimages.org/">picture element</a> and associated features are W3C standard HTML features that allow web developers to deliver an appropriate image to every user depending on a variety of conditions like screen size, viewport size, screen resolution, and more. Picturefill is a JavaScript file (or a <em>polyfill</em> to be more specific) that enables support for the <code>picture</code> element and associated features in browsers that do not yet support them, so you can start using them today!</p>
 
 		<p>Picturefill is developed and maintained by <a href="http://filamentgroup.com"><img src="http://filamentgroup.com/images/fg-logo-icon-lrg.png" class="filament-logo" alt="Filament Group"></a>, with help from the members of the <a href="http://picture.responsiveimages.org/">Responsive Images Community Group</a> and the developer community at large. For Picturefill version 2, a special thanks goes to <a href="https://github.com/jansepar">Shawn Jansepar</a> for all his work on polyfilling the new spec.</p>
 
@@ -70,7 +70,7 @@ document.createElement( &quot;picture&quot; );
 &lt;script src=&quot;picturefill.js&quot; async&gt;&lt;/script&gt;
 </code></pre>
 
-		<p class="note">Note that if you are already including a recent version of the HTML5 Shiv (sometimes packaged with Modernizr), you may not need this line as it is included there as well. Also, more advanced users may not need thismay choose to load Picturefill dynamically using a script loader like Require.js, (AMD and CommonJS support is included in the script).</p>
+		<p class="note">Note that if you are already including a recent version of the HTML5 Shiv (sometimes packaged with Modernizr), you may not need this line as it is included there as well. Also, more advanced users may not need this may choose to load Picturefill dynamically using a script loader like Require.js, (AMD and CommonJS support is included in the script).</p>
 
 
 		<h2 id="examples">Basic markup patterns</h2>
@@ -79,7 +79,7 @@ document.createElement( &quot;picture&quot; );
 
 		<h3>Using <code>img</code> with <code>srcset</code> &amp; <code>sizes</code> attributes</h3>
 
-		<p>The <code>sizes</code> syntax is used to define the size of the image across a number of breakpoints. Mcode>srcset</code> then defines an array of images and their inherent sizes. It's beyond the scope of this guide to get into much detail about how to use the new <code>srcset</code> &amp; <code>sizes</code> attributes, so we'd recommend reading the following post by Eric Portis: <a href="http://ericportis.com/posts/2014/srcset-sizes/">Srcset and Sizes</a>. Read that first, then check out the demos below!</p>
+		<p>The <code>sizes</code> syntax is used to define the size of the image across a number of breakpoints. <code>srcset</code> then defines an array of images and their inherent sizes. It's beyond the scope of this guide to get into much detail about how to use the new <code>srcset</code> &amp; <code>sizes</code> attributes, so we'd recommend reading the following post by Eric Portis: <a href="http://ericportis.com/posts/2014/srcset-sizes/">Srcset and Sizes</a>. Read that first, then check out the demos below!</p>
 
 		<h3>An img with "srcset" and sizes" attributes:</h3>
 <pre><code>&lt;img sizes=&quot;(max-width: 30em) 100%, (max-width: 50em) 75%, 50%&quot;
