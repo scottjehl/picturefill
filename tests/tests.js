@@ -18,7 +18,8 @@
 	var pf, originalDprMethod,
 		originalVideoShimMethod,
 		originalMatchesMedia,
-		originalProcessSourceSet;
+		originalProcessSourceSet,
+		originalGetWidthFromLength;
 
 	pf = picturefill._;
 
@@ -29,6 +30,7 @@
 			originalVideoShimMethod = pf.removeVideoShim;
 			originalMatchesMedia = pf.matchesMedia;
 			originalProcessSourceSet = pf.processSourceSet;
+			originalGetWidthFromLength = pf.getWidthFromLength;
 		},
 
 		teardown: function() {
@@ -45,8 +47,7 @@
 
 	test("findWidthFromSourceSize", function() {
 		var sizes = "	 (max-width: 30em) 1000px,	 (max-width: 50em) 750px, 500px	 ";
-		// mock match media
-		var oldMatchesMedia = pf.matchesMedia;
+
 		pf.matchesMedia = function(media) {
 			return true;
 		};
@@ -58,9 +59,6 @@
 		};
 		var width = pf.findWidthFromSourceSize(sizes);
 		equal(width, 500, "returns 500 when match media returns false");
-
-		// restore `matchesMedia`
-		pf.matchesMedia = oldMatchesMedia;
 	});
 
 	test("parseSize", function() {
@@ -185,14 +183,15 @@
 				url: "pic2048.png"
 			}
 		];
-		var oldMatchesMedia = pf.matchesMedia;
-		pf.matchesMedia = function(media) {
-			return true;
-		};
-		var oldGetWidthFromLength = pf.getWidthFromLength;
+
 		pf.getWidthFromLength = function(width) {
 			return 640;
 		}
+
+		pf.matchesMedia = function(media) {
+			return true;
+		};
+
 		deepEqual(pf.getCandidatesFromSourceSet(candidate6, sizes), expectedCandidates, "Works!");
 
 		var expected, candidate;
@@ -207,10 +206,6 @@
 		}];
 
 		deepEqual(pf.getCandidatesFromSourceSet(candidate), expected, "comma urls split");
-
-		// restores `matchesMedia` and `getWidthFromLength`
-		pf.matchesMedia = oldMatchesMedia;
-		pf.getWidthFromLength = oldGetWidthFromLength;
 	});
 
 	test("verifyTypeSupport", function() {
