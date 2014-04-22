@@ -193,14 +193,8 @@ window.matchMedia || (window.matchMedia = function() {
 			if ( !length ) {
 					continue;
 			}
-			if ( !media ) {
-				// if there is no media query, choose this as our winning length
-				winningLength = length;
-				break;
-			}
-
-			if ( pf.matchesMedia( media ) ) {
-				// if the media query matches, choose this as our winning length
+			if ( !media || pf.matchesMedia( media ) ) {
+				// if there is no media query or it matches, choose this as our winning length
 				// and end algorithm
 				winningLength = length;
 				break;
