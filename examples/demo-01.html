@@ -20,16 +20,14 @@
 
 
 		<h3>An img with "srcset" and sizes" attributes:</h3>
-<pre><code>&lt;img sizes=&quot;(max-width: 30em) 100%, (max-width: 50em) 75%, 50%&quot;
+<pre><code>&lt;img sizes=&quot;100%, (min-width: 40em) 80%&quot;
 srcset=&quot;../examples/images/pic-small.png 400w, ../examples/images/pic-medium.png 800w, ../examples/images/pic-large.png 1200w&quot; alt=&quot;Obama with soldiers&quot;&gt;
 </code></pre>
 
 		<p>Here's how that renders in the browser. Feel free to resize to see it change.</p>
 
-		<img sizes="(max-width: 30em) 100%, (max-width: 50em) 75%, 50%"
-				srcset="../examples/images/pic-small.png 400w, ../examples/images/pic-medium.png 800w, ../examples/images/pic-large.png 1200w" alt="Obama with soldiers">
-
-
+		<img sizes="100%, (min-width: 40em) 80%"
+				srcset="examples/images/pic-small.png 400w, examples/images/pic-medium.png 800w, examples/images/pic-large.png 1200w" alt="Obama with soldiers">
 
 	</body>
 </html>
