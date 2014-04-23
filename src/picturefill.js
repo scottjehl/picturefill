@@ -182,7 +182,7 @@
 			}
 			if ( sizes ) {
 				// get the dpr by taking the length / width in css pixels
-				resolution = parseFloat( ( parseInt( sizeDescriptor, 10 ) / widthInCssPixels ).toFixed( 2 ) );
+				resolution = parseFloat( ( parseInt( sizeDescriptor, 10 ) / widthInCssPixels ) );
 			} else {
 				// get the dpr by grabbing the value of Nx
 				resolution = sizeDescriptor ? parseFloat( sizeDescriptor, 10 ) : 1;

@@ -1,4 +1,4 @@
-/*! Picturefill - v2.0.0-alpha - 2014-04-23
+/*! Picturefill - v2.0.0-beta - 2014-04-23
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -231,7 +231,7 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 			if ( sizes ) {
 				// get the dpr by taking the length / width in css pixels
-				resolution = parseFloat( ( parseInt( sizeDescriptor, 10 ) / widthInCssPixels ).toFixed( 2 ) );
+				resolution = parseFloat( ( parseInt( sizeDescriptor, 10 ) / widthInCssPixels ) );
 			} else {
 				// get the dpr by grabbing the value of Nx
 				resolution = sizeDescriptor ? parseFloat( sizeDescriptor, 10 ) : 1;
