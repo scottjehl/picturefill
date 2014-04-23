@@ -53,8 +53,8 @@
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
 	 */
 	pf.getWidthFromLength = function( length ) {
-		// If no length was specified, default to `100vw` (per the spec). Using 100% here for the sake of compatibility in older browsers.
-		length = length || "100%";
+		// If no length was specified, or it is 0, default to `100vw` (per the spec). Using 100% here for the sake of compatibility in older browsers.
+		length = length && parseFloat( length ) > 0 ? length : "100%";
 		// Create a cached element for getting length value widths
 		if( !pf.lengthEl ){
 			pf.lengthEl = doc.createElement( "div" );
