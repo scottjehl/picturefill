@@ -1,4 +1,4 @@
-/*! Picturefill - v2.0.0-alpha - 2014-04-22
+/*! Picturefill - v2.0.0-alpha - 2014-04-23
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -177,18 +177,17 @@ window.matchMedia || (window.matchMedia = function() {
 	pf.findWidthFromSourceSize = function( sourceSizeListStr ) {
 		// Split up source size list, ie ( max-width: 30em ) 100%, ( max-width: 50em ) 50%, 33%
 		//                            or (min-width:30em) calc(30% - 15px)
-		var sourceSizeList = pf.trim( sourceSizeListStr ).split( /\s*,\s*/ );
-		var winningLength;
-		var winningLengthInt;
+		var sourceSizeList = pf.trim( sourceSizeListStr ).split( /\s*,\s*/ ),
+			winningLength,
+			winningLengthInt;
 
 		for ( var i=0, len=sourceSizeList.length; i < len; i++ ) {
 			// Match <media-condition>? length, ie ( min-width: 50em ) 100%
-			var sourceSize = sourceSizeList[ i ];
-
-			// Split "( min-width: 50em ) 100%" into separate strings
-			var parsedSize = pf.parseSize( sourceSize );
-			var length = parsedSize.length;
-			var media = parsedSize.media;
+			var sourceSize = sourceSizeList[ i ],
+				// Split "( min-width: 50em ) 100%" into separate strings
+				parsedSize = pf.parseSize( sourceSize ),
+				length = parsedSize.length,
+				media = parsedSize.media;
 
 			if ( !length ) {
 					continue;
@@ -223,15 +222,15 @@ window.matchMedia || (window.matchMedia = function() {
 	 * If sizes is specified, resolution is calculated
 	 */
 	pf.getCandidatesFromSourceSet = function( srcset, sizes ) {
-		var candidates = pf.trim( srcset ).split( /,\s+/ );
-		var widthInCssPixels = sizes ? pf.findWidthFromSourceSize( sizes ) : "100%";
-		var formattedCandidates = [];
+		var candidates = pf.trim( srcset ).split( /,\s+/ ),
+			widthInCssPixels = sizes ? pf.findWidthFromSourceSize( sizes ) : "100%",
+			formattedCandidates = [];
 
 		for ( var i = 0, len = candidates.length; i < len; i++ ) {
-			var candidate = candidates[ i ];
-			var candidateArr = candidate.split( /\s+/ );
-			var sizeDescriptor = candidateArr[ 1 ];
-			var resolution;
+			var candidate = candidates[ i ],
+				candidateArr = candidate.split( /\s+/ ),
+				sizeDescriptor = candidateArr[ 1 ],
+				resolution;
 			if ( sizeDescriptor && ( sizeDescriptor.slice( -1 ) === "w" || sizeDescriptor.slice( -1 ) === "x" ) ) {
 				sizeDescriptor = sizeDescriptor.slice( 0, -1 );
 			}
@@ -285,7 +284,9 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	pf.applyBestCandidate = function( candidates, picImg ) {
-		var candidate, length, bestCandidate;
+		var candidate,
+			length,
+			bestCandidate;
 
 		candidates.sort( pf.ascendingSort );
 
@@ -322,8 +323,8 @@ window.matchMedia || (window.matchMedia = function() {
 	pf.removeVideoShim = function( picture ){
 		var videos = picture.getElementsByTagName( "video" );
 		if ( videos.length ) {
-			var video = videos[ 0 ];
-			var vsources = video.getElementsByTagName( "source" );
+			var video = videos[ 0 ],
+				vsources = video.getElementsByTagName( "source" );
 			while ( vsources.length ) {
 				picture.insertBefore( vsources[ 0 ], video );
 			}
@@ -360,8 +361,8 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	pf.getMatch = function( picture ) {
-		var sources = picture.childNodes;
-		var match;
+		var sources = picture.childNodes,
+			match;
 
 		// Go through each child, and if they have media queries, evaluate them
 		for ( var j=0, slen = sources.length; j < slen; j++ ) {
