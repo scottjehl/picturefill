@@ -102,6 +102,8 @@ window.matchMedia || (window.matchMedia = function() {
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
 	 */
 	pf.getWidthFromLength = function( length ) {
+		// If no length was specified, default to `100vw` (per the spec). Using 100% here for the sake of compatibility in older browsers.
+		length = length || "100%";
 		// Create a cached element for getting length value widths
 		if( !pf.lengthEl ){
 			pf.lengthEl = doc.createElement( "div" );
@@ -172,14 +174,13 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	/**
-	 * Takes a string of sizes and returns the width in pixels as an int
+	 * Takes a string of sizes and returns the width in pixels as a number
 	 */
 	pf.findWidthFromSourceSize = function( sourceSizeListStr ) {
 		// Split up source size list, ie ( max-width: 30em ) 100%, ( max-width: 50em ) 50%, 33%
 		//                            or (min-width:30em) calc(30% - 15px)
 		var sourceSizeList = pf.trim( sourceSizeListStr ).split( /\s*,\s*/ ),
-			winningLength,
-			winningLengthInt;
+			winningLength;
 
 		for ( var i=0, len=sourceSizeList.length; i < len; i++ ) {
 			// Match <media-condition>? length, ie ( min-width: 50em ) 100%
@@ -200,15 +201,9 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 		}
 
-		// If no length was selected, default to `100vw` (per the spec). Using 100% here for the sake of compatibility in older browsers.
-		if ( !winningLength ) {
-			winningLengthInt = pf.getWidthFromLength( "100%" );
-		}
-
 		// pass the length to a method that can properly determine length
 		// in pixels based on these formats: http://dev.w3.org/csswg/css-values-3/#length-value
-		winningLengthInt = pf.getWidthFromLength( winningLength );
-		return winningLengthInt;
+		return pf.getWidthFromLength( winningLength );
 	};
 
 	/**
