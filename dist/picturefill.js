@@ -363,14 +363,20 @@ window.matchMedia || (window.matchMedia = function() {
 		for ( var j=0, slen = sources.length; j < slen; j++ ) {
 			var source = sources[ j ];
 
-      // skip non element nodes
+			// ignore non-element nodes
 			if( source.nodeType !== 1 ){
 				continue;
 			}
 
-			// any element that is not a source, stops the search
-			if( source.nodeName.toUpperCase() !== "SOURCE" ) {
+			// Hitting an `img` element stops the search for `sources`.
+			// If no previous `source` matches, the `img` itself is evaluated later.
+			if( source.nodeName.toUpperCase() === "IMG" ) {
 				return match;
+			}
+
+			// ignore non-`source` nodes
+			if( source.nodeName.toUpperCase() !== "SOURCE" ){
+				continue;
 			}
 
 			var media = source.getAttribute( "media" );
