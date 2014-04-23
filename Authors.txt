@@ -5,6 +5,7 @@ Mat Marquis, @wilto
 David Beesley, @davebeesley
 Gordon Brander, @gordonbrander
 Max Klenk, @maxklenk
+@ignasio
 Dennis Gaebel, @grayghostvisuals
 @codekipple
 @jelmerdemaat
@@ -16,10 +17,15 @@ John Albin Wilkins, @JohnAlbin
 Maxime Thirouin, @MoOx
 William Turrell, @wturrell
 Brian Muenzenmeyer, @bmuenzenmeyer
+Bryan Burgers, @bryanburgers
 @michaelgilley
 Tina Holly, @tinacious
 Travis Northcutt, @tnorthcutt
 @Zearin
+Samy Al Zahrani, @salzhrani
 Shawn Jansepar, @jansepar
 John Bender, @johnbender
 Thorsten Lorenz, @thlorenz
+@gBokiau
+Andy Matthews, @commadelimited
+James Kerr, @jkerr838
