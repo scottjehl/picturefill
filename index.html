@@ -38,11 +38,11 @@
 		<p>For more information on the development of Picturefill, and how you can file bugs or contribute fixes, check out the the code project site on Github : <a href="https://github.com/scottjehl/picturefill">Picturefill on Github.</a></p>
 
 		<h2 id="download">Downloading Picturefill</h2>
-		<h3>Picturefill Version 2 (Alpha)</h3>
+		<h3>Picturefill Version 2 (Beta)</h3>
 		<p>For native <code>picture</code> element support, you'll want Picturefill version 2. These downloads include the <a href="https://github.com/paulirish/matchMedia.js/">matchMedia polyfill</a> for browsers that need it (like IE9).</p>
 		<ul>
-			<li><a href="dist/picturefill.js">picturefill.js</a> (development version, unminified code)</li>
-			<li><a href="dist/picturefill.min.js">picturefill.min.js</a> (production version, minified code)</li>
+			<li><a href="https://github.com/scottjehl/picturefill/blob/2.0.0-beta/dist/picturefill.js">picturefill.js</a> (development version, unminified code)</li>
+			<li><a href="https://github.com/scottjehl/picturefill/blob/2.0.0-beta/dist/picturefill.min.js">picturefill.min.js</a> (production version, minified code)</li>
 		</ul>
 		<h3>Version 1.2.1 (latest stable version)</h3>
 		<p>Version 1.2.1 of Picturefill is available if you are interested in the older markup pattern that uses <code>span</code> elements. This version is a lot lighter in weight than version 2 and allows for a fallback image in browsers that have JavaScript disabled (whereas Picturefill version 2 only offers <code>alt</code> text as a fallback for  non-JS browsers without <code>picture</code> support).</p>
@@ -82,13 +82,13 @@ document.createElement( &quot;picture&quot; );
 		<p>The <code>sizes</code> syntax is used to define the size of the image across a number of breakpoints. <code>srcset</code> then defines an array of images and their inherent sizes. It's beyond the scope of this guide to get into much detail about how to use the new <code>srcset</code> &amp; <code>sizes</code> attributes, so we'd recommend reading the following post by Eric Portis: <a href="http://ericportis.com/posts/2014/srcset-sizes/">Srcset and Sizes</a>. Read that first, then check out the demos below!</p>
 
 		<h3>An img with "srcset" and sizes" attributes:</h3>
-<pre><code>&lt;img sizes=&quot;(max-width: 30em) 100%, (max-width: 50em) 75%, 50%&quot;
+<pre><code>&lt;sizes="100%, (min-width: 40em) 80%&quot;
 srcset=&quot;examples/images/pic-small.png 400w, examples/images/pic-medium.png 800w, examples/images/pic-large.png 1200w&quot; alt=&quot;Obama with soldiers&quot;&gt;
 </code></pre>
 
 		<p>Here's how that renders in the browser. Feel free to resize to see it change.</p>
 
-		<img sizes="(max-width: 30em) 100%, (max-width: 50em) 75%, 50%"
+		<img sizes="100%, (min-width: 40em) 80%"
 				srcset="examples/images/pic-small.png 400w, examples/images/pic-medium.png 800w, examples/images/pic-large.png 1200w" alt="Obama with soldiers">
 
 		<p><a href="examples/demo-01.html">View standalone demo</a></p>
