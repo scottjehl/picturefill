@@ -199,7 +199,7 @@
 
 	/*
 	 * if it's an img element and it has a srcset property,
-	 * we need to remove the attribute so we can minipulate src
+	 * we need to remove the attribute so we can manipulate src
 	 * (the property's existence infers native srcset support, and a srcset-supporting browser will prioritize srcset's value over our winning picture candidate)
 	 * this moves srcset's value to memory for later use and removes the attr
 	 */
