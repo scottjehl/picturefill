@@ -194,18 +194,25 @@
 
 		deepEqual(pf.getCandidatesFromSourceSet(candidate6, sizes), expectedCandidates, "Works!");
 
-		var expected, candidate;
-
-		candidate = "foo,bar.png 320w, bar,baz.png 320w";
-		expected = [{
+		var srcset1 = "foo,bar.png 320w, bar,baz.png 320w";
+		var expectedresult1 = [{
 			url: "foo,bar.png",
 			resolution: 320
 		},{
 			url: "bar,baz.png",
 			resolution: 320
 		}];
+		deepEqual(pf.getCandidatesFromSourceSet(srcset1), expectedresult1, srcset1 + " is parsed correctly" );
 
-		deepEqual(pf.getCandidatesFromSourceSet(candidate), expected, "comma urls split");
+		var srcset2 = "foo,bar.png 320w,bar,baz.png 320w";
+		var expectedresult2 = [{
+			url: "foo,bar.png",
+			resolution: 320
+		},{
+			url: "bar,baz.png",
+			resolution: 320
+		}];
+		deepEqual(pf.getCandidatesFromSourceSet(srcset2), expectedresult2, srcset2 + " is parsed correctly" );
 	});
 
 	test("verifyTypeSupport", function() {
