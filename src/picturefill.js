@@ -157,26 +157,74 @@
 		return pf.getWidthFromLength( winningLength );
 	};
 
-	/**
-	 * Takes a srcset in the form of url/
-	 * ex. "images/pic-medium.png 1x, images/pic-medium-2x.png 2x" or
-	 *     "images/pic-medium.png 400w, images/pic-medium-2x.png 800w" or
-	 *     "images/pic-small.png"
-	 * Get an array of image candidates in the form of
-	 *      {url: "/foo/bar.png", resolution: 1}
-	 * where resolution is http://dev.w3.org/csswg/css-values-3/#resolution-value
-	 * If sizes is specified, resolution is calculated
-	 */
-	pf.getCandidatesFromSourceSet = function( srcset, sizes ) {
-		var candidates = pf.trim( srcset ).split( /,\s+/ ),
-			widthInCssPixels = sizes ? pf.findWidthFromSourceSize( sizes ) : "100%",
-			formattedCandidates = [];
+	pf.parseSrcset = function( srcset ) {
+		var current, last, mode, candidates, chars, srcsetChars;
 
-		for ( var i = 0, len = candidates.length; i < len; i++ ) {
-			var candidate = candidates[ i ],
-				candidateArr = candidate.split( /\s+/ ),
-				sizeDescriptor = candidateArr[ 1 ],
-				resolution;
+		mode = "url";
+		candidates = [];
+		chars = [];
+		srcsetChars = srcset.split('');
+
+		for ( var i = 0; i < srcsetChars.length + 1; i++ ) {
+			current = srcsetChars[i];
+
+			// skip useless whitespace
+			if( /\s/.test(current) && chars.length == 0 ){
+				continue;
+			}
+
+			// record the current char
+			chars.push( current );
+
+			if( (/\s/.test(current) || current == undefined) && mode === "url" ) {
+				// remove the whitespace
+				chars.pop();
+				last = chars[ chars.length - 1 ];
+
+				if( last === "," ) {
+					// remove the comma
+					chars.pop();
+				} else {
+					// switch to looking for a descriptor
+					mode = "descriptor";
+				}
+
+				// join the url and push the candidate without a descriptor
+				candidates.push({
+					url: chars.join(""),
+					descriptor: ""
+				});
+
+				// clean out the tracking
+				chars = [];
+
+				// procede to grab the descriptor
+				continue;
+			}
+
+			if( (/,/.test(current) || current == undefined) && mode === "descriptor" ) {
+				// remove the comma
+				chars.pop();
+
+				// we're looking for a descriptor set it on the already constructed candidate
+				candidates[ candidates.length - 1 ].descriptor = chars.join("");
+
+				// clean out the tracking
+				chars = [];
+
+				// switch to looking for a url
+				mode = "url";
+			}
+		}
+
+		return candidates;
+	};
+
+	pf.parseDescriptor = function( descriptor, sizes ) {
+		var sizeDescriptor = descriptor,
+				resolution,
+				widthInCssPixels = sizes ? pf.findWidthFromSourceSize( sizes ) : "100%";
+
 			if ( sizeDescriptor && ( sizeDescriptor.slice( -1 ) === "w" || sizeDescriptor.slice( -1 ) === "x" ) ) {
 				sizeDescriptor = sizeDescriptor.slice( 0, -1 );
 			}
@@ -188,12 +236,35 @@
 				resolution = sizeDescriptor ? parseFloat( sizeDescriptor, 10 ) : 1;
 			}
 
-			var formattedCandidate = {
-				url: candidateArr[ 0 ],
-				resolution: resolution
-			};
-			formattedCandidates.push( formattedCandidate );
+		return resolution;
+	};
+
+	/**
+	 * Takes a srcset in the form of url/
+	 * ex. "images/pic-medium.png 1x, images/pic-medium-2x.png 2x" or
+	 *     "images/pic-medium.png 400w, images/pic-medium-2x.png 800w" or
+	 *     "images/pic-small.png"
+	 * Get an array of image candidates in the form of
+	 *      {url: "/foo/bar.png", resolution: 1}
+	 * where resolution is http://dev.w3.org/csswg/css-values-3/#resolution-value
+	 * If sizes is specified, resolution is calculated
+	 */
+	pf.getCandidatesFromSourceSet = function( srcset, sizes ) {
+		var candidates = pf.parseSrcset( srcset ),
+			widthInCssPixels = sizes ? pf.findWidthFromSourceSize( sizes ) : "100%",
+			formattedCandidates = [];
+
+		console.log( candidates );
+		for ( var i = 0, len = candidates.length; i < len; i++ ) {
+			var candidate = candidates[ i ];
+
+			console.log( candidate );
+			formattedCandidates.push({
+				url: candidate.url,
+				resolution: pf.parseDescriptor( candidate.descriptor, sizes )
+			});
 		}
+
 		return formattedCandidates;
 	};
 

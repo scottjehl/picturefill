@@ -115,6 +115,7 @@
 				url: "images/pic-medium-2x.png"
 			}
 		];
+
 		deepEqual(pf.getCandidatesFromSourceSet(candidate2), expectedFormattedCandidates2, "Works!");
 
 		var candidate2a = "images/pic-medium.png 1x, images/pic-medium-2x.png 2x";
@@ -128,6 +129,7 @@
 				url: "images/pic-medium-2x.png"
 			}
 		];
+
 		deepEqual(pf.getCandidatesFromSourceSet(candidate2a), expectedFormattedCandidates2a, "Works!");
 
 		// Test with multiple spaces
@@ -197,6 +199,17 @@
 		var expected, candidate;
 
 		candidate = "foo,bar.png 320w, bar,baz.png 320w";
+		expected = [{
+			url: "foo,bar.png",
+			resolution: 320
+		},{
+			url: "bar,baz.png",
+			resolution: 320
+		}];
+
+		deepEqual(pf.getCandidatesFromSourceSet(candidate), expected, "comma urls split");
+
+		candidate = "foo,bar.png 320w,bar,baz.png 320w";
 		expected = [{
 			url: "foo,bar.png",
 			resolution: 320
