@@ -54,10 +54,9 @@
 	 */
 pf.getWidthFromLength = function( length ) {
 	// If no length was specified, or it is 0, default to `100vw` (per the spec).
-	// Using 100% here for the sake of compatibility in older browsers.
 	length = length && parseFloat( length ) > 0 ? length : "100vw";
 
-	/** 
+	/**
 	* If length is specified in  `vw` units, use `%` instead since the div we’re measuring
 	* is injected at the top of the document.
 	*
