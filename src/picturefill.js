@@ -254,11 +254,9 @@
 			widthInCssPixels = sizes ? pf.findWidthFromSourceSize( sizes ) : "100%",
 			formattedCandidates = [];
 
-		console.log( candidates );
 		for ( var i = 0, len = candidates.length; i < len; i++ ) {
 			var candidate = candidates[ i ];
 
-			console.log( candidate );
 			formattedCandidates.push({
 				url: candidate.url,
 				resolution: pf.parseDescriptor( candidate.descriptor, sizes )
