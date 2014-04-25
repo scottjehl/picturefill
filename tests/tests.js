@@ -194,65 +194,18 @@
 
 		deepEqual(pf.getCandidatesFromSourceSet(candidate6, sizes), expectedCandidates, "Works!");
 
-		var srcset1 = "foo,bar.png 320w, bar,baz.png 320w";
-		var expectedresult1 = [{
+		var expected, candidate;
+
+		candidate = "foo,bar.png 320w, bar,baz.png 320w";
+		expected = [{
 			url: "foo,bar.png",
 			resolution: 320
 		},{
 			url: "bar,baz.png",
 			resolution: 320
 		}];
-		deepEqual(pf.getCandidatesFromSourceSet(srcset1), expectedresult1, srcset1 + " is parsed correctly" );
 
-		var srcset2 = "foo,bar.png 320w,bar,baz.png 320w";
-		var expectedresult2 = [{
-			url: "foo,bar.png",
-			resolution: 320
-		},{
-			url: "bar,baz.png",
-			resolution: 320
-		}];
-		deepEqual(pf.getCandidatesFromSourceSet(srcset2), expectedresult2, srcset2 + " is parsed correctly" );
-
-		var srcset3 = "foo.png 1x, bar.png -2x";
-		var expectedresult3 = [{
-			url: "foo.png",
-			resolution: 1
-		},{
-			url: "bar.png",
-			resolution: -2
-		}];
-		deepEqual(pf.getCandidatesFromSourceSet(srcset3), expectedresult3, srcset3 + " is parsed correctly" );
-
-		var srcset4 = "foo.png 1x, bar.png 2q";
-		var expectedresult4 = [{
-			url: "foo.png",
-			resolution: 1
-		},{
-			url: "bar.png",
-			resolution: 1
-		}];
-		deepEqual(pf.getCandidatesFromSourceSet(srcset4), expectedresult4, srcset4 + " is parsed correctly" );
-
-		var srcset5 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg 1x, bar.png 2x";
-		var expectedresult5 = [{
-			url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg",
-			resolution: 1
-		},{
-			url: "bar.png",
-			resolution: 2
-		}];
-		deepEqual(pf.getCandidatesFromSourceSet(srcset5), expectedresult5, srcset5 + " is parsed correctly" );
-
-		var srcset6 = "2.png 1x,1.png 2x";
-		var expectedresult6 = [{
-			url: "2.png",
-			resolution: 1
-		},{
-			url: "1.png",
-			resolution: 2
-		}];
-		deepEqual(pf.getCandidatesFromSourceSet(srcset6), expectedresult6, srcset6 + " is parsed correctly" );
+		deepEqual(pf.getCandidatesFromSourceSet(candidate), expected, "comma urls split");
 	});
 
 	test("verifyTypeSupport", function() {
