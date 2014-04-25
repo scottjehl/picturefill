@@ -73,7 +73,7 @@
 
 	// test webp support, only when the markup calls for it
 	pf.types[ "image/webp" ] = function(){
-		// based on Modernizr's img-webp test
+		// based on Modernizr's lossless img-webp test
 		// note: asynchronous
 		var img = new w.Image(),
 			type = "image/webp";
@@ -86,7 +86,7 @@
 			pf.types[ type ] = img.width === 1;
 			picturefill();
 		};
-		img.src = 'data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA=';
+		img.src = 'data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=';
 	};
 
 	/**
