@@ -52,18 +52,30 @@
 	 * Get width in css pixel value from a "length" value
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
 	 */
-	pf.getWidthFromLength = function( length ) {
-		// If no length was specified, or it is 0, default to `100vw` (per the spec). Using 100% here for the sake of compatibility in older browsers.
-		length = length && parseFloat( length ) > 0 ? length : "100%";
-		// Create a cached element for getting length value widths
-		if( !pf.lengthEl ){
-			pf.lengthEl = doc.createElement( "div" );
-			doc.documentElement.insertBefore( pf.lengthEl, doc.documentElement.firstChild );
-		}
-		pf.lengthEl.style.cssText = "width: " + length + ";";
-		// Using offsetWidth to get width from CSS
-		return pf.lengthEl.offsetWidth;
-	};
+pf.getWidthFromLength = function( length ) {
+	// If no length was specified, or it is 0, default to `100vw` (per the spec).
+	// Using 100% here for the sake of compatibility in older browsers.
+	length = length && parseFloat( length ) > 0 ? length : "100vw";
+
+	/** 
+	* If length is specified in  `vw` units, use `%` instead since the div we’re measuring
+	* is injected at the top of the document.
+	*
+	* TODO: maybe we should put this behind a feature test for `vw`?
+	*/
+	length = length.replace( "vw", "%" );
+
+	// Create a cached element for getting length value widths
+	if( !pf.lengthEl ){
+		pf.lengthEl = doc.createElement( "div" );
+		doc.documentElement.insertBefore( pf.lengthEl, doc.documentElement.firstChild );
+	}
+
+	// Positioning styles help prevent padding/margin/width on `html` from throwing calculations off.
+	pf.lengthEl.style.cssText = "position: absolute; left: 0; width: " + length + ";";
+	// Using offsetWidth to get width from CSS
+	return pf.lengthEl.offsetWidth;
+};
 
 	// container of supported mime types that one might need to qualify before using
 	pf.types =  {};
