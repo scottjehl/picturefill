@@ -158,72 +158,60 @@
 	};
 
 	pf.parseSrcset = function( srcset ) {
-		var current, last, mode, candidates, chars, srcsetChars;
+		/**
+		* 1. Let input (`srcset`) be the value passed to this algorithm.
+		* 2. Let position be a pointer into input, initially pointing at the start of the string.
+		* 3. Let raw candidates be an initially empty ordered list of URLs with associated 
+		*    unparsed descriptors. The order of entries in the list is the order in which entries 
+		*    are added to the list.
+		*/
+		var candidates = [];
 
-		mode = "url";
-		candidates = [];
-		chars = [];
-		srcsetChars = srcset.split('');
+		while( srcset !== "" ) {
+			srcset = srcset.replace(/^\s+/g,'');
 
-		for ( var i = 0; i < srcsetChars.length + 1; i++ ) {
-			current = srcsetChars[i];
+			// 5. Collect a sequence of characters that are not space characters, and let that be url.
+			var pos = srcset.indexOf(' '),
+				url, descriptor;
 
-			// skip useless whitespace
-			if( /\s/.test(current) && chars.length == 0 ){
-				continue;
-			}
+			if( pos !== -1 ) {
+				url = srcset.slice( 0, pos );
 
-			// record the current char
-			chars.push( current );
+				var last = url[ url.length - 1 ];
+				if( last === "," && url !== "" ) {
+					// 6. If url ends with a U+002C COMMA character (,), remove that character from url
+					// and let descriptors be the empty string. Otherwise, follow these substeps
+					url = url.substring( 0, url.length - 1);
+					descriptor = "";
+				}
+				// 6.1. If url is empty, then jump to the step labeled descriptor parser.
+				srcset = srcset.slice( pos + 1 );
+				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and 
+				// let that be descriptors.
+				var descpos = srcset.indexOf(',');
 
-			if( (/\s/.test(current) || current == undefined) && mode === "url" ) {
-				// remove the whitespace
-				chars.pop();
-				last = chars[ chars.length - 1 ];
-
-				if( last === "," ) {
-					// remove the comma
-					chars.pop();
+				if( descpos === -1 ) {
+					descriptor = srcset;
+					srcset = "";
 				} else {
-					// switch to looking for a descriptor
-					mode = "descriptor";
+					descriptor = srcset.slice( 0, descpos );
+					srcset = srcset.slice( descpos + 1 );
 				}
 
-				// join the url and push the candidate without a descriptor
+				// 7. Add url to raw candidates, associated with descriptors.
 				candidates.push({
-					url: chars.join(""),
-					descriptor: ""
+					url: url,
+					descriptor: descriptor
 				});
-
-				// clean out the tracking
-				chars = [];
-
-				// procede to grab the descriptor
-				continue;
-			}
-
-			if( (/,/.test(current) || current == undefined) && mode === "descriptor" ) {
-				// remove the comma
-				chars.pop();
-
-				// we're looking for a descriptor set it on the already constructed candidate
-				candidates[ candidates.length - 1 ].descriptor = chars.join("");
-
-				// clean out the tracking
-				chars = [];
-
-				// switch to looking for a url
-				mode = "url";
 			}
 		}
-
 		return candidates;
 	};
 
 	pf.parseDescriptor = function( descriptor, sizes ) {
 		var sizeDescriptor = descriptor,
-				resolution,
-				widthInCssPixels = sizes ? pf.findWidthFromSourceSize( sizes ) : "100%";
+			resolution,
+			widthInCssPixels = sizes ? pf.findWidthFromSourceSize( sizes ) : "100%";
 
 			if ( sizeDescriptor && ( sizeDescriptor.slice( -1 ) === "w" || sizeDescriptor.slice( -1 ) === "x" ) ) {
 				sizeDescriptor = sizeDescriptor.slice( 0, -1 );
@@ -262,7 +250,6 @@
 				resolution: pf.parseDescriptor( candidate.descriptor, sizes )
 			});
 		}
-
 		return formattedCandidates;
 	};
 
