@@ -174,57 +174,65 @@
 			srcset = srcset.replace(/^\s+/g,'');
 
 			// 5. Collect a sequence of characters that are not space characters, and let that be url.
-			var pos = srcset.indexOf(' '),
-				url, descriptor;
+			var pos = srcset.search(/\s/g),
+				url, descriptor = null;
 
 			if( pos !== -1 ) {
 				url = srcset.slice( 0, pos );
 
 				var last = url[ url.length - 1 ];
-				if( last === "," && url !== "" ) {
-					// 6. If url ends with a U+002C COMMA character (,), remove that character from url
-					// and let descriptors be the empty string. Otherwise, follow these substeps
+
+				// 6. If url ends with a U+002C COMMA character (,), remove that character from url
+				// and let descriptors be the empty string. Otherwise, follow these substeps
+				// 6.1. If url is empty, then jump to the step labeled descriptor parser.
+
+				if( last === "," || url === "" ) {
 					url = url.substring( 0, url.length - 1);
 					descriptor = "";
 				}
-				// 6.1. If url is empty, then jump to the step labeled descriptor parser.
 				srcset = srcset.slice( pos + 1 );
+
 				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and 
 				// let that be descriptors.
-				var descpos = srcset.indexOf(',');
-
-				if( descpos === -1 ) {
-					descriptor = srcset;
-					srcset = "";
-				} else {
-					descriptor = srcset.slice( 0, descpos );
-					srcset = srcset.slice( descpos + 1 );
+				if( descriptor === null ) {
+					var descpos = srcset.indexOf(',');
+					if( descpos !== -1 ) {
+						descriptor = srcset.slice( 0, descpos );
+						srcset = srcset.slice( descpos + 1 );
+					} else {
+						descriptor = srcset;
+						srcset = "";
+					}
 				}
-
-				// 7. Add url to raw candidates, associated with descriptors.
-				candidates.push({
-					url: url,
-					descriptor: descriptor
-				});
+			} else {
+				url = srcset;
+				srcset = "";
 			}
+
+			// 7. Add url to raw candidates, associated with descriptors.
+			candidates.push({
+				url: url,
+				descriptor: descriptor
+			});
 		}
 		return candidates;
 	};
 
 	pf.parseDescriptor = function( descriptor, sizes ) {
-		var sizeDescriptor = descriptor,
+		var sizeDescriptor = descriptor && descriptor.replace(/(^[\s]+|[\s]+$)/g, ''),
 			resolution,
-			widthInCssPixels = sizes ? pf.findWidthFromSourceSize( sizes ) : "100%";
+			widthInCssPixels = sizes ? pf.findWidthFromSourceSize( sizes ) : "100%",
+			lastchar = sizeDescriptor && sizeDescriptor.slice( -1 );
 
-			if ( sizeDescriptor && ( sizeDescriptor.slice( -1 ) === "w" || sizeDescriptor.slice( -1 ) === "x" ) ) {
+			if ( sizeDescriptor && ( lastchar === "w" || lastchar === "x" ) ) {
 				sizeDescriptor = sizeDescriptor.slice( 0, -1 );
 			}
-			if ( sizes ) {
+			if ( sizes && !resolution ) {
 				// get the dpr by taking the length / width in css pixels
 				resolution = parseFloat( ( parseInt( sizeDescriptor, 10 ) / widthInCssPixels ) );
 			} else {
 				// get the dpr by grabbing the value of Nx
-				resolution = sizeDescriptor ? parseFloat( sizeDescriptor, 10 ) : 1;
+				resolution = sizeDescriptor && lastchar === "x" || lastchar === "w" ? parseFloat( sizeDescriptor, 10 ) : 1;
 			}
 
 		return resolution;
@@ -242,7 +250,6 @@
 	 */
 	pf.getCandidatesFromSourceSet = function( srcset, sizes ) {
 		var candidates = pf.parseSrcset( srcset ),
-			widthInCssPixels = sizes ? pf.findWidthFromSourceSize( sizes ) : "100%",
 			formattedCandidates = [];
 
 		for ( var i = 0, len = candidates.length; i < len; i++ ) {
