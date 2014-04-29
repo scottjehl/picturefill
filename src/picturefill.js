@@ -428,7 +428,7 @@ pf.getWidthFromLength = function( length ) {
 					picImg[ pf.ns ] = {};
 				}
 
-				if( picImg.srcset ){
+				if( picImg.srcset === undefined && picImg.srcset ){
 					// cache and remove srcset if present
 					pf.dodgeSrcset( picImg );
 				}
