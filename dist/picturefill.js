@@ -1,4 +1,4 @@
-/*! Picturefill - v2.0.0-beta - 2014-04-25
+/*! Picturefill - v2.0.0-beta - 2014-04-29
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -103,10 +103,9 @@ window.matchMedia || (window.matchMedia = function() {
 	 */
 pf.getWidthFromLength = function( length ) {
 	// If no length was specified, or it is 0, default to `100vw` (per the spec).
-	// Using 100% here for the sake of compatibility in older browsers.
 	length = length && parseFloat( length ) > 0 ? length : "100vw";
 
-	/** 
+	/**
 	* If length is specified in  `vw` units, use `%` instead since the div we’re measuring
 	* is injected at the top of the document.
 	*
@@ -478,7 +477,7 @@ pf.getWidthFromLength = function( length ) {
 					picImg[ pf.ns ] = {};
 				}
 
-				if( picImg.srcset ){
+				if( picImg.srcset === undefined && picImg.srcset ){
 					// cache and remove srcset if present
 					pf.dodgeSrcset( picImg );
 				}
