@@ -187,7 +187,7 @@
 				// 6.1. If url is empty, then jump to the step labeled descriptor parser.
 
 				if( last === "," || url === "" ) {
-					url = url.substring( 0, url.length - 1);
+					url = url.replace(/,+$/, '');
 					descriptor = "";
 				}
 				srcset = srcset.slice( pos + 1 );
@@ -210,32 +210,47 @@
 			}
 
 			// 7. Add url to raw candidates, associated with descriptors.
-			candidates.push({
-				url: url,
-				descriptor: descriptor
-			});
+			if( url || descriptor ) {
+				candidates.push({
+					url: url,
+					descriptor: descriptor
+				});
+			}
 		}
 		return candidates;
 	};
 
 	pf.parseDescriptor = function( descriptor, sizes ) {
-		var sizeDescriptor = descriptor && descriptor.replace(/(^[\s]+|[\s]+$)/g, ''),
-			resolution,
+		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list 
+		// is the order in which entries are added to the list.
+		var sizeDescriptor = descriptor && descriptor.replace(/(^\s+|\s+$)/g, ''),
 			widthInCssPixels = sizes ? pf.findWidthFromSourceSize( sizes ) : "100%",
-			lastchar = sizeDescriptor && sizeDescriptor.slice( -1 );
+			resCandidate;
 
-			if ( sizeDescriptor && ( lastchar === "w" || lastchar === "x" ) ) {
-				sizeDescriptor = sizeDescriptor.slice( 0, -1 );
-			}
-			if ( sizes && !resolution ) {
-				// get the dpr by taking the length / width in css pixels
-				resolution = parseFloat( ( parseInt( sizeDescriptor, 10 ) / widthInCssPixels ) );
+			if ( sizeDescriptor ) {
+				var splitDescriptor = sizeDescriptor.split(" ");
+
+				for (var i = 0, l = splitDescriptor.length + 1; i >= 0; i--) {
+					var curr = splitDescriptor[ i ],
+						lastchar = curr && curr.slice( curr.length - 1 );
+
+					if( lastchar === "w" || lastchar === "x" ) {
+						resCandidate = curr;
+					}
+					if ( sizes && resCandidate ) {
+						// get the dpr by taking the length / width in css pixels
+						resCandidate = parseFloat( ( parseInt( curr, 10 ) / widthInCssPixels ) );
+					} else {
+						// get the dpr by grabbing the value of Nx
+						var res = curr && parseFloat( curr, 10 );
+
+						resCandidate = res && !isNaN( res ) && lastchar === "x" || lastchar === "w" ? res : 1;
+					}
+				}
 			} else {
-				// get the dpr by grabbing the value of Nx
-				resolution = sizeDescriptor && lastchar === "x" || lastchar === "w" ? parseFloat( sizeDescriptor, 10 ) : 1;
+				resCandidate = 1;
 			}
-
-		return resolution;
+		return resCandidate;
 	};
 
 	/**
