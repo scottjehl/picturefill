@@ -12,22 +12,26 @@
 			// Picture element HTML shim|v it for old IE (pairs with Picturefill.js)
 			document.createElement( "picture" );
 		</script>
-		<script async="true" src="../dist/picturefill.js"></script>
+		<script async="true" src="../src/picturefill.js"></script>
 	</head>
 	<body>
 		<a href="http://responsiveimages.org/" class="ricg"><img src="https://raw.github.com/ResponsiveImagesCG/meta/master/logo/Web/RICG_logo_small.png"></a>
 
-
-
-		<h3>An img with "srcset" and sizes" attributes:</h3>
-<pre><code>&lt;img sizes=&quot;100vw, (min-width: 40em) 80vw&quot;
-srcset=&quot;../examples/images/pic-small.png 400w, ../examples/images/pic-medium.png 800w, ../examples/images/pic-large.png 1200w&quot; alt=&quot;Obama with soldiers&quot;&gt;
-</code></pre>
-
-		<p>Here's how that renders in the browser. Feel free to resize to see it change.</p>
+		<p><code>../examples/images/pic-small.png, ../examples/images/pic-medium.png 2x</code></p>
 
 		<img sizes="100vw, (min-width: 40em) 80vw"
 				srcset="../examples/images/pic-small.png 400w, ../examples/images/pic-medium.png 800w, ../examples/images/pic-large.png 1200w" alt="Obama with soldiers">
+
+		<p><code>../examples/images/pic-small.png, ../examples/images/pic-medium.png 2x</code></p>
+		<img srcset="../examples/images/pic-small.png, ../examples/images/pic-medium.png 2x" alt="Obama with soldiers">
+
+		<p>picture tho</p>
+		<picture>
+			<source srcset="../examples/images/extralarge.jpg" media="(min-width: 1000px)">
+			<source srcset="../examples/images/large.jpg" media="(min-width: 800px)">
+			<source srcset="../examples/images/medium.jpg">
+			<img srcset="../examples/images/medium.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+		</picture>
 
 	</body>
 </html>

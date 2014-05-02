@@ -428,8 +428,8 @@ pf.getWidthFromLength = function( length ) {
 					picImg[ pf.ns ] = {};
 				}
 
-				if( picImg.srcset === undefined && picImg.srcset ){
-					// cache and remove srcset if present
+				// Cache and remove `srcset` if present and we’re going to be doing `sizes`/`picture` polyfilling to it.
+				if( picImg.srcset && ( elemType === "PICTURE" || picImg.getAttribute( "sizes" ) ) ){
 					pf.dodgeSrcset( picImg );
 				}
 
