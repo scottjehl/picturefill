@@ -471,10 +471,14 @@ pf.getWidthFromLength = function( length ) {
 		if( w.addEventListener ){
 			var resizeThrottle;
 			w.addEventListener( "resize", function() {
-				w.clearTimeout( resizeThrottle );
-				resizeThrottle = w.setTimeout( function(){
-					picturefill({ reevaluate: true });
-				}, 60 );
+				if (!w._picturefillWorking) {
+					w._picturefillWorking = true;
+					w.clearTimeout( resizeThrottle );
+					resizeThrottle = w.setTimeout( function(){
+						picturefill({ reevaluate: true });
+						w._picturefillWorking = false;
+					}, 60 );
+				}
 			}, false );
 		}
 	}
