@@ -362,12 +362,13 @@
 	});
 
 	test( "`img` with `sizes` but no `srcset` shouldn’t fail silently", function() {
-		var el = document.createElement( "img" ),
-			threw = false;
+		expect( 0 );
+		var el = document.createElement( "img" );
 
 		el.setAttribute( "sizes", "100vw" );
+		el.setAttribute( "class", "no-src" );
+		el.insertBefore( document.documentElement.firstChild, null );
 
-		try { picturefill({ reevaluate: false, elements: [ el ] }); } catch (e) { threw = true; }
-		deepEqual( threw, false, "Omitted `srcset` attribute does not the house down." );
+		try { picturefill({ reevaluate: false, elements: document.querySelector( ".no-src" ) }); } catch (e) { console.log( e ); ok( false ); }
 	});
 })( window, jQuery );
