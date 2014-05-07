@@ -456,6 +456,7 @@
 	 * Sets up picture polyfill by polling the document and running
 	 * the polyfill every 250ms until the document is ready.
 	 * Also attaches picturefill on resize
+	 * Also installs a mutation observer that triggers picturefill on matching new DOM elements
 	 */
 	function runPicturefill() {
 		picturefill();
@@ -477,6 +478,24 @@
 				}, 60 );
 			}, false );
 		}
+		var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
+			observer = new MutationObserver( function( mutations, observer ) {
+				// look through all mutations that just occured
+				for( var i = 0, mutationsLength = mutations.length; i < mutationsLength; i++ ) {
+					// look through all added nodes of current mutation item
+					for( var j = 0, addedNodesLength = mutations[i].addedNodes.length; j < addedNodesLength; j++ ) {
+						var elem = mutations[i].addedNodes[j],
+							elemType = elem.nodeName.toUpperCase();
+
+						switch ( elemType ) {
+							case 'PICTURE':
+							case 'IMG':
+								picturefill({ elements: [ elem ] });
+								break;
+						}
+					}
+				}
+			});
 	}
 
 	runPicturefill();

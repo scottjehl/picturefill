@@ -1,4 +1,4 @@
-/*! Picturefill - v2.0.0-beta - 2014-05-02
+/*! Picturefill - v2.0.0-beta - 2014-05-07
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -101,29 +101,29 @@ window.matchMedia || (window.matchMedia = function() {
 	 * Get width in css pixel value from a "length" value
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
 	 */
-pf.getWidthFromLength = function( length ) {
-	// If no length was specified, or it is 0, default to `100vw` (per the spec).
-	length = length && parseFloat( length ) > 0 ? length : "100vw";
-
-	/**
-	* If length is specified in  `vw` units, use `%` instead since the div we’re measuring
-	* is injected at the top of the document.
-	*
-	* TODO: maybe we should put this behind a feature test for `vw`?
-	*/
-	length = length.replace( "vw", "%" );
-
-	// Create a cached element for getting length value widths
-	if( !pf.lengthEl ){
-		pf.lengthEl = doc.createElement( "div" );
-		doc.documentElement.insertBefore( pf.lengthEl, doc.documentElement.firstChild );
-	}
-
-	// Positioning styles help prevent padding/margin/width on `html` from throwing calculations off.
-	pf.lengthEl.style.cssText = "position: absolute; left: 0; width: " + length + ";";
-	// Using offsetWidth to get width from CSS
-	return pf.lengthEl.offsetWidth;
-};
+	pf.getWidthFromLength = function( length ) {
+		// If no length was specified, or it is 0, default to `100vw` (per the spec).
+		length = length && parseFloat( length ) > 0 ? length : "100vw";
+	
+		/**
+		* If length is specified in  `vw` units, use `%` instead since the div we’re measuring
+		* is injected at the top of the document.
+		*
+		* TODO: maybe we should put this behind a feature test for `vw`?
+		*/
+		length = length.replace( "vw", "%" );
+	
+		// Create a cached element for getting length value widths
+		if( !pf.lengthEl ){
+			pf.lengthEl = doc.createElement( "div" );
+			doc.documentElement.insertBefore( pf.lengthEl, doc.documentElement.firstChild );
+		}
+	
+		// Positioning styles help prevent padding/margin/width on `html` from throwing calculations off.
+		pf.lengthEl.style.cssText = "position: absolute; left: 0; width: " + length + ";";
+		// Using offsetWidth to get width from CSS
+		return pf.lengthEl.offsetWidth;
+	};
 
 	// container of supported mime types that one might need to qualify before using
 	pf.types =  {};
