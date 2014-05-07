@@ -360,4 +360,14 @@
 
 		ok( mockPicture[ pf.ns ].evaluated );
 	});
+
+	test( "`img` with `sizes` but no `srcset` shouldn’t fail silently", function() {
+		var el = document.createElement( "img" ),
+			threw = false;
+
+		el.setAttribute( "sizes", "100vw" );
+
+		try { picturefill({ reevaluate: false, elements: [ el ] }); } catch (e) { threw = true; }
+		deepEqual( threw, false, "Omitted `srcset` attribute does not the house down." );
+	});
 })( window, jQuery );
