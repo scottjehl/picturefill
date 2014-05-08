@@ -113,8 +113,13 @@
 			return true;
 		}
 		else {
+			// if the type is undefined, assume it is supported.
+			if( typeof( pf.types[ type ] ) === "undefined" ){
+        pf.types[ type ] = true;
+        return true;
+      }
 			// if the type test is a function, run it and return "pending" status. The function will rerun picturefill on pending elements once finished.
-			if( typeof( pf.types[ type ] ) === "function" ){
+			else if( typeof( pf.types[ type ] ) === "function" ){
 				pf.types[ type ]();
 				return "pending";
 			}
