@@ -44,27 +44,15 @@
       jshint: {
         all: {
           options: {
-              "curly": true,
-              "eqeqeq": true,
-              "immed": true,
-              "latedef": true,
-              "newcap": true,
-              "noarg": true,
-              "sub": true,
-              "undef": true,
-              "unused": true,
-              "boss": true,
-              "eqnull": true,
-            "node": true,
-            "predef": [ "define", "module" ]
+            jshintrc: true
           },
-          src: [ 'Gruntfile.js', 'src/*.js' ]
+          src: [ 'Gruntfile.js', 'src/*.js', 'tests/*.js' ]
         }
       },
       watch: {
         gruntfile: {
-          files: [ 'Gruntfile.js', 'src/*.js'],
-          tasks: [ 'jshint', 'qunit', 'clean', 'concat', 'uglify' ]
+          files: [ 'Gruntfile.js', 'src/*.js', 'tests/*.js' ],
+          tasks: [ 'default' ]
         }
       }
     });
@@ -82,13 +70,13 @@
     // These plugins provide necessary tasks.
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-concat');
-    grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-qunit');
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-qunit');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
 
     // Default task.
-    grunt.registerTask('default', ['jshint', 'qunit', 'clean', 'concat', 'uglify']);
+    grunt.registerTask('default', ['test', 'clean', 'concat', 'uglify']);
     grunt.registerTask('test', ['jshint', 'qunit']);
   };
 })();
