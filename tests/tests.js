@@ -209,14 +209,7 @@
 	});
 
 	test("verifyTypeSupport", function() {
-		expect( 5 );
-
-		// Assume unknown types are supported.
-		ok(pf.verifyTypeSupport({
-			getAttribute: function() {
-				return "image/jpeg";
-			}
-		}));
+		expect( 4 );
 
 		// if the type attribute is supported it should return true
 		ok(pf.verifyTypeSupport({
