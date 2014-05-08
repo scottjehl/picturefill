@@ -1,0 +1,9 @@
+{
+	"sub": true,
+	"multistr": true,
+	"globals": {
+		"test": false,
+		"ok": false,
+		"deepEqual": false
+	}
+}
