@@ -79,6 +79,11 @@
 	// container of supported mime types that one might need to qualify before using
 	pf.types =  {};
 
+	// Add support for standard mime types.
+	pf.types["image/jpeg"] = true;
+	pf.types["image/gif"] = true;
+	pf.types["image/png"] = true;
+
 	// test svg support
 	pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature('http://www.w3.org/TR/SVG11/feature#Image', '1.1');
 

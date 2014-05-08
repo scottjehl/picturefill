@@ -209,7 +209,26 @@
 	});
 
 	test("verifyTypeSupport", function() {
-		expect( 4 );
+		expect( 7 );
+
+		// Test widely supported mime types.
+		ok(pf.verifyTypeSupport({
+			getAttribute: function() {
+				return "image/jpeg";
+			}
+		}));
+
+		ok(pf.verifyTypeSupport({
+			getAttribute: function() {
+				return "image/png";
+			}
+		}));
+
+		ok(pf.verifyTypeSupport({
+			getAttribute: function() {
+				return "image/gif";
+			}
+		}));
 
 		// if the type attribute is supported it should return true
 		ok(pf.verifyTypeSupport({
