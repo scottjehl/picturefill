@@ -57,7 +57,7 @@ window.matchMedia || (window.matchMedia = function() {
 	"use strict";
 
 	// If picture is supported, well, that's awesome. Let's get outta here...
-	if( w.HTMLPictureElement ){
+	if ( w.HTMLPictureElement ) {
 		return;
 	}
 
@@ -74,12 +74,12 @@ window.matchMedia || (window.matchMedia = function() {
 	pf.srcsetSupported = new w.Image().srcset !== undefined;
 
 	// just a string trim workaround
-	pf.trim = function( str ){
+	pf.trim = function( str ) {
 		return str.trim ? str.trim() : str.replace( /^\s+|\s+$/g, "" );
 	};
 
 	// just a string endsWith workaround
-	pf.endsWith = function( str, suffix ){
+	pf.endsWith = function( str, suffix ) {
 		return str.endsWith ? str.endsWith( suffix ) : str.indexOf( suffix, str.length - suffix.length ) !== -1;
 	};
 
@@ -114,7 +114,7 @@ window.matchMedia || (window.matchMedia = function() {
 		length = length.replace( "vw", "%" );
 	
 		// Create a cached element for getting length value widths
-		if( !pf.lengthEl ){
+		if ( !pf.lengthEl ) {
 			pf.lengthEl = doc.createElement( "div" );
 			doc.documentElement.insertBefore( pf.lengthEl, doc.documentElement.firstChild );
 		}
@@ -134,24 +134,24 @@ window.matchMedia || (window.matchMedia = function() {
 	pf.types["image/png"] = true;
 
 	// test svg support
-	pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature('http://www.w3.org/TR/SVG11/feature#Image', '1.1');
+	pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Image", "1.1");
 
 	// test webp support, only when the markup calls for it
-	pf.types[ "image/webp" ] = function(){
+	pf.types[ "image/webp" ] = function() {
 		// based on Modernizr's lossless img-webp test
 		// note: asynchronous
 		var img = new w.Image(),
 			type = "image/webp";
 
-		img.onerror = function(){
+		img.onerror = function() {
 			pf.types[ type ] = false;
 			picturefill();
 		};
-		img.onload = function(){
+		img.onload = function() {
 			pf.types[ type ] = img.width === 1;
 			picturefill();
 		};
-		img.src = 'data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=';
+		img.src = "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=";
 	};
 
 	/**
@@ -160,19 +160,17 @@ window.matchMedia || (window.matchMedia = function() {
 	 * you can define them as a function that'll run only if that type needs to be tested. Just make the test function call picturefill again when it is complete.
 	 * see the async webp test above for example
 	 */
-	pf.verifyTypeSupport = function( source ){
+	pf.verifyTypeSupport = function( source ) {
 		var type = source.getAttribute( "type" );
 		// if type attribute exists, return test result, otherwise return true
-		if( type === null || type === "" ){
+		if ( type === null || type === "" ) {
 			return true;
-		}
-		else {
+		} else {
 			// if the type test is a function, run it and return "pending" status. The function will rerun picturefill on pending elements once finished.
-			if( typeof( pf.types[ type ] ) === "function" ){
+			if ( typeof( pf.types[ type ] ) === "function" ) {
 				pf.types[ type ]();
 				return "pending";
-			}
-			else {
+			} else {
 				return pf.types[ type ];
 			}
 		}
@@ -198,7 +196,7 @@ window.matchMedia || (window.matchMedia = function() {
 		var sourceSizeList = pf.trim( sourceSizeListStr ).split( /\s*,\s*/ ),
 			winningLength;
 
-		for ( var i=0, len=sourceSizeList.length; i < len; i++ ) {
+		for ( var i = 0, len = sourceSizeList.length; i < len; i++ ) {
 			// Match <media-condition>? length, ie ( min-width: 50em ) 100%
 			var sourceSize = sourceSizeList[ i ],
 				// Split "( min-width: 50em ) 100%" into separate strings
@@ -268,8 +266,8 @@ window.matchMedia || (window.matchMedia = function() {
 	 * (the property's existence infers native srcset support, and a srcset-supporting browser will prioritize srcset's value over our winning picture candidate)
 	 * this moves srcset's value to memory for later use and removes the attr
 	 */
-	pf.dodgeSrcset = function( img ){
-		if( img.srcset ){
+	pf.dodgeSrcset = function( img ) {
+		if ( img.srcset ) {
 			img[ pf.ns ].srcset = img.srcset;
 			img.removeAttribute( "srcset" );
 		}
@@ -284,11 +282,11 @@ window.matchMedia || (window.matchMedia = function() {
 			candidates = [];
 
 		// if it's an img element, use the cached srcset property (defined or not)
-		if( el.nodeName.toUpperCase() === "IMG" && el[ pf.ns ] && el[ pf.ns ].srcset ){
+		if ( el.nodeName.toUpperCase() === "IMG" && el[ pf.ns ] && el[ pf.ns ].srcset ) {
 			srcset = el[ pf.ns ].srcset;
 		}
 
-		if( srcset ) {
+		if ( srcset ) {
 			candidates = pf.getCandidatesFromSourceSet( srcset, sizes );
 		}
 		return candidates;
@@ -304,8 +302,8 @@ window.matchMedia || (window.matchMedia = function() {
 		length = candidates.length;
 		bestCandidate = candidates[ length - 1 ];
 
-		for ( var l=0; l < length; l++ ) {
-			candidate = candidates[ l ];
+		for ( var i = 0; i < length; i++ ) {
+			candidate = candidates[ i ];
 			if ( candidate.resolution >= pf.getDpr() ) {
 				bestCandidate = candidate;
 				break;
@@ -325,13 +323,13 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	/*
-	 * In IE9, <source> elements get removed if they aren"t children of
+	 * In IE9, <source> elements get removed if they aren't children of
 	 * video elements. Thus, we conditionally wrap source elements
 	 * using <!--[if IE 9]><video style="display: none;"><![endif]-->
 	 * and must account for that here by moving those source elements
 	 * back into the picture element.
 	 */
-	pf.removeVideoShim = function( picture ){
+	pf.removeVideoShim = function( picture ) {
 		var videos = picture.getElementsByTagName( "video" );
 		if ( videos.length ) {
 			var video = videos[ 0 ],
@@ -355,10 +353,9 @@ window.matchMedia || (window.matchMedia = function() {
 			imgs = doc.getElementsByTagName( "img" );
 
 		for ( var h = 0, len = pictures.length + imgs.length; h < len; h++ ) {
-			if ( h < pictures.length ){
+			if ( h < pictures.length ) {
 				elems[ h ] = pictures[ h ];
-			}
-			else {
+			} else {
 				var currImg = imgs[ h - pictures.length ];
 
 				if ( currImg.parentNode.nodeName.toUpperCase() !== "PICTURE" &&
@@ -376,22 +373,22 @@ window.matchMedia || (window.matchMedia = function() {
 			match;
 
 		// Go through each child, and if they have media queries, evaluate them
-		for ( var j=0, slen = sources.length; j < slen; j++ ) {
+		for ( var j = 0, slen = sources.length; j < slen; j++ ) {
 			var source = sources[ j ];
 
 			// ignore non-element nodes
-			if( source.nodeType !== 1 ){
+			if ( source.nodeType !== 1 ) {
 				continue;
 			}
 
 			// Hitting an `img` element stops the search for `sources`.
 			// If no previous `source` matches, the `img` itself is evaluated later.
-			if( source.nodeName.toUpperCase() === "IMG" ) {
+			if ( source.nodeName.toUpperCase() === "IMG" ) {
 				return match;
 			}
 
 			// ignore non-`source` nodes
-			if( source.nodeName.toUpperCase() !== "SOURCE" ){
+			if ( source.nodeName.toUpperCase() !== "SOURCE" ) {
 				continue;
 			}
 
@@ -402,14 +399,14 @@ window.matchMedia || (window.matchMedia = function() {
 				continue;
 			}
 
-			// if there"s no media specified, OR w.matchMedia is supported
-			if( ( !media || pf.matchesMedia( media ) ) ){
+			// if there's no media specified, OR w.matchMedia is supported
+			if ( ( !media || pf.matchesMedia( media ) ) ) {
 				var typeSupported = pf.verifyTypeSupport( source );
 
-				if( typeSupported === true ){
+				if ( typeSupported === true ) {
 					match = source;
 					break;
-				} else if( typeSupported === "pending" ){
+				} else if ( typeSupported === "pending" ) {
 					return false;
 				}
 			}
@@ -430,7 +427,7 @@ window.matchMedia || (window.matchMedia = function() {
 		elements = options.elements || pf.getAllElements();
 
 		// Loop through all elements
-		for ( var i=0, plen = elements.length; i < plen; i++ ) {
+		for ( var i = 0, plen = elements.length; i < plen; i++ ) {
 			element = elements[ i ];
 			elemType = element.nodeName.toUpperCase();
 			firstMatch = undefined;
@@ -438,7 +435,7 @@ window.matchMedia || (window.matchMedia = function() {
 			picImg = undefined;
 
 			// expando for caching data on the img
-			if( !element[ pf.ns ] ){
+			if ( !element[ pf.ns ] ) {
 				element[ pf.ns ] = {};
 			}
 
@@ -450,7 +447,7 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 
 			// if element is a picture element
-			if( elemType === "PICTURE" ){
+			if ( elemType === "PICTURE" ) {
 
 				// IE9 video workaround
 				pf.removeVideoShim( element );
@@ -463,7 +460,7 @@ window.matchMedia || (window.matchMedia = function() {
 				// if any sources are pending in this picture due to async type test(s)
 				// remove the evaluated attr and skip for now ( the pending test will
 				// rerun picturefill on this element when complete)
-				if( firstMatch === false ) {
+				if ( firstMatch === false ) {
 					continue;
 				}
 
@@ -475,15 +472,15 @@ window.matchMedia || (window.matchMedia = function() {
 				picImg = element;
 			}
 
-			if( picImg ) {
+			if ( picImg ) {
 
 				// expando for caching data on the img
-				if( !picImg[ pf.ns ] ){
+				if ( !picImg[ pf.ns ] ) {
 					picImg[ pf.ns ] = {};
 				}
 
 				// Cache and remove `srcset` if present and we’re going to be doing `sizes`/`picture` polyfilling to it.
-				if( picImg.srcset && ( elemType === "PICTURE" || picImg.getAttribute( "sizes" ) ) ){
+				if ( picImg.srcset && ( elemType === "PICTURE" || picImg.getAttribute( "sizes" ) ) ) {
 					pf.dodgeSrcset( picImg );
 				}
 
@@ -494,7 +491,7 @@ window.matchMedia || (window.matchMedia = function() {
 					// No sources matched, so we’re down to processing the inner `img` as a source.
 					candidates = pf.processSourceSet( picImg );
 
-					if( picImg.srcset === undefined || ( picImg.getAttribute( "sizes" ) && picImg[ pf.ns ].srcset ) ) {
+					if ( picImg.srcset === undefined || ( picImg.getAttribute( "sizes" ) && picImg[ pf.ns ].srcset ) ) {
 						// Either `srcset` is completely unsupported, or we need to polyfill `sizes` functionality.
 						pf.applyBestCandidate( candidates, picImg );
 					} // Else, resolution-only `srcset` is supported natively.
@@ -513,7 +510,7 @@ window.matchMedia || (window.matchMedia = function() {
 	 */
 	function runPicturefill() {
 		picturefill();
-		var intervalId = setInterval( function(){
+		var intervalId = setInterval( function() {
 			// When the document has finished loading, stop checking for new images
 			// https://github.com/ded/domready/blob/master/ready.js#L15
 			picturefill();
@@ -522,13 +519,13 @@ window.matchMedia || (window.matchMedia = function() {
 				return;
 			}
 		}, 250 );
-		if( w.addEventListener ){
+		if ( w.addEventListener ) {
 			var resizeThrottle;
 			w.addEventListener( "resize", function() {
 				if (!w._picturefillWorking) {
 					w._picturefillWorking = true;
 					w.clearTimeout( resizeThrottle );
-					resizeThrottle = w.setTimeout( function(){
+					resizeThrottle = w.setTimeout( function() {
 						picturefill({ reevaluate: true });
 						w._picturefillWorking = false;
 					}, 60 );
@@ -543,15 +540,13 @@ window.matchMedia || (window.matchMedia = function() {
 	picturefill._ = pf;
 
 	/* expose picturefill */
-	if ( typeof module === "object" && typeof module.exports === "object" ){
+	if ( typeof module === "object" && typeof module.exports === "object" ) {
 		// CommonJS, just export
 		module.exports = picturefill;
-	}
-	else if( typeof define === "function" && define.amd ){
+	} else if ( typeof define === "function" && define.amd ){
 		// AMD support
-		define( function(){ return picturefill; } );
-	}
-	else if( typeof w === "object" ){
+		define( function() { return picturefill; } );
+	} else if ( typeof w === "object" ) {
 		// If no AMD and we are in the browser, attach to window
 		w.picturefill = picturefill;
 	}
