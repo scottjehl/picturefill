@@ -1,5 +1,5 @@
 (function(window, jQuery) {
-	if( window.HTMLPictureElement ){
+	if ( window.HTMLPictureElement ){
 		test( "Picture is natively supported", function() {
 			ok( window.HTMLPictureElement );
 		});
@@ -42,12 +42,12 @@
 	});
 
 	test("getWidthFromLength", function() {
-		equal(pf.getWidthFromLength('750px'), 750, "returns int value of width string");
+		equal(pf.getWidthFromLength("750px"), 750, "returns int value of width string");
 	});
 
 	test("findWidthFromSourceSize", function() {
 		var width;
-		var sizes = "	 (max-width: 30em) 1000px,	 (max-width: 50em) 750px, 500px	 ";
+		var sizes = "	(max-width: 30em) 1000px,	(max-width: 50em) 750px, 500px	";
 
 		pf.matchesMedia = function(media) {
 			return true;
@@ -133,11 +133,11 @@
 		deepEqual(pf.getCandidatesFromSourceSet(candidate2a), expectedFormattedCandidates2a, "Works!");
 
 		// Test with multiple spaces
-		var candidate3 = "			images/pic-medium.png		 1x		,		 images/pic-medium-2x.png		 2x		";
+		var candidate3 = "			images/pic-medium.png		1x		,		images/pic-medium-2x.png		2x		";
 		deepEqual(pf.getCandidatesFromSourceSet(candidate3), expectedFormattedCandidates2, "Works!");
 
 		// Test with decimals
-		var candidate4 = "			images/pic-smallest.png		 0.25x	 ,		images/pic-small.png		0.5x	 , images/pic-medium.png 1x";
+		var candidate4 = "			images/pic-smallest.png		0.25x	,		images/pic-small.png		0.5x	, images/pic-medium.png 1x";
 		var expectedFormattedCandidates4 = [
 			{
 				resolution: 0.25,
@@ -155,14 +155,14 @@
 		deepEqual(pf.getCandidatesFromSourceSet(candidate4), expectedFormattedCandidates4, "Works!");
 
 		// Test with "sizes" passed with a px length specified
-		var candidate5 = "			images/pic-smallest.png		 250w		,		 images/pic-small.png		 500w		, images/pic-medium.png 1000w";
+		var candidate5 = "			images/pic-smallest.png		250w		,		images/pic-small.png		500w		, images/pic-medium.png 1000w";
 		sizes = "1000px";
 		deepEqual(pf.getCandidatesFromSourceSet(candidate5, sizes), expectedFormattedCandidates4, "Works!");
 
 		// Test with "sizes" passed with % lengths specified
-		var candidate6 = "\npic320.png 320w	 , pic640.png		640w, pic768.png 768w, \
-		\npic1536.png 1536w, pic2048.png	2048w	 ";
-		sizes = "	 (max-width: 30em) 100%,	 (max-width: 50em) 50%, 33%";
+		var candidate6 = "\npic320.png 320w	, pic640.png		640w, pic768.png 768w, \
+		\npic1536.png 1536w, pic2048.png	2048w	";
+		sizes = "	(max-width: 30em) 100%,	(max-width: 50em) 50%, 33%";
 		var expectedCandidates = [
 			{
 				resolution: 0.5,
@@ -199,13 +199,16 @@
 		var expected, candidate;
 
 		candidate = "foo,bar.png 320w, bar,baz.png 320w";
-		expected = [{
-			url: "foo,bar.png",
-			resolution: 320
-		},{
-			url: "bar,baz.png",
-			resolution: 320
-		}];
+		expected = [
+			{
+				url: "foo,bar.png",
+				resolution: 320
+			},
+			{
+				url: "bar,baz.png",
+				resolution: 320
+			}
+		];
 
 		deepEqual(pf.getCandidatesFromSourceSet(candidate), expected, "comma urls split");
 	});
@@ -365,7 +368,7 @@
 			ok( false );
 		};
 
-		picturefill({ reevaluate: false, elements: [mockPicture] });
+		picturefill({ reevaluate: false, elements: [ mockPicture ] });
 	});
 
 	test( "picturefill marks elements with a property", function() {
