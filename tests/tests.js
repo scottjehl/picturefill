@@ -9,8 +9,8 @@
 
 	test("functional: The first matching `source` is selected.", function() {
 		var pic = $( ".first-match" ),
-				firstsource = pic.find( "source" ).eq( 0 ),
-				img = pic.find( "img" );
+			firstsource = pic.find( "source" ).eq( 0 ),
+			img = pic.find( "img" );
 
 		equal( img[ 0 ].getAttribute( "src" ), firstsource[ 0 ].getAttribute( "srcset" ) );
 	});
@@ -50,7 +50,7 @@
 
 		pf.matchesMedia = function(media) {
 			return true;
-		};
+				};
 		var width = pf.findWidthFromSourceSize(sizes);
 		equal(width, 1000, "returns 1000 when match media returns true");
 
@@ -360,4 +360,69 @@
 
 		ok( mockPicture[ pf.ns ].evaluated );
 	});
+
+	asyncTest( "picturefill processes images that get manipulated post load", function() {
+		// Since PhantomJS does neither support Mutation Events on attribute changes
+		// nor Mutation Observers, we need to disarm this test for it.
+		// See: https://github.com/ariya/phantomjs/issues/10715
+		var isDOMAttrModifiedSupported = function() {
+			var p,
+				flag = false;
+
+			p = window.document.createElement('p');
+			p.addEventListener('DOMAttrModified', function() {
+				flag = true;
+			}, false);
+			p.setAttribute('id', 'target');
+			return flag;
+		}
+
+		if (!window.MutationObserver && !window.WebKitMutationObserver && !isDOMAttrModifiedSupported()) {
+			expect ( 0 );
+			start();
+			return;
+		}
+		// For all other browsers we want to keep the test:
+		else {
+			expect ( 1 );
+
+			var pic = $( ".manipulate-check" ),
+				source = pic.find( "source" ).eq( 0 ),
+				img = pic.find( "img"),
+				srcset = "../examples/images/extralarge.jpg";
+
+			source.attr("srcset", srcset);
+
+			window.setTimeout( function() {
+				equal( img[ 0 ].getAttribute( "src" ), srcset );
+
+				start();
+			}, 500);
+		}
+	});
+
+	asyncTest( "picturefill processes images that get inserted post load", function() {
+		expect ( 4 );
+
+		var insertPictureHTML = '<picture class="insert-check">\
+			<source srcset="../examples/images/small.jpg"></source>\
+			<img>\
+			</picture>';
+
+		$( insertPictureHTML ).appendTo( '#qunit-fixture' );
+
+		window.setTimeout( function() {
+			var pic = $( ".insert-check" ),
+				source = pic.find( "source" ).eq( 0 ),
+				img = pic.find( "img" );
+
+			ok( !!pic.size() );
+			ok( !!source.size() );
+			ok( !!img.size() );
+			equal( img[ 0 ].getAttribute( "src" ), source[ 0 ].getAttribute( "srcset" ) );
+
+			start();
+		}, 1000);
+	});
+
 })( window, jQuery );

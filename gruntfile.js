@@ -55,8 +55,8 @@
               "unused": true,
               "boss": true,
               "eqnull": true,
-            "node": true,
-            "predef": [ "define", "module" ]
+              "node": true,
+              "predef": [ "define", "module" ]
           },
           src: [ 'Gruntfile.js', 'src/*.js' ]
         }

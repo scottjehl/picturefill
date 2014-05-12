@@ -258,7 +258,7 @@
 			}
 		}
 
-		if ( !pf.endsWith( picImg.src, bestCandidate.url ) ) {
+		if ( bestCandidate && !pf.endsWith( picImg.src, bestCandidate.url ) ) {
 			picImg.src = bestCandidate.url;
 			// currentSrc attribute and property to match
 			// http://picture.responsiveimages.org/#the-img-element
@@ -460,6 +460,8 @@
 	 */
 	function runPicturefill() {
 		picturefill();
+
+		// Checks the DOM for new image elements until document has finished loading
 		var intervalId = setInterval( function(){
 			// When the document has finished loading, stop checking for new images
 			// https://github.com/ded/domready/blob/master/ready.js#L15
@@ -469,6 +471,8 @@
 				return;
 			}
 		}, 250 );
+
+		// Event listener for resize events
 		if( w.addEventListener ){
 			var resizeThrottle;
 			w.addEventListener( "resize", function() {
@@ -478,24 +482,143 @@
 				}, 60 );
 			}, false );
 		}
-		var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
-			observer = new MutationObserver( function( mutations, observer ) {
-				// look through all mutations that just occured
-				for( var i = 0, mutationsLength = mutations.length; i < mutationsLength; i++ ) {
-					// look through all added nodes of current mutation item
-					for( var j = 0, addedNodesLength = mutations[i].addedNodes.length; j < addedNodesLength; j++ ) {
-						var elem = mutations[i].addedNodes[j],
-							elemType = elem.nodeName.toUpperCase();
 
-						switch ( elemType ) {
-							case 'PICTURE':
-							case 'IMG':
-								picturefill({ elements: [ elem ] });
+		// Observe DOM changes START
+		var observeDom,
+			MutationObserver = w.MutationObserver || w.WebKitMutationObserver;
+
+		// If the browser does neither support Mutation Observers nor W3C event binding, then leave
+		if ( !MutationObserver && !w.addEventListener ) {
+			return;
+		}
+
+		// If the browser supports the newer Mutation Observers
+		if ( MutationObserver ) {
+			observeDom = function() {
+				var observer = new MutationObserver( function( mutations, observer ) {
+					var elem,
+						elemType;
+
+					// Disconnect the observer while picturefill runs
+					observer.disconnect();
+
+					// look through all mutations that just occured
+					for( var i = 0, mutationsLength = mutations.length; i < mutationsLength; i++ ) {
+						switch( mutations[i].type ) {
+							default:
+								// look through all added nodes of current mutation item
+								for( var j = 0, addedNodesLength = mutations[i].addedNodes.length; j < addedNodesLength; j++ ) {
+									elem = mutations[i].addedNodes[j];
+									elemType = elem.nodeName.toUpperCase();
+
+									switch ( elemType ) {
+										case 'PICTURE':
+										case 'IMG':
+											picturefill({
+												elements: [ elem ],
+												reevaluate: true
+											});
+											break;
+
+										case 'SOURCE':
+											picturefill({
+												elements: [ elem.parentNode ],
+												reevaluate: true
+											});
+											break;
+									}
+								}
+								break;
+
+							case 'attributes':
+								elem = mutations[i].target;
+								elemType = elem.nodeName.toUpperCase();
+
+								switch ( elemType ) {
+									case 'IMG':
+										picturefill({
+											elements: [ elem ],
+											reevaluate: true
+										});
+										break;
+
+									case 'SOURCE':
+										picturefill({
+											elements: [ elem.parentNode ],
+											reevaluate: true
+										});
+										break;
+								}
 								break;
 						}
 					}
-				}
+
+					// Reconnect the observer after picturefill ran
+					observer.observe( w.document.documentElement, {
+						childList: true,
+						attributes: true,
+						subtree: true
+					});
+				});
+
+				observer.observe( w.document.documentElement, {
+					childList: true,
+					attributes: true,
+					subtree: true
+				});
+			};
+
+		}
+		// If not: Use the older Mutation Events
+		else {
+			var addDomEvents = function() {
+					w.addEventListener('DOMNodeInserted', domChanged, false);
+					w.addEventListener('DOMAttrModified', domChanged, false);
+				},
+				removeDomEvents = function() {
+					w.removeEventListener('DOMNodeInserted', domChanged, false);
+					w.removeEventListener('DOMAttrModified', domChanged, false);
+				},
+				domChanged = function( event ) {
+					var elem = event.target,
+						elemType = elem.nodeName.toUpperCase();
+
+					switch ( elemType ) {
+						case 'PICTURE':
+						case 'IMG':
+							removeDomEvents();
+							picturefill({
+								elements: [ elem ],
+								reevaluate: true
+							});
+							addDomEvents();
+							break;
+
+						case 'SOURCE':
+							removeDomEvents();
+							picturefill({
+								elements: [ elem.parentNode ],
+								reevaluate: true
+							});
+							addDomEvents();
+							break;
+					}
+				};
+
+			observeDom = function() {
+				addDomEvents();
+			};
+		}
+
+		// When document is fully loaded start observing the DOM
+		if ( w.document.readyState === 'complete' ) {
+			observeDom();
+		} else {
+			w.addEventListener('load', function() {
+				observeDom();
 			});
+		}
+		// Observe DOM changes END
 	}
 
 	runPicturefill();

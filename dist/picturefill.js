@@ -1,4 +1,4 @@
-/*! Picturefill - v2.0.0-beta - 2014-05-07
+/*! Picturefill - v2.0.0-beta - 2014-05-12
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -505,9 +505,12 @@ window.matchMedia || (window.matchMedia = function() {
 	 * Sets up picture polyfill by polling the document and running
 	 * the polyfill every 250ms until the document is ready.
 	 * Also attaches picturefill on resize
+	 * Also installs a mutation observer that triggers picturefill on matching new DOM elements
 	 */
 	function runPicturefill() {
 		picturefill();
+
+		// Checks the DOM for new image elements until document has finished loading
 		var intervalId = setInterval( function(){
 			// When the document has finished loading, stop checking for new images
 			// https://github.com/ded/domready/blob/master/ready.js#L15
@@ -517,6 +520,8 @@ window.matchMedia || (window.matchMedia = function() {
 				return;
 			}
 		}, 250 );
+
+		// Event listener for resize events
 		if( w.addEventListener ){
 			var resizeThrottle;
 			w.addEventListener( "resize", function() {
@@ -526,6 +531,78 @@ window.matchMedia || (window.matchMedia = function() {
 				}, 60 );
 			}, false );
 		}
+
+		// Observe DOM changes START
+		var observeDom,
+			MutationObserver = w.MutationObserver || w.WebKitMutationObserver;
+
+		// If the browser does neither support Mutation Observers nor W3C event binding, then leave
+		if ( !MutationObserver && !w.addEventListener ) {
+			return;
+		}
+
+		// If the browser supports the newer Mutation Observers
+		if ( MutationObserver ) {
+			observeDom = function() {
+				var observer = new MutationObserver( function( mutations ) {
+					// look through all mutations that just occured
+					for( var i = 0, mutationsLength = mutations.length; i < mutationsLength; i++ ) {
+						// look through all added nodes of current mutation item
+						for( var j = 0, addedNodesLength = mutations[i].addedNodes.length; j < addedNodesLength; j++ ) {
+							var elem = mutations[i].addedNodes[j],
+								elemType = elem.nodeName.toUpperCase();
+
+							switch ( elemType ) {
+								case 'PICTURE':
+								case 'IMG':
+									picturefill({
+										elements: [ elem ]
+									});
+									break;
+							}
+						}
+					}
+				});
+
+				observer.observe( w.document.documentElement, {
+					childList: true,
+					subtree: true
+				});
+			};
+
+		}
+		// If not: Use the older Mutation Events
+		else {
+			var domInserted = function( event ) {
+					var elem = event.target,
+						elemType = elem.nodeName.toUpperCase();
+
+					switch ( elemType ) {
+						case 'PICTURE':
+						case 'IMG':
+							w.removeEventListener('DOMNodeInserted', domInserted, false);
+							picturefill({
+								elements: [ elem ]
+							});
+							w.addEventListener('DOMNodeInserted', domInserted, false);
+							break;
+					}
+				};
+
+			observeDom = function() {
+				w.addEventListener('DOMNodeInserted', domInserted, false);
+			};
+		}
+
+		// When document is fully loaded start observing the DOM
+		if ( w.document.readyState === 'complete' ) {
+			observeDom();
+		} else {
+			w.addEventListener('load', function() {
+				observeDom();
+			});
+		}
+		// Observe DOM changes END
 	}
 
 	runPicturefill();
