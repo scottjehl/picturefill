@@ -1,4 +1,4 @@
-/*! Picturefill - v2.0.0-beta - 2014-05-12
+/*! Picturefill - v2.0.0-beta - 2014-05-13
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -307,7 +307,7 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 		}
 
-		if ( !pf.endsWith( picImg.src, bestCandidate.url ) ) {
+		if ( bestCandidate && !pf.endsWith( picImg.src, bestCandidate.url ) ) {
 			picImg.src = bestCandidate.url;
 			// currentSrc attribute and property to match
 			// http://picture.responsiveimages.org/#the-img-element
@@ -544,28 +544,75 @@ window.matchMedia || (window.matchMedia = function() {
 		// If the browser supports the newer Mutation Observers
 		if ( MutationObserver ) {
 			observeDom = function() {
-				var observer = new MutationObserver( function( mutations ) {
+				var observer = new MutationObserver( function( mutations, observer ) {
+					var elem,
+						elemType;
+
+					// Disconnect the observer while picturefill runs
+					observer.disconnect();
+
 					// look through all mutations that just occured
 					for( var i = 0, mutationsLength = mutations.length; i < mutationsLength; i++ ) {
-						// look through all added nodes of current mutation item
-						for( var j = 0, addedNodesLength = mutations[i].addedNodes.length; j < addedNodesLength; j++ ) {
-							var elem = mutations[i].addedNodes[j],
+						switch( mutations[i].type ) {
+							default:
+								// look through all added nodes of current mutation item
+								for( var j = 0, addedNodesLength = mutations[i].addedNodes.length; j < addedNodesLength; j++ ) {
+									elem = mutations[i].addedNodes[j];
+									elemType = elem.nodeName.toUpperCase();
+
+									switch ( elemType ) {
+										case 'PICTURE':
+										case 'IMG':
+											picturefill({
+												elements: [ elem ],
+												reevaluate: true
+											});
+											break;
+
+										case 'SOURCE':
+											picturefill({
+												elements: [ elem.parentNode ],
+												reevaluate: true
+											});
+											break;
+									}
+								}
+								break;
+
+							case 'attributes':
+								elem = mutations[i].target;
 								elemType = elem.nodeName.toUpperCase();
 
-							switch ( elemType ) {
-								case 'PICTURE':
-								case 'IMG':
-									picturefill({
-										elements: [ elem ]
-									});
-									break;
-							}
+								switch ( elemType ) {
+									case 'IMG':
+										picturefill({
+											elements: [ elem ],
+											reevaluate: true
+										});
+										break;
+
+									case 'SOURCE':
+										picturefill({
+											elements: [ elem.parentNode ],
+											reevaluate: true
+										});
+										break;
+								}
+								break;
 						}
 					}
+
+					// Reconnect the observer after picturefill ran
+					observer.observe( w.document.documentElement, {
+						childList: true,
+						attributes: true,
+						subtree: true
+					});
 				});
 
 				observer.observe( w.document.documentElement, {
 					childList: true,
+					attributes: true,
 					subtree: true
 				});
 			};
@@ -573,24 +620,42 @@ window.matchMedia || (window.matchMedia = function() {
 		}
 		// If not: Use the older Mutation Events
 		else {
-			var domInserted = function( event ) {
+			var addDomEvents = function() {
+					w.addEventListener('DOMNodeInserted', domChanged, false);
+					w.addEventListener('DOMAttrModified', domChanged, false);
+				},
+				removeDomEvents = function() {
+					w.removeEventListener('DOMNodeInserted', domChanged, false);
+					w.removeEventListener('DOMAttrModified', domChanged, false);
+				},
+				domChanged = function( event ) {
 					var elem = event.target,
 						elemType = elem.nodeName.toUpperCase();
 
 					switch ( elemType ) {
 						case 'PICTURE':
 						case 'IMG':
-							w.removeEventListener('DOMNodeInserted', domInserted, false);
+							removeDomEvents();
 							picturefill({
-								elements: [ elem ]
+								elements: [ elem ],
+								reevaluate: true
 							});
-							w.addEventListener('DOMNodeInserted', domInserted, false);
+							addDomEvents();
+							break;
+
+						case 'SOURCE':
+							removeDomEvents();
+							picturefill({
+								elements: [ elem.parentNode ],
+								reevaluate: true
+							});
+							addDomEvents();
 							break;
 					}
 				};
 
 			observeDom = function() {
-				w.addEventListener('DOMNodeInserted', domInserted, false);
+				addDomEvents();
 			};
 		}
 
