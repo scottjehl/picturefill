@@ -189,7 +189,7 @@ srcset=&quot;examples/images/pic-small.png 400w, examples/images/pic-medium.png 
 
 		<h3>The picturefill function</h3>
 
-		<p>Picturefill.js exposes a single global function: the <code>picturefill()</code> function. <code>picturefill()</code> is automatically called one or more times while a page is loading, and it also is triggered when the browser window is resized (or on orientation change). You can run the <code>picturefill()</code> function at any time in JavaScript yourself as well, which may be useful after making updates to the DOM, or when conditions relevant to your application change:</p>
+		<p>Picturefill.js exposes a single global function: the <code>picturefill()</code> function. <code>picturefill()</code> is automatically called one or more times while a page is loading. It also gets triggered when the browser window is resized (or on orientation change), when new images are being inserted into the DOM, or when an existing image's markup is being modified. You can run the <code>picturefill()</code> function at any time in JavaScript yourself as well, which may be useful when conditions relevant to your application change:</p>
 
 <pre><code>
 picturefill();
@@ -227,6 +227,7 @@ picturefill();
 
 			<li><strong>Source element limitations:</strong> Browsers like Android 2.3 and Internet Explorer 9 can not see the <code>source</code> elements inside a <code>picture</code> element. For IE, the <code>video</code> tag workaround helps us avoid this problem, but Android will still have no access to <code>source</code> elements. Be sure to provide a <code>srcset</code> attribute on your enclosed <code>img</code> to ensure an image will show in this browser.</li>
 			<li><strong>Media attribute support requires native media query support</strong>The <code>picture</code> element (paired with picturefill) works best in browsers that support CSS3 media queries. Picturefill includes  the <a href="https://github.com/paulirish/matchMedia.js/">matchMedia polyfill</a> by default, which makes matchMedia work in media query-supporting browsers that don’t support <code>matchMedia</code>.</li>
+			<li><strong>Automatically react to DOM changes:</strong> This feature relies on features called <strong>Mutation Events</strong> or <strong>Mutation Observers</strong>.</li>
 		</ul>
 
 	</body>
