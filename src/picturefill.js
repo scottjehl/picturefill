@@ -445,7 +445,7 @@
 		var intervalId = setInterval( function(){
 			// When the document has finished loading, stop checking for new images
 			// https://github.com/ded/domready/blob/master/ready.js#L15
-			w.picturefill();
+			picturefill();
 			if ( /^loaded|^i|^c/.test( doc.readyState ) ) {
 				clearInterval( intervalId );
 				return;
