@@ -1,4 +1,4 @@
-/*! Picturefill - v2.0.0 - 2014-04-17
+/*! Picturefill - v2.0.0 - 2014-05-13
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -494,7 +494,7 @@ window.matchMedia || (window.matchMedia = function() {
 		var intervalId = setInterval( function(){
 			// When the document has finished loading, stop checking for new images
 			// https://github.com/ded/domready/blob/master/ready.js#L15
-			w.picturefill();
+			picturefill();
 			if ( /^loaded|^i|^c/.test( doc.readyState ) ) {
 				clearInterval( intervalId );
 				return;
@@ -521,7 +521,7 @@ window.matchMedia || (window.matchMedia = function() {
 		// CommonJS, just export
 		module.exports = picturefill;
 	}
-	else if( typeof define === "object" && define.amd ){
+	else if( typeof define === "function" && define.amd ){
 		// AMD support
 		define( function(){ return picturefill; } );
 	}
