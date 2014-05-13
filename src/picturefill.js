@@ -472,7 +472,7 @@
 		// CommonJS, just export
 		module.exports = picturefill;
 	}
-	else if( typeof define === "object" && define.amd ){
+	else if( typeof define === "function" && define.amd ){
 		// AMD support
 		define( function(){ return picturefill; } );
 	}
