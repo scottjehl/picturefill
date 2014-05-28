@@ -516,7 +516,7 @@ window.matchMedia || (window.matchMedia = function() {
 		var intervalId = setInterval( function(){
 			// When the document has finished loading, stop checking for new images
 			// https://github.com/ded/domready/blob/master/ready.js#L15
-			w.picturefill();
+			picturefill();
 			if ( /^loaded|^i|^c/.test( doc.readyState ) ) {
 				clearInterval( intervalId );
 				return;
@@ -547,7 +547,7 @@ window.matchMedia || (window.matchMedia = function() {
 		// CommonJS, just export
 		module.exports = picturefill;
 	}
-	else if( typeof define === "object" && define.amd ){
+	else if( typeof define === "function" && define.amd ){
 		// AMD support
 		define( function(){ return picturefill; } );
 	}
