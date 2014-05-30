@@ -551,4 +551,4 @@ window.matchMedia || (window.matchMedia = function() {
 		w.picturefill = picturefill;
 	}
 
-} )( this, this.document );
+} )( window, window.document );
