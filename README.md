@@ -114,4 +114,3 @@ If you find a bug in Picturefill, please add it to [the issue tracker](https://g
 ## Support
 
 Picturefill supports a broad range of browsers and devices (there are currently no known unsupported browsers), provided that you stick with the markup conventions provided.
-

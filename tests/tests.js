@@ -1,5 +1,5 @@
 (function(window, jQuery) {
-	if( window.HTMLPictureElement ){
+	if ( window.HTMLPictureElement ){
 		test( "Picture is natively supported", function() {
 			ok( window.HTMLPictureElement );
 		});
@@ -42,22 +42,23 @@
 	});
 
 	test("getWidthFromLength", function() {
-		equal(pf.getWidthFromLength('750px'), 750, "returns int value of width string");
+		equal(pf.getWidthFromLength("750px"), 750, "returns int value of width string");
 	});
 
 	test("findWidthFromSourceSize", function() {
-		var sizes = "	 (max-width: 30em) 1000px,	 (max-width: 50em) 750px, 500px	 ";
+		var width;
+		var sizes = "	(max-width: 30em) 1000px,	(max-width: 50em) 750px, 500px	";
 
 		pf.matchesMedia = function(media) {
 			return true;
 		};
-		var width = pf.findWidthFromSourceSize(sizes);
+		width = pf.findWidthFromSourceSize(sizes);
 		equal(width, 1000, "returns 1000 when match media returns true");
 
 		pf.matchesMedia = function(media) {
 			return false;
 		};
-		var width = pf.findWidthFromSourceSize(sizes);
+		width = pf.findWidthFromSourceSize(sizes);
 		equal(width, 500, "returns 500 when match media returns false");
 	});
 
@@ -93,7 +94,7 @@
 				url: "images/pic-medium.png"
 			}
 		];
-		deepEqual(pf.getCandidatesFromSourceSet(candidate1), expectedFormattedCandidates1, "Works!");
+		deepEqual(pf.getCandidatesFromSourceSet(candidate1), expectedFormattedCandidates1, "`" + candidate1 + "` is parsed correctly");
 
 		var candidate1a = "images/pic-medium.png 1x";
 		var expectedFormattedCandidates1a = [
@@ -102,7 +103,7 @@
 				url: "images/pic-medium.png"
 			}
 		];
-		deepEqual(pf.getCandidatesFromSourceSet(candidate1a), expectedFormattedCandidates1a, "Works!");
+		deepEqual(pf.getCandidatesFromSourceSet(candidate1a), expectedFormattedCandidates1a, "`" + candidate1a + "` is parsed correctly" );
 
 		var candidate2 = "images/pic-medium.png, images/pic-medium-2x.png 2x";
 		var expectedFormattedCandidates2 = [
@@ -115,7 +116,8 @@
 				url: "images/pic-medium-2x.png"
 			}
 		];
-		deepEqual(pf.getCandidatesFromSourceSet(candidate2), expectedFormattedCandidates2, "Works!");
+
+		deepEqual(pf.getCandidatesFromSourceSet(candidate2), expectedFormattedCandidates2, "`" + candidate2 + "` is parsed correctly" );
 
 		var candidate2a = "images/pic-medium.png 1x, images/pic-medium-2x.png 2x";
 		var expectedFormattedCandidates2a = [
@@ -128,14 +130,15 @@
 				url: "images/pic-medium-2x.png"
 			}
 		];
-		deepEqual(pf.getCandidatesFromSourceSet(candidate2a), expectedFormattedCandidates2a, "Works!");
+
+		deepEqual(pf.getCandidatesFromSourceSet(candidate2a), expectedFormattedCandidates2a, "`" + candidate2a + "` is parsed correctly");
 
 		// Test with multiple spaces
 		var candidate3 = "			images/pic-medium.png		 1x		,		 images/pic-medium-2x.png		 2x		";
-		deepEqual(pf.getCandidatesFromSourceSet(candidate3), expectedFormattedCandidates2, "Works!")
+		deepEqual(pf.getCandidatesFromSourceSet(candidate3), expectedFormattedCandidates2, "`" + candidate3 + "` is parsed correctly" );
 
 		// Test with decimals
-		var candidate4 = "			images/pic-smallest.png		 0.25x	 ,		images/pic-small.png		0.5x	 , images/pic-medium.png 1x";
+		var candidate4 = "			images/pic-smallest.png		0.25x	,		images/pic-small.png		0.5x	, images/pic-medium.png 1x";
 		var expectedFormattedCandidates4 = [
 			{
 				resolution: 0.25,
@@ -150,17 +153,17 @@
 				url: "images/pic-medium.png"
 			}
 		];
-		deepEqual(pf.getCandidatesFromSourceSet(candidate4), expectedFormattedCandidates4, "Works!");
+		deepEqual(pf.getCandidatesFromSourceSet(candidate4), expectedFormattedCandidates4, "`" + candidate4 + "` is parsed correctly" );
 
 		// Test with "sizes" passed with a px length specified
 		var candidate5 = "			images/pic-smallest.png		 250w		,		 images/pic-small.png		 500w		, images/pic-medium.png 1000w";
-		var sizes = "1000px";
-		deepEqual(pf.getCandidatesFromSourceSet(candidate5, sizes), expectedFormattedCandidates4, "Works!");
+		var sizes5 = "1000px";
+		deepEqual(pf.getCandidatesFromSourceSet(candidate5, sizes5), expectedFormattedCandidates4, "`" + candidate4 + "` is parsed correctly");
 
 		// Test with "sizes" passed with % lengths specified
-		var candidate6 = "\npic320.png 320w	 , pic640.png		640w, pic768.png 768w, \
-		\npic1536.png 1536w, pic2048.png	2048w	 ";
-		var sizes = "	 (max-width: 30em) 100%,	 (max-width: 50em) 50%, 33%";
+		var candidate6 = "\npic320.png 320w	, pic640.png		640w, pic768.png 768w, \
+		\npic1536.png 1536w, pic2048.png	2048w	";
+		var sizes6 = "	(max-width: 30em) 100%,	(max-width: 50em) 50%, 33%";
 		var expectedCandidates = [
 			{
 				resolution: 0.5,
@@ -186,30 +189,180 @@
 
 		pf.getWidthFromLength = function(width) {
 			return 640;
-		}
+		};
 
 		pf.matchesMedia = function(media) {
 			return true;
 		};
 
-		deepEqual(pf.getCandidatesFromSourceSet(candidate6, sizes), expectedCandidates, "Works!");
+		deepEqual(pf.getCandidatesFromSourceSet(candidate6, sizes6), expectedCandidates, "`" + candidate6 + "` is parsed correctly" );
 
-		var expected, candidate;
+		var srcset1 = "foo,bar.png 320w, bar,baz.png 320w";
+		var expectedresult1 = [
+			{
+				url: "foo,bar.png",
+				resolution: 320
+			},{
+				url: "bar,baz.png",
+				resolution: 320
+			}
+		];
+		deepEqual(pf.getCandidatesFromSourceSet(srcset1), expectedresult1, "`" + srcset1 + "` is parsed correctly" );
 
-		candidate = "foo,bar.png 320w, bar,baz.png 320w";
-		expected = [{
-			url: "foo,bar.png",
-			resolution: 320
-		},{
-			url: "bar,baz.png",
-			resolution: 320
-		}];
+		var srcset2 = "foo,bar.png 320w,bar,baz.png 320w";
+		var expectedresult2 = [
+			{
+				url: "foo,bar.png",
+				resolution: 320
+			},{
+				url: "bar,baz.png",
+				resolution: 320
+			}
+		];
 
-		deepEqual(pf.getCandidatesFromSourceSet(candidate), expected, "comma urls split");
+		deepEqual(pf.getCandidatesFromSourceSet(srcset2), expectedresult2, "`" + srcset2 + "` is parsed correctly" );
+
+		var srcset3 = "foo.png 1x, bar.png -2x";
+		var expectedresult3 = [
+			{
+				url: "foo.png",
+				resolution: 1
+			},{
+				url: "bar.png",
+				resolution: -2
+			}
+		];
+		deepEqual(pf.getCandidatesFromSourceSet(srcset3), expectedresult3, "`" + srcset3 + "` is parsed correctly" );
+
+		var srcset4 = "foo.png 1x, bar.png 2q";
+		var expectedresult4 = [
+			{
+				url: "foo.png",
+				resolution: 1
+			},{
+				url: "bar.png",
+				resolution: 1
+			}
+		];
+		deepEqual(pf.getCandidatesFromSourceSet(srcset4), expectedresult4, "`" + srcset4 + "` is parsed correctly" );
+
+		var srcset5 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg 1x, bar.png 2x";
+		var expectedresult5 = [
+			{
+				url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg",
+				resolution: 1
+			},{
+				url: "bar.png",
+				resolution: 2
+			}
+		];
+		deepEqual(pf.getCandidatesFromSourceSet(srcset5), expectedresult5, "`" + srcset5 + "` is parsed correctly" );
+
+		var srcset6 = "2.png 1x,1.png 2x";
+		var expectedresult6 = [
+			{
+				url: "2.png",
+				resolution: 1
+			},{
+				url: "1.png",
+				resolution: 2
+			}
+		];
+		deepEqual(pf.getCandidatesFromSourceSet(srcset6), expectedresult6, "`" + srcset6 + "` is parsed correctly" );
+
+		var srcset7 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg 2x, 1x.gif 1x, data:image/png;base64,iVBORw0KGgoAAAANSUhEUg";
+		var expectedresult7 = [
+			{
+				url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg",
+				resolution: 2
+			},{
+				url: "1x.gif",
+				resolution: 1
+			},{
+				url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg",
+				resolution: 1
+			}
+		];
+		deepEqual(pf.getCandidatesFromSourceSet(srcset7), expectedresult7, "`" + srcset7 + "` is parsed correctly" );
+
+		var srcset8 = "400.gif 400w, 6000.gif 6000w";
+		var expectedresult8 = [
+			{
+				url: "400.gif",
+				resolution: 400
+			},{
+				url: "6000.gif",
+				resolution: 6000
+			}
+		];
+		deepEqual(pf.getCandidatesFromSourceSet(srcset8), expectedresult8, "`" + srcset8 + "` is parsed correctly" );
+
+		var srcset9 = "800.gif 2x, 1600.gif 1600w";
+		var expectedresult9 = [
+			{
+				url: "800.gif",
+				resolution: 2
+			},{
+				url: "1600.gif",
+				resolution: 1600
+			}
+		];
+		deepEqual(pf.getCandidatesFromSourceSet(srcset9), expectedresult9, "`" + srcset9 + "` is parsed correctly" );
+		var srcset10 = "1x,,  ,   x    ,2x	, 1x.gif, , 3x, 4x.gif 4x 100h,,, 5x.gif 5, dx.gif dx, 2x.gif   2x,";
+		var expectedresult10 = [
+			{
+				url: "1x",
+				resolution: 1
+			},{
+				url: "x",
+				resolution: 1
+			},{
+				url: "2x",
+				resolution: 1
+			},{
+				url: "1x.gif",
+				resolution: 1
+			},{
+				url: "3x",
+				resolution: 1
+			},{
+				url: "4x.gif",
+				resolution: 4
+			},{
+				url: "5x.gif",
+				resolution: 1
+			},{
+				url: "dx.gif",
+				resolution: 1
+			},{
+				url: "2x.gif",
+				resolution: 2
+			}
+		];
+		deepEqual(pf.getCandidatesFromSourceSet(srcset10), expectedresult10, "`" + srcset10 + "` is parsed correctly" );
 	});
 
 	test("verifyTypeSupport", function() {
-		expect( 4 );
+		expect( 7 );
+
+		// Test widely supported mime types.
+		ok(pf.verifyTypeSupport({
+			getAttribute: function() {
+				return "image/jpeg";
+			}
+		}));
+
+		ok(pf.verifyTypeSupport({
+			getAttribute: function() {
+				return "image/png";
+			}
+		}));
+
+		ok(pf.verifyTypeSupport({
+			getAttribute: function() {
+				return "image/gif";
+			}
+		}));
 
 		// if the type attribute is supported it should return true
 		ok(pf.verifyTypeSupport({
@@ -344,7 +497,7 @@
 			ok( false );
 		};
 
-		picturefill({ reevaluate: false, elements: [mockPicture] });
+		picturefill({ reevaluate: false, elements: [ mockPicture ] });
 	});
 
 	test( "picturefill marks elements with a property", function() {
@@ -360,4 +513,16 @@
 
 		ok( mockPicture[ pf.ns ].evaluated );
 	});
+
+	test( "`img` with `sizes` but no `srcset` shouldn’t fail silently", function() {
+		expect( 0 );
+		var el = document.createElement( "img" );
+
+		el.setAttribute( "sizes", "100vw" );
+		el.setAttribute( "class", "no-src" );
+		el.insertBefore( document.documentElement.firstChild, null );
+
+		try { picturefill({ reevaluate: false, elements: document.querySelector( ".no-src" ) }); } catch (e) { console.log( e ); ok( false ); }
+	});
+
 })( window, jQuery );

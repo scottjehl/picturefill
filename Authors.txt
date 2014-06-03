@@ -29,3 +29,6 @@ Thorsten Lorenz, @thlorenz
 @gBokiau
 Andy Matthews, @commadelimited
 James Kerr, @jkerr838
+Pascal Borreli, @pborreli
+Christoph Rohrer, @crohrer
+Krister Kari, @kristerkari
