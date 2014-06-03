@@ -199,128 +199,147 @@
 		deepEqual(pf.getCandidatesFromSourceSet(candidate6, sizes), expectedCandidates, "`" + candidate6 + "` is parsed correctly" );
 
 		var srcset1 = "foo,bar.png 320w, bar,baz.png 320w";
-		var expectedresult1 = [{
-			url: "foo,bar.png",
-			resolution: 320
-		},{
-			url: "bar,baz.png",
-			resolution: 320
-		}];
+		var expectedresult1 = [
+			{
+				url: "foo,bar.png",
+				resolution: 320
+			},{
+				url: "bar,baz.png",
+				resolution: 320
+			}
+		];
 		deepEqual(pf.getCandidatesFromSourceSet(srcset1), expectedresult1, "`" + srcset1 + "` is parsed correctly" );
 
-
 		var srcset2 = "foo,bar.png 320w,bar,baz.png 320w";
-		var expectedresult2 = [{
-			url: "foo,bar.png",
-			resolution: 320
-		},{
-			url: "bar,baz.png",
-			resolution: 320
-		}];
+		var expectedresult2 = [
+			{
+				url: "foo,bar.png",
+				resolution: 320
+			},{
+				url: "bar,baz.png",
+				resolution: 320
+			}
+		];
 
 		deepEqual(pf.getCandidatesFromSourceSet(srcset2), expectedresult2, "`" + srcset2 + "` is parsed correctly" );
 
 		var srcset3 = "foo.png 1x, bar.png -2x";
-		var expectedresult3 = [{
-			url: "foo.png",
-			resolution: 1
-		},{
-			url: "bar.png",
-			resolution: -2
-		}];
+		var expectedresult3 = [
+			{
+				url: "foo.png",
+				resolution: 1
+			},{
+				url: "bar.png",
+				resolution: -2
+			}
+		];
 		deepEqual(pf.getCandidatesFromSourceSet(srcset3), expectedresult3, "`" + srcset3 + "` is parsed correctly" );
 
 		var srcset4 = "foo.png 1x, bar.png 2q";
-		var expectedresult4 = [{
-			url: "foo.png",
-			resolution: 1
-		},{
-			url: "bar.png",
-			resolution: 1
-		}];
+		var expectedresult4 = [
+			{
+				url: "foo.png",
+				resolution: 1
+			},{
+				url: "bar.png",
+				resolution: 1
+			}
+		];
 		deepEqual(pf.getCandidatesFromSourceSet(srcset4), expectedresult4, "`" + srcset4 + "` is parsed correctly" );
 
 		var srcset5 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg 1x, bar.png 2x";
-		var expectedresult5 = [{
-			url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg",
-			resolution: 1
-		},{
-			url: "bar.png",
-			resolution: 2
-		}];
+		var expectedresult5 = [
+			{
+				url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg",
+				resolution: 1
+			},{
+				url: "bar.png",
+				resolution: 2
+			}
+		];
 		deepEqual(pf.getCandidatesFromSourceSet(srcset5), expectedresult5, "`" + srcset5 + "` is parsed correctly" );
 
 		var srcset6 = "2.png 1x,1.png 2x";
-		var expectedresult6 = [{
-			url: "2.png",
-			resolution: 1
-		},{
-			url: "1.png",
-			resolution: 2
-		}];
+		var expectedresult6 = [
+			{
+				url: "2.png",
+				resolution: 1
+			},{
+				url: "1.png",
+				resolution: 2
+			}
+		];
 		deepEqual(pf.getCandidatesFromSourceSet(srcset6), expectedresult6, "`" + srcset6 + "` is parsed correctly" );
 
 		var srcset7 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg 2x, 1x.gif 1x, data:image/png;base64,iVBORw0KGgoAAAANSUhEUg";
-		var expectedresult7 = [{
-			url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg",
-			resolution: 2
-		},{
-			url: "1x.gif",
-			resolution: 1
-		},{
-			url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg",
-			resolution: 1
-		}];
+		var expectedresult7 = [
+			{
+				url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg",
+				resolution: 2
+			},{
+				url: "1x.gif",
+				resolution: 1
+			},{
+				url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg",
+				resolution: 1
+			}
+		];
 		deepEqual(pf.getCandidatesFromSourceSet(srcset7), expectedresult7, "`" + srcset7 + "` is parsed correctly" );
 
 		var srcset8 = "400.gif 400w, 6000.gif 6000w";
-		var expectedresult8 = [{
-			url: "400.gif",
-			resolution: 400
-		},{
-			url: "6000.gif",
-			resolution: 6000
-		}];
+		var expectedresult8 = [
+			{
+				url: "400.gif",
+				resolution: 400
+			},{
+				url: "6000.gif",
+				resolution: 6000
+			}
+		];
 		deepEqual(pf.getCandidatesFromSourceSet(srcset8), expectedresult8, "`" + srcset8 + "` is parsed correctly" );
 
 		var srcset9 = "800.gif 2x, 1600.gif 1600w";
-		var expectedresult9 = [{
-			url: "800.gif",
-			resolution: 2
-		},{
-			url: "1600.gif",
-			resolution: 1600
-		}];
+		var expectedresult9 = [
+			{
+				url: "800.gif",
+				resolution: 2
+			},{
+				url: "1600.gif",
+				resolution: 1600
+			}
+		];
 		deepEqual(pf.getCandidatesFromSourceSet(srcset9), expectedresult9, "`" + srcset9 + "` is parsed correctly" );
 		var srcset10 = "1x,,  ,   x    ,2x	, 1x.gif, , 3x, 4x.gif 4x 100h,,, 5x.gif 5, dx.gif dx, 2x.gif   2x,";
-		var expectedresult10 = [{
-			url: "1x",
-			resolution: 1
-		},{
-			url: "x",
-			resolution: 1
-		},{
-			url: "2x",
-			resolution: 1
-		},{
-			url: "1x.gif",
-			resolution: 1
-		},{
-			url: "3x",
-			resolution: 1
-		},{
-			url: "4x.gif",
-			resolution: 4
-		},{
-			url: "5x.gif",
-			resolution: 1
-		},{
-			url: "dx.gif",
-			resolution: 1
-		},{
-			url: "2x.gif",
-			resolution: 2
-		}];
+		var expectedresult10 = [
+			{
+				url: "1x",
+				resolution: 1
+			},{
+				url: "x",
+				resolution: 1
+			},{
+				url: "2x",
+				resolution: 1
+			},{
+				url: "1x.gif",
+				resolution: 1
+			},{
+				url: "3x",
+				resolution: 1
+			},{
+				url: "4x.gif",
+				resolution: 4
+			},{
+				url: "5x.gif",
+				resolution: 1
+			},{
+				url: "dx.gif",
+				resolution: 1
+			},{
+				url: "2x.gif",
+				resolution: 2
+			}
+		];
 		deepEqual(pf.getCandidatesFromSourceSet(srcset10), expectedresult10, "`" + srcset10 + "` is parsed correctly" );
 	});
 

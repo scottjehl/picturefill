@@ -184,14 +184,14 @@
 		*/
 		var candidates = [];
 
-		while( srcset !== "" ) {
-			srcset = srcset.replace(/^\s+/g,'');
+		while ( srcset !== "" ) {
+			srcset = srcset.replace(/^\s+/g,"");
 
 			// 5. Collect a sequence of characters that are not space characters, and let that be url.
 			var pos = srcset.search(/\s/g),
 				url, descriptor = null;
 
-			if( pos !== -1 ) {
+			if ( pos !== -1 ) {
 				url = srcset.slice( 0, pos );
 
 				var last = url[ url.length - 1 ];
@@ -200,17 +200,17 @@
 				// and let descriptors be the empty string. Otherwise, follow these substeps
 				// 6.1. If url is empty, then jump to the step labeled descriptor parser.
 
-				if( last === "," || url === "" ) {
-					url = url.replace(/,+$/, '');
+				if ( last === "," || url === "" ) {
+					url = url.replace(/,+$/, "");
 					descriptor = "";
 				}
 				srcset = srcset.slice( pos + 1 );
 
 				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and 
 				// let that be descriptors.
-				if( descriptor === null ) {
-					var descpos = srcset.indexOf(',');
-					if( descpos !== -1 ) {
+				if ( descriptor === null ) {
+					var descpos = srcset.indexOf(",");
+					if ( descpos !== -1 ) {
 						descriptor = srcset.slice( 0, descpos );
 						srcset = srcset.slice( descpos + 1 );
 					} else {
@@ -224,7 +224,7 @@
 			}
 
 			// 7. Add url to raw candidates, associated with descriptors.
-			if( url || descriptor ) {
+			if ( url || descriptor ) {
 				candidates.push({
 					url: url,
 					descriptor: descriptor
@@ -237,7 +237,7 @@
 	pf.parseDescriptor = function( descriptor, sizes ) {
 		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list 
 		// is the order in which entries are added to the list.
-		var sizeDescriptor = descriptor && descriptor.replace(/(^\s+|\s+$)/g, ''),
+		var sizeDescriptor = descriptor && descriptor.replace(/(^\s+|\s+$)/g, ""),
 			widthInCssPixels = sizes ? pf.findWidthFromSourceSize( sizes ) : "100%",
 			resCandidate;
 
@@ -248,7 +248,7 @@
 					var curr = splitDescriptor[ i ],
 						lastchar = curr && curr.slice( curr.length - 1 );
 
-					if( lastchar === "w" || lastchar === "x" ) {
+					if ( lastchar === "w" || lastchar === "x" ) {
 						resCandidate = curr;
 					}
 					if ( sizes && resCandidate ) {
