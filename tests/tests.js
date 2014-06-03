@@ -1,5 +1,5 @@
 (function(window, jQuery) {
-	if( window.HTMLPictureElement ){
+	if ( window.HTMLPictureElement ){
 		test( "Picture is natively supported", function() {
 			ok( window.HTMLPictureElement );
 		});
@@ -42,22 +42,23 @@
 	});
 
 	test("getWidthFromLength", function() {
-		equal(pf.getWidthFromLength('750px'), 750, "returns int value of width string");
+		equal(pf.getWidthFromLength("750px"), 750, "returns int value of width string");
 	});
 
 	test("findWidthFromSourceSize", function() {
-		var sizes = "	 (max-width: 30em) 1000px,	 (max-width: 50em) 750px, 500px	 ";
+		var width;
+		var sizes = "	(max-width: 30em) 1000px,	(max-width: 50em) 750px, 500px	";
 
 		pf.matchesMedia = function(media) {
 			return true;
 		};
-		var width = pf.findWidthFromSourceSize(sizes);
+		width = pf.findWidthFromSourceSize(sizes);
 		equal(width, 1000, "returns 1000 when match media returns true");
 
 		pf.matchesMedia = function(media) {
 			return false;
 		};
-		var width = pf.findWidthFromSourceSize(sizes);
+		width = pf.findWidthFromSourceSize(sizes);
 		equal(width, 500, "returns 500 when match media returns false");
 	});
 
@@ -85,6 +86,7 @@
 	});
 
 	test("getCandidatesFromSourceSet", function() {
+		var sizes;
 		// Basic test
 		var candidate1 = "images/pic-medium.png";
 		var expectedFormattedCandidates1 = [
@@ -137,7 +139,7 @@
 		deepEqual(pf.getCandidatesFromSourceSet(candidate3), expectedFormattedCandidates2, "`" + candidate3 + "` is parsed correctly" )
 
 		// Test with decimals
-		var candidate4 = "			images/pic-smallest.png		 0.25x	 ,		images/pic-small.png		0.5x	 , images/pic-medium.png 1x";
+		var candidate4 = "			images/pic-smallest.png		0.25x	,		images/pic-small.png		0.5x	, images/pic-medium.png 1x";
 		var expectedFormattedCandidates4 = [
 			{
 				resolution: 0.25,
@@ -160,9 +162,9 @@
 		deepEqual(pf.getCandidatesFromSourceSet(candidate5, sizes), expectedFormattedCandidates4, "`" + candidate4 + "` is parsed correctly");
 
 		// Test with "sizes" passed with % lengths specified
-		var candidate6 = "\npic320.png 320w	 , pic640.png		640w, pic768.png 768w, \
-		\npic1536.png 1536w, pic2048.png	2048w	 ";
-		var sizes = "	 (max-width: 30em) 100%,	 (max-width: 50em) 50%, 33%";
+		var candidate6 = "\npic320.png 320w	, pic640.png		640w, pic768.png 768w, \
+		\npic1536.png 1536w, pic2048.png	2048w	";
+		sizes = "	(max-width: 30em) 100%,	(max-width: 50em) 50%, 33%";
 		var expectedCandidates = [
 			{
 				resolution: 0.5,
@@ -323,7 +325,26 @@
 	});
 
 	test("verifyTypeSupport", function() {
-		expect( 4 );
+		expect( 7 );
+
+		// Test widely supported mime types.
+		ok(pf.verifyTypeSupport({
+			getAttribute: function() {
+				return "image/jpeg";
+			}
+		}));
+
+		ok(pf.verifyTypeSupport({
+			getAttribute: function() {
+				return "image/png";
+			}
+		}));
+
+		ok(pf.verifyTypeSupport({
+			getAttribute: function() {
+				return "image/gif";
+			}
+		}));
 
 		// if the type attribute is supported it should return true
 		ok(pf.verifyTypeSupport({
@@ -458,7 +479,7 @@
 			ok( false );
 		};
 
-		picturefill({ reevaluate: false, elements: [mockPicture] });
+		picturefill({ reevaluate: false, elements: [ mockPicture ] });
 	});
 
 	test( "picturefill marks elements with a property", function() {
@@ -473,6 +494,17 @@
 		picturefill({ reevaluate: false, elements: [ mockPicture ] });
 
 		ok( mockPicture[ pf.ns ].evaluated );
+	});
+
+	test( "`img` with `sizes` but no `srcset` shouldn’t fail silently", function() {
+		expect( 0 );
+		var el = document.createElement( "img" );
+
+		el.setAttribute( "sizes", "100vw" );
+		el.setAttribute( "class", "no-src" );
+		el.insertBefore( document.documentElement.firstChild, null );
+
+		try { picturefill({ reevaluate: false, elements: document.querySelector( ".no-src" ) }); } catch (e) { console.log( e ); ok( false ); }
 	});
 
 })( window, jQuery );
