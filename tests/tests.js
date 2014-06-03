@@ -86,7 +86,6 @@
 	});
 
 	test("getCandidatesFromSourceSet", function() {
-		var sizes;
 		// Basic test
 		var candidate1 = "images/pic-medium.png";
 		var expectedFormattedCandidates1 = [
@@ -136,7 +135,7 @@
 
 		// Test with multiple spaces
 		var candidate3 = "			images/pic-medium.png		 1x		,		 images/pic-medium-2x.png		 2x		";
-		deepEqual(pf.getCandidatesFromSourceSet(candidate3), expectedFormattedCandidates2, "`" + candidate3 + "` is parsed correctly" )
+		deepEqual(pf.getCandidatesFromSourceSet(candidate3), expectedFormattedCandidates2, "`" + candidate3 + "` is parsed correctly" );
 
 		// Test with decimals
 		var candidate4 = "			images/pic-smallest.png		0.25x	,		images/pic-small.png		0.5x	, images/pic-medium.png 1x";
@@ -158,13 +157,13 @@
 
 		// Test with "sizes" passed with a px length specified
 		var candidate5 = "			images/pic-smallest.png		 250w		,		 images/pic-small.png		 500w		, images/pic-medium.png 1000w";
-		var sizes = "1000px";
-		deepEqual(pf.getCandidatesFromSourceSet(candidate5, sizes), expectedFormattedCandidates4, "`" + candidate4 + "` is parsed correctly");
+		var sizes5 = "1000px";
+		deepEqual(pf.getCandidatesFromSourceSet(candidate5, sizes5), expectedFormattedCandidates4, "`" + candidate4 + "` is parsed correctly");
 
 		// Test with "sizes" passed with % lengths specified
 		var candidate6 = "\npic320.png 320w	, pic640.png		640w, pic768.png 768w, \
 		\npic1536.png 1536w, pic2048.png	2048w	";
-		sizes = "	(max-width: 30em) 100%,	(max-width: 50em) 50%, 33%";
+		var sizes6 = "	(max-width: 30em) 100%,	(max-width: 50em) 50%, 33%";
 		var expectedCandidates = [
 			{
 				resolution: 0.5,
@@ -196,7 +195,7 @@
 			return true;
 		};
 
-		deepEqual(pf.getCandidatesFromSourceSet(candidate6, sizes), expectedCandidates, "`" + candidate6 + "` is parsed correctly" );
+		deepEqual(pf.getCandidatesFromSourceSet(candidate6, sizes6), expectedCandidates, "`" + candidate6 + "` is parsed correctly" );
 
 		var srcset1 = "foo,bar.png 320w, bar,baz.png 320w";
 		var expectedresult1 = [

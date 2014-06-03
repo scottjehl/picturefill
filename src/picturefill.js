@@ -244,7 +244,8 @@
 			if ( sizeDescriptor ) {
 				var splitDescriptor = sizeDescriptor.split(" ");
 
-				for (var i = 0, l = splitDescriptor.length + 1; i >= 0; i--) {
+				for (var i = splitDescriptor.length + 1; i >= 0; i--) {
+
 					var curr = splitDescriptor[ i ],
 						lastchar = curr && curr.slice( curr.length - 1 );
 
