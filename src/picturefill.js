@@ -171,6 +171,103 @@
 		return pf.getWidthFromLength( winningLength );
 	};
 
+	pf.parseSrcset = function( srcset ) {
+		/**
+		* A lot of this was pulled from Boris Smus’ parser for the now-defunct WHATWG `srcset`
+		* https://github.com/borismus/srcset-polyfill/blob/master/js/srcset-info.js
+		*
+		* 1. Let input (`srcset`) be the value passed to this algorithm.
+		* 2. Let position be a pointer into input, initially pointing at the start of the string.
+		* 3. Let raw candidates be an initially empty ordered list of URLs with associated 
+		*    unparsed descriptors. The order of entries in the list is the order in which entries 
+		*    are added to the list.
+		*/
+		var candidates = [];
+
+		while ( srcset !== "" ) {
+			srcset = srcset.replace(/^\s+/g,"");
+
+			// 5. Collect a sequence of characters that are not space characters, and let that be url.
+			var pos = srcset.search(/\s/g),
+				url, descriptor = null;
+
+			if ( pos !== -1 ) {
+				url = srcset.slice( 0, pos );
+
+				var last = url[ url.length - 1 ];
+
+				// 6. If url ends with a U+002C COMMA character (,), remove that character from url
+				// and let descriptors be the empty string. Otherwise, follow these substeps
+				// 6.1. If url is empty, then jump to the step labeled descriptor parser.
+
+				if ( last === "," || url === "" ) {
+					url = url.replace(/,+$/, "");
+					descriptor = "";
+				}
+				srcset = srcset.slice( pos + 1 );
+
+				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and 
+				// let that be descriptors.
+				if ( descriptor === null ) {
+					var descpos = srcset.indexOf(",");
+					if ( descpos !== -1 ) {
+						descriptor = srcset.slice( 0, descpos );
+						srcset = srcset.slice( descpos + 1 );
+					} else {
+						descriptor = srcset;
+						srcset = "";
+					}
+				}
+			} else {
+				url = srcset;
+				srcset = "";
+			}
+
+			// 7. Add url to raw candidates, associated with descriptors.
+			if ( url || descriptor ) {
+				candidates.push({
+					url: url,
+					descriptor: descriptor
+				});
+			}
+		}
+		return candidates;
+	};
+
+	pf.parseDescriptor = function( descriptor, sizes ) {
+		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list 
+		// is the order in which entries are added to the list.
+		var sizeDescriptor = descriptor && descriptor.replace(/(^\s+|\s+$)/g, ""),
+			widthInCssPixels = sizes ? pf.findWidthFromSourceSize( sizes ) : "100%",
+			resCandidate;
+
+			if ( sizeDescriptor ) {
+				var splitDescriptor = sizeDescriptor.split(" ");
+
+				for (var i = splitDescriptor.length + 1; i >= 0; i--) {
+
+					var curr = splitDescriptor[ i ],
+						lastchar = curr && curr.slice( curr.length - 1 );
+
+					if ( lastchar === "w" || lastchar === "x" ) {
+						resCandidate = curr;
+					}
+					if ( sizes && resCandidate ) {
+						// get the dpr by taking the length / width in css pixels
+						resCandidate = parseFloat( ( parseInt( curr, 10 ) / widthInCssPixels ) );
+					} else {
+						// get the dpr by grabbing the value of Nx
+						var res = curr && parseFloat( curr, 10 );
+
+						resCandidate = res && !isNaN( res ) && lastchar === "x" || lastchar === "w" ? res : 1;
+					}
+				}
+			} else {
+				resCandidate = 1;
+			}
+		return resCandidate;
+	};
+
 	/**
 	 * Takes a srcset in the form of url/
 	 * ex. "images/pic-medium.png 1x, images/pic-medium-2x.png 2x" or
@@ -182,31 +279,16 @@
 	 * If sizes is specified, resolution is calculated
 	 */
 	pf.getCandidatesFromSourceSet = function( srcset, sizes ) {
-		var candidates = pf.trim( srcset ).split( /,\s+/ ),
-			widthInCssPixels = sizes ? pf.findWidthFromSourceSize( sizes ) : "100%",
+		var candidates = pf.parseSrcset( srcset ),
 			formattedCandidates = [];
 
 		for ( var i = 0, len = candidates.length; i < len; i++ ) {
-			var candidate = candidates[ i ],
-				candidateArr = candidate.split( /\s+/ ),
-				sizeDescriptor = candidateArr[ 1 ],
-				resolution;
-			if ( sizeDescriptor && ( sizeDescriptor.slice( -1 ) === "w" || sizeDescriptor.slice( -1 ) === "x" ) ) {
-				sizeDescriptor = sizeDescriptor.slice( 0, -1 );
-			}
-			if ( sizes ) {
-				// get the dpr by taking the length / width in css pixels
-				resolution = parseFloat( ( parseInt( sizeDescriptor, 10 ) / widthInCssPixels ) );
-			} else {
-				// get the dpr by grabbing the value of Nx
-				resolution = sizeDescriptor ? parseFloat( sizeDescriptor, 10 ) : 1;
-			}
+			var candidate = candidates[ i ];
 
-			var formattedCandidate = {
-				url: candidateArr[ 0 ],
-				resolution: resolution
-			};
-			formattedCandidates.push( formattedCandidate );
+			formattedCandidates.push({
+				url: candidate.url,
+				resolution: pf.parseDescriptor( candidate.descriptor, sizes )
+			});
 		}
 		return formattedCandidates;
 	};
