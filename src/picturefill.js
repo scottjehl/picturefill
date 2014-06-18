@@ -3,7 +3,22 @@
 *  License: MIT/GPLv2
 *  Spec: http://picture.responsiveimages.org/
 */
-(function( w, doc ) {
+(function( root, factory ) {
+	if (typeof define === "function" && define.amd) {
+		// AMD. Register as an anonymous module.
+		define([], function() {
+			return factory(root, root.document);
+		});
+	} else if (typeof exports === "object") {
+		// Node. Does not work with strict CommonJS, but
+		// only CommonJS-like environments that support module.exports,
+		// like Node.
+		module.exports = factory(root, root.document);
+	} else {
+		// Browser globals (root is window)
+		root.picturefill = factory(root, root.document);
+	}
+}( this, function( w, doc ) {
 	// Enable strict mode
 	"use strict";
 
@@ -572,16 +587,5 @@
 	/* expose methods for testing */
 	picturefill._ = pf;
 
-	/* expose picturefill */
-	if ( typeof module === "object" && typeof module.exports === "object" ) {
-		// CommonJS, just export
-		module.exports = picturefill;
-	} else if ( typeof define === "function" && define.amd ){
-		// AMD support
-		define( function() { return picturefill; } );
-	} else if ( typeof w === "object" ) {
-		// If no AMD and we are in the browser, attach to window
-		w.picturefill = picturefill;
-	}
-
-} )( this, this.document );
+	return picturefill;
+}));
