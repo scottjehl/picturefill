@@ -2,6 +2,7 @@
 	if ( window.HTMLPictureElement ){
 		test( "Picture is natively supported", function() {
 			ok( window.HTMLPictureElement );
+			ok( window.picturefill );
 		});
 
 		return;

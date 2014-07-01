@@ -9,6 +9,7 @@
 
 	// If picture is supported, well, that's awesome. Let's get outta here...
 	if ( w.HTMLPictureElement ) {
+		w.picturefill = function() { };
 		return;
 	}
 
