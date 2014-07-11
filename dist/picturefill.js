@@ -1,4 +1,4 @@
-/*! Picturefill - v2.1.0-beta - 2014-06-06
+/*! Picturefill - v2.1.0-beta - 2014-07-11
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -58,6 +58,7 @@ window.matchMedia || (window.matchMedia = function() {
 
 	// If picture is supported, well, that's awesome. Let's get outta here...
 	if ( w.HTMLPictureElement ) {
+		w.picturefill = function() { };
 		return;
 	}
 
@@ -102,8 +103,8 @@ window.matchMedia || (window.matchMedia = function() {
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
 	 */
 	pf.getWidthFromLength = function( length ) {
-		// If no length was specified, or it is 0, default to `100vw` (per the spec).
-		length = length && parseFloat( length ) > 0 ? length : "100vw";
+		// If no length was specified, or it is 0 or negative, default to `100vw` (per the spec).
+		length = length && ( parseFloat( length ) > 0 || length.indexOf( "calc(" ) > -1 ) ? length : "100vw";
 
 		/**
 		* If length is specified in  `vw` units, use `%` instead since the div we’re measuring
@@ -121,7 +122,12 @@ window.matchMedia || (window.matchMedia = function() {
 
 		// Positioning styles help prevent padding/margin/width on `html` from throwing calculations off.
 		pf.lengthEl.style.cssText = "position: absolute; left: 0; width: " + length + ";";
-		// Using offsetWidth to get width from CSS
+
+		if ( pf.lengthEl.offsetWidth <= 0 ) {
+			// Something has gone wrong. `calc()` is in use and unsupported, most likely. Default to `100vw` (`100%`, for broader support.):
+			pf.lengthEl.style.cssText = "width: 100%;";
+		}
+
 		return pf.lengthEl.offsetWidth;
 	};
 
