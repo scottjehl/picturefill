@@ -43,7 +43,17 @@
 	});
 
 	test("getWidthFromLength", function() {
-		equal(pf.getWidthFromLength("750px"), 750, "returns int value of width string");
+		var calcTest = (function() {
+			var fullWidthEl = document.createElement( "div" );
+			document.documentElement.insertBefore( fullWidthEl, document.documentElement.firstChild );
+
+			var gotWidth = pf.getWidthFromLength("calc(766px - 1em)");
+
+			return ( gotWidth === 750 || gotWidth === fullWidthEl.offsetWidth );
+		}());
+
+		equal( pf.getWidthFromLength("750px"), 750, "returns int value of width string" );
+		ok( calcTest, "If `calc` is supported, `calc(766px - 1em)` returned `750px`. If `calc` is unsupported, the value was discarded and defaulted to `100vw`.");
 	});
 
 	test("findWidthFromSourceSize", function() {
