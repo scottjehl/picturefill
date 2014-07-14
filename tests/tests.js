@@ -8,14 +8,6 @@
 		return;
 	}
 
-	test("functional: The first matching `source` is selected.", function() {
-		var pic = $( ".first-match" ),
-				firstsource = pic.find( "source" ).eq( 0 ),
-				img = pic.find( "img" );
-
-		equal( img[ 0 ].getAttribute( "src" ), firstsource[ 0 ].getAttribute( "srcset" ) );
-	});
-
 	var pf, originalDprMethod,
 		originalVideoShimMethod,
 		originalMatchesMedia,
@@ -451,10 +443,24 @@
 		equal( $videoShim.find( "source" ).length, 2 );
 	});
 
+	test("getMatch returns the first matching `source`", function() {
+		var firstsource = $( ".first-match" )[ 0 ].parentNode.getElementsByTagName( "source" )[ 0 ];
+
+		equal( pf.getMatch( $( ".first-match" )[ 0 ], $( ".first-match" )[ 0 ].parentNode ), firstsource );
+	});
+
+	test("Each `img` should then check if its parent is `picture`, then loop through `source` elements until finding the `img` that triggered the loop.", function() {
+		var match = $( ".match" )[ 0 ],
+			match2 = $( ".match-second" )[ 0 ],
+			firstSource = match.parentNode.getElementsByTagName( "source" )[ 0 ];
+
+		ok( pf.getMatch( match, match.parentNode ) === undefined && pf.getMatch( match2, match2.parentNode ) === firstSource );
+	});
+
 	test( "getMatch returns false when a source type is pending", function() {
 		pf.types["foo"] = function() {};
 
-		equal( pf.getMatch($(".pending-check")[0]), false, "pending type should be false" );
+		equal( pf.getMatch($(".pending-check")[0], $(".pending-check")[0].parentNode ), false, "pending type should be false" );
 	});
 
 	test( "getMatch returns source when it matches the media", function() {
@@ -463,7 +469,7 @@
 			return true;
 		};
 
-		equal( pf.getMatch( $match[0] ), $match.find( "source" )[0] );
+		equal( pf.getMatch( $match[0], $match[0].parentNode ), $match[0].parentNode.getElementsByTagName( "source" )[0] );
 	});
 
 	test( "getMatch returns undefined when no match is found", function() {
@@ -473,24 +479,24 @@
 
 		var $noMatch = $( ".no-match-check ");
 
-		equal( pf.getMatch( $noMatch[0] ), undefined );
+		equal( pf.getMatch( $noMatch[0], $noMatch[0].parentNode ), undefined );
 	});
 
 	test( "getMatch returns undefined when no srcset is found", function() {
 		var $noSrcset = $( ".no-srcset-check ");
 
-		equal( pf.getMatch( $noSrcset[0] ), undefined );
+		equal( pf.getMatch( $noSrcset[0], $noSrcset[0].parentNode ), undefined );
 	});
 
 	test( "getMatch returns only sources preceding fallback img", function() {
 		var $ignoredSource = $( ".ignored-source-check" );
 
 		// ensure the construction of the fixture
-		equal($ignoredSource.children()[0].nodeName, "IMG" );
-		equal($ignoredSource.children()[1].nodeName, "SOURCE" );
+		equal($ignoredSource[0].nodeName, "IMG" );
+		equal($ignoredSource.next()[0].nodeName, "SOURCE" );
 
 		// ensure that the result is undefined so the picture is grabbed later
-		equal( pf.getMatch( $ignoredSource[0] ), undefined, "no source found" );
+		equal( pf.getMatch( $ignoredSource[0], $ignoredSource[0].parentNode ), undefined, "no source found" );
 	});
 
 	test( "picturefill ignores elements when they are marked with a property", function() {
