@@ -429,11 +429,10 @@
 			// ignore non-`source` nodes
 			if ( source.nodeName.toUpperCase() !== "SOURCE" ) {
 				continue;
-			} else {
-				// if it's a source element that has the `src` property set, throw a warning in the console
-				if (source.getAttribute("src") !== null){
-					console.warn("You should not use `src` inside of a <source> element; instead, use `srcset`.");
-				}
+			}
+			// if it's a source element that has the `src` property set, throw a warning in the console
+			if (source.getAttribute("src") !== null && typeof console !== undefined){
+				console.warn("You should not use `src` inside of a <source> element; instead, use `srcset`.");
 			}
 
 			var media = source.getAttribute( "media" );
