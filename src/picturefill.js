@@ -9,6 +9,7 @@
 
 	// If picture is supported, well, that's awesome. Let's get outta here...
 	if ( w.HTMLPictureElement ) {
+		w.picturefill = function() { };
 		return;
 	}
 
@@ -22,7 +23,8 @@
 	pf.ns = "picturefill";
 
 	// srcset support test
-	pf.srcsetSupported = new w.Image().srcset !== undefined;
+	pf.srcsetSupported = "srcset" in doc.createElement( "img" );
+	pf.sizesSupported = w.HTMLImageElement.sizes;
 
 	// just a string trim workaround
 	pf.trim = function( str ) {
@@ -53,8 +55,8 @@
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
 	 */
 	pf.getWidthFromLength = function( length ) {
-		// If no length was specified, or it is 0, default to `100vw` (per the spec).
-		length = length && parseFloat( length ) > 0 ? length : "100vw";
+		// If no length was specified, or it is 0 or negative, default to `100vw` (per the spec).
+		length = length && ( parseFloat( length ) > 0 || length.indexOf( "calc(" ) > -1 ) ? length : "100vw";
 
 		/**
 		* If length is specified in  `vw` units, use `%` instead since the div we’re measuring
@@ -72,7 +74,12 @@
 
 		// Positioning styles help prevent padding/margin/width on `html` from throwing calculations off.
 		pf.lengthEl.style.cssText = "position: absolute; left: 0; width: " + length + ";";
-		// Using offsetWidth to get width from CSS
+
+		if ( pf.lengthEl.offsetWidth <= 0 ) {
+			// Something has gone wrong. `calc()` is in use and unsupported, most likely. Default to `100vw` (`100%`, for broader support.):
+			pf.lengthEl.style.cssText = "width: 100%;";
+		}
+
 		return pf.lengthEl.offsetWidth;
 	};
 
@@ -156,7 +163,7 @@
 				media = parsedSize.media;
 
 			if ( !length ) {
-					continue;
+				continue;
 			}
 			if ( !media || pf.matchesMedia( media ) ) {
 				// if there is no media query or it matches, choose this as our winning length
@@ -234,38 +241,32 @@
 		return candidates;
 	};
 
-	pf.parseDescriptor = function( descriptor, sizes ) {
+	pf.parseDescriptor = function( descriptor, sizesattr ) {
 		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list 
 		// is the order in which entries are added to the list.
-		var sizeDescriptor = descriptor && descriptor.replace(/(^\s+|\s+$)/g, ""),
-			widthInCssPixels = sizes ? pf.findWidthFromSourceSize( sizes ) : "100%",
+		var sizes = sizesattr || "100vw",
+			sizeDescriptor = descriptor && descriptor.replace(/(^\s+|\s+$)/g, ""),
+			widthInCssPixels = pf.findWidthFromSourceSize( sizes ),
 			resCandidate;
 
 			if ( sizeDescriptor ) {
 				var splitDescriptor = sizeDescriptor.split(" ");
 
 				for (var i = splitDescriptor.length + 1; i >= 0; i--) {
+					if ( splitDescriptor[ i ] !== undefined ) {
+						var curr = splitDescriptor[ i ],
+							lastchar = curr && curr.slice( curr.length - 1 );
 
-					var curr = splitDescriptor[ i ],
-						lastchar = curr && curr.slice( curr.length - 1 );
-
-					if ( lastchar === "w" || lastchar === "x" ) {
-						resCandidate = curr;
-					}
-					if ( sizes && resCandidate ) {
-						// get the dpr by taking the length / width in css pixels
-						resCandidate = parseFloat( ( parseInt( curr, 10 ) / widthInCssPixels ) );
-					} else {
-						// get the dpr by grabbing the value of Nx
-						var res = curr && parseFloat( curr, 10 );
-
-						resCandidate = res && !isNaN( res ) && lastchar === "x" || lastchar === "w" ? res : 1;
+						if ( ( lastchar === "h" || lastchar === "w" ) && !pf.sizesSupported ) {
+							resCandidate = parseFloat( ( parseInt( curr, 10 ) / widthInCssPixels ) );
+						} else if ( lastchar === "x" ) {
+							var res = curr && parseFloat( curr, 10 );
+							resCandidate = res && !isNaN( res ) ? res : 1;
+						}
 					}
 				}
-			} else {
-				resCandidate = 1;
 			}
-		return resCandidate;
+		return resCandidate || 1;
 	};
 
 	/**
@@ -343,7 +344,7 @@
 			}
 		}
 
-		if ( !pf.endsWith( picImg.src, bestCandidate.url ) ) {
+		if ( bestCandidate && !pf.endsWith( picImg.src, bestCandidate.url ) ) {
 			picImg.src = bestCandidate.url;
 			// currentSrc attribute and property to match
 			// http://picture.responsiveimages.org/#the-img-element
@@ -376,32 +377,26 @@
 	};
 
 	/*
-	 * Find all picture elements and,
-	 * in browsers that don't natively support srcset, find all img elements
-	 * with srcset attrs that don't have picture parents
+	 * Find all `img` elements, and add them to the candidate list if they have
+	 * a `picture` parent, a `sizes` attribute in basic `srcset` supporting browsers,
+	 * a `srcset` attribute at all, and they haven’t been evaluated already.
 	 */
 	pf.getAllElements = function() {
-		var pictures = doc.getElementsByTagName( "picture" ),
-			elems = [],
+		var elems = [],
 			imgs = doc.getElementsByTagName( "img" );
 
-		for ( var h = 0, len = pictures.length + imgs.length; h < len; h++ ) {
-			if ( h < pictures.length ) {
-				elems[ h ] = pictures[ h ];
-			} else {
-				var currImg = imgs[ h - pictures.length ];
+		for ( var h = 0, len = imgs.length; h < len; h++ ) {
+			var currImg = imgs[ h ];
 
-				if ( currImg.parentNode.nodeName.toUpperCase() !== "PICTURE" &&
-					( ( pf.srcsetSupported && currImg.getAttribute( "sizes" ) ) ||
-					currImg.getAttribute( "srcset" ) !== null ) ) {
-						elems.push( currImg );
-				}
+			if ( currImg.parentNode.nodeName.toUpperCase() === "PICTURE" ||
+				( currImg.getAttribute( "srcset" ) !== null ) || currImg[ pf.ns ] && currImg[ pf.ns ].srcset !== null ) {
+					elems.push( currImg );
 			}
 		}
 		return elems;
 	};
 
-	pf.getMatch = function( picture ) {
+	pf.getMatch = function( img, picture ) {
 		var sources = picture.childNodes,
 			match;
 
@@ -414,15 +409,19 @@
 				continue;
 			}
 
-			// Hitting an `img` element stops the search for `sources`.
+			// Hitting the `img` element that started everything stops the search for `sources`.
 			// If no previous `source` matches, the `img` itself is evaluated later.
-			if ( source.nodeName.toUpperCase() === "IMG" ) {
+			if ( source === img ) {
 				return match;
 			}
 
 			// ignore non-`source` nodes
 			if ( source.nodeName.toUpperCase() !== "SOURCE" ) {
 				continue;
+			}
+			// if it's a source element that has the `src` property set, throw a warning in the console
+			if ( source.getAttribute( "src" ) !== null && typeof console !== undefined ){
+				console.warn("The `src` attribute is invalid on `picture` `source` element; instead, use `srcset`.");
 			}
 
 			var media = source.getAttribute( "media" );
@@ -448,24 +447,22 @@
 		return match;
 	};
 
-	function picturefill( options ) {
+	function picturefill( opt ) {
 		var elements,
 			element,
-			elemType,
+			parent,
 			firstMatch,
 			candidates,
-			picImg;
 
-		options = options || {};
+		options = opt || {};
 		elements = options.elements || pf.getAllElements();
 
 		// Loop through all elements
 		for ( var i = 0, plen = elements.length; i < plen; i++ ) {
 			element = elements[ i ];
-			elemType = element.nodeName.toUpperCase();
+			parent = element.parentNode;
 			firstMatch = undefined;
 			candidates = undefined;
-			picImg = undefined;
 
 			// expando for caching data on the img
 			if ( !element[ pf.ns ] ) {
@@ -479,16 +476,16 @@
 				continue;
 			}
 
-			// if element is a picture element
-			if ( elemType === "PICTURE" ) {
+			// if `img` is in a `picture` element
+			if ( parent.nodeName.toUpperCase() === "PICTURE" ) {
 
 				// IE9 video workaround
-				pf.removeVideoShim( element );
+				pf.removeVideoShim( parent );
 
 				// return the first match which might undefined
 				// returns false if there is a pending source
 				// TODO the return type here is brutal, cleanup
-				firstMatch = pf.getMatch( element );
+				firstMatch = pf.getMatch( element, parent );
 
 				// if any sources are pending in this picture due to async type test(s)
 				// remove the evaluated attr and skip for now ( the pending test will
@@ -496,43 +493,32 @@
 				if ( firstMatch === false ) {
 					continue;
 				}
-
-				// Find any existing img element in the picture element
-				picImg = element.getElementsByTagName( "img" )[ 0 ];
 			} else {
-				// if it's an img element
 				firstMatch = undefined;
-				picImg = element;
 			}
 
-			if ( picImg ) {
-
-				// expando for caching data on the img
-				if ( !picImg[ pf.ns ] ) {
-					picImg[ pf.ns ] = {};
-				}
-
-				// Cache and remove `srcset` if present and we’re going to be doing `sizes`/`picture` polyfilling to it.
-				if ( picImg.srcset && ( elemType === "PICTURE" || picImg.getAttribute( "sizes" ) ) ) {
-					pf.dodgeSrcset( picImg );
-				}
-
-				if ( firstMatch ) {
-					candidates = pf.processSourceSet( firstMatch );
-					pf.applyBestCandidate( candidates, picImg );
-				} else {
-					// No sources matched, so we’re down to processing the inner `img` as a source.
-					candidates = pf.processSourceSet( picImg );
-
-					if ( picImg.srcset === undefined || picImg[ pf.ns ].srcset ) {
-						// Either `srcset` is completely unsupported, or we need to polyfill `sizes` functionality.
-						pf.applyBestCandidate( candidates, picImg );
-					} // Else, resolution-only `srcset` is supported natively.
-				}
-
-				// set evaluated to true to avoid unnecessary reparsing
-				element[ pf.ns ].evaluated = true;
+			// Cache and remove `srcset` if present and we’re going to be doing `picture`/`srcset`/`sizes` polyfilling to it.
+			if ( parent.nodeName.toUpperCase() === "PICTURE" ||
+			( element.srcset && !pf.srcsetSupported ) ||
+			( !pf.sizesSupported && ( element.srcset && element.srcset.indexOf("w") > -1 ) ) ) {
+				pf.dodgeSrcset( element );
 			}
+
+			if ( firstMatch ) {
+				candidates = pf.processSourceSet( firstMatch );
+				pf.applyBestCandidate( candidates, element );
+			} else {
+				// No sources matched, so we’re down to processing the inner `img` as a source.
+				candidates = pf.processSourceSet( element );
+
+				if ( element.srcset === undefined || element[ pf.ns ].srcset ) {
+					// Either `srcset` is completely unsupported, or we need to polyfill `sizes` functionality.
+					pf.applyBestCandidate( candidates, element );
+				} // Else, resolution-only `srcset` is supported natively.
+			}
+
+			// set evaluated to true to avoid unnecessary reparsing
+			element[ pf.ns ].evaluated = true;
 		}
 	}
 

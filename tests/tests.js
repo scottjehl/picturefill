@@ -2,18 +2,11 @@
 	if ( window.HTMLPictureElement ){
 		test( "Picture is natively supported", function() {
 			ok( window.HTMLPictureElement );
+			ok( window.picturefill );
 		});
 
 		return;
 	}
-
-	test("functional: The first matching `source` is selected.", function() {
-		var pic = $( ".first-match" ),
-				firstsource = pic.find( "source" ).eq( 0 ),
-				img = pic.find( "img" );
-
-		equal( img[ 0 ].getAttribute( "src" ), firstsource[ 0 ].getAttribute( "srcset" ) );
-	});
 
 	var pf, originalDprMethod,
 		originalVideoShimMethod,
@@ -42,7 +35,17 @@
 	});
 
 	test("getWidthFromLength", function() {
-		equal(pf.getWidthFromLength("750px"), 750, "returns int value of width string");
+		var calcTest = (function() {
+			var fullWidthEl = document.createElement( "div" );
+			document.documentElement.insertBefore( fullWidthEl, document.documentElement.firstChild );
+
+			var gotWidth = pf.getWidthFromLength("calc(766px - 1em)");
+
+			return ( gotWidth === 750 || gotWidth === fullWidthEl.offsetWidth );
+		}());
+
+		equal( pf.getWidthFromLength("750px"), 750, "returns int value of width string" );
+		ok( calcTest, "If `calc` is supported, `calc(766px - 1em)` returned `750px`. If `calc` is unsupported, the value was discarded and defaulted to `100vw`.");
 	});
 
 	test("findWidthFromSourceSize", function() {
@@ -201,10 +204,10 @@
 		var expectedresult1 = [
 			{
 				url: "foo,bar.png",
-				resolution: 320
+				resolution: 0.5
 			},{
 				url: "bar,baz.png",
-				resolution: 320
+				resolution: 0.5
 			}
 		];
 		deepEqual(pf.getCandidatesFromSourceSet(srcset1), expectedresult1, "`" + srcset1 + "` is parsed correctly" );
@@ -213,10 +216,10 @@
 		var expectedresult2 = [
 			{
 				url: "foo,bar.png",
-				resolution: 320
+				resolution: 0.5
 			},{
 				url: "bar,baz.png",
-				resolution: 320
+				resolution: 0.5
 			}
 		];
 
@@ -289,10 +292,10 @@
 		var expectedresult8 = [
 			{
 				url: "400.gif",
-				resolution: 400
+				resolution: 0.625
 			},{
 				url: "6000.gif",
-				resolution: 6000
+				resolution: 9.375
 			}
 		];
 		deepEqual(pf.getCandidatesFromSourceSet(srcset8), expectedresult8, "`" + srcset8 + "` is parsed correctly" );
@@ -304,7 +307,7 @@
 				resolution: 2
 			},{
 				url: "1600.gif",
-				resolution: 1600
+				resolution: 2.5
 			}
 		];
 		deepEqual(pf.getCandidatesFromSourceSet(srcset9), expectedresult9, "`" + srcset9 + "` is parsed correctly" );
@@ -440,10 +443,24 @@
 		equal( $videoShim.find( "source" ).length, 2 );
 	});
 
+	test("getMatch returns the first matching `source`", function() {
+		var firstsource = $( ".first-match" )[ 0 ].parentNode.getElementsByTagName( "source" )[ 0 ];
+
+		equal( pf.getMatch( $( ".first-match" )[ 0 ], $( ".first-match" )[ 0 ].parentNode ), firstsource );
+	});
+
+	test("Each `img` should then check if its parent is `picture`, then loop through `source` elements until finding the `img` that triggered the loop.", function() {
+		var match = $( ".match" )[ 0 ],
+			match2 = $( ".match-second" )[ 0 ],
+			firstSource = match.parentNode.getElementsByTagName( "source" )[ 0 ];
+
+		ok( pf.getMatch( match, match.parentNode ) === undefined && pf.getMatch( match2, match2.parentNode ) === firstSource );
+	});
+
 	test( "getMatch returns false when a source type is pending", function() {
 		pf.types["foo"] = function() {};
 
-		equal( pf.getMatch($(".pending-check")[0]), false, "pending type should be false" );
+		equal( pf.getMatch($(".pending-check")[0], $(".pending-check")[0].parentNode ), false, "pending type should be false" );
 	});
 
 	test( "getMatch returns source when it matches the media", function() {
@@ -452,7 +469,7 @@
 			return true;
 		};
 
-		equal( pf.getMatch( $match[0] ), $match.find( "source" )[0] );
+		equal( pf.getMatch( $match[0], $match[0].parentNode ), $match[0].parentNode.getElementsByTagName( "source" )[0] );
 	});
 
 	test( "getMatch returns undefined when no match is found", function() {
@@ -462,24 +479,24 @@
 
 		var $noMatch = $( ".no-match-check ");
 
-		equal( pf.getMatch( $noMatch[0] ), undefined );
+		equal( pf.getMatch( $noMatch[0], $noMatch[0].parentNode ), undefined );
 	});
 
 	test( "getMatch returns undefined when no srcset is found", function() {
 		var $noSrcset = $( ".no-srcset-check ");
 
-		equal( pf.getMatch( $noSrcset[0] ), undefined );
+		equal( pf.getMatch( $noSrcset[0], $noSrcset[0].parentNode ), undefined );
 	});
 
 	test( "getMatch returns only sources preceding fallback img", function() {
 		var $ignoredSource = $( ".ignored-source-check" );
 
 		// ensure the construction of the fixture
-		equal($ignoredSource.children()[0].nodeName, "IMG" );
-		equal($ignoredSource.children()[1].nodeName, "SOURCE" );
+		equal($ignoredSource[0].nodeName, "IMG" );
+		equal($ignoredSource.next()[0].nodeName, "SOURCE" );
 
 		// ensure that the result is undefined so the picture is grabbed later
-		equal( pf.getMatch( $ignoredSource[0] ), undefined, "no source found" );
+		equal( pf.getMatch( $ignoredSource[0], $ignoredSource[0].parentNode ), undefined, "no source found" );
 	});
 
 	test( "picturefill ignores elements when they are marked with a property", function() {

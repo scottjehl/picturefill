@@ -14,43 +14,60 @@
 <div id="qunit-fixture">
 
 	<!-- Functional tests -->
-	<picture class="first-match">
+	<picture>
 		<!-- First `source` in source order is selected -->
 		<source srcset="../examples/images/small.jpg"></source>
 		<source srcset="../examples/images/extralarge.jpg"></source>
-		<img>
+		<img class="first-match">
+	</picture>
+
+	<picture>
+		<!-- First `source` in source order is selected -->
+		<img class="match">
+		<source srcset="baz"></source>
+		<img class="match-second">
 	</picture>
 
 	<!-- dummy elements used as a mock pictures -->
-	<div class="video-shim">
+	<picture class="video-shim">
 		<video>
 			<source class="source-one"/>
 			<source class="source-two"/>
 		</video>
-	</div>
+	</picture>
 
 	<img src="bar" class="prop-check"/>
 
-	<div class="pending-check">
-    <source type="foo" srcset="foo"/>
-  </div>
+	<picture>
+		<source type="foo" srcset="foo"/>
+		<img class="pending-check" src="test" />
+	</picture>
 
-  <div class="match-check">
-    <source srcset="foo" media="bar"/>
-  </div>
+	<picture>
+		<source srcset="foo" media="bar"/>
+		<img class="match-check" src="test" />
+	</picture>
 
-  <div class="no-match-check">
-    <source srcset="foo" media="bar"/>
-  </div>
+	<picture>
+		<source srcset="foo" media="bar"/>
+		<img class="no-match-check" src="test" />
+	</picture>
 
-  <div class="no-srcset-check">
-    <source media="bar"/>
-  </div>
+	<picture>
+		<source media="bar"/>
+		<img class="no-srcset-check" src="test" />
+	</picture>
 
-  <div class="ignored-source-check">
-    <img srcset="bar"/>
-    <source srcset="foo"/>
-  </div>
+	<picture>
+		<img class="ignored-source-check" srcset="foo"/>
+		<source srcset="bar"/>
+	</picture>
+
+	<div class="src-source-check">
+		<picture>
+			<source src="foo"/>
+		</picture>
+	</div>
 
 </div>
 
