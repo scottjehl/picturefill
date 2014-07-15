@@ -419,6 +419,10 @@
 			if ( source.nodeName.toUpperCase() !== "SOURCE" ) {
 				continue;
 			}
+			// if it's a source element that has the `src` property set, throw a warning in the console
+			if ( source.getAttribute( "src" ) !== null && typeof console !== undefined ){
+				console.warn("The `src` attribute is invalid on `picture` `source` element; instead, use `srcset`.");
+			}
 
 			var media = source.getAttribute( "media" );
 
