@@ -1,4 +1,4 @@
-/*! Picturefill - v2.1.0-beta - 2014-07-14
+/*! Picturefill - v2.1.0-beta - 2014-07-15
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -72,7 +72,8 @@ window.matchMedia || (window.matchMedia = function() {
 	pf.ns = "picturefill";
 
 	// srcset support test
-	pf.srcsetSupported = new w.Image().srcset !== undefined;
+	pf.srcsetSupported = "srcset" in doc.createElement( "img" );
+	pf.sizesSupported = w.HTMLImageElement.sizes;
 
 	// just a string trim workaround
 	pf.trim = function( str ) {
@@ -289,38 +290,32 @@ window.matchMedia || (window.matchMedia = function() {
 		return candidates;
 	};
 
-	pf.parseDescriptor = function( descriptor, sizes ) {
+	pf.parseDescriptor = function( descriptor, sizesattr ) {
 		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list 
 		// is the order in which entries are added to the list.
-		var sizeDescriptor = descriptor && descriptor.replace(/(^\s+|\s+$)/g, ""),
-			widthInCssPixels = sizes ? pf.findWidthFromSourceSize( sizes ) : "100%",
+		var sizes = sizesattr || "100vw",
+			sizeDescriptor = descriptor && descriptor.replace(/(^\s+|\s+$)/g, ""),
+			widthInCssPixels = pf.findWidthFromSourceSize( sizes ),
 			resCandidate;
 
 			if ( sizeDescriptor ) {
 				var splitDescriptor = sizeDescriptor.split(" ");
 
 				for (var i = splitDescriptor.length + 1; i >= 0; i--) {
+					if ( splitDescriptor[ i ] !== undefined ) {
+						var curr = splitDescriptor[ i ],
+							lastchar = curr && curr.slice( curr.length - 1 );
 
-					var curr = splitDescriptor[ i ],
-						lastchar = curr && curr.slice( curr.length - 1 );
-
-					if ( lastchar === "w" || lastchar === "x" ) {
-						resCandidate = curr;
-					}
-					if ( sizes && resCandidate ) {
-						// get the dpr by taking the length / width in css pixels
-						resCandidate = parseFloat( ( parseInt( curr, 10 ) / widthInCssPixels ) );
-					} else {
-						// get the dpr by grabbing the value of Nx
-						var res = curr && parseFloat( curr, 10 );
-
-						resCandidate = res && !isNaN( res ) && lastchar === "x" || lastchar === "w" ? res : 1;
+						if ( ( lastchar === "h" || lastchar === "w" ) && !pf.sizesSupported ) {
+							resCandidate = parseFloat( ( parseInt( curr, 10 ) / widthInCssPixels ) );
+						} else if ( lastchar === "x" ) {
+							var res = curr && parseFloat( curr, 10 );
+							resCandidate = res && !isNaN( res ) ? res : 1;
+						}
 					}
 				}
-			} else {
-				resCandidate = 1;
 			}
-		return resCandidate;
+		return resCandidate || 1;
 	};
 
 	/**
@@ -398,7 +393,6 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 		}
 
-		//if ( bestCandidate && !pf.endsWith( picImg.src, bestCandidate.url ) ) {
 		if ( bestCandidate && !pf.endsWith( picImg.src, bestCandidate.url ) ) {
 			picImg.src = bestCandidate.url;
 			// currentSrc attribute and property to match
@@ -432,9 +426,9 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	/*
-	 * Find all picture elements and,
-	 * in browsers that don't natively support srcset, find all img elements
-	 * with srcset attrs that don't have picture parents
+	 * Find all `img` elements, and add them to the candidate list if they have
+	 * a `picture` parent, a `sizes` attribute in basic `srcset` supporting browsers,
+	 * a `srcset` attribute at all, and they haven’t been evaluated already.
 	 */
 	pf.getAllElements = function() {
 		var elems = [],
@@ -444,9 +438,7 @@ window.matchMedia || (window.matchMedia = function() {
 			var currImg = imgs[ h ];
 
 			if ( currImg.parentNode.nodeName.toUpperCase() === "PICTURE" ||
-				( ( pf.srcsetSupported && currImg.getAttribute( "sizes" ) ) ||
-				currImg.getAttribute( "srcset" ) !== null ) ||
-				currImg[ pf.ns ] && currImg[ pf.ns ].srcset !== null ) {
+				( currImg.getAttribute( "srcset" ) !== null ) || currImg[ pf.ns ] && currImg[ pf.ns ].srcset !== null ) {
 					elems.push( currImg );
 			}
 		}
@@ -466,7 +458,7 @@ window.matchMedia || (window.matchMedia = function() {
 				continue;
 			}
 
-			// Hitting an unevaluated `img` element stops the search for `sources`.
+			// Hitting the `img` element that started everything stops the search for `sources`.
 			// If no previous `source` matches, the `img` itself is evaluated later.
 			if ( source === img ) {
 				return match;
@@ -550,8 +542,10 @@ window.matchMedia || (window.matchMedia = function() {
 				firstMatch = undefined;
 			}
 
-			// Cache and remove `srcset` if present and we’re going to be doing `sizes`/`picture` polyfilling to it.
-			if ( element.srcset && ( parent.nodeName.toUpperCase() === "PICTURE" || element.getAttribute( "sizes" ) ) ) {
+			// Cache and remove `srcset` if present and we’re going to be doing `picture`/`srcset`/`sizes` polyfilling to it.
+			if ( parent.nodeName.toUpperCase() === "PICTURE" ||
+			( element.srcset && !pf.srcsetSupported ) ||
+			( !pf.sizesSupported && ( element.srcset && element.srcset.indexOf("w") > -1 ) ) ) {
 				pf.dodgeSrcset( element );
 			}
 

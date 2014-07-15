@@ -204,10 +204,10 @@
 		var expectedresult1 = [
 			{
 				url: "foo,bar.png",
-				resolution: 320
+				resolution: 0.5
 			},{
 				url: "bar,baz.png",
-				resolution: 320
+				resolution: 0.5
 			}
 		];
 		deepEqual(pf.getCandidatesFromSourceSet(srcset1), expectedresult1, "`" + srcset1 + "` is parsed correctly" );
@@ -216,10 +216,10 @@
 		var expectedresult2 = [
 			{
 				url: "foo,bar.png",
-				resolution: 320
+				resolution: 0.5
 			},{
 				url: "bar,baz.png",
-				resolution: 320
+				resolution: 0.5
 			}
 		];
 
@@ -292,10 +292,10 @@
 		var expectedresult8 = [
 			{
 				url: "400.gif",
-				resolution: 400
+				resolution: 0.625
 			},{
 				url: "6000.gif",
-				resolution: 6000
+				resolution: 9.375
 			}
 		];
 		deepEqual(pf.getCandidatesFromSourceSet(srcset8), expectedresult8, "`" + srcset8 + "` is parsed correctly" );
@@ -307,7 +307,7 @@
 				resolution: 2
 			},{
 				url: "1600.gif",
-				resolution: 1600
+				resolution: 2.5
 			}
 		];
 		deepEqual(pf.getCandidatesFromSourceSet(srcset9), expectedresult9, "`" + srcset9 + "` is parsed correctly" );
