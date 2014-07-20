@@ -7,6 +7,9 @@
 	"scripts": [
 		"dist/picturefill.js"
 	],
+	"dependencies": {
+		"html5shiv": "~3.7.2"
+	},
 	"license": "MIT",
 	"homepage": "http://scottjehl.github.com/picturefill/",
 	"authors": [
