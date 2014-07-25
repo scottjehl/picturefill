@@ -1,4 +1,4 @@
-/*! Picturefill - v2.1.0-beta2 - 2014-07-17
+/*! Picturefill - v2.1.0 - 2014-07-25
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -467,6 +467,10 @@ window.matchMedia || (window.matchMedia = function() {
 			// ignore non-`source` nodes
 			if ( source.nodeName.toUpperCase() !== "SOURCE" ) {
 				continue;
+			}
+			// if it's a source element that has the `src` property set, throw a warning in the console
+			if ( source.getAttribute( "src" ) !== null && typeof console !== undefined ){
+				console.warn("The `src` attribute is invalid on `picture` `source` element; instead, use `srcset`.");
 			}
 
 			var media = source.getAttribute( "media" );
