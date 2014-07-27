@@ -36,16 +36,12 @@
 		return str.endsWith ? str.endsWith( suffix ) : str.indexOf( suffix, str.length - suffix.length ) !== -1;
 	};
 
-	/**
-	 * Shortcut method for matchMedia ( for easy overriding in tests )
-	 */
+	// Shortcut method for matchMedia ( for easy overriding in tests )
 	pf.matchesMedia = function( media ) {
 		return w.matchMedia && w.matchMedia( media ).matches;
 	};
 
-	/**
-	 * Shortcut method for `devicePixelRatio` ( for easy overriding in tests )
-	 */
+	// Shortcut method for `devicePixelRatio` ( for easy overriding in tests )
 	pf.getDpr = function() {
 		return ( w.devicePixelRatio || 1 );
 	};
@@ -59,11 +55,11 @@
 		length = length && ( parseFloat( length ) > 0 || length.indexOf( "calc(" ) > -1 ) ? length : "100vw";
 
 		/**
-		* If length is specified in  `vw` units, use `%` instead since the div we’re measuring
-		* is injected at the top of the document.
-		*
-		* TODO: maybe we should put this behind a feature test for `vw`?
-		*/
+		 * If length is specified in  `vw` units, use `%` instead since the div we’re measuring
+		 * is injected at the top of the document.
+		 *
+		 * TODO: maybe we should put this behind a feature test for `vw`?
+		 */
 		length = length.replace( "vw", "%" );
 
 		// Create a cached element for getting length value widths
@@ -86,10 +82,10 @@
 	// container of supported mime types that one might need to qualify before using
 	pf.types =  {};
 
-	// Add support for standard mime types.
-	pf.types["image/jpeg"] = true;
-	pf.types["image/gif"] = true;
-	pf.types["image/png"] = true;
+	// Add support for standard mime types
+	pf.types[ "image/jpeg" ] = true;
+	pf.types[ "image/gif" ] = true;
+	pf.types[ "image/png" ] = true;
 
 	// test svg support
 	pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Image", "1.1");
@@ -134,9 +130,7 @@
 		}
 	};
 
-	/**
-	* Parses an individual `size` and returns the length, and optional media query
-	*/
+	// Parses an individual `size` and returns the length, and optional media query
 	pf.parseSize = function( sourceSizeStr ) {
 		var match = /(\([^)]+\))?\s*(.+)/g.exec( sourceSizeStr );
 		return {
@@ -145,9 +139,7 @@
 		};
 	};
 
-	/**
-	 * Takes a string of sizes and returns the width in pixels as a number
-	 */
+	// Takes a string of sizes and returns the width in pixels as a number
 	pf.findWidthFromSourceSize = function( sourceSizeListStr ) {
 		// Split up source size list, ie ( max-width: 30em ) 100%, ( max-width: 50em ) 50%, 33%
 		//                            or (min-width:30em) calc(30% - 15px)
@@ -180,19 +172,19 @@
 
 	pf.parseSrcset = function( srcset ) {
 		/**
-		* A lot of this was pulled from Boris Smus’ parser for the now-defunct WHATWG `srcset`
-		* https://github.com/borismus/srcset-polyfill/blob/master/js/srcset-info.js
-		*
-		* 1. Let input (`srcset`) be the value passed to this algorithm.
-		* 2. Let position be a pointer into input, initially pointing at the start of the string.
-		* 3. Let raw candidates be an initially empty ordered list of URLs with associated 
-		*    unparsed descriptors. The order of entries in the list is the order in which entries 
-		*    are added to the list.
-		*/
+		 * A lot of this was pulled from Boris Smus’ parser for the now-defunct WHATWG `srcset`
+		 * https://github.com/borismus/srcset-polyfill/blob/master/js/srcset-info.js
+		 *
+		 * 1. Let input (`srcset`) be the value passed to this algorithm.
+		 * 2. Let position be a pointer into input, initially pointing at the start of the string.
+		 * 3. Let raw candidates be an initially empty ordered list of URLs with associated 
+		 *    unparsed descriptors. The order of entries in the list is the order in which entries 
+		 *    are added to the list.
+		 */
 		var candidates = [];
 
 		while ( srcset !== "" ) {
-			srcset = srcset.replace(/^\s+/g,"");
+			srcset = srcset.replace( /^\s+/g, "" );
 
 			// 5. Collect a sequence of characters that are not space characters, and let that be url.
 			var pos = srcset.search(/\s/g),
@@ -208,7 +200,7 @@
 				// 6.1. If url is empty, then jump to the step labeled descriptor parser.
 
 				if ( last === "," || url === "" ) {
-					url = url.replace(/,+$/, "");
+					url = url.replace( /,+$/, "" );
 					descriptor = "";
 				}
 				srcset = srcset.slice( pos + 1 );
@@ -216,7 +208,7 @@
 				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and 
 				// let that be descriptors.
 				if ( descriptor === null ) {
-					var descpos = srcset.indexOf(",");
+					var descpos = srcset.indexOf( "," );
 					if ( descpos !== -1 ) {
 						descriptor = srcset.slice( 0, descpos );
 						srcset = srcset.slice( descpos + 1 );
@@ -245,7 +237,7 @@
 		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list 
 		// is the order in which entries are added to the list.
 		var sizes = sizesattr || "100vw",
-			sizeDescriptor = descriptor && descriptor.replace(/(^\s+|\s+$)/g, ""),
+			sizeDescriptor = descriptor && descriptor.replace( /(^\s+|\s+$)/g, "" ),
 			widthInCssPixels = pf.findWidthFromSourceSize( sizes ),
 			resCandidate;
 
@@ -294,7 +286,7 @@
 		return formattedCandidates;
 	};
 
-	/*
+	/**
 	 * if it's an img element and it has a srcset property,
 	 * we need to remove the attribute so we can manipulate src
 	 * (the property's existence infers native srcset support, and a srcset-supporting browser will prioritize srcset's value over our winning picture candidate)
@@ -307,9 +299,7 @@
 		}
 	};
 
-	/*
-	 * Accept a source or img element and process its srcset and sizes attrs
-	 */
+	// Accept a source or img element and process its srcset and sizes attrs
 	pf.processSourceSet = function( el ) {
 		var srcset = el.getAttribute( "srcset" ),
 			sizes = el.getAttribute( "sizes" ),
@@ -356,7 +346,7 @@
 		return a.resolution - b.resolution;
 	};
 
-	/*
+	/**
 	 * In IE9, <source> elements get removed if they aren't children of
 	 * video elements. Thus, we conditionally wrap source elements
 	 * using <!--[if IE 9]><video style="display: none;"><![endif]-->
@@ -376,7 +366,7 @@
 		}
 	};
 
-	/*
+	/**
 	 * Find all `img` elements, and add them to the candidate list if they have
 	 * a `picture` parent, a `sizes` attribute in basic `srcset` supporting browsers,
 	 * a `srcset` attribute at all, and they haven’t been evaluated already.
@@ -389,8 +379,8 @@
 			var currImg = imgs[ h ];
 
 			if ( currImg.parentNode.nodeName.toUpperCase() === "PICTURE" ||
-				( currImg.getAttribute( "srcset" ) !== null ) || currImg[ pf.ns ] && currImg[ pf.ns ].srcset !== null ) {
-					elems.push( currImg );
+			( currImg.getAttribute( "srcset" ) !== null ) || currImg[ pf.ns ] && currImg[ pf.ns ].srcset !== null ) {
+				elems.push( currImg );
 			}
 		}
 		return elems;
@@ -420,7 +410,7 @@
 				continue;
 			}
 			// if it's a source element that has the `src` property set, throw a warning in the console
-			if ( source.getAttribute( "src" ) !== null && typeof console !== undefined ){
+			if ( source.getAttribute( "src" ) !== null && typeof console !== undefined ) {
 				console.warn("The `src` attribute is invalid on `picture` `source` element; instead, use `srcset`.");
 			}
 
@@ -453,8 +443,8 @@
 			parent,
 			firstMatch,
 			candidates,
+			options = opt || {};
 
-		options = opt || {};
 		elements = options.elements || pf.getAllElements();
 
 		// Loop through all elements
@@ -469,8 +459,8 @@
 				element[ pf.ns ] = {};
 			}
 
-			// if the element has already been evaluated, skip it
-			// unless `options.force` is set to true ( this, for example,
+			// if the element has already been evaluated, skip it unless
+			// `options.reevaluate` is set to true ( this, for example,
 			// is set to true when running `picturefill` on `resize` ).
 			if ( !options.reevaluate && element[ pf.ns ].evaluated ) {
 				continue;
@@ -541,7 +531,7 @@
 		if ( w.addEventListener ) {
 			var resizeThrottle;
 			w.addEventListener( "resize", function() {
-				if (!w._picturefillWorking) {
+				if ( !w._picturefillWorking ) {
 					w._picturefillWorking = true;
 					w.clearTimeout( resizeThrottle );
 					resizeThrottle = w.setTimeout( function() {
@@ -562,7 +552,7 @@
 	if ( typeof module === "object" && typeof module.exports === "object" ) {
 		// CommonJS, just export
 		module.exports = picturefill;
-	} else if ( typeof define === "function" && define.amd ){
+	} else if ( typeof define === "function" && define.amd ) {
 		// AMD support
 		define( function() { return picturefill; } );
 	} else if ( typeof w === "object" ) {
