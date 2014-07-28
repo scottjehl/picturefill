@@ -454,6 +454,11 @@
 			firstMatch = undefined;
 			candidates = undefined;
 
+			// immediately skip non-`img` nodes
+			if ( element.nodeName.toUpperCase() !== "IMG" ) {
+				continue;
+			}
+
 			// expando for caching data on the img
 			if ( !element[ pf.ns ] ) {
 				element[ pf.ns ] = {};
