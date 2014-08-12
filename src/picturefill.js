@@ -24,7 +24,7 @@
 
 	// srcset support test
 	pf.srcsetSupported = "srcset" in doc.createElement( "img" );
-	pf.sizesSupported = w.HTMLImageElement.sizes;
+	pf.sizesSupported = "sizes" in doc.createElement( "img" );
 
 	// just a string trim workaround
 	pf.trim = function( str ) {
