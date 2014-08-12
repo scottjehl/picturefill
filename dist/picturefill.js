@@ -1,4 +1,4 @@
-/*! Picturefill - v2.1.0 - 2014-07-25
+/*! Picturefill - v2.1.0 - 2014-08-12
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -85,6 +85,12 @@ window.matchMedia || (window.matchMedia = function() {
 		return str.endsWith ? str.endsWith( suffix ) : str.indexOf( suffix, str.length - suffix.length ) !== -1;
 	};
 
+	/**
+	 * Shortcut method for https://w3c.github.io/webappsec/specs/mixedcontent/#restricts-mixed-content ( for easy overriding in tests )
+	 */
+	pf.restrictsMixedContent = function() {
+		return w.location.protocol === "https:";
+	};
 	/**
 	 * Shortcut method for matchMedia ( for easy overriding in tests )
 	 */
@@ -394,10 +400,16 @@ window.matchMedia || (window.matchMedia = function() {
 		}
 
 		if ( bestCandidate && !pf.endsWith( picImg.src, bestCandidate.url ) ) {
-			picImg.src = bestCandidate.url;
-			// currentSrc attribute and property to match
-			// http://picture.responsiveimages.org/#the-img-element
-			picImg.currentSrc = picImg.src;
+			if ( pf.restrictsMixedContent() && bestCandidate.url.substr(0, "http:".length).toLowerCase() === "http:" ) {
+				if ( typeof console !== undefined ) {
+					console.warn( "Blocked mixed content image " + bestCandidate.url );
+				}
+			} else {
+				picImg.src = bestCandidate.url;
+				// currentSrc attribute and property to match
+				// http://picture.responsiveimages.org/#the-img-element
+				picImg.currentSrc = picImg.src;
+			}
 		}
 	};
 

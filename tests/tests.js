@@ -12,7 +12,8 @@
 		originalVideoShimMethod,
 		originalMatchesMedia,
 		originalProcessSourceSet,
-		originalGetWidthFromLength;
+		originalGetWidthFromLength,
+		originalRestrictsMixedContentMethod;
 
 	pf = picturefill._;
 
@@ -24,6 +25,7 @@
 			originalMatchesMedia = pf.matchesMedia;
 			originalProcessSourceSet = pf.processSourceSet;
 			originalGetWidthFromLength = pf.getWidthFromLength;
+			originalrestrictsMixedContentMethod = pf.restrictsMixedContent;
 		},
 
 		teardown: function() {
@@ -31,6 +33,7 @@
 			pf.removeVideoShim = originalVideoShimMethod;
 			pf.matchesMedia = originalMatchesMedia;
 			pf.processSourceSet = originalProcessSourceSet;
+			pf.restrictsMixedContent = originalrestrictsMixedContentMethod;
 		}
 	});
 
@@ -540,6 +543,26 @@
 		el.insertBefore( document.documentElement.firstChild, null );
 
 		try { picturefill({ reevaluate: false, elements: document.querySelector( ".no-src" ) }); } catch (e) { console.log( e ); ok( false ); }
+	});
+
+	test( "Mixed content should be blocked", function() {
+		pf.restrictsMixedContent = function() {
+			return true;
+		};
+		var image, candidates;
+
+		candidates = [
+			{ resolution: 1, url: "http://example.org/bar" },
+		];
+
+		image = {
+			src: "foo"
+		};
+
+		pf.applyBestCandidate( candidates, image );
+
+		equal( image.src, "foo" );
+
 	});
 
 })( window, jQuery );
