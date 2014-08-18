@@ -1,4 +1,4 @@
-/*! Picturefill - v2.1.0 - 2014-07-25
+/*! Picturefill - v2.1.0 - 2014-08-18
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -123,6 +123,9 @@ window.matchMedia || (window.matchMedia = function() {
 
 		// Positioning styles help prevent padding/margin/width on `html` from throwing calculations off.
 		pf.lengthEl.style.cssText = "position: absolute; left: 0; width: " + length + ";";
+
+		// Add a class, so that everyone knows where this element comes from
+		pf.lengthEl.className = "helper-from-picturefill-js";
 
 		if ( pf.lengthEl.offsetWidth <= 0 ) {
 			// Something has gone wrong. `calc()` is in use and unsupported, most likely. Default to `100vw` (`100%`, for broader support.):

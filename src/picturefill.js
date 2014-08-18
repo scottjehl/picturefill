@@ -75,6 +75,9 @@
 		// Positioning styles help prevent padding/margin/width on `html` from throwing calculations off.
 		pf.lengthEl.style.cssText = "position: absolute; left: 0; width: " + length + ";";
 
+		// Add a class, so that everyone knows where this element comes from
+		pf.lengthEl.className = "helper-from-picturefill-js";
+
 		if ( pf.lengthEl.offsetWidth <= 0 ) {
 			// Something has gone wrong. `calc()` is in use and unsupported, most likely. Default to `100vw` (`100%`, for broader support.):
 			pf.lengthEl.style.cssText = "width: 100%;";
