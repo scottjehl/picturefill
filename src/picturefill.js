@@ -550,13 +550,14 @@
 				return;
 			}
 		}, 250 );
+		var onResize = function() {
+			picturefill({ reevaluate: true });
+		};
 		if ( w.addEventListener ) {
 			var resizeThrottle;
 			w.addEventListener( "resize", function() {
 				w.clearTimeout( resizeThrottle );
-				resizeThrottle = w.setTimeout( function() {
-					picturefill({ reevaluate: true });
-				}, 40 );
+				resizeThrottle = w.setTimeout( onResize, 40 );
 			}, false );
 		}
 	}
