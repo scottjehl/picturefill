@@ -553,14 +553,10 @@
 		if ( w.addEventListener ) {
 			var resizeThrottle;
 			w.addEventListener( "resize", function() {
-				if (!w._picturefillWorking) {
-					w._picturefillWorking = true;
-					w.clearTimeout( resizeThrottle );
-					resizeThrottle = w.setTimeout( function() {
-						picturefill({ reevaluate: true });
-						w._picturefillWorking = false;
-					}, 60 );
-				}
+				w.clearTimeout( resizeThrottle );
+				resizeThrottle = w.setTimeout( function() {
+					picturefill({ reevaluate: true });
+				}, 40 );
 			}, false );
 		}
 	}
