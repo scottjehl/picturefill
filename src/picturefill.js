@@ -152,7 +152,7 @@
 		var type = source.getAttribute( "type" );
 		if( type ){
 			if( !(type in pf.types) ){
-				//pf.createImageTest(type, source.getAttribute('src') || source.getAttribute('srcset') );
+				//pf.createImageTest(type, source.getAttribute('srcset') );
 				return undefined;
 			}
 			if( typeof( pf.types[ type ] ) === "function" ){
