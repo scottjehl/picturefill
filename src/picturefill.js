@@ -383,8 +383,6 @@
 			}
 		}
 
-		//debugger;
-
 		if( !bestCandidate && picImg[ pf.ns ].src ){
 
 			bestCandidate = {
