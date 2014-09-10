@@ -104,7 +104,7 @@
 	pf.types[ "image/webp" ] = function() {
 		// based on Modernizr's lossless img-webp test
 		// note: asynchronous
-		var img = new w.Image(),
+		var img = document.createElement( "img" ),
 			type = "image/webp";
 
 		img.onerror = function() {
