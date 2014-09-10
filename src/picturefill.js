@@ -18,13 +18,14 @@
 
 	// local object for method references and testing exposure
 	var pf = {};
+    var image = doc.createElement( "img" );
 
 	// namespace
 	pf.ns = "picturefill";
 
 	// srcset support test
-	pf.srcsetSupported = "srcset" in doc.createElement( "img" );
-	pf.sizesSupported = w.HTMLImageElement.sizes;
+	pf.srcsetSupported = "srcset" in image;
+	pf.sizesSupported = "sizes" in image;
 
 	// just a string trim workaround
 	pf.trim = function( str ) {
