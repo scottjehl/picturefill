@@ -62,32 +62,46 @@
 	 * Get width in css pixel value from a "length" value
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
 	 */
+	pf.widthCache = {};
 	pf.getWidthFromLength = function( length ) {
-		// If a length is specified and doesn’t contain a percentage, and it is greater than 0 or using `calc`, use it. Else, use the `100vw` default.
-		length = length && length.indexOf( "%" ) < 0 && ( parseFloat( length ) > 0 || length.indexOf( "calc(" ) > -1 ) ? length : "100vw";
-		/**
-		* If length is specified in  `vw` units, use `%` instead since the div we’re measuring
-		* is injected at the top of the document.
-		*
-		* TODO: maybe we should put this behind a feature test for `vw`?
-		*/
-		length = length.replace( "vw", "%" );
+		var origLength = length;
 
-		// Create a cached element for getting length value widths
-		if ( !pf.lengthEl ) {
-			pf.lengthEl = doc.createElement( "div" );
-			doc.documentElement.insertBefore( pf.lengthEl, doc.documentElement.firstChild );
+		if( !pf.widthCache[origLength] ){
+			// If a length is specified and doesn’t contain a percentage, and it is greater than 0 or using `calc`, use it. Else, use the `100vw` default.
+			length = length && length.indexOf( "%" ) < 0 && ( parseFloat( length ) > 0 || length.indexOf( "calc(" ) > -1 ) ? length : "100vw";
+			/**
+			* If length is specified in  `vw` units, use `%` instead since the div we’re measuring
+			* is injected at the top of the document.
+			*
+			* TODO: maybe we should put this behind a feature test for `vw`?
+			*/
+			length = length.replace( "vw", "%" );
+
+			// Create a cached element for getting length value widths
+			if ( !pf.lengthEl ) {
+				pf.lengthEl = doc.createElement( "div" );
+				// Positioning styles help prevent padding/margin/width on `html` from throwing calculations off.
+				pf.lengthEl.style.cssText = "position: absolute; left: 0; visibility: hidden;";
+			}
+
+			if(!pf.lengthElInstered){
+				doc.documentElement.insertBefore( pf.lengthEl, doc.documentElement.firstChild );
+				pf.lengthElInstered = true;
+			}
+
+			// set width
+			pf.lengthEl.style.width = length;
+
+			if ( pf.lengthEl.offsetWidth <= 0 ) {
+				// Something has gone wrong. `calc()` is in use and unsupported, most likely. Default to `100vw` (`100%`, for broader support.):
+				pf.lengthEl.style.width = "100%";
+			}
+
+			//cache result
+			pf.widthCache[origLength] = pf.lengthEl.offsetWidth;
 		}
 
-		// Positioning styles help prevent padding/margin/width on `html` from throwing calculations off.
-		pf.lengthEl.style.cssText = "position: absolute; left: 0; width: " + length + ";";
-
-		if ( pf.lengthEl.offsetWidth <= 0 ) {
-			// Something has gone wrong. `calc()` is in use and unsupported, most likely. Default to `100vw` (`100%`, for broader support.):
-			pf.lengthEl.style.cssText = "width: 100%;";
-		}
-
-		return pf.lengthEl.offsetWidth;
+		return pf.widthCache[origLength];
 	};
 
 	// container of supported mime types that one might need to qualify before using
@@ -488,6 +502,9 @@
 		options = opt || {};
 		elements = options.elements || pf.getAllElements();
 
+		//invalidate cache
+		pf.widthCache = {};
+
 		// Loop through all elements
 		for ( var i = 0, plen = elements.length; i < plen; i++ ) {
 			element = elements[ i ];
@@ -553,6 +570,11 @@
 			// set evaluated to true to avoid unnecessary reparsing
 			element[ pf.ns ].evaluated = true;
 		}
+
+		if(pf.lengthElInstered){
+			pf.lengthElInstered = false;
+			doc.documentElement.removeChild(pf.lengthEl);
+		}
 	}
 
 	/**
@@ -578,7 +600,7 @@
 			var resizeThrottle;
 			w.addEventListener( "resize", function() {
 				w.clearTimeout( resizeThrottle );
-				resizeThrottle = w.setTimeout( onResize, 40 );
+				resizeThrottle = w.setTimeout( onResize, 90 );
 			}, false );
 		}
 	}
