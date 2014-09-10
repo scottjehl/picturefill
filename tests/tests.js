@@ -461,7 +461,9 @@
 	});
 
 	test( "getMatch returns false when a source type is pending", function() {
-		pf.types["foo"] = function() {};
+		pf.types["foo"] = function() {
+			pf.types["foo"] = "pending";
+		};
 
 		equal( pf.getMatch($(".pending-check")[0], $(".pending-check")[0].parentNode ), false, "pending type should be false" );
 	});

@@ -115,25 +115,30 @@
 	// test svg support
 	pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Image", "1.1");
 
-	// test webp support, only when the markup calls for it
-	pf.types[ "image/webp" ] = function() {
-		// based on Modernizr's lossless img-webp test
-		// note: asynchronous
-		var img = document.createElement( "img" ),
-			type = "image/webp";
 
-		pf.types[ type ] = "pending";
 
-		img.onerror = function() {
-			pf.types[ type ] = false;
-			picturefill();
+	pf.createImageTest = function( type, src ){
+		pf.types[ type ] = function(){
+			// based on Modernizr's lossless img-webp test
+			// note: asynchronous
+			var img = document.createElement( "img" );
+
+			pf.types[ type ] = "pending";
+
+			img.onerror = function() {
+				pf.types[ type ] = false;
+				picturefill();
+			};
+			img.onload = function() {
+				pf.types[ type ] = img.width === 1;
+				picturefill();
+			};
+			img.src = src;
 		};
-		img.onload = function() {
-			pf.types[ type ] = img.width === 1;
-			picturefill();
-		};
-		img.src = "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=";
 	};
+
+	// test webp support, only when the markup calls for it
+	pf.createImageTest( "image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=" );
 
 	/**
 	 * Takes a source element and checks if its type attribute is present and if so, supported
@@ -141,20 +146,25 @@
 	 * you can define them as a function that'll run only if that type needs to be tested. Just make the test function call picturefill again when it is complete.
 	 * see the async webp test above for example
 	 */
+
+	//suggested method:
 	pf.verifyTypeSupport = function( source ) {
 		var type = source.getAttribute( "type" );
-		// if type attribute exists, return test result, otherwise return true
-		if ( type === null || type === "" ) {
-			return true;
-		} else {
-			// if the type test is a function, run it and return "pending" status. The function will rerun picturefill on pending elements once finished.
-			if ( typeof( pf.types[ type ] ) === "function" ) {
+		if( type ){
+			if( !(type in pf.types) ){
+				//pf.createImageTest(type, source.getAttribute('src') || source.getAttribute('srcset') );
+				return undefined;
+			}
+			if( typeof( pf.types[ type ] ) === "function" ){
 				pf.types[ type ]();
 			}
-
 			return pf.types[ type ];
+		} else {
+			return true;
 		}
 	};
+
+
 
 	/**
 	* Parses an individual `size` and returns the length, and optional media query
