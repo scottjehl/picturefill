@@ -18,7 +18,8 @@
 
 	// local object for method references and testing exposure
 	var pf = {};
-    var image = doc.createElement( "img" );
+	var image = doc.createElement( "img" );
+
 
 	// namespace
 	pf.ns = "picturefill";
@@ -63,7 +64,7 @@
 	 */
 	pf.getWidthFromLength = function( length ) {
 		// If a length is specified and doesn’t contain a percentage, and it is greater than 0 or using `calc`, use it. Else, use the `100vw` default.
-		length = length && length.indexOf( "%" ) > -1 === false && ( parseFloat( length ) > 0 || length.indexOf( "calc(" ) > -1 ) ? length : "100vw";
+		length = length && length.indexOf( "%" ) < 0 && ( parseFloat( length ) > 0 || length.indexOf( "calc(" ) > -1 ) ? length : "100vw";
 		/**
 		* If length is specified in  `vw` units, use `%` instead since the div we’re measuring
 		* is injected at the top of the document.
@@ -314,6 +315,13 @@
 		}
 	};
 
+	pf.dodgeSrc = function( img ){
+		if( !('src' in img[ pf.ns ]) ){
+			//use getAttribute to account for empty string as src attribute
+			img[ pf.ns ].src = img.getAttribute('src');
+		}
+	};
+
 	/*
 	 * Accept a source or img element and process its srcset and sizes attrs
 	 */
@@ -349,6 +357,16 @@
 				bestCandidate = candidate;
 				break;
 			}
+		}
+
+		//debugger;
+
+		if( !bestCandidate && picImg[ pf.ns ].src ){
+
+			bestCandidate = {
+				url: picImg[ pf.ns ].src
+			};
+
 		}
 
 		if ( bestCandidate && !pf.endsWith( picImg.src, bestCandidate.url ) ) {
@@ -516,6 +534,8 @@
 			( !pf.sizesSupported && ( element.srcset && element.srcset.indexOf("w") > -1 ) ) ) {
 				pf.dodgeSrcset( element );
 			}
+
+			pf.dodgeSrc( element );
 
 			if ( firstMatch ) {
 				candidates = pf.processSourceSet( firstMatch );
