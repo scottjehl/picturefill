@@ -322,7 +322,7 @@
 			candidates = [];
 
 		// if it's an img element, use the cached srcset property (defined or not)
-		if ( el.nodeName.toUpperCase() === "IMG" && el[ pf.ns ] && el[ pf.ns ].srcset ) {
+		if ( el[ pf.ns ] && el[ pf.ns ].srcset && el.nodeName.toUpperCase() === "IMG" ) {
 			srcset = el[ pf.ns ].srcset;
 		}
 
@@ -432,7 +432,7 @@
 				continue;
 			}
 			// if it's a source element that has the `src` property set, throw a warning in the console
-			if ( source.getAttribute( "src" ) !== null && typeof console !== undefined ){
+			if ( w.console && console.warn && source.getAttribute( "src" ) !== null  ){
 				console.warn("The `src` attribute is invalid on `picture` `source` element; instead, use `srcset`.");
 			}
 
