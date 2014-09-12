@@ -27,6 +27,7 @@
 	// srcset support test
 	pf.srcsetSupported = "srcset" in image;
 	pf.sizesSupported = "sizes" in image;
+	pf.currentSrcSupported = 'currentSrc' in image;
 
 	// just a string trim workaround
 	pf.trim = function( str ) {
@@ -152,7 +153,7 @@
 		var type = source.getAttribute( "type" );
 		if( type ){
 			if( !(type in pf.types) ){
-				//pf.createImageTest(type, source.getAttribute('srcset') );
+				//pf.createImageTest(type, source.getAttribute( "srcset") );
 				return undefined;
 			}
 			if( typeof( pf.types[ type ] ) === "function" ){
@@ -400,7 +401,10 @@
 				picImg.src = bestCandidate.url;
 				// currentSrc attribute and property to match
 				// http://picture.responsiveimages.org/#the-img-element
-				picImg.currentSrc = picImg.src;
+
+				if(!pf.currentSrcSupported){
+					picImg.currentSrc = picImg.src;
+				}
 			}
 		}
 	};
