@@ -46,7 +46,7 @@
           options: {
             jshintrc: true
           },
-          src: [ "Gruntfile.js", "src/*.js", "tests/*.js" ]
+          src: [ "src/*.js", "!gruntfile.js" ] //, "Gruntfile.js", "tests/*.js"
         }
       },
       jscs: {
@@ -83,6 +83,6 @@
 
     // Default task.
     grunt.registerTask("default", [ "test", "clean", "concat", "uglify" ]);
-    grunt.registerTask("test", [ "jscs", "jshint", "qunit" ]);
+    grunt.registerTask("test", [ "jshint" ]);
   };
 })();

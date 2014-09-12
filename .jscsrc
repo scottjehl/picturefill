@@ -1,7 +1,7 @@
 {
 	"preset": "jquery",
 	"validateLineBreaks": null,
-	"requireMultipleVarDecl": null,
+	"requireMultipleVarDecl": true,
 	"validateQuoteMarks": "\"",
 	"excludeFiles": [
 		"node_modules",

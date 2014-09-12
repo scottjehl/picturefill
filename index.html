@@ -12,11 +12,35 @@
 			// Picture element HTML shim|v it for old IE (pairs with Picturefill.js)
 			document.createElement( "picture" );
 		</script>
-		<script async="async" src="dist/picturefill.js"></script>
+		<script src="src/external/matchmedia.js"></script>
+
+
 	</head>
 	<body>
-		<a href="http://responsiveimages.org/" class="ricg"><img src="https://raw.github.com/ResponsiveImagesCG/meta/master/logo/Web/RICG_logo_small.png"></a>
-		<h1>Picturefill <em>A responsive image polyfill</em></h1>
+	<script src="src/picturefill.js"></script>
+	<script>
+
+	</script>
+	<script src="src/picturefill-mutations.js"></script>
+	<img src="examples/images/medium.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	<img src="examples/images/medium.jpg"  alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	<img src="examples/images/medium.jpg" srcset="examples/images/medium.jpg 1x, examples/images/large.jpg 2x" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	<img src="examples/images/medium.jpg" srcset="examples/images/medium.jpg 1x, examples/images/large.jpg 2x" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	<img sizes="(min-width: 40em) 80vw, 100vw"
+		 srcset="examples/images/medium.jpg 375w, examples/images/medium.jpg 480w, examples/images/large.jpg 768w" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+		<img src="examples/images/medium.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	<img src="examples/images/medium.jpg"  alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	<img src="examples/images/medium.jpg" srcset="examples/images/medium.jpg 1x, examples/images/large.jpg 2x" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	<img src="examples/images/medium.jpg" srcset="examples/images/medium.jpg 1x, examples/images/large.jpg 2x" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	<img sizes="(min-width: 40em) 80vw, 100vw"
+		 srcset="examples/images/medium.jpg 375w, examples/images/medium.jpg 480w, examples/images/large.jpg 768w" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+
+
+
+	<h1>Picturefill <em>A responsive image polyfill</em></h1>
+<script>
+
+</script>
 
 		<nav>
 			<ul class="nav">
@@ -28,6 +52,26 @@
 				<li><a href="#contributing">Contributing</a></li>
 			</ul>
 		</nav>
+
+		<picture>
+			<!--[if IE 9]><video style="display: none;"><![endif]-->
+			<source srcset="examples/images/extralarge.jpg" media="(min-width: 1000px)">
+			<!--[if IE 9]></video><![endif]-->
+			<img src="examples/images/medium.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+		</picture>
+
+	<picture>
+		<!--[if IE 9]><video style="display: none;"><![endif]-->
+		<source srcset="examples/images/extralarge.jpg" media="(min-width: 1000px)">
+		<!--[if IE 9]></video><![endif]-->
+		<img src="examples/images/medium.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	</picture>
+	<picture>
+		<!--[if IE 9]><video style="display: none;"><![endif]-->
+		<source srcset="examples/images/extralarge.jpg" media="(min-width: 1000px)">
+		<!--[if IE 9]></video><![endif]-->
+		<img src="examples/images/medium.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+	</picture>
 
 		<p>The <a href="http://picture.responsiveimages.org/">picture element</a> and associated features are W3C standard HTML features that allow web developers to deliver an appropriate image to every user depending on a variety of conditions like screen size, viewport size, screen resolution, and more. Picturefill is a JavaScript file (or a <em>polyfill</em> to be more specific) that enables support for the <code>picture</code> element and associated features in browsers that do not yet support them, so you can start using them today!</p>
 
