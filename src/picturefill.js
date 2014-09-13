@@ -271,6 +271,7 @@
 					url = url.replace(/,+$/, "");
 					descriptor = "";
 				}
+
 				srcset = srcset.slice( pos + 1 );
 
 				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and 
@@ -467,11 +468,11 @@
 		return match;
 	};
 
-	pf.parseCanditates = function(element, parent, options){
+	pf.parseCanditates = function( element, parent, options ) {
 		var srcsetAttribute;
 		var hasPicture = parent.nodeName.toUpperCase() === "PICTURE";
 
-		if( hasPicture || !pf.srcsetSupported || (!pf.sizesSupported && element.srcset.indexOf('w') != -1) ){
+		if ( hasPicture || !pf.srcsetSupported || (!pf.sizesSupported && element.srcset.indexOf('w') != -1) ) {
 			element[ pf.ns ].supported = false;
 		} else {
 			element[ pf.ns ].supported = true;
@@ -479,27 +480,24 @@
 
 		element[ pf.ns ].candidates = [];
 
-		if( !('src' in element[ pf.ns ]) || options.reparseSrc ){
+		if( !('src' in element[ pf.ns ]) || options.reparseSrc ) {
 			element[ pf.ns ].src = element.getAttribute( "src" );
 		}
 
-		if( !('srcset' in element[ pf.ns ]) || options.reparseSrcset || element.srcset){
+		if ( !('srcset' in element[ pf.ns ]) || options.reparseSrcset || element.srcset) {
 			srcsetAttribute = element.getAttribute( "srcset" );
 			element[ pf.ns ].srcset = srcsetAttribute;
 
-			if( srcsetAttribute ) {
-				element.setAttribute('data-'+pf.ns, element[ pf.ns ].srcset);
-				if( pf.srcsetSupported && !pf.sizesSupported ){
+			if ( srcsetAttribute ) {
+				element.setAttribute(pf.picutreFillAttribute, element[ pf.ns ].srcset);
+				if ( pf.srcsetSupported && !pf.sizesSupported ) {
 					element.srcset = "";
 				} else {
 					element.removeAttribute( "srcset" );
 				}
 
 			} else {
-				element.removeAttribute('data-'+pf.ns);
-				if ( !hasPicture ) {
-					element[ pf.ns ].supported = true;
-				}
+				element.removeAttribute( pf.picutreFillAttribute );
 			}
 		}
 
@@ -512,16 +510,16 @@
 		}
 
 		if(element[ pf.ns ].srcset){
-			element[ pf.ns ].candidates.push({
+			element[ pf.ns ].candidates.push( {
 				srcset: element[ pf.ns ].srcset,
 				sizes: element.getAttribute( "sizes" )
-			});
+			} );
 		}
 
 		element[ pf.ns ].parsed = true;
 	};
 
-	function getAllSourceElements(element, picture , candidates){
+	function getAllSourceElements(element, picture , candidates) {
 		var i, len, source, srcset;
 
 		var sources = picture.childNodes;
@@ -549,12 +547,12 @@
 				continue;
 			}
 
-			candidates.push({
+			candidates.push( {
 				srcset: srcset,
 				media: source.getAttribute( "media" ),
 				type: source.getAttribute( "type" ),
 				sizes: source.getAttribute( "sizes" )
-			});
+			} );
 		}
 	}
 
@@ -584,20 +582,20 @@
 	};
 
 
-	pf.setupRun = function(){
+	pf.setupRun = function() {
 		//invalidate cache
 		pf.widthCache = {};
 	};
 
-	pf.teardownRun = function(){
-		if(pf.lengthElInstered){
+	pf.teardownRun = function() {
+		if ( pf.lengthElInstered ) {
 			pf.lengthElInstered = false;
 			doc.documentElement.removeChild(pf.lengthEl);
 		}
 	};
 
 	var picturefill = function ( opt ) {
-		var elements, element, i, plen;
+		var elements, i, plen;
 
 		var options = opt || {};
 
@@ -612,9 +610,7 @@
 
 			// Loop through all elements
 			for ( i = 0; i < plen; i++ ) {
-				element = elements[ i ];
 				pf._forEachImg(elements[ i ], options);
-
 			}
 
 			pf.teardownRun();
@@ -635,8 +631,14 @@
 			// https://github.com/ded/domready/blob/master/ready.js#L15
 			if ( /^loade|^i|^c/.test( doc.readyState || "" ) || ( e && e.type == "DOMContentLoaded" ) ) {
 				clearInterval( intervalId );
+
 				picturefill();
+
 				pf.onReady();
+
+				if ( doc.removeEventListener ) {
+					doc.removeEventListener( "DOMContentLoaded", run );
+				}
 			} else {
 				picturefill();
 			}
@@ -655,7 +657,7 @@
 		}
 	})();
 
-	// test webp support + automatically runs picturefill test
+	// test webp support + automatically runs picturefill
 	pf.createImageTest( "image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=" );
 
 	/* expose picturefill */

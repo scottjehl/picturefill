@@ -26,7 +26,7 @@
 
 
 
-	if(window.HTMLPictureElement || !picturefill._ ){return pfobserver;}
+	if ( window.HTMLPictureElement || !picturefill._ ) {return pfobserver;}
 	var matches;
 	var pf = picturefill._;
 	var observeProps = {src: 1, srcset: 1, sizes: 1};
@@ -95,7 +95,7 @@
 			nodeName = node.nodeName.toUpperCase();
 
 			if ( nodeName == "PICTURE" ) {
-				addToElements( node.getElementsByTagName("img"), imgs );
+				addToElements( node.getElementsByTagName("img")[0], imgs );
 			} else if ( nodeName == "IMG" && matches( node, "img[srcset], picture > img" ) ){
 				addToElements( node, imgs );
 			} else if ( nodeName == "SOURCE" ) {
@@ -174,7 +174,7 @@
 		var attrFilter = Object.keys( observeProps );
 		var config = {attributes: true, childList: true, subtree: true, attributeFilter: attrFilter};
 
-		var observer = new MutationObserver(onMutations);
+		var observer = new MutationObserver( onMutations );
 
 		pf.setupRun = function() {
 			observer.disconnect();
@@ -184,8 +184,6 @@
 			oldTeardown.apply( this, arguments );
 			pfobserver.observe();
 		};
-
-
 
 		pfobserver.observe = function() {
 			observer.observe( document.body, config );
@@ -216,29 +214,30 @@
 		})();
 	}
 
-	var addMutation = (function() {
-		var run;
-		var running = false;
-		var mutations = [];
-		var setImmediate = window.setImmediate || window.setTimeout;
-		return function(mutation) {
-			if(!running){
-				running = true;
-				if(!run){
-					run = function(){
-						onMutations( mutations );
-						mutations = [];
-						running = false;
-					};
-				}
-				setImmediate( run );
-			}
-			mutations.push( mutation );
-		};
-	})();
 	(function() {
 		var i;
-		var domMethods = ['appendChild', 'insertBefore', 'removeChild'];
+		var domMethods = ["appendChild", "insertBefore", "removeChild"];
+		var addMutation = (function() {
+			var run;
+			var running = false;
+			var mutations = [];
+			var setImmediate = window.setImmediate || window.setTimeout;
+			return function(mutation) {
+				if(!running){
+					running = true;
+					if(!run){
+						run = function(){
+							onMutations( mutations );
+							mutations = [];
+							running = false;
+						};
+					}
+					setImmediate( run );
+				}
+				mutations.push( mutation );
+			};
+		})();
+
 		picturefill.html = function( dom, html ) {
 				pfobserver.disconnect();
 				dom.innerHTML = html;
@@ -260,32 +259,30 @@
 			};
 			/*jshint loopfunc: false */
 		}
-	})();
 
-
-
-	//only setter || no getter (getter would be great or)
-	picturefill.props = function(dom, prop, value) {
-		var ip;
-		if ( typeof prop == "object" ) {
-			for(ip in prop){
-				picturefill.props( dom, ip, prop[ip] );
-			}
-		} else {
-			pfobserver.disconnect();
-			if ( value === null ) {
-				dom.removeAttribute(prop);
-			} else if ( prop in dom ) {
-				dom[prop] = value;
+		//only setter || no getter (getter would be great or)
+		picturefill.props = function(dom, prop, value) {
+			var ip;
+			if ( typeof prop == "object" ) {
+				for(ip in prop){
+					picturefill.props( dom, ip, prop[ip] );
+				}
 			} else {
-				dom.setAttribute( prop, value );
+				pfobserver.disconnect();
+				if ( value === null ) {
+					dom.removeAttribute(prop);
+				} else if ( prop in dom ) {
+					dom[prop] = value;
+				} else {
+					dom.setAttribute( prop, value );
+				}
+				if( observeProps[prop] ){
+					addMutation( {type: 'attributes', target: dom, attributeName: prop} );
+				}
+				pfobserver.observe();
 			}
-			if( observeProps[prop] ){
-				addMutation( {type: 'attributes', target: dom, attributeName: prop} );
-			}
-			pfobserver.observe();
-		}
-	};
+		};
+	})();
 
 	pf.observer = pfobserver;
 
