@@ -111,7 +111,9 @@
 			}
 
 			// set width
-			lengthEl.style.width = length;
+			try {
+				lengthEl.style.width = length;
+			} catch(e){}
 
 			if ( lengthEl.offsetWidth <= 0 ) {
 				// Something has gone wrong. `calc()` is in use and unsupported, most likely. Default to `100vw` (`100%`, for broader support.):
@@ -157,8 +159,8 @@
 			pf.types[ type ] = img.width === 1;
 			complete();
 		};
-		img.src = src;
 		timer = setTimeout(img.onerror, 300);
+		img.src = src;
 	};
 
 	/**
@@ -311,7 +313,7 @@
 						curr = splitDescriptor[ i ];
 						lastchar = curr && curr.slice( curr.length - 1 );
 
-						if ( ( lastchar === "h" || lastchar === "w" ) && !pf.sizesSupported ) {
+						if ( ( lastchar === "h" || lastchar === "w" ) ) {
 							if( widthInCssPixels === null ){
 								widthInCssPixels = pf.findWidthFromSourceSize( sizes );
 							}
@@ -421,7 +423,7 @@
 	 * and must account for that here by moving those source elements
 	 * back into the picture element.
 	 */
-	pf.removeVideoShim = function( picture ) {
+	pf.removeMediaShim = function( picture ) {
 		var vsources;
 		var media = pf.qs( picture, "video, audio" );
 
@@ -500,7 +502,7 @@
 
 		if( hasPicture ){
 			// IE9 video workaround
-			pf.removeVideoShim( parent );
+			pf.removeMediaShim( parent );
 
 			getAllSourceElements( element, parent, element[ pf.ns ].candidates );
 		}
@@ -510,6 +512,8 @@
 				srcset: element[ pf.ns ].srcset,
 				sizes: element.getAttribute( "sizes" )
 			} );
+		} else if( !hasPicture && !options.reparse ) {
+			element[ pf.ns ].supported = true;
 		}
 
 		element[ pf.ns ].parsed = true;
@@ -564,7 +568,11 @@
 			element[ pf.ns ].evaluated = false;
 
 			pf.applyBestCandidate( element );
+
+		} else {
+			element[ pf.ns ].evaluated = true;
 		}
+
 	};
 
 

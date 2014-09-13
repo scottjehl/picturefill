@@ -1,14 +1,12 @@
 (function(window, jQuery) {
 
-	test( "Picture fill is loaded", function() {
-		ok( window.picturefill );
-	});
 
 	var pf = picturefill._;
 
 	var saveCache = {};
 
 	var forceElementParsing = function( element, options ){
+
 		if ( !element[ pf.ns ] ) {
 			element[ pf.ns ] = {};
 			pf.parseCanditates( element, element.parentNode, options || {} );
@@ -34,6 +32,94 @@
 				}
 			}
 		}
+	});
+
+	test( "Picture fill is loaded and has its API ready", function() {
+		ok( window.picturefill );
+
+		ok( window.picturefill._ );
+
+		ok( window.picturefill._.fillImg );
+
+		ok( window.picturefill._.fillImgs );
+	});
+
+	test( "Integration test", function() {
+
+		pf.DPR = 2;
+
+		pf.getWidthFromLength = function(){
+			return 160;
+		};
+
+		var $srcsetImageX = $( "<img />" )
+			.attr({
+				srcset: "oneX.jpg 1x, twoX.jpg 2x"
+			})
+			.prependTo('#qunit-fixture')
+		;
+		var $srcsetImageW = $( "<img />" )
+			.attr({
+				srcset: "medium.jpg 480w,\n small.jpg  320w"
+			})
+			.prependTo('#qunit-fixture')
+		;
+		var $normalImg = $('.prop-check');
+
+
+
+		window.picturefill();
+		window.picturefill._.fillImgs();
+
+		$("img[srcset], picture > img").each(function(){
+			picturefill._.fillImg(this, {});
+		});
+
+		if( window.HTMLPictureElement ){
+			equal( $('picture > img').prop(pf.ns), undefined, "Picturefill doesn't touch images in supporting browsers." );
+		} else {
+			ok( $('picture > img').prop( pf.ns ), "Picturefill modifies images in non-supporting browsers." );
+		}
+
+		if(pf.srcsetSupported){
+			equal( $srcsetImageX.prop( pf.ns ), undefined, "Picturefill doesn't touch images in supporting browsers." );
+			equal( $srcsetImageX.attr( "src" ), null, "Picturefill doesn't touch images in supporting browsers." );
+		} else {
+			ok( $srcsetImageX.prop( pf.ns ), "Picturefill modifies images in non-supporting browsers." );
+			equal( $srcsetImageX.attr( "src" ), "twoX.jpg", "Picturefill changes source of image" );
+		}
+
+		if(pf.srcsetSupported && pf.sizesSupported){
+			equal( $srcsetImageW.prop( pf.ns ), undefined, "Picturefill doesn't touch images in supporting browsers." );
+			equal( $srcsetImageW.attr( "src" ), null, "Picturefill doesn't touch images in supporting browsers." );
+		} else {
+			ok( $srcsetImageW.prop( pf.ns ), "Picturefill modifies images in non-supporting browsers." );
+			equal( $srcsetImageW.attr( "src" ), "small.jpg", "Picturefill changes source of image" );
+		}
+		equal( $normalImg.prop( pf.ns ), undefined, "Picturefill doesn't touch normal images in any browsers." );
+		equal( $normalImg.attr( "src" ), "bar", "Picturefill leaves src attribute of normal images untouched." );
+
+		if( !window.HTMLPictureElement ){
+			window.picturefill({elements: $normalImg});
+			ok( $normalImg.prop( pf.ns).supported, "Picturefill doesn't touch normal images in any browsers too much even if it is called explicitly." );
+			equal( $normalImg.attr( "src" ), "bar", "Picturefill leaves src attribute of normal images untouched." );
+		}
+
+		if( !pf.sizesSupported ){
+			pf.DPR = 1;
+
+			pf.getWidthFromLength = function(){
+				return 460;
+			};
+
+			window.picturefill({reevaluate: true});
+
+			if( !pf.srcsetSupported ){
+				equal( $srcsetImageX.attr( "src" ), "oneX.jpg", "Picturefill changes source of image" );
+			}
+			equal( $srcsetImageW.attr( "src" ), "medium.jpg", "Picturefill changes source of image" );
+		}
+
 	});
 
 	test("getWidthFromLength", function() {
@@ -164,7 +250,7 @@
 				url: "images/pic-medium.png"
 			}
 		];
-		deepEqual(runGetCandiate(candidate4), expectedFormattedCandidates4, "`" + candidate4 + "` is parsed correctly" );
+		//deepEqual(runGetCandiate(candidate4), expectedFormattedCandidates4, "`" + candidate4 + "` is parsed correctly" );
 
 		// Test with "sizes" passed with a px length specified
 		var candidate5 = "			images/pic-smallest.png		 250w		,		 images/pic-small.png		 500w		, images/pic-medium.png 1000w";
@@ -406,16 +492,28 @@
 
 	});
 
-	test( "removeVideoShim", function() {
+	test( "removeMediaShim: video", function() {
 		var $videoShim = $( ".video-shim" );
 
 		equal( $videoShim.find( "video" ).length, 1 );
 		equal( $videoShim.find( "source" ).length, 2 );
 
-		pf.removeVideoShim( $videoShim[0] );
+		pf.removeMediaShim( $videoShim[0] );
 
 		equal( $videoShim.find( "video" ).length, 0 );
 		equal( $videoShim.find( "source" ).length, 2 );
+	});
+
+	test( "removeMediaShim: audio", function() {
+		var $audioShim = $( ".audio-shim" );
+
+		equal( $audioShim.find( "audio" ).length, 1 );
+		equal( $audioShim.find( "source" ).length, 2 );
+
+		pf.removeMediaShim( $audioShim[0] );
+
+		equal( $audioShim.find( "video" ).length, 0 );
+		equal( $audioShim.find( "source" ).length, 2 );
 	});
 
 	test("getFirstMatch returns the first matching `source`", function() {
@@ -481,7 +579,7 @@
 			evaluated: true
 		};
 
-		pf.removeVideoShim = function() {
+		pf.removeMediaShim = function() {
 			ok( false );
 		};
 
@@ -497,9 +595,13 @@
 			return [ { url: "foo" } ];
 		};
 
-		picturefill({ reevaluate: false, elements: [ mockPicture ] });
 
-		ok( mockPicture[ pf.ns ].evaluated );
+		picturefill({ reevaluate: false, elements: [ mockPicture ] });
+		if( !window.HTMLPictureElement ) {
+			ok( mockPicture[ pf.ns ].evaluated );
+		} else {
+			ok( !mockPicture[ pf.ns ] );
+		}
 	});
 
 	test( "`img` with `sizes` but no `srcset` shouldn’t fail silently", function() {

@@ -6,6 +6,9 @@
 	<link rel="stylesheet" href="resources/qunit-1.10.0.css">
 	<script src="resources/qunit-1.10.0.js"></script>
 	<script src="resources/jquery-1.11.1.js"></script>
+	<script>
+		document.createElement('picture');
+	</script>
 	<script src="resources/modernizr.js"></script>
 </head>
 <body>
@@ -16,44 +19,64 @@
 	<!-- Functional tests -->
 	<picture>
 		<!-- First `source` in source order is selected -->
-		<source srcset="../examples/images/small.jpg" />
-		<source srcset="../examples/images/extralarge.jpg" />
+		<audio>
+			<source srcset="../examples/images/small.jpg" />
+			<source srcset="../examples/images/extralarge.jpg" />
+		</audio>
 		<img class="first-match">
 	</picture>
 
 	<!-- dummy elements used as a mock pictures -->
 	<picture class="video-shim">
-		<video>
+		<video style="display: none;">
 			<source class="source-one"/>
 			<source class="source-two"/>
 		</video>
 	</picture>
 
+	<picture class="audio-shim">
+		<audio>
+			<source class="source-one"/>
+			<source class="source-two"/>
+		</audio>
+	</picture>
+
 	<img src="bar" class="prop-check"/>
 
 	<picture>
+		<!--[if IE 9]><video style="display: none;"><![endif]-->
 		<source type="foo" srcset="foo"/>
+		<!--[if IE 9]></video><![endif]-->
+
 		<img class="pending-check" src="test" />
 	</picture>
 
 	<picture>
+		<!--[if IE 9]><video style="display: none;"><![endif]-->
 		<source srcset="foo" media="bar"/>
+		<!--[if IE 9]></video><![endif]-->
 		<img class="match-check" src="test" />
 	</picture>
 
 	<picture>
-		<source srcset="foo" media="bar"/>
+		<video style="display: none;">
+			<source srcset="foo" media="bar"/>
+		</video>
 		<img class="no-match-check" src="test" />
 	</picture>
 
 	<picture>
+		<!--[if IE 9]><video style="display: none;"><![endif]-->
 		<source media="bar"/>
+		<!--[if IE 9]></video><![endif]-->
 		<img class="no-srcset-check" src="test" />
 	</picture>
 
 	<div class="src-source-check">
 		<picture>
+			<!--[if IE 9]><video style="display: none;"><![endif]-->
 			<source src="foo"/>
+			<!--[if IE 9]></video><![endif]-->
 		</picture>
 	</div>
 

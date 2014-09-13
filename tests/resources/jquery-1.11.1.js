@@ -1,5 +1,5 @@
 /*!
- * jQuery JavaScript Library v1.11.1
+ * jQuery JavaScript Library v1.11.1-prictureAdded - modified to support the pircture element
  * http://jquery.com/
  *
  * Includes Sizzle.js
@@ -5284,7 +5284,7 @@ function createSafeFragment( document ) {
 }
 
 var nodeNames = "abbr|article|aside|audio|bdi|canvas|data|datalist|details|figcaption|figure|footer|" +
-		"header|hgroup|mark|meter|nav|output|progress|section|summary|time|video",
+		"header|hgroup|mark|meter|nav|output|picture|progress|section|summary|time|video",
 	rinlinejQuery = / jQuery\d+="(?:null|\d+)"/g,
 	rnoshimcache = new RegExp("<(?:" + nodeNames + ")[\\s/>]", "i"),
 	rleadingWhitespace = /^\s+/,
