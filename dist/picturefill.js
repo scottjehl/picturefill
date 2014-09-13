@@ -211,9 +211,6 @@ window.matchMedia || (window.matchMedia = function() {
 		img.src = src;
 	};
 
-	// test webp support
-	pf.createImageTest( "image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=" );
-
 	/**
 	 * Takes a source element and checks if its type attribute is present and if so, supported
 	 * Note: for type tests that require a async logic,
@@ -305,7 +302,7 @@ window.matchMedia || (window.matchMedia = function() {
 				url, descriptor = null;
 
 			if ( pos !== -1 ) {
-				url = srcset.charAt( 0, pos );
+				url = srcset.slice( 0, pos );
 
 				var last = url.charAt[ url.length - 1 ];
 
@@ -317,7 +314,7 @@ window.matchMedia || (window.matchMedia = function() {
 					url = url.replace(/,+$/, "");
 					descriptor = "";
 				}
-				srcset = srcset.charAt( pos + 1 );
+				srcset = srcset.slice( pos + 1 );
 
 				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and 
 				// let that be descriptors.
@@ -325,7 +322,7 @@ window.matchMedia || (window.matchMedia = function() {
 					var descpos = srcset.indexOf(",");
 					if ( descpos !== -1 ) {
 						descriptor = srcset.slice( 0, descpos );
-						srcset = srcset.charAt( descpos + 1 );
+						srcset = srcset.slice( descpos + 1 );
 					} else {
 						descriptor = srcset;
 						srcset = "";
@@ -641,7 +638,7 @@ window.matchMedia || (window.matchMedia = function() {
 		}
 	};
 
-	function picturefill( opt ) {
+	var picturefill = function ( opt ) {
 
 		var elements, element;
 
@@ -663,16 +660,24 @@ window.matchMedia || (window.matchMedia = function() {
 		}
 
 		pf.teardownRun();
-	}
+	};
+
+	// test webp support
+	pf.createImageTest( "image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=" );
+
+
+
+	/* expose methods for testing */
+	picturefill._ = pf;
 
 	/**
 	 * Sets up picture polyfill by polling the document and running
 	 * the polyfill every 250ms until the document is ready.
 	 * Also attaches picturefill on resize
 	 */
-	function runPicturefill() {
+	(function () {
 		if(doc.body){
-			picturefill();
+			setTimeout(picturefill);
 		}
 		var intervalId = setInterval( function() {
 			// When the document has finished loading, stop checking for new images
@@ -696,12 +701,7 @@ window.matchMedia || (window.matchMedia = function() {
 				resizeThrottle = w.setTimeout( onResize, 99 );
 			}, false );
 		}
-	}
-
-	runPicturefill();
-
-	/* expose methods for testing */
-	picturefill._ = pf;
+	})();
 
 	/* expose picturefill */
 	if ( typeof module === "object" && typeof module.exports === "object" ) {

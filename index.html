@@ -13,15 +13,17 @@
 			document.createElement( "picture" );
 		</script>
 		<script src="src/external/matchmedia.js"></script>
+		<!--[if lte IE 7]>
+			<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 
+		<![endif]-->
 
+		<script src="src/picturefill.js" async=""></script>
 	</head>
 	<body>
-	<script src="src/picturefill.js"></script>
 	<script>
 
 	</script>
-	<script src="src/picturefill-mutations.js"></script>
 	<img src="examples/images/medium.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 	<img src="examples/images/medium.jpg"  alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 	<img src="examples/images/medium.jpg" srcset="examples/images/medium.jpg 1x, examples/images/large.jpg 2x" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
