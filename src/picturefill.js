@@ -18,14 +18,14 @@
 
 	// local object for method references and testing exposure
 	var pf = {};
-	var noop = function(){};
+	var noop = function() {};
 	var image = doc.createElement( "img" );
 
 
 
 	// namespace
 	pf.ns = "picturefill" + new Date().getTime();
-	pf.onReady = function(){pf.isReady = true;};
+	pf.onReady = function() {pf.isReady = true;};
 	pf.isReady = false;
 
 	// srcset support test
@@ -51,10 +51,10 @@
 		};
 	} else {
 		pf.qsa = function(context, sel){
-			return (w.jQuery && jQuery.find || window.Sizzle || noop)(sel, context) || [];
+			return (w.jQuery && jQuery.find || noop)(sel, context) || [];
 		};
 		pf.qs = function(context, sel){
-			return (w.jQuery && jQuery.find || window.Sizzle || noop)(sel, context)[0];
+			return (w.jQuery && jQuery.find || noop)(sel, context)[0];
 		};
 	}
 
@@ -261,7 +261,7 @@
 			if ( pos !== -1 ) {
 				url = srcset.slice( 0, pos );
 
-				var last = url.charAt[ url.length - 1 ];
+				var last = url.charAt( url.length - 1 );
 
 				// 6. If url ends with a U+002C COMMA character (,), remove that character from url
 				// and let descriptors be the empty string. Otherwise, follow these substeps
@@ -316,7 +316,7 @@
 				for (var i = splitDescriptor.length + 1; i >= 0; i--) {
 					if ( splitDescriptor[ i ] !== undefined ) {
 						var curr = splitDescriptor[ i ],
-							lastchar = curr && curr.charAt( curr.length - 1 );
+							lastchar = curr && curr.slice( curr.length - 1 );
 
 						if ( ( lastchar === "h" || lastchar === "w" ) && !pf.sizesSupported ) {
 							resCandidate = parseFloat( ( parseInt( curr, 10 ) / widthInCssPixels ) );
