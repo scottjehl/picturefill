@@ -236,14 +236,33 @@
 			mutations.push( mutation );
 		};
 	})();
+	(function() {
+		var i;
+		var domMethods = ['appendChild', 'insertBefore', 'removeChild'];
+		picturefill.html = function( dom, html ) {
+				pfobserver.disconnect();
+				dom.innerHTML = html;
+				addMutation( {type: "childList", addedNodes: [dom], removedNodes: []} );
+				pfobserver.observe();
+		};
 
-	picturefill.updateContent = function(dom) {
-		if(pf.isReady){
-			pfobserver.disconnect();
-			addMutation( {type: 'childList', addedNodes: [dom], removedNodes: []} );
-			pfobserver.observe();
+		for ( i = 0; i < domMethods.length; i++ ) {
+			/*jshint loopfunc: true */
+			picturefill[ domMethods[ i ] ] = function( main, dom ) {
+				var mutation = domMethods[ i ] == "removeChild" ?
+					{type: "childList", addedNodes: [], removedNodes: [dom]} :
+					{type: "childList", addedNodes: [dom], removedNodes: []}
+				;
+				pfobserver.disconnect();
+				main[ domMethods[ i ] ]( dom );
+				addMutation( mutation );
+				pfobserver.observe();
+			};
+			/*jshint loopfunc: false */
 		}
-	};
+	})();
+
+
 
 	//only setter || no getter (getter would be great or)
 	picturefill.props = function(dom, prop, value) {
