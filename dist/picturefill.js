@@ -196,19 +196,25 @@ window.matchMedia || (window.matchMedia = function() {
 	pf.createImageTest = function( type, src ){
 		// based on Modernizr's lossless img-webp test
 		// note: asynchronous
+		var timer;
 		var img = doc.createElement( "img" );
-
+		var complete = function() {
+			clearTimeout(timer);
+			picturefill();
+			img = null;
+		};
 		pf.types[ type ] = "pending";
 
 		img.onerror = function() {
 			pf.types[ type ] = false;
-			picturefill();
+			complete();
 		};
 		img.onload = function() {
 			pf.types[ type ] = img.width === 1;
-			picturefill();
+			complete();
 		};
 		img.src = src;
+		timer = setTimeout(img.onerror, 300);
 	};
 
 	/**
@@ -500,7 +506,7 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 
 			if( supportsType == "pending" ){
-				candidate = "pending";
+				candidate = supportsType;
 			}
 
 			match = candidate;
@@ -508,18 +514,6 @@ window.matchMedia || (window.matchMedia = function() {
 		}
 
 		return match;
-	};
-
-	pf.setupRun = function(){
-		//invalidate cache
-		pf.widthCache = {};
-	};
-
-	pf.teardownRun = function(){
-		if(pf.lengthElInstered){
-			pf.lengthElInstered = false;
-			doc.documentElement.removeChild(pf.lengthEl);
-		}
 	};
 
 	pf.parseCanditates = function(element, parent, options){
@@ -638,9 +632,21 @@ window.matchMedia || (window.matchMedia = function() {
 		}
 	};
 
-	var picturefill = function ( opt ) {
 
-		var elements, element;
+	pf.setupRun = function(){
+		//invalidate cache
+		pf.widthCache = {};
+	};
+
+	pf.teardownRun = function(){
+		if(pf.lengthElInstered){
+			pf.lengthElInstered = false;
+			doc.documentElement.removeChild(pf.lengthEl);
+		}
+	};
+
+	var picturefill = function ( opt ) {
+		var elements, element, i, plen;
 
 		var options = opt || {};
 
@@ -648,24 +654,21 @@ window.matchMedia || (window.matchMedia = function() {
 			console.warn( "reparse should only run on specific elements. reparse option also removes dodged `srcset and `src attributes!" );
 		}
 
-		elements = options.elements || pf.qsa(doc, options.reevaluate ?  pf.selector : pf.shortSelector);
+		elements = options.elements || pf.qsa(doc, options.reevaluate ? pf.selector : pf.shortSelector);
 
-		pf.setupRun();
+		if( (plen = elements.length) ) {
+			pf.setupRun();
 
-		// Loop through all elements
-		for ( var i = 0, plen = elements.length; i < plen; i++ ) {
-			element = elements[ i ];
-			pf._forEachImg(elements[ i ], options);
+			// Loop through all elements
+			for ( i = 0; i < plen; i++ ) {
+				element = elements[ i ];
+				pf._forEachImg(elements[ i ], options);
 
+			}
+
+			pf.teardownRun();
 		}
-
-		pf.teardownRun();
 	};
-
-	// test webp support
-	pf.createImageTest( "image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=" );
-
-
 
 	/* expose methods for testing */
 	picturefill._ = pf;
@@ -676,32 +679,33 @@ window.matchMedia || (window.matchMedia = function() {
 	 * Also attaches picturefill on resize
 	 */
 	(function () {
-		if(doc.body){
-			setTimeout(picturefill);
-		}
-		var intervalId = setInterval( function() {
+		var run = function(e) {
 			// When the document has finished loading, stop checking for new images
 			// https://github.com/ded/domready/blob/master/ready.js#L15
-			if ( /^loade|^i|^c/.test( doc.readyState || "" ) ) {
+			if ( /^loade|^i|^c/.test( doc.readyState || "" ) || ( e && e.type == "DOMContentLoaded" ) ) {
 				clearInterval( intervalId );
 				picturefill();
 				pf.onReady();
 			} else {
 				picturefill();
 			}
-
-		}, 250 );
+		};
+		var intervalId = setInterval( run, 250);
 		var onResize = function() {
 			picturefill({ reevaluate: true });
 		};
-		if ( w.addEventListener ) {
+		if ( w.addEventListener && doc.addEventListener ) {
 			var resizeThrottle;
 			w.addEventListener( "resize", function() {
 				w.clearTimeout( resizeThrottle );
 				resizeThrottle = w.setTimeout( onResize, 99 );
 			}, false );
+			doc.addEventListener( "DOMContentLoaded", run );
 		}
 	})();
+
+	// test webp support + automatically runs picturefill test
+	pf.createImageTest( "image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=" );
 
 	/* expose picturefill */
 	if ( typeof module === "object" && typeof module.exports === "object" ) {
