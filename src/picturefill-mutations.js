@@ -26,7 +26,7 @@
 
 
 
-	if ( window.HTMLPictureElement || !picturefill._ ) {return pfobserver;}
+	if ( !picturefill._ ) {return pfobserver;}
 	var matches;
 	var pf = picturefill._;
 	var observeProps = {src: 1, srcset: 1, sizes: 1};
@@ -59,7 +59,7 @@
 					delete img._pfOptions;
 				}
 
-				pf._forEachImg( img, opts );
+				pf.fillImg( img, opts );
 			}
 
 			pf.teardownRun();
@@ -180,9 +180,12 @@
 			observer.disconnect();
 			oldSetup.apply( this, arguments );
 		};
-		pf.teardownRun = function() {
+		pf.teardownRun = function( options ) {
 			oldTeardown.apply( this, arguments );
-			pfobserver.observe();
+
+			if ( !options || !options.disableObserver ) {
+				pfobserver.observe();
+			}
 		};
 
 		pfobserver.observe = function() {
@@ -200,7 +203,7 @@
 		pfobserver.observe();
 	}
 
-	if ( window.MutationObserver ) {
+	if ( !window.HTMLPictureElement && window.MutationObserver ) {
 		(function() {
 			var oldOnReady = pf.onReady;
 			if ( pf.isReady ) {
@@ -222,7 +225,9 @@
 			var running = false;
 			var mutations = [];
 			var setImmediate = window.setImmediate || window.setTimeout;
-			return function(mutation) {
+			return window.HTMLPictureElement ?
+				noop :
+				function(mutation) {
 				if(!running){
 					running = true;
 					if(!run){

@@ -7,20 +7,14 @@
 	// Enable strict mode
 	"use strict";
 
-	// If picture is supported, well, that's awesome. Let's get outta here...
-	if ( w.HTMLPictureElement ) {
-		w.picturefill = function() { };
-		return;
-	}
-
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
 	doc.createElement( "picture" );
 
 	// local object for method references and testing exposure
+	var lengthElInstered, lengthEl;
 	var pf = {};
 	var noop = function() {};
 	var image = doc.createElement( "img" );
-
 
 
 	// namespace
@@ -71,9 +65,7 @@
 	/**
 	 * Shortcut method for https://w3c.github.io/webappsec/specs/mixedcontent/#restricts-mixed-content ( for easy overriding in tests )
 	 */
-	pf.restrictsMixedContent = function() {
-		return w.location.protocol === "https:";
-	};
+	pf.restrictsMixedContent = w.location.protocol === "https:";
 	/**
 	 * Shortcut method for matchMedia ( for easy overriding in tests )
 	 */
@@ -84,18 +76,18 @@
 	/**
 	 * Shortcut method for `devicePixelRatio` ( for easy overriding in tests )
 	 */
-	pf.getDpr = function() {
-		return ( w.devicePixelRatio || 1 );
-	};
+	pf.DPR = ( w.devicePixelRatio || 1 );
 
 	/**
 	 * Get width in css pixel value from a "length" value
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
 	 */
+	pf.widthCache = {};
 	pf.getWidthFromLength = function( length ) {
 		var origLength = length;
 
-		if( !pf.widthCache[origLength] ){
+
+		if( !pf.widthCache[ origLength ] ){
 			// If a length is specified and doesn’t contain a percentage, and it is greater than 0 or using `calc`, use it. Else, use the `100vw` default.
 			length = length && length.indexOf( "%" ) < 0 && ( parseFloat( length ) > 0 || length.indexOf( "calc(" ) > -1 ) ? length : "100vw";
 			/**
@@ -107,27 +99,27 @@
 			length = length.replace( "vw", "%" );
 
 			// Create a cached element for getting length value widths
-			if ( !pf.lengthEl ) {
-				pf.lengthEl = doc.createElement( "div" );
+			if ( !lengthEl ) {
+				lengthEl = doc.createElement( "div" );
 				// Positioning styles help prevent padding/margin/width on `html` from throwing calculations off.
-				pf.lengthEl.style.cssText = "position: absolute; left: 0; visibility: hidden;";
+				lengthEl.style.cssText = "position: absolute; left: 0; visibility: hidden; display: block; padding: 0; margin: 0; border: none;";
 			}
 
-			if(!pf.lengthElInstered){
-				doc.documentElement.insertBefore( pf.lengthEl, doc.documentElement.firstChild );
-				pf.lengthElInstered = true;
+			if ( !lengthElInstered ) {
+				lengthElInstered = true;
+				doc.documentElement.insertBefore( lengthEl, doc.documentElement.firstChild );
 			}
 
 			// set width
-			pf.lengthEl.style.width = length;
+			lengthEl.style.width = length;
 
-			if ( pf.lengthEl.offsetWidth <= 0 ) {
+			if ( lengthEl.offsetWidth <= 0 ) {
 				// Something has gone wrong. `calc()` is in use and unsupported, most likely. Default to `100vw` (`100%`, for broader support.):
-				pf.lengthEl.style.width = "100%";
+				lengthEl.style.width = "100%";
 			}
 
 			//cache result
-			pf.widthCache[origLength] = pf.lengthEl.offsetWidth;
+			pf.widthCache[origLength] = lengthEl.offsetWidth;
 		}
 
 		return pf.widthCache[origLength];
@@ -151,9 +143,10 @@
 		var img = doc.createElement( "img" );
 		var complete = function() {
 			clearTimeout(timer);
-			picturefill();
+			pf.fillImgs();
 			img = null;
 		};
+
 		pf.types[ type ] = "pending";
 
 		img.onerror = function() {
@@ -169,10 +162,7 @@
 	};
 
 	/**
-	 * Takes a source element and checks if its type attribute is present and if so, supported
-	 * Note: for type tests that require a async logic,
-	 * you can define them as a function that'll run only if that type needs to be tested. Just make the test function call picturefill again when it is complete.
-	 * see the async webp test above for example
+	 * Takes a type string and checks if its supported
 	 */
 
 	//suggested method:
@@ -189,9 +179,9 @@
 	/**
 	* Parses an individual `size` and returns the length, and optional media query
 	*/
-	var regSize = /(\([^)]+\))?\s*(.+)/g;
+	var regSize = /(\([^)]+\))?\s*(.+)/;
 	pf.parseSize = function( sourceSizeStr ) {
-		var match = regSize.exec( sourceSizeStr );
+		var match = ( sourceSizeStr || "" ).match(regSize);
 		return {
 			media: match && match[1],
 			length: match && match[2]
@@ -204,16 +194,16 @@
 	pf.findWidthFromSourceSize = function( sourceSizeListStr ) {
 		// Split up source size list, ie ( max-width: 30em ) 100%, ( max-width: 50em ) 50%, 33%
 		//                            or (min-width:30em) calc(30% - 15px)
-		var sourceSizeList = pf.trim( sourceSizeListStr ).split( /\s*,\s*/ ),
-			winningLength;
+		var winningLength, sourceSize, parsedSize, length, media, i, len;
+		var sourceSizeList = pf.trim( sourceSizeListStr ).split( /\s*,\s*/ );
 
-		for ( var i = 0, len = sourceSizeList.length; i < len; i++ ) {
+		for ( i = 0, len = sourceSizeList.length; i < len; i++ ) {
 			// Match <media-condition>? length, ie ( min-width: 50em ) 100%
-			var sourceSize = sourceSizeList[ i ],
-				// Split "( min-width: 50em ) 100%" into separate strings
-				parsedSize = pf.parseSize( sourceSize ),
-				length = parsedSize.length,
-				media = parsedSize.media;
+			sourceSize = sourceSizeList[ i ];
+			// Split "( min-width: 50em ) 100%" into separate strings
+			parsedSize = pf.parseSize( sourceSize );
+			length = parsedSize.length;
+			media = parsedSize.media;
 
 			if ( !length ) {
 				continue;
@@ -246,6 +236,8 @@
 		if( candidate.parsedSrcset ) {
 			return candidate.parsedSrcset;
 		}
+
+		var pos, url, descriptor, last, descpos;
 		var candidates = [];
 		var srcset = candidate.srcset;
 
@@ -255,13 +247,13 @@
 			srcset = srcset.replace(/^\s+/g,"");
 
 			// 5. Collect a sequence of characters that are not space characters, and let that be url.
-			var pos = srcset.search(/\s/g),
-				url, descriptor = null;
+			pos = srcset.search(/\s/g);
+			descriptor = null;
 
 			if ( pos !== -1 ) {
 				url = srcset.slice( 0, pos );
 
-				var last = url.charAt( url.length - 1 );
+				last = url.charAt( url.length - 1 );
 
 				// 6. If url ends with a U+002C COMMA character (,), remove that character from url
 				// and let descriptors be the empty string. Otherwise, follow these substeps
@@ -277,7 +269,7 @@
 				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and 
 				// let that be descriptors.
 				if ( descriptor === null ) {
-					var descpos = srcset.indexOf(",");
+					descpos = srcset.indexOf( "," );
 					if ( descpos !== -1 ) {
 						descriptor = srcset.slice( 0, descpos );
 						srcset = srcset.slice( descpos + 1 );
@@ -306,23 +298,26 @@
 	pf.parseDescriptor = function( descriptor, sizesattr ) {
 		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list 
 		// is the order in which entries are added to the list.
-		var sizes = sizesattr || "100vw",
-			sizeDescriptor = descriptor && descriptor.replace(regPipe, ""),
-			widthInCssPixels = pf.findWidthFromSourceSize( sizes ),
-			resCandidate;
+		var resCandidate, splitDescriptor, i, curr, lastchar, res;
+		var sizes = sizesattr || "100vw";
+		var sizeDescriptor = descriptor && descriptor.replace( regPipe, "" );
+		var widthInCssPixels = null;
 
 			if ( sizeDescriptor ) {
-				var splitDescriptor = sizeDescriptor.split(" ");
+				splitDescriptor = sizeDescriptor.split(" ");
 
-				for (var i = splitDescriptor.length + 1; i >= 0; i--) {
+				for (i = splitDescriptor.length + 1; i >= 0; i--) {
 					if ( splitDescriptor[ i ] !== undefined ) {
-						var curr = splitDescriptor[ i ],
-							lastchar = curr && curr.slice( curr.length - 1 );
+						curr = splitDescriptor[ i ];
+						lastchar = curr && curr.slice( curr.length - 1 );
 
 						if ( ( lastchar === "h" || lastchar === "w" ) && !pf.sizesSupported ) {
+							if( widthInCssPixels === null ){
+								widthInCssPixels = pf.findWidthFromSourceSize( sizes );
+							}
 							resCandidate = parseFloat( ( parseInt( curr, 10 ) / widthInCssPixels ) );
 						} else if ( lastchar === "x" ) {
-							var res = curr && parseFloat( curr, 10 );
+							res = curr && parseFloat( curr, 10 );
 							resCandidate = res && !isNaN( res ) ? res : 1;
 						}
 					}
@@ -332,7 +327,7 @@
 	};
 
 	/**
-	 * Takes a srcset in the form of url/
+	 * Takes a candidate object with a srcset property in the form of url/
 	 * ex. "images/pic-medium.png 1x, images/pic-medium-2x.png 2x" or
 	 *     "images/pic-medium.png 400w, images/pic-medium-2x.png 800w" or
 	 *     "images/pic-small.png"
@@ -352,7 +347,7 @@
 
 				formattedCandidates.push({
 					url: candidate.url,
-					resolution: pf.parseDescriptor( candidate.descriptor, candidate.sizes )
+					resolution: pf.parseDescriptor( candidate.descriptor, candidateData.sizes )
 				});
 			}
 		}
@@ -373,7 +368,7 @@
 
 		for ( var i = 0; i < length; i++ ) {
 			candidate = candidates[ i ];
-			if ( candidate.resolution >= pf.getDpr() ) {
+			if ( candidate.resolution >= pf.DPR ) {
 				bestCandidate = candidate;
 				break;
 			}
@@ -388,7 +383,7 @@
 		}
 
 		if ( bestCandidate && !pf.endsWith( picImg.src, bestCandidate.url ) ) {
-			if ( pf.restrictsMixedContent() && bestCandidate.url.substr(0, "http:".length).toLowerCase() === "http:" ) {
+			if ( pf.restrictsMixedContent && bestCandidate.url.substr(0, "http:".length).toLowerCase() === "http:" ) {
 				if ( pf.hasConsole ) {
 					console.warn( "Blocked mixed content image " + bestCandidate.url );
 				}
@@ -422,15 +417,16 @@
 	/*
 	 * In IE9, <source> elements get removed if they aren't children of
 	 * video elements. Thus, we conditionally wrap source elements
-	 * using <!--[if IE 9]><video style="display: none;"><![endif]-->
+	 * using <!--[if IE 9]><audio><![endif]-->
 	 * and must account for that here by moving those source elements
 	 * back into the picture element.
 	 */
 	pf.removeVideoShim = function( picture ) {
+		var vsources;
 		var media = pf.qs( picture, "video, audio" );
 
 		if ( media ) {
-			var vsources = media.getElementsByTagName( "source" );
+			vsources = media.getElementsByTagName( "source" );
 			while ( vsources.length ) {
 				picture.insertBefore( vsources[ 0 ], media );
 			}
@@ -472,7 +468,7 @@
 		var srcsetAttribute;
 		var hasPicture = parent.nodeName.toUpperCase() === "PICTURE";
 
-		if ( hasPicture || !pf.srcsetSupported || (!pf.sizesSupported && element.srcset.indexOf('w') != -1) ) {
+		if ( hasPicture || !pf.srcsetSupported || ( !pf.sizesSupported && element.srcset.indexOf('w') != -1) ) {
 			element[ pf.ns ].supported = false;
 		} else {
 			element[ pf.ns ].supported = true;
@@ -484,7 +480,7 @@
 			element[ pf.ns ].src = element.getAttribute( "src" );
 		}
 
-		if ( !('srcset' in element[ pf.ns ]) || options.reparseSrcset || element.srcset) {
+		if ( !('srcset' in element[ pf.ns ]) || options.reparseSrcset ) {
 			srcsetAttribute = element.getAttribute( "srcset" );
 			element[ pf.ns ].srcset = srcsetAttribute;
 
@@ -522,19 +518,9 @@
 	function getAllSourceElements(element, picture , candidates) {
 		var i, len, source, srcset;
 
-		var sources = picture.childNodes;
+		var sources = picture.getElementsByTagName( "source" );
 		for ( i = 0, len = sources.length; i < len; i++){
 			source = sources[ i ];
-
-			// Hitting the `img` element that started everything stops the search for `sources`.
-			if ( source === element ) {
-				break;
-			}
-
-			// ignore non-element nodes
-			if ( source.nodeType !== 1 || source.nodeName.toUpperCase() !== "SOURCE" ) {
-				continue;
-			}
 
 			srcset = source.getAttribute( "srcset" );
 
@@ -556,7 +542,7 @@
 		}
 	}
 
-	pf._forEachImg = function(element, options){
+	pf.fillImg = function(element, options){
 		// expando for caching data on the img
 		if ( !element[ pf.ns ] ) {
 			element[ pf.ns ] = {};
@@ -582,83 +568,101 @@
 	};
 
 
-	pf.setupRun = function() {
+	pf.setupRun = function( options ) {
 		//invalidate cache
-		pf.widthCache = {};
+		if ( !options || options.reevaluate ){
+			pf.widthCache = {};
+		}
 	};
 
-	pf.teardownRun = function() {
-		if ( pf.lengthElInstered ) {
-			pf.lengthElInstered = false;
-			doc.documentElement.removeChild(pf.lengthEl);
+	pf.teardownRun = function( /*options*/ ) {
+		if ( lengthElInstered ) {
+			lengthElInstered = false;
+			doc.documentElement.removeChild( lengthEl );
 		}
 	};
 
 	var picturefill = function ( opt ) {
-		var elements, i, plen;
+		var elements, i, plen, xParse;
 
 		var options = opt || {};
 
-		if(pf.hasConsole && options.reparse && !options.elements){
-			console.warn( "reparse should only run on specific elements. reparse option also removes dodged `srcset and `src attributes!" );
+		if ( options.reparseSrcset || options.reparseSrc ) {
+			xParse = true;
+			options.reparse = true;
+		}
+
+		if(pf.hasConsole && xParse && !options.elements){
+			throw( "reparse should only run on specific elements." );
 		}
 
 		elements = options.elements || pf.qsa(doc, options.reevaluate ? pf.selector : pf.shortSelector);
 
 		if( (plen = elements.length) ) {
-			pf.setupRun();
+			pf.setupRun( options );
 
 			// Loop through all elements
 			for ( i = 0; i < plen; i++ ) {
-				pf._forEachImg(elements[ i ], options);
+				pf.fillImg(elements[ i ], options);
 			}
 
-			pf.teardownRun();
+			pf.teardownRun( options );
 		}
 	};
 
+	// If picture is supported, well, that's awesome.
+	if ( w.HTMLPictureElement ) {
+		picturefill = noop;
+		pf.fillImg = noop;
+	}
+
 	/* expose methods for testing */
 	picturefill._ = pf;
+
+	//use this internally for easy monkey patching/performance testing
+	pf.fillImgs = picturefill;
 
 	/**
 	 * Sets up picture polyfill by polling the document and running
 	 * the polyfill every 250ms until the document is ready.
 	 * Also attaches picturefill on resize
 	 */
-	(function () {
-		var run = function(e) {
-			// When the document has finished loading, stop checking for new images
-			// https://github.com/ded/domready/blob/master/ready.js#L15
-			if ( /^loade|^i|^c/.test( doc.readyState || "" ) || ( e && e.type == "DOMContentLoaded" ) ) {
-				clearInterval( intervalId );
+	if ( !w.HTMLPictureElement ) {
+		(function () {
+			var run = function(e) {
+				// When the document has finished loading, stop checking for new images
+				// https://github.com/ded/domready/blob/master/ready.js#L15
+				if ( /^loade|^i|^c/.test( doc.readyState || "" ) || ( e && e.type == "DOMContentLoaded" ) ) {
+					clearInterval( intervalId );
 
-				picturefill();
+					pf.fillImgs();
 
-				pf.onReady();
+					pf.onReady();
 
-				if ( doc.removeEventListener ) {
-					doc.removeEventListener( "DOMContentLoaded", run );
+					if ( doc.removeEventListener ) {
+						doc.removeEventListener( "DOMContentLoaded", run );
+					}
+				} else {
+					pf.fillImgs();
 				}
-			} else {
-				picturefill();
+			};
+			var intervalId = setInterval( run, 250);
+			var onResize = function() {
+				pf.fillImgs({ reevaluate: true });
+			};
+			if ( w.addEventListener && doc.addEventListener ) {
+				var resizeThrottle;
+				w.addEventListener( "resize", function() {
+					w.clearTimeout( resizeThrottle );
+					resizeThrottle = w.setTimeout( onResize, 99 );
+				}, false );
+				doc.addEventListener( "DOMContentLoaded", run );
 			}
-		};
-		var intervalId = setInterval( run, 250);
-		var onResize = function() {
-			picturefill({ reevaluate: true });
-		};
-		if ( w.addEventListener && doc.addEventListener ) {
-			var resizeThrottle;
-			w.addEventListener( "resize", function() {
-				w.clearTimeout( resizeThrottle );
-				resizeThrottle = w.setTimeout( onResize, 99 );
-			}, false );
-			doc.addEventListener( "DOMContentLoaded", run );
-		}
-	})();
+		})();
 
-	// test webp support + automatically runs picturefill
-	pf.createImageTest( "image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=" );
+		// test webp support
+		pf.createImageTest( "image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=" );
+	}
 
 	/* expose picturefill */
 	if ( typeof module === "object" && typeof module.exports === "object" ) {

@@ -19,6 +19,23 @@
 		<![endif]-->
 
 		<script src="src/picturefill.js"></script>
+		<script>
+			if(window.console && console.time && console.timeEnd){
+				(function(pic){
+					picturefill._.fillImgs = function(){
+						console.time('run');
+						pic.apply(this, arguments);
+						console.timeEnd('run');
+					};
+
+					for(var prop in pic){
+						if(pic.hasOwnProperty(prop) && pic[prop] != picturefill._.fillImgs[prop]){
+							picturefill._.fillImgs[prop] = pic[prop];
+						}
+					}
+				})(picturefill._.fillImgs);
+			}
+		</script>
 
 		<script src="src/picturefill-mutations.js" async=""></script>
 

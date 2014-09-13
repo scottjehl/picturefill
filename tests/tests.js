@@ -1,39 +1,38 @@
 (function(window, jQuery) {
-	if ( window.HTMLPictureElement ){
-		test( "Picture is natively supported", function() {
-			ok( window.HTMLPictureElement );
-			ok( window.picturefill );
-		});
 
-		return;
-	}
+	test( "Picture fill is loaded", function() {
+		ok( window.picturefill );
+	});
 
-	var pf, originalDprMethod,
-		originalVideoShimMethod,
-		originalMatchesMedia,
-		originalProcessSourceSet,
-		originalGetWidthFromLength,
-		originalRestrictsMixedContentMethod;
+	var pf = picturefill._;
 
-	pf = picturefill._;
+	var saveCache = {};
+
+	var forceElementParsing = function( element, options ){
+		if ( !element[ pf.ns ] ) {
+			element[ pf.ns ] = {};
+			pf.parseCanditates( element, element.parentNode, options || {} );
+		}
+	};
 
 	// reset stubbing
 	module( "method", {
 		setup: function() {
-			originalDprMethod = pf.getDpr;
-			originalVideoShimMethod = pf.removeVideoShim;
-			originalMatchesMedia = pf.matchesMedia;
-			originalProcessSourceSet = pf.processSourceSet;
-			originalGetWidthFromLength = pf.getWidthFromLength;
-			originalrestrictsMixedContentMethod = pf.restrictsMixedContent;
+			var prop;
+			for( prop in pf ){
+				if ( pf.hasOwnProperty( prop ) ) {
+					saveCache[ prop ] = pf[ prop ];
+				}
+			}
 		},
 
 		teardown: function() {
-			pf.getDpr = originalDprMethod;
-			pf.removeVideoShim = originalVideoShimMethod;
-			pf.matchesMedia = originalMatchesMedia;
-			pf.processSourceSet = originalProcessSourceSet;
-			pf.restrictsMixedContent = originalrestrictsMixedContentMethod;
+			var prop;
+			for( prop in saveCache ){
+				if( pf.hasOwnProperty(prop) && saveCache[prop] != pf[ prop ] ){
+					pf[prop] = saveCache[prop];
+				}
+			}
 		}
 	});
 
@@ -44,7 +43,7 @@
 
 			var gotWidth = pf.getWidthFromLength("calc(766px - 1em)");
 
-			return ( gotWidth === 750 || gotWidth === fullWidthEl.offsetWidth );
+			return ( Modernizr.csscalc ? gotWidth === 750 : gotWidth === fullWidthEl.offsetWidth );
 		}());
 
 		equal( pf.getWidthFromLength("750px"), 750, "returns int value of width string" );
@@ -58,11 +57,13 @@
 		pf.matchesMedia = function(media) {
 			return true;
 		};
+
 		width = pf.findWidthFromSourceSize(sizes);
+
 		equal(width, 1000, "returns 1000 when match media returns true");
 
 		pf.matchesMedia = function(media) {
-			return false;
+			return !media || false;
 		};
 		width = pf.findWidthFromSourceSize(sizes);
 		equal(width, 500, "returns 500 when match media returns false");
@@ -93,6 +94,10 @@
 
 	test("getCandidatesFromSourceSet", function() {
 		// Basic test
+		var runGetCandiate = function(candidate, sizes){
+			return pf.getCandidatesFromSourceSet({srcset: candidate, sizes: sizes || null});
+		};
+
 		var candidate1 = "images/pic-medium.png";
 		var expectedFormattedCandidates1 = [
 			{
@@ -100,7 +105,7 @@
 				url: "images/pic-medium.png"
 			}
 		];
-		deepEqual(pf.getCandidatesFromSourceSet(candidate1), expectedFormattedCandidates1, "`" + candidate1 + "` is parsed correctly");
+		deepEqual(runGetCandiate(candidate1), expectedFormattedCandidates1, "`" + candidate1 + "` is parsed correctly");
 
 		var candidate1a = "images/pic-medium.png 1x";
 		var expectedFormattedCandidates1a = [
@@ -109,7 +114,7 @@
 				url: "images/pic-medium.png"
 			}
 		];
-		deepEqual(pf.getCandidatesFromSourceSet(candidate1a), expectedFormattedCandidates1a, "`" + candidate1a + "` is parsed correctly" );
+		deepEqual(runGetCandiate(candidate1a), expectedFormattedCandidates1a, "`" + candidate1a + "` is parsed correctly" );
 
 		var candidate2 = "images/pic-medium.png, images/pic-medium-2x.png 2x";
 		var expectedFormattedCandidates2 = [
@@ -123,7 +128,7 @@
 			}
 		];
 
-		deepEqual(pf.getCandidatesFromSourceSet(candidate2), expectedFormattedCandidates2, "`" + candidate2 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(candidate2), expectedFormattedCandidates2, "`" + candidate2 + "` is parsed correctly" );
 
 		var candidate2a = "images/pic-medium.png 1x, images/pic-medium-2x.png 2x";
 		var expectedFormattedCandidates2a = [
@@ -137,11 +142,11 @@
 			}
 		];
 
-		deepEqual(pf.getCandidatesFromSourceSet(candidate2a), expectedFormattedCandidates2a, "`" + candidate2a + "` is parsed correctly");
+		deepEqual(runGetCandiate(candidate2a), expectedFormattedCandidates2a, "`" + candidate2a + "` is parsed correctly");
 
 		// Test with multiple spaces
 		var candidate3 = "			images/pic-medium.png		 1x		,		 images/pic-medium-2x.png		 2x		";
-		deepEqual(pf.getCandidatesFromSourceSet(candidate3), expectedFormattedCandidates2, "`" + candidate3 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(candidate3), expectedFormattedCandidates2, "`" + candidate3 + "` is parsed correctly" );
 
 		// Test with decimals
 		var candidate4 = "			images/pic-smallest.png		0.25x	,		images/pic-small.png		0.5x	, images/pic-medium.png 1x";
@@ -159,12 +164,13 @@
 				url: "images/pic-medium.png"
 			}
 		];
-		deepEqual(pf.getCandidatesFromSourceSet(candidate4), expectedFormattedCandidates4, "`" + candidate4 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(candidate4), expectedFormattedCandidates4, "`" + candidate4 + "` is parsed correctly" );
 
 		// Test with "sizes" passed with a px length specified
 		var candidate5 = "			images/pic-smallest.png		 250w		,		 images/pic-small.png		 500w		, images/pic-medium.png 1000w";
 		var sizes5 = "1000px";
-		deepEqual(pf.getCandidatesFromSourceSet(candidate5, sizes5), expectedFormattedCandidates4, "`" + candidate4 + "` is parsed correctly");
+
+		deepEqual(runGetCandiate(candidate5, sizes5), expectedFormattedCandidates4, "`" + candidate4 + "` is parsed correctly");
 
 		// Test with "sizes" passed with % lengths specified
 		var candidate6 = "\npic320.png 320w	, pic640.png		640w, pic768.png 768w, \
@@ -201,7 +207,7 @@
 			return true;
 		};
 
-		deepEqual(pf.getCandidatesFromSourceSet(candidate6, sizes6), expectedCandidates, "`" + candidate6 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(candidate6, sizes6), expectedCandidates, "`" + candidate6 + "` is parsed correctly" );
 
 		var srcset1 = "foo,bar.png 320w, bar,baz.png 320w";
 		var expectedresult1 = [
@@ -213,7 +219,7 @@
 				resolution: 0.5
 			}
 		];
-		deepEqual(pf.getCandidatesFromSourceSet(srcset1), expectedresult1, "`" + srcset1 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(srcset1), expectedresult1, "`" + srcset1 + "` is parsed correctly" );
 
 		var srcset2 = "foo,bar.png 320w,bar,baz.png 320w";
 		var expectedresult2 = [
@@ -226,7 +232,7 @@
 			}
 		];
 
-		deepEqual(pf.getCandidatesFromSourceSet(srcset2), expectedresult2, "`" + srcset2 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(srcset2), expectedresult2, "`" + srcset2 + "` is parsed correctly" );
 
 		var srcset3 = "foo.png 1x, bar.png -2x";
 		var expectedresult3 = [
@@ -238,7 +244,7 @@
 				resolution: -2
 			}
 		];
-		deepEqual(pf.getCandidatesFromSourceSet(srcset3), expectedresult3, "`" + srcset3 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(srcset3), expectedresult3, "`" + srcset3 + "` is parsed correctly" );
 
 		var srcset4 = "foo.png 1x, bar.png 2q";
 		var expectedresult4 = [
@@ -250,7 +256,7 @@
 				resolution: 1
 			}
 		];
-		deepEqual(pf.getCandidatesFromSourceSet(srcset4), expectedresult4, "`" + srcset4 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(srcset4), expectedresult4, "`" + srcset4 + "` is parsed correctly" );
 
 		var srcset5 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg 1x, bar.png 2x";
 		var expectedresult5 = [
@@ -262,7 +268,7 @@
 				resolution: 2
 			}
 		];
-		deepEqual(pf.getCandidatesFromSourceSet(srcset5), expectedresult5, "`" + srcset5 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(srcset5), expectedresult5, "`" + srcset5 + "` is parsed correctly" );
 
 		var srcset6 = "2.png 1x,1.png 2x";
 		var expectedresult6 = [
@@ -274,7 +280,7 @@
 				resolution: 2
 			}
 		];
-		deepEqual(pf.getCandidatesFromSourceSet(srcset6), expectedresult6, "`" + srcset6 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(srcset6), expectedresult6, "`" + srcset6 + "` is parsed correctly" );
 
 		var srcset7 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg 2x, 1x.gif 1x, data:image/png;base64,iVBORw0KGgoAAAANSUhEUg";
 		var expectedresult7 = [
@@ -289,7 +295,7 @@
 				resolution: 1
 			}
 		];
-		deepEqual(pf.getCandidatesFromSourceSet(srcset7), expectedresult7, "`" + srcset7 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(srcset7), expectedresult7, "`" + srcset7 + "` is parsed correctly" );
 
 		var srcset8 = "400.gif 400w, 6000.gif 6000w";
 		var expectedresult8 = [
@@ -301,7 +307,7 @@
 				resolution: 9.375
 			}
 		];
-		deepEqual(pf.getCandidatesFromSourceSet(srcset8), expectedresult8, "`" + srcset8 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(srcset8), expectedresult8, "`" + srcset8 + "` is parsed correctly" );
 
 		var srcset9 = "800.gif 2x, 1600.gif 1600w";
 		var expectedresult9 = [
@@ -313,7 +319,7 @@
 				resolution: 2.5
 			}
 		];
-		deepEqual(pf.getCandidatesFromSourceSet(srcset9), expectedresult9, "`" + srcset9 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(srcset9), expectedresult9, "`" + srcset9 + "` is parsed correctly" );
 		var srcset10 = "1x,,  ,   x    ,2x	, 1x.gif, , 3x, 4x.gif 4x 100h,,, 5x.gif 5, dx.gif dx, 2x.gif   2x,";
 		var expectedresult10 = [
 			{
@@ -345,65 +351,27 @@
 				resolution: 2
 			}
 		];
-		deepEqual(pf.getCandidatesFromSourceSet(srcset10), expectedresult10, "`" + srcset10 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(srcset10), expectedresult10, "`" + srcset10 + "` is parsed correctly" );
 	});
 
 	test("verifyTypeSupport", function() {
-		expect( 7 );
+		expect( 5 );
 
 		// Test widely supported mime types.
-		ok(pf.verifyTypeSupport({
-			getAttribute: function() {
-				return "image/jpeg";
-			}
-		}));
+		ok( pf.verifyTypeSupport( "image/jpeg" ) );
 
-		ok(pf.verifyTypeSupport({
-			getAttribute: function() {
-				return "image/png";
-			}
-		}));
+		ok( pf.verifyTypeSupport( "image/png" ) );
 
-		ok(pf.verifyTypeSupport({
-			getAttribute: function() {
-				return "image/gif";
-			}
-		}));
+		ok( pf.verifyTypeSupport( "image/gif" ) );
 
 		// if the type attribute is supported it should return true
-		ok(pf.verifyTypeSupport({
-			getAttribute: function() {
-				return "";
-			}
-		}));
+		ok( pf.verifyTypeSupport( "" ) );
 
 		// if the type attribute is supported it should return true
-		ok(pf.verifyTypeSupport({
-			getAttribute: function() {
-				return null;
-			}
-		}));
-
-		pf.types[ "foo" ] = function() {
-			ok( true, "foo type function executed" );
-		};
-
-		pf.verifyTypeSupport({
-			getAttribute: function() {
-				return "foo";
-			}
-		});
-
-		pf.types[ "bar" ] = "baz";
-
-		equal( "baz", pf.verifyTypeSupport({
-			getAttribute: function() {
-				return "bar";
-			}
-		}));
+		ok( pf.verifyTypeSupport( null ) );
 	});
 
-	test("applyBestCandidate", function() {
+	test("applyBestCandidateFromSrcSet", function() {
 		var image, candidates;
 
 		candidates = [
@@ -416,22 +384,26 @@
 			src: "not one of the urls"
 		};
 
-		pf.getDpr = function() {
-			return 300;
-		};
+		pf.DPR = 300;
 
-		pf.applyBestCandidate( candidates, image );
+		pf.applyBestCandidateFromSrcSet( candidates, image );
 
 		deepEqual(image.src, candidates[2].url, "uses the url from the best px fit" );
-		deepEqual(image.currentSrc, candidates[2].url, "uses the url from the best px fit" );
+		if(!pf.currentSrcSupported){
+			deepEqual(image.currentSrc, candidates[2].url, "uses the url from the best px fit" );
+		}
 
 		image.src = "foo300";
 		image.currentSrc = "foo300";
 
-		pf.applyBestCandidate( candidates, image );
+		pf.applyBestCandidateFromSrcSet( candidates, image );
 
 		deepEqual(image.src, "foo300", "src left alone when matched" );
-		deepEqual(image.currentSrc, "foo300", "currentSrc left alone when matched" );
+
+		if(!pf.currentSrcSupported){
+			deepEqual(image.currentSrc, "foo300", "currentSrc left alone when matched" );
+		}
+
 	});
 
 	test( "removeVideoShim", function() {
@@ -446,62 +418,56 @@
 		equal( $videoShim.find( "source" ).length, 2 );
 	});
 
-	test("getMatch returns the first matching `source`", function() {
-		var firstsource = $( ".first-match" )[ 0 ].parentNode.getElementsByTagName( "source" )[ 0 ];
+	test("getFirstMatch returns the first matching `source`", function() {
+		var img = $( ".first-match" )[ 0 ];
+		var firstsource = img.parentNode.getElementsByTagName( "source" )[ 0 ];
 
-		equal( pf.getMatch( $( ".first-match" )[ 0 ], $( ".first-match" )[ 0 ].parentNode ), firstsource );
+		forceElementParsing( img );
+
+		equal( pf.getFirstMatch( img ).srcset, firstsource.getAttribute( "srcset" ) );
 	});
 
-	test("Each `img` should then check if its parent is `picture`, then loop through `source` elements until finding the `img` that triggered the loop.", function() {
-		var match = $( ".match" )[ 0 ],
-			match2 = $( ".match-second" )[ 0 ],
-			firstSource = match.parentNode.getElementsByTagName( "source" )[ 0 ];
 
-		ok( pf.getMatch( match, match.parentNode ) === undefined && pf.getMatch( match2, match2.parentNode ) === firstSource );
+	test( "getFirstMatch returns 'pending' when a source type is pending", function() {
+		var img = $(".pending-check")[0];
+		pf.types["foo"] = "pending";
+
+		forceElementParsing( img );
+
+		equal( pf.getFirstMatch( img ), "pending", "pending type should be false" );
 	});
 
-	test( "getMatch returns false when a source type is pending", function() {
-		pf.types["foo"] = function() {
-			pf.types["foo"] = "pending";
-		};
-
-		equal( pf.getMatch($(".pending-check")[0], $(".pending-check")[0].parentNode ), false, "pending type should be false" );
-	});
-
-	test( "getMatch returns source when it matches the media", function() {
-		var $match = $( ".match-check ");
+	test( "getFirstMatch returns source when it matches the media", function() {
+		var img = $( ".match-check ")[ 0 ];
 		pf.matchesMedia = function() {
 			return true;
 		};
 
-		equal( pf.getMatch( $match[0], $match[0].parentNode ), $match[0].parentNode.getElementsByTagName( "source" )[0] );
+		forceElementParsing( img );
+
+		equal( pf.getFirstMatch( img).srcset, img.parentNode.getElementsByTagName( "source" )[0].getAttribute( "srcset" ) );
 	});
 
-	test( "getMatch returns undefined when no match is found", function() {
-		pf.matchesMedia = function() {
-			return false;
+
+	test( "getMatch returns false when no match is found", function() {
+		pf.matchesMedia = function( media ) {
+			return !media || false;
 		};
 
-		var $noMatch = $( ".no-match-check ");
+		var img = $( ".no-match-check ")[0];
 
-		equal( pf.getMatch( $noMatch[0], $noMatch[0].parentNode ), undefined );
+		forceElementParsing( img );
+
+		equal( pf.getFirstMatch( img ), false );
 	});
 
-	test( "getMatch returns undefined when no srcset is found", function() {
-		var $noSrcset = $( ".no-srcset-check ");
 
-		equal( pf.getMatch( $noSrcset[0], $noSrcset[0].parentNode ), undefined );
-	});
+	test( "getFirstMatch returns false when no srcset is found", function() {
+		var img = $( ".no-srcset-check ")[0];
 
-	test( "getMatch returns only sources preceding fallback img", function() {
-		var $ignoredSource = $( ".ignored-source-check" );
+		forceElementParsing( img );
 
-		// ensure the construction of the fixture
-		equal($ignoredSource[0].nodeName, "IMG" );
-		equal($ignoredSource.next()[0].nodeName, "SOURCE" );
-
-		// ensure that the result is undefined so the picture is grabbed later
-		equal( pf.getMatch( $ignoredSource[0], $ignoredSource[0].parentNode ), undefined, "no source found" );
+		equal( pf.getFirstMatch( img ), false );
 	});
 
 	test( "picturefill ignores elements when they are marked with a property", function() {
@@ -542,26 +508,25 @@
 
 		el.setAttribute( "sizes", "100vw" );
 		el.setAttribute( "class", "no-src" );
-		el.insertBefore( document.documentElement.firstChild, null );
 
-		try { picturefill({ reevaluate: false, elements: document.querySelector( ".no-src" ) }); } catch (e) { console.log( e ); ok( false ); }
+		jQuery( "#qunit-fixture" ).append( el );
+
+		try { picturefill({ reevaluate: false, elements: jQuery( ".no-src" ) }); } catch (e) { console.log( e ); ok( false ); }
 	});
 
 	test( "Mixed content should be blocked", function() {
-		pf.restrictsMixedContent = function() {
-			return true;
-		};
+		pf.restrictsMixedContent = true;
 		var image, candidates;
 
 		candidates = [
-			{ resolution: 1, url: "http://example.org/bar" },
+			{ resolution: 1, url: "http://example.org/bar" }
 		];
 
 		image = {
 			src: "foo"
 		};
 
-		pf.applyBestCandidate( candidates, image );
+		pf.applyBestCandidateFromSrcSet( candidates, image );
 
 		equal( image.src, "foo" );
 
