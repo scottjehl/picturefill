@@ -56,6 +56,7 @@ window.matchMedia || (window.matchMedia = function() {
 	// Enable strict mode
 	"use strict";
 
+	if( !("querySelectorAll" in doc) ) {return;}
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
 	doc.createElement( "picture" );
 
@@ -64,7 +65,6 @@ window.matchMedia || (window.matchMedia = function() {
 	var pf = {};
 	var noop = function() {};
 	var image = doc.createElement( "img" );
-	var qsa = 'querySelectorAll' in doc;
 
 
 	// namespace
@@ -90,32 +90,19 @@ window.matchMedia || (window.matchMedia = function() {
 	}
 
 
-	if( qsa ){
-		pf.qsa = function(context, sel){
-			return context.querySelectorAll(sel);
-		};
-		pf.qs = function(context, sel){
-			return context.querySelector(sel);
-		};
+	pf.qsa = function(context, sel){
+		return context.querySelectorAll(sel);
+	};
 
-	} // This only IE7:
-	else {
-		pf.qsa = function(context, sel){
-			return (w.jQuery && jQuery.find || noop)(sel, context) || [];
-		};
-		pf.qs = function(context, sel){
-			return (w.jQuery && jQuery.find || noop)(sel, context)[0];
-		};
-	}
+	pf.qs = function(context, sel){
+		return context.querySelector(sel);
+	};
 
 	pf.makeUrl = (function(){
-		var anchor = doc.createElement('a');
+		var anchor = doc.createElement( "a" );
 		return function(src){
 			anchor.href = src;
-			return qsa ?
-				anchor.href :
-				anchor.getAttribute( "href", 4 )
-			;
+			return anchor.getAttribute( "href", 4 );
 		};
 	})();
 
@@ -125,7 +112,7 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	/**
-	 * Shortcut method for https://w3c.github.io/webappsec/specs/mixedcontent/#restricts-mixed-content ( for easy overriding in tests )
+	 * Shortcut property for https://w3c.github.io/webappsec/specs/mixedcontent/#restricts-mixed-content ( for easy overriding in tests )
 	 */
 	pf.restrictsMixedContent = w.location.protocol === "https:";
 	/**
@@ -136,7 +123,7 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	/**
-	 * Shortcut method for `devicePixelRatio` ( for easy overriding in tests )
+	 * Shortcut property for `devicePixelRatio` ( for easy overriding in tests )
 	 */
 	pf.DPR = ( w.devicePixelRatio || 1 );
 
@@ -354,7 +341,7 @@ window.matchMedia || (window.matchMedia = function() {
 						curr = splitDescriptor[ i ];
 						lastchar = curr && curr.slice( curr.length - 1 );
 
-						if ( ( lastchar === "h" || lastchar === "w" ) ) {
+						if ( lastchar === "w" ) { // lastchar === "h" is future don't implement it yet.
 							parsedDescriptor.value = parseInt( curr, 10 );
 						} else if ( lastchar === "x" ) {
 							res = curr && parseFloat( curr, 10 );

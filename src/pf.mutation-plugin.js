@@ -21,7 +21,8 @@
 	var pfobserver = {
 		disconnect: noop,
 		take: noop,
-		observe: noop
+		observe: noop,
+		connected: false
 	};
 
 
@@ -173,7 +174,7 @@
 		var observer = new MutationObserver( onMutations );
 
 		pf.setupRun = function() {
-			observer.disconnect();
+			pfobserver.disconnect();
 			oldSetup.apply( this, arguments );
 		};
 
@@ -186,10 +187,12 @@
 		};
 
 		pfobserver.observe = function() {
+			pfobserver.connected = true;
 			observer.observe( document.body, config );
 		};
 
 		pfobserver.disconnect = function() {
+			pfobserver.connected = false;
 			observer.disconnect();
 		};
 
