@@ -64,6 +64,7 @@ window.matchMedia || (window.matchMedia = function() {
 	var pf = {};
 	var noop = function() {};
 	var image = doc.createElement( "img" );
+	var qsa = 'querySelectorAll' in doc;
 
 
 	// namespace
@@ -89,14 +90,16 @@ window.matchMedia || (window.matchMedia = function() {
 	}
 
 
-	if(doc.querySelectorAll){
+	if( qsa ){
 		pf.qsa = function(context, sel){
 			return context.querySelectorAll(sel);
 		};
 		pf.qs = function(context, sel){
 			return context.querySelector(sel);
 		};
-	} else {
+
+	} // This only IE7:
+	else {
 		pf.qsa = function(context, sel){
 			return (w.jQuery && jQuery.find || noop)(sel, context) || [];
 		};
@@ -105,14 +108,20 @@ window.matchMedia || (window.matchMedia = function() {
 		};
 	}
 
+	pf.makeUrl = (function(){
+		var anchor = doc.createElement('a');
+		return function(src){
+			anchor.href = src;
+			return qsa ?
+				anchor.href :
+				anchor.getAttribute( "href", 4 )
+			;
+		};
+	})();
+
 	// just a string trim workaround
 	pf.trim = function( str ) {
 		return str.trim ? str.trim() : str.replace( /^\s+|\s+$/g, "" );
-	};
-
-	// just a string endsWith workaround
-	pf.endsWith = function( str, suffix ) {
-		return str.endsWith ? str.endsWith( suffix ) : str.indexOf( suffix, str.length - suffix.length ) !== -1;
 	};
 
 	/**
@@ -440,7 +449,6 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 
-
 	pf.applyBestCandidateFromSrcSet = function( candidates, picImg ) {
 		var candidate,
 			length,
@@ -467,7 +475,7 @@ window.matchMedia || (window.matchMedia = function() {
 
 		}
 
-		if ( bestCandidate && !pf.endsWith( picImg.src, bestCandidate.url ) ) {
+		if ( bestCandidate &&  pf.makeUrl( bestCandidate.url ) != picImg.src ) {
 			if ( pf.restrictsMixedContent && bestCandidate.url.substr(0, "http:".length).toLowerCase() === "http:" ) {
 				if ( pf.hasConsole ) {
 					console.warn( "Blocked mixed content image " + bestCandidate.url );

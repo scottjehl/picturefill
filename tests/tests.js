@@ -463,10 +463,12 @@
 	test("applyBestCandidateFromSrcSet", function() {
 		var image, candidates;
 
+		var fullPath = pf.makeUrl("foo300");
+
 		candidates = [
-			{ resolution: 100, url: "100" },
-			{ resolution: 200, url: "200" },
-			{ resolution: 300, url: "300" }
+			{ resolution: 100, url: "foo100" },
+			{ resolution: 200, url: "foo200" },
+			{ resolution: 300, url: "foo300" }
 		];
 
 		image = {
@@ -478,19 +480,20 @@
 		pf.applyBestCandidateFromSrcSet( candidates, image );
 
 		deepEqual(image.src, candidates[2].url, "uses the url from the best px fit" );
+
 		if(!pf.currentSrcSupported){
 			deepEqual(image.currentSrc, candidates[2].url, "uses the url from the best px fit" );
 		}
 
-		image.src = "foo300";
-		image.currentSrc = "foo300";
+		image.src = fullPath;
+		image.currentSrc = fullPath;
 
 		pf.applyBestCandidateFromSrcSet( candidates, image );
 
-		deepEqual(image.src, "foo300", "src left alone when matched" );
+		deepEqual(image.src, fullPath, "src left alone when matched" );
 
 		if(!pf.currentSrcSupported){
-			deepEqual(image.currentSrc, "foo300", "currentSrc left alone when matched" );
+			deepEqual(image.currentSrc, fullPath, "currentSrc left alone when matched" );
 		}
 
 	});
