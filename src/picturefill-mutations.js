@@ -27,9 +27,10 @@
 
 
 	if ( !picturefill._ ) {return pfobserver;}
-	var matches;
+	var matches, addMutation;
 	var pf = picturefill._;
-	var observeProps = {src: 1, srcset: 1, sizes: 1};
+	var observeProps = {src: 1, srcset: 1, sizes: 1, media: 1};
+
 	var onMutations = function( mutations ) {
 		var i, len, opts, img;
 		var modifiedImgs = [];
@@ -95,7 +96,7 @@
 			nodeName = node.nodeName.toUpperCase();
 
 			if ( nodeName == "PICTURE" ) {
-				addToElements( node.getElementsByTagName("img")[0], imgs );
+				addToElements( node.getElementsByTagName( "img" )[0], imgs );
 			} else if ( nodeName == "IMG" && matches( node, "img[srcset], picture > img" ) ){
 				addToElements( node, imgs );
 			} else if ( nodeName == "SOURCE" ) {
@@ -141,7 +142,7 @@
 		var nodeName = mutation.target.nodeName.toUpperCase();
 		var isImg = nodeName == "IMG";
 		if ( mutation.attributeName == "src" ){
-			if( isImg && mutation.target.matches( "img[srcset], picture > img" ) ) {
+			if( isImg && matches( mutation.target, "img[srcset], picture > img" ) ) {
 				if ( !mutation.target._pfOptions ) {
 					mutation.target._pfOptions = {};
 				}
@@ -149,7 +150,7 @@
 				addToElements( mutation.target, modifiedImgs );
 			}
 		} else {
-			if (isImg ) {
+			if ( isImg ) {
 				if ( mutation.attributeName == "srcset" ) {
 					if ( !mutation.target._pfOptions ) {
 						mutation.target._pfOptions = {};
@@ -157,7 +158,7 @@
 					mutation.target._pfOptions.reparseSrcset = true;
 				}
 				addToElements( mutation.target, modifiedImgs );
-			} else if(nodeName == "SOURCE"){
+			} else if ( nodeName == "SOURCE" ) {
 				addImgForSource( mutation.target, mutation.target.parentNode, modifiedImgs );
 			}
 		}
@@ -175,6 +176,7 @@
 			observer.disconnect();
 			oldSetup.apply( this, arguments );
 		};
+
 		pf.teardownRun = function( options ) {
 			oldTeardown.apply( this, arguments );
 
@@ -193,29 +195,21 @@
 
 		pfobserver.take = function() {
 			onMutations( observer.takeRecords() );
+			if ( addMutation.take ) {
+				addMutation.take();
+			}
 		};
 
 		pfobserver.observe();
 	}
 
-	if ( !window.HTMLPictureElement && window.MutationObserver ) {
-		(function() {
-			var oldOnReady = pf.onReady;
-			if ( pf.isReady ) {
-				createObserver();
-			} else {
-				pf.onReady = function() {
-					oldOnReady.apply( this, arguments );
-					createObserver();
-				};
-			}
-		})();
-	}
+
 
 	(function() {
 		var i;
 		var domMethods = ["appendChild", "insertBefore", "removeChild"];
-		var addMutation = (function() {
+
+		addMutation = (function() {
 			var run;
 			var running = false;
 			var mutations = [];
@@ -225,8 +219,8 @@
 				function(mutation) {
 				if(!running){
 					running = true;
-					if(!run){
-						run = function(){
+					if(! addMutation.take ){
+						addMutation.take = function(){
 							onMutations( mutations );
 							mutations = [];
 							running = false;
@@ -260,15 +254,19 @@
 			/*jshint loopfunc: false */
 		}
 
-		//only setter || no getter (getter would be great or)
-		picturefill.props = function(dom, prop, value) {
-			var ip;
-			if ( typeof prop == "object" ) {
-				for(ip in prop){
-					picturefill.props( dom, ip, prop[ip] );
-				}
-			} else {
-				pfobserver.disconnect();
+		//only setter || no getter (a normalized getter would be great?, nut then we should do it using IMAGE.prototype/SOURCE.prototype)
+		picturefill.props = function(dom, props) {
+			var prop, value, tmpObj;
+			if ( typeof props == "string" ) {
+				tmpObj = {};
+				tmpObj[props] = arguments[2];
+				props = tmpObj;
+			}
+
+			pfobserver.disconnect();
+
+			for(prop in props){
+				value = props[prop];
 				if ( value === null ) {
 					dom.removeAttribute(prop);
 				} else if ( prop in dom ) {
@@ -276,13 +274,30 @@
 				} else {
 					dom.setAttribute( prop, value );
 				}
+
 				if( observeProps[prop] ){
 					addMutation( {type: 'attributes', target: dom, attributeName: prop} );
 				}
-				pfobserver.observe();
 			}
+
+			pfobserver.observe();
+
 		};
 	})();
+
+	if ( !window.HTMLPictureElement && window.MutationObserver ) {
+		(function() {
+			var oldOnReady = pf.onReady;
+			if ( pf.isReady ) {
+				createObserver();
+			} else {
+				pf.onReady = function() {
+					oldOnReady.apply( this, arguments );
+					createObserver();
+				};
+			}
+		})();
+	}
 
 	pf.observer = pfobserver;
 
