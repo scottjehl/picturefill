@@ -720,10 +720,10 @@
 	 */
 	if ( !w.HTMLPictureElement ) {
 		(function () {
-			var run = function(e) {
+			var run = function() {
 				// When the document has finished loading, stop checking for new images
 				// https://github.com/ded/domready/blob/master/ready.js#L15
-				if ( /^loade|^i|^c/.test( doc.readyState || "" ) || ( e && e.type == "DOMContentLoaded" ) ) {
+				if ( /^loade|^c/.test( doc.readyState || "" ) ) {
 					clearInterval( intervalId );
 
 					pf.fillImgs();

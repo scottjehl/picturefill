@@ -56,7 +56,10 @@ window.matchMedia || (window.matchMedia = function() {
 	// Enable strict mode
 	"use strict";
 
-	if( !("querySelectorAll" in doc) ) {return;}
+	if( !("querySelectorAll" in doc) ) {
+		throw( "No support for this old browser." );
+	}
+
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
 	doc.createElement( "picture" );
 
@@ -65,7 +68,6 @@ window.matchMedia || (window.matchMedia = function() {
 	var pf = {};
 	var noop = function() {};
 	var image = doc.createElement( "img" );
-
 
 	// namespace
 	pf.ns = "picturefill" + new Date().getTime();
@@ -767,10 +769,10 @@ window.matchMedia || (window.matchMedia = function() {
 	 */
 	if ( !w.HTMLPictureElement ) {
 		(function () {
-			var run = function(e) {
+			var run = function() {
 				// When the document has finished loading, stop checking for new images
 				// https://github.com/ded/domready/blob/master/ready.js#L15
-				if ( /^loade|^i|^c/.test( doc.readyState || "" ) || ( e && e.type == "DOMContentLoaded" ) ) {
+				if ( /^loade|^c/.test( doc.readyState || "" ) ) {
 					clearInterval( intervalId );
 
 					pf.fillImgs();
