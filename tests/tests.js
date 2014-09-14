@@ -36,7 +36,7 @@
 	});
 
 
-	test( "Picture fill is loaded and has its API ready", function() {
+	test( "picturefill: Picture fill is loaded and has its API ready", function() {
 		ok( window.picturefill );
 
 		ok( window.picturefill._ );
@@ -46,45 +46,46 @@
 		ok( window.picturefill._.fillImgs );
 	});
 
-	test( "Integration test", function() {
+	test( "picturefill: global integration test", function() {
 		pf.DPR = 2;
 
 		pf.getWidthFromLength = function(){
 			return 160;
 		};
-
-		var $srcsetImageX = $( "<img />" )
-			.attr({
-				srcset: "oneX.jpg 1x, twoX.jpg 2x"
-			})
-			.prependTo('#qunit-fixture')
-		;
 		var $srcsetImageW = $( "<img />" )
 			.attr({
 				srcset: "medium.jpg 480w,\n small.jpg  320w"
 			})
 			.prependTo('#qunit-fixture')
 		;
+		var $srcsetImageX = $( "<img />" )
+			.attr({
+				srcset: "oneX.jpg 1x, twoX.jpg 2x"
+			})
+			.prependTo('#qunit-fixture')
+		;
+
 		var $normalImg = $('.prop-check');
-
-
 
 		window.picturefill();
 		window.picturefill._.fillImgs();
 
-		$("img[srcset], picture > img").each(function(){
-			picturefill._.fillImg(this, {});
-		});
+		$( "img[srcset], picture > img" ).each( function(){
+			picturefill._.fillImg( this, {} );
+		} );
 
-		if( window.HTMLPictureElement ){
-			equal( $('picture > img').prop(pf.ns), undefined, "Picturefill doesn't touch images in supporting browsers." );
+		if ( window.HTMLPictureElement ) {
+			equal( $('picture > img' ).prop( pf.ns ), undefined, "Picturefill doesn't touch images in supporting browsers." );
 		} else {
-			ok( $('picture > img').prop( pf.ns ), "Picturefill modifies images in non-supporting browsers." );
+
+			ok( $('picture > img' ).prop( pf.ns ), "Picturefill modifies images in non-supporting browsers." );
 		}
 
-		if(pf.srcsetSupported){
-			equal( $srcsetImageX.prop( pf.ns ), undefined, "Picturefill doesn't touch images in supporting browsers." );
-			equal( $srcsetImageX.attr( "src" ), null, "Picturefill doesn't touch images in supporting browsers." );
+		if ( pf.srcsetSupported ) {
+
+			equal( ($srcsetImageX.prop( pf.ns ) || {supported: true}).supported, true, "Picturefill doesn't touch images in supporting browsers." );
+			equal( $srcsetImageX.attr( "src" ), null, "Picturefill doesn't touch image sources in supporting browsers." );
+
 		} else {
 			ok( $srcsetImageX.prop( pf.ns ), "Picturefill modifies images in non-supporting browsers." );
 			equal( $srcsetImageX.attr( "src" ), "twoX.jpg", "Picturefill changes source of image" );
@@ -92,8 +93,9 @@
 
 		if(pf.srcsetSupported && pf.sizesSupported){
 			equal( $srcsetImageW.prop( pf.ns ), undefined, "Picturefill doesn't touch images in supporting browsers." );
-			equal( $srcsetImageW.attr( "src" ), null, "Picturefill doesn't touch images in supporting browsers." );
+			equal( $srcsetImageW.attr( "src" ), null, "Picturefill doesn't touch image sources in supporting browsers." );
 		} else {
+
 			ok( $srcsetImageW.prop( pf.ns ), "Picturefill modifies images in non-supporting browsers." );
 			equal( $srcsetImageW.attr( "src" ), "small.jpg", "Picturefill changes source of image" );
 		}

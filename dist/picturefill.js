@@ -229,11 +229,9 @@ window.matchMedia || (window.matchMedia = function() {
 		}
 	};
 
-
-
 	/**
-	* Parses an individual `size` and returns the length, and optional media query
-	*/
+	 * Parses an individual `size` and returns the length, and optional media query
+	 */
 	pf.parseSize = (function(){
 		var regSize = /(\([^)]+\))?\s*(.+)/;
 		var memSize = {};
@@ -251,39 +249,6 @@ window.matchMedia || (window.matchMedia = function() {
 			return memSize[sourceSizeStr];
 		};
 	})();
-
-	/**
-	 * Takes a string of sizes and returns the width in pixels as a number
-	 */
-	pf.findWidthFromSourceSize = function( sourceSizeListStr ) {
-		// Split up source size list, ie ( max-width: 30em ) 100%, ( max-width: 50em ) 50%, 33%
-		//                            or (min-width:30em) calc(30% - 15px)
-		var winningLength, sourceSize, parsedSize, length, media, i, len;
-		var sourceSizeList = pf.trim( sourceSizeListStr ).split( /\s*,\s*/ );
-
-		for ( i = 0, len = sourceSizeList.length; i < len; i++ ) {
-			// Match <media-condition>? length, ie ( min-width: 50em ) 100%
-			sourceSize = sourceSizeList[ i ];
-			// Split "( min-width: 50em ) 100%" into separate strings
-			parsedSize = pf.parseSize( sourceSize );
-			length = parsedSize.length;
-			media = parsedSize.media;
-
-			if ( !length ) {
-				continue;
-			}
-			if ( pf.matchesMedia( media ) ) {
-				// if there is no media query or it matches, choose this as our winning length
-				// and end algorithm
-				winningLength = length;
-				break;
-			}
-		}
-
-		// pass the length to a method that can properly determine length
-		// in pixels based on these formats: http://dev.w3.org/csswg/css-values-3/#length-value
-		return pf.getWidthFromLength( winningLength );
-	};
 
 	pf.parseSrcset = function( candidate ) {
 		/**
@@ -351,7 +316,7 @@ window.matchMedia || (window.matchMedia = function() {
 			if ( url || descriptor ) {
 				candidate.parsedSrcset.push({
 					url: url,
-					descriptor: descriptor
+					descriptor: pf.parseDescriptor( descriptor,  candidate.sizes )
 				});
 			}
 		}
@@ -359,34 +324,90 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	var regPipe = /(^\s+|\s+$)/g;
-	pf.parseDescriptor = function( descriptor, sizesattr ) {
-		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list 
-		// is the order in which entries are added to the list.
-		var resCandidate, splitDescriptor, i, curr, lastchar, res;
-		var sizes = sizesattr || "100vw";
-		var sizeDescriptor = descriptor && descriptor.replace( regPipe, "" );
-		var widthInCssPixels = null;
+	var memDescriptor = {};
+	pf.parseDescriptor = function( descriptor ) {
+
+		if ( !memDescriptor[ descriptor ] ) {
+			// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list
+			// is the order in which entries are added to the list.
+			var splitDescriptor, i, curr, lastchar, res;
+			var sizeDescriptor = descriptor && descriptor.replace( regPipe, "" );
+			var parsedDescriptor = {
+				value: 1,
+				type: 'x'
+			};
 
 			if ( sizeDescriptor ) {
 				splitDescriptor = sizeDescriptor.split(" ");
 
-				for (i = splitDescriptor.length + 1; i >= 0; i--) {
+				for ( i = splitDescriptor.length + 1; i >= 0; i-- ) {
 					if ( splitDescriptor[ i ] !== undefined ) {
 						curr = splitDescriptor[ i ];
 						lastchar = curr && curr.slice( curr.length - 1 );
 
 						if ( ( lastchar === "h" || lastchar === "w" ) ) {
-							if( widthInCssPixels === null ){
-								widthInCssPixels = pf.findWidthFromSourceSize( sizes );
-							}
-							resCandidate = parseFloat( ( parseInt( curr, 10 ) / widthInCssPixels ) );
+							parsedDescriptor.value = parseInt( curr, 10 );
 						} else if ( lastchar === "x" ) {
 							res = curr && parseFloat( curr, 10 );
-							resCandidate = res && !isNaN( res ) ? res : 1;
+							parsedDescriptor.value = res && !isNaN( res ) ? res : 1;
 						}
+						parsedDescriptor.type = lastchar;
 					}
 				}
 			}
+
+			if( !parsedDescriptor.value ) {
+				parsedDescriptor.value = 1;
+			}
+
+			memDescriptor[ descriptor ] = parsedDescriptor;
+		}
+
+		return memDescriptor[ descriptor ];
+	};
+
+	/**
+	 * Takes a string of sizes and returns the width in pixels as a number
+	 */
+	pf.findWidthFromSourceSize = function( sourceSizeListStr ) {
+		// Split up source size list, ie ( max-width: 30em ) 100%, ( max-width: 50em ) 50%, 33%
+		//                            or (min-width:30em) calc(30% - 15px)
+		var winningLength, sourceSize, parsedSize, length, media, i, len;
+		var sourceSizeList = pf.trim( sourceSizeListStr ).split( /\s*,\s*/ );
+
+		for ( i = 0, len = sourceSizeList.length; i < len; i++ ) {
+			// Match <media-condition>? length, ie ( min-width: 50em ) 100%
+			sourceSize = sourceSizeList[ i ];
+			// Split "( min-width: 50em ) 100%" into separate strings
+			parsedSize = pf.parseSize( sourceSize );
+			length = parsedSize.length;
+			media = parsedSize.media;
+
+			if ( !length ) {
+				continue;
+			}
+			if ( pf.matchesMedia( media ) ) {
+				// if there is no media query or it matches, choose this as our winning length
+				// and end algorithm
+				winningLength = length;
+				break;
+			}
+		}
+
+		// pass the length to a method that can properly determine length
+		// in pixels based on these formats: http://dev.w3.org/csswg/css-values-3/#length-value
+		return pf.getWidthFromLength( winningLength );
+	};
+
+	pf.getResolution = function( descriptor, sizesattr ) {
+		var sizes = sizesattr || "100vw";
+		var resCandidate = descriptor.value;
+
+		if( descriptor.type == 'w' ) { // h = means height: || descriptor.type == 'h' do not handle yet...
+			resCandidate = resCandidate / pf.findWidthFromSourceSize( sizes ) ;
+		}
+
+
 		return resCandidate || 1;
 	};
 
@@ -411,7 +432,7 @@ window.matchMedia || (window.matchMedia = function() {
 
 				formattedCandidates.push({
 					url: candidate.url,
-					resolution: pf.parseDescriptor( candidate.descriptor, candidateData.sizes )
+					resolution: pf.getResolution( candidate.descriptor, candidateData.sizes )
 				});
 			}
 		}
@@ -528,18 +549,34 @@ window.matchMedia || (window.matchMedia = function() {
 		return match;
 	};
 
+	pf.hasNonXDescriptor = function( candidate ) {
+		var i;
+		var srcset = pf.parseSrcset( candidate );
+		var ret = false;
+		for( i = 0; i < srcset.length; i++ ) {
+			if ( srcset[ 0 ].descriptor && srcset[ 0 ].descriptor.type != 'x' ) {
+				ret = true;
+				break;
+			}
+		}
+		return ret;
+	};
+
+	pf.needsSrcsetPolyfill = function( candidate ) {
+		if ( !candidate ) { return false; }
+		var needsPolyfill = !pf.srcsetSupported;
+
+		if ( !needsPolyfill && !pf.sizesSupported &&
+			( candidate.sizes || pf.hasNonXDescriptor( candidate ) ) ) {
+			needsPolyfill = true;
+		}
+		return needsPolyfill;
+	};
+
 	pf.parseCanditates = function( element, parent, options ) {
-		var srcsetAttribute;
+		var srcsetAttribute, fallbackCandidate , srcsetChanged;
 
 		var hasPicture = parent.nodeName.toUpperCase() === "PICTURE";
-
-		if ( hasPicture || !pf.srcsetSupported || ( !pf.sizesSupported && element.srcset.indexOf('w') != -1) ) {
-			element[ pf.ns ].supported = false;
-		} else {
-			element[ pf.ns ].supported = true;
-		}
-
-		element[ pf.ns ].candidates = [];
 
 		if( !('src' in element[ pf.ns ]) || options.reparseSrc ) {
 			element[ pf.ns ].src = element.getAttribute( "src" );
@@ -547,11 +584,14 @@ window.matchMedia || (window.matchMedia = function() {
 
 		if ( !('srcset' in element[ pf.ns ]) || options.reparseSrcset ) {
 			srcsetAttribute = element.getAttribute( "srcset" );
+
+			srcsetChanged = !srcsetAttribute && element[ pf.ns ].srcset;
+
 			element[ pf.ns ].srcset = srcsetAttribute;
 
 			if ( pf.srcsetSupported ) {
 				if ( srcsetAttribute ) {
-					element.setAttribute(pf.picutreFillAttribute, element[ pf.ns ].srcset);
+					element.setAttribute( pf.picutreFillAttribute, srcsetAttribute );
 					if ( pf.srcsetSupported && !pf.sizesSupported ) {
 						element.srcset = "";
 					} else {
@@ -564,6 +604,28 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 		}
 
+		if( element[ pf.ns ].srcset ){
+			fallbackCandidate = {
+				srcset: element[ pf.ns ].srcset,
+				sizes: element.getAttribute( "sizes" )
+			};
+
+			if ( !hasPicture ) {
+				pf.parseSrcset( fallbackCandidate );
+			}
+		}
+
+
+		if ( hasPicture || srcsetChanged || pf.needsSrcsetPolyfill( fallbackCandidate ) ) {
+			element[ pf.ns ].supported = false;
+		} else {
+			element[ pf.ns ].supported = true;
+		}
+
+		element[ pf.ns ].candidates = [];
+
+
+
 		if( hasPicture ){
 			// IE9 video workaround
 			pf.removeMediaShim( parent );
@@ -571,13 +633,8 @@ window.matchMedia || (window.matchMedia = function() {
 			getAllSourceElements( element, parent, element[ pf.ns ].candidates );
 		}
 
-		if(element[ pf.ns ].srcset){
-			element[ pf.ns ].candidates.push( {
-				srcset: element[ pf.ns ].srcset,
-				sizes: element.getAttribute( "sizes" )
-			} );
-		} else if( !hasPicture && !options.reparse ) {
-			element[ pf.ns ].supported = true;
+		if(fallbackCandidate){
+			element[ pf.ns ].candidates.push( fallbackCandidate );
 		}
 
 		element[ pf.ns ].parsed = true;
@@ -646,7 +703,9 @@ window.matchMedia || (window.matchMedia = function() {
 			pf.applyBestCandidate( element );
 
 		} else {
+
 			element[ pf.ns ].evaluated = true;
+
 		}
 
 	};
