@@ -526,6 +526,19 @@
 		equal( pf.getFirstMatch( img ).srcset, firstsource.getAttribute( "srcset" ) );
 	});
 
+	test("Each `img` should then check if its parent is `picture`, then loop through `source` elements until finding the `img` that triggered the loop.", function() {
+		var firstSource;
+		var img = $( ".match" )[ 0 ];
+		var img2 = $( ".match-second" )[ 0 ];
+
+		forceElementParsing( img );
+		forceElementParsing( img2 );
+
+		firstSource = img.parentNode.getElementsByTagName( "source" )[ 0 ];
+
+		ok( pf.getFirstMatch( img ) === false && pf.getFirstMatch( img2).srcset === firstSource.getAttribute('srcset') );
+	});
+
 
 	test( "getFirstMatch returns 'pending' when a source type is pending", function() {
 		var img = $(".pending-check")[0];
@@ -544,7 +557,7 @@
 
 		forceElementParsing( img );
 
-		equal( pf.getFirstMatch( img).srcset, img.parentNode.getElementsByTagName( "source" )[0].getAttribute( "srcset" ) );
+		equal( pf.getFirstMatch( img ).srcset, img.parentNode.getElementsByTagName( "source" )[0].getAttribute( "srcset" ) );
 	});
 
 
@@ -567,6 +580,19 @@
 		forceElementParsing( img );
 
 		equal( pf.getFirstMatch( img ), false );
+	});
+
+	test( "getMatch returns only sources preceding fallback img", function() {
+		var $ignoredSource = $( ".ignored-source-check" );
+
+		forceElementParsing( $ignoredSource[ 0 ] );
+
+		// ensure the construction of the fixture
+		equal($ignoredSource[0].nodeName, "IMG" );
+		equal($ignoredSource.next()[0].nodeName, "SOURCE" );
+
+		// ensure that the result is undefined so the picture is grabbed later
+		equal( pf.getFirstMatch( $ignoredSource[0]).srcset, "imgsrcset", "no source srcset found" );
 	});
 
 	test( "picturefill ignores elements when they are marked with a property", function() {

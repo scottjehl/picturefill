@@ -584,20 +584,22 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	function getAllSourceElements(element, picture , candidates) {
-		var i, len, source, srcset;
+		var i, len, source, srcset, nodeName;
 
 
 		var sources = picture.childNodes;
-		for ( i = 0, len = sources.length; i < len; i++){
+		for ( i = 0, len = sources.length; i < len; i++ ) {
 			source = sources[ i ];
-
-			if( (source.nodeName || "").toUpperCase() !== "SOURCE" ){
-				continue;
-			}
 
 			if ( source == element ) {
 				break;
 			}
+
+			if( !( nodeName = source.nodeName ) || nodeName.toUpperCase() !== "SOURCE" ){
+				continue;
+			}
+
+
 
 			srcset = source.getAttribute( "srcset" );
 

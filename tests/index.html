@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
+	<meta charset="utf-8" />
 	<title>picturefill tests</title>
-	<link rel="stylesheet" href="resources/qunit-1.15.0.css">
+	<link rel="stylesheet" href="resources/qunit-1.15.0.css" />
 	<script src="resources/qunit-1.15.0.js"></script>
 	<script src="resources/jquery-1.11.1.js"></script>
 	<script>
@@ -42,6 +42,22 @@
 	</picture>
 
 	<img src="bar" class="prop-check"/>
+
+	<picture>
+		<img srcset="imgsrcset" class="ignored-source-check" src="foo">
+		<!--[if IE 9]><video style="display: none;"><![endif]-->
+		<source srcset="sourcesrcset"></source>
+		<!--[if IE 9]></video><![endif]-->
+	</picture>
+
+	<picture>
+		<!-- First `source` in source order is selected -->
+		<img class="match">
+		<audio>
+			<source srcset="baz"></source>
+		</audio>
+		<img class="match-second" src="baz">
+	</picture>
 
 	<picture>
 		<!--[if IE 9]><video style="display: none;"><![endif]-->
