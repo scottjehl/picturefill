@@ -33,7 +33,11 @@
 	// using qsa instead of dom traversing does scale much better,
 	// especially on sites mixing responsive and non-responsive images
 	pf.shortSelector = "picture > img, img[srcset]";
-	pf.selector = pf.shortSelector + ", img[" + pf.picutreFillAttribute + "]";
+	pf.selector = pf.shortSelector;
+
+	if ( pf.srcsetSupported ) {
+		pf.selector += ", img[" + pf.picutreFillAttribute + "]";
+	}
 
 
 	if(doc.querySelectorAll){
@@ -496,16 +500,18 @@
 			srcsetAttribute = element.getAttribute( "srcset" );
 			element[ pf.ns ].srcset = srcsetAttribute;
 
-			if ( srcsetAttribute ) {
-				element.setAttribute(pf.picutreFillAttribute, element[ pf.ns ].srcset);
-				if ( pf.srcsetSupported && !pf.sizesSupported ) {
-					element.srcset = "";
-				} else {
-					element.removeAttribute( "srcset" );
-				}
+			if ( pf.srcsetSupported ) {
+				if ( srcsetAttribute ) {
+					element.setAttribute(pf.picutreFillAttribute, element[ pf.ns ].srcset);
+					if ( pf.srcsetSupported && !pf.sizesSupported ) {
+						element.srcset = "";
+					} else {
+						element.removeAttribute( "srcset" );
+					}
 
-			} else {
-				element.removeAttribute( pf.picutreFillAttribute );
+				} else {
+					element.removeAttribute( pf.picutreFillAttribute );
+				}
 			}
 		}
 

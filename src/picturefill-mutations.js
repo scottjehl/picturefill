@@ -83,7 +83,7 @@
 
 	function onSubtreeChange( mutations, imgs ) {
 		findAddedMutations( mutations.addedNodes, imgs );
-		findRemovedMutations( mutations.removedNodes, imgs );
+		findRemovedMutations( mutations.removedNodes, mutations.target, imgs );
 	}
 
 	function findAddedMutations( nodes, imgs ) {
@@ -99,34 +99,29 @@
 			} else if ( nodeName == "IMG" && matches( node, "img[srcset], picture > img" ) ){
 				addToElements( node, imgs );
 			} else if ( nodeName == "SOURCE" ) {
-				addImgForSource( node, imgs );
+				addImgForSource( node, node.parentNode, imgs );
 			} else {
 				addToElements( pf.qsa( node, "img[srcset], picture > img" ), imgs );
 			}
 		}
 	}
 
-	function findRemovedMutations( nodes, imgs ) {
+	function findRemovedMutations( nodes, target, imgs ) {
 		var i, len, node;
 		for ( i = 0, len = nodes.length; i < len; i++ ) {
 			node = nodes[i];
 			if ( node.nodeType != 1 ) {continue;}
 			if ( node.nodeName.toUpperCase() == "SOURCE" ) {
-				addImgForSource( node, imgs );
+				addImgForSource( node, target, imgs );
 			}
 		}
 	}
 
-	function addImgForSource( node, imgs ) {
-		var parent;
-		if( matches( node, 'picture source' ) ){
+	function addImgForSource( node, parent, imgs ) {
+		if ( parent && ( parent.nodeName || "" ).toUpperCase() != "PICTURE" ) {
 			parent = node.parentNode;
-
-			if ( parent.nodeName.toUpperCase() != "PICTURE" ) {
-				parent = node.parentNode;
-			}
-			addToElements( parent.getElementsByTagName( "img" )[0], imgs );
 		}
+		addToElements( parent.getElementsByTagName( "img" )[0], imgs );
 	}
 
 	function addToElements( img, imgs ) {
@@ -163,7 +158,7 @@
 				}
 				addToElements( mutation.target, modifiedImgs );
 			} else if(nodeName == "SOURCE"){
-				addImgForSource( mutation.target, modifiedImgs );
+				addImgForSource( mutation.target, mutation.target.parentNode, modifiedImgs );
 			}
 		}
 	}
@@ -254,8 +249,8 @@
 			/*jshint loopfunc: true */
 			picturefill[ domMethods[ i ] ] = function( main, dom ) {
 				var mutation = domMethods[ i ] == "removeChild" ?
-					{type: "childList", addedNodes: [], removedNodes: [dom]} :
-					{type: "childList", addedNodes: [dom], removedNodes: []}
+					{type: "childList", addedNodes: [], removedNodes: [dom], target: main} :
+					{type: "childList", addedNodes: [dom], removedNodes: [], target: main}
 				;
 				pfobserver.disconnect();
 				main[ domMethods[ i ] ]( dom );
