@@ -1,4 +1,4 @@
-/*! Picturefill - v2.1.0 - 2014-09-13
+/*! Picturefill - v2.1.0 - 2014-09-14
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -230,14 +230,23 @@ window.matchMedia || (window.matchMedia = function() {
 	/**
 	* Parses an individual `size` and returns the length, and optional media query
 	*/
-	var regSize = /(\([^)]+\))?\s*(.+)/;
-	pf.parseSize = function( sourceSizeStr ) {
-		var match = ( sourceSizeStr || "" ).match(regSize);
-		return {
-			media: match && match[1],
-			length: match && match[2]
+	pf.parseSize = (function(){
+		var regSize = /(\([^)]+\))?\s*(.+)/;
+		var memSize = {};
+		return function( sourceSizeStr ) {
+			var match;
+
+			if(!memSize[sourceSizeStr]){
+				match = ( sourceSizeStr || "" ).match(regSize);
+				memSize[sourceSizeStr] = {
+					media: match && match[1],
+					length: match && match[2]
+				};
+			}
+
+			return memSize[sourceSizeStr];
 		};
-	};
+	})();
 
 	/**
 	 * Takes a string of sizes and returns the width in pixels as a number
@@ -289,10 +298,10 @@ window.matchMedia || (window.matchMedia = function() {
 		}
 
 		var pos, url, descriptor, last, descpos;
-		var candidates = [];
+
 		var srcset = candidate.srcset;
 
-		candidate.parsedSrcset = candidates;
+		candidate.parsedSrcset = [];
 
 		while ( srcset ) {
 			srcset = srcset.replace(/^\s+/g,"");
@@ -336,13 +345,13 @@ window.matchMedia || (window.matchMedia = function() {
 
 			// 7. Add url to raw candidates, associated with descriptors.
 			if ( url || descriptor ) {
-				candidates.push({
+				candidate.parsedSrcset.push({
 					url: url,
 					descriptor: descriptor
 				});
 			}
 		}
-		return candidates;
+		return candidate.parsedSrcset;
 	};
 
 	var regPipe = /(^\s+|\s+$)/g;
@@ -517,6 +526,7 @@ window.matchMedia || (window.matchMedia = function() {
 
 	pf.parseCanditates = function( element, parent, options ) {
 		var srcsetAttribute;
+
 		var hasPicture = parent.nodeName.toUpperCase() === "PICTURE";
 
 		if ( hasPicture || !pf.srcsetSupported || ( !pf.sizesSupported && element.srcset.indexOf('w') != -1) ) {
@@ -548,7 +558,6 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 		}
 
-
 		if( hasPicture ){
 			// IE9 video workaround
 			pf.removeMediaShim( parent );
@@ -571,17 +580,26 @@ window.matchMedia || (window.matchMedia = function() {
 	function getAllSourceElements(element, picture , candidates) {
 		var i, len, source, srcset;
 
-		var sources = picture.getElementsByTagName( "source" );
+
+		var sources = picture.childNodes;
 		for ( i = 0, len = sources.length; i < len; i++){
 			source = sources[ i ];
+
+			if( (source.nodeName || "").toUpperCase() !== "SOURCE" ){
+				continue;
+			}
+
+			if ( source == element ) {
+				break;
+			}
 
 			srcset = source.getAttribute( "srcset" );
 
 			// if source does not have a srcset attribute, skip
 			if ( !srcset ) {
 				// if it's a source element has the `src` property set, throw a warning in the console
-				if( pf.hasConsole ) {
-					console.warn( "Couldn't find srcset attribute on source. Also Note: The `src` attribute is invalid on `picture` `source` element; instead, use `srcset`." );
+				if( pf.hasConsole && picturefill.debug && source.getAttribute( "src" ) ) {
+					console.warn( "Couldn't find srcset attribute on source. Note: The `src` attribute is invalid on `picture` `source` element; use `srcset`." );
 				}
 				continue;
 			}
@@ -593,6 +611,7 @@ window.matchMedia || (window.matchMedia = function() {
 				sizes: source.getAttribute( "sizes" )
 			} );
 		}
+
 	}
 
 	pf.fillImg = function(element, options){
@@ -696,9 +715,7 @@ window.matchMedia || (window.matchMedia = function() {
 
 					pf.onReady();
 
-					if ( doc.removeEventListener ) {
-						doc.removeEventListener( "DOMContentLoaded", run );
-					}
+					pf.onReady = noop;
 				} else {
 					pf.fillImgs();
 				}
@@ -713,7 +730,6 @@ window.matchMedia || (window.matchMedia = function() {
 					w.clearTimeout( resizeThrottle );
 					resizeThrottle = w.setTimeout( onResize, 99 );
 				}, false );
-				doc.addEventListener( "DOMContentLoaded", run );
 			}
 		})();
 

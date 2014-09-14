@@ -14,6 +14,7 @@
 	};
 
 	// reset stubbing
+
 	module( "method", {
 		setup: function() {
 			var prop;
@@ -34,6 +35,7 @@
 		}
 	});
 
+
 	test( "Picture fill is loaded and has its API ready", function() {
 		ok( window.picturefill );
 
@@ -45,7 +47,6 @@
 	});
 
 	test( "Integration test", function() {
-
 		pf.DPR = 2;
 
 		pf.getWidthFromLength = function(){

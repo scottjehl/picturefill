@@ -15,53 +15,36 @@
 		<script src="src/external/matchmedia.js"></script>
 		<!--[if lte IE 7]>
 			<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+
 		<![endif]-->
-		<script>
-			try {
-				if(!window.console){
-					window.console = {};
-				}
-				if(!console.log){
-					console.log = $.noop;
-				}
-				if(!window.console.time){
-					(function(){
-						var times = {};
-						console.time = function(name) {
-							name = '$'+(name || '');
-							times[name] = new Date().getTime();
-						};
-						console.timeEnd = function(name) {
-							name = '$'+(name || '');
-							if(name in times){
-								console.log(name+': '+ (new Date().getTime() - times[name])  );
-								delete times[name];
-							}
-						};
-					})();
-				}
-			} catch(e){}
-		</script>
-		<script src="src/picturefill.js"></script>
-		<script>
-			if(window.console && console.time && console.timeEnd){
-				(function(pic){
-					picturefill._.fillImgs = function(){
-						console.time('run');
-						pic.apply(this, arguments);
-						console.timeEnd('run');
-					};
-
-					for(var prop in pic){
-						if(pic.hasOwnProperty(prop) && pic[prop] != picturefill._.fillImgs[prop]){
-							picturefill._.fillImgs[prop] = pic[prop];
-						}
+<script>
+	try {
+		if(!window.console){
+			window.console = {};
+		}
+		if(!console.log){
+			console.log = $.noop;
+		}
+		if(!window.console.time){
+			(function(){
+				var times = {};
+				console.time = function(name) {
+					name = '$'+(name || '');
+					times[name] = new Date().getTime();
+				};
+				console.timeEnd = function(name) {
+					name = '$'+(name || '');
+					if(name in times){
+						console.log(name+': '+ (new Date().getTime() - times[name])  );
+						delete times[name];
 					}
-				})(picturefill._.fillImgs);
-			}
-		</script>
+				};
+			})();
+		}
+	} catch(e){}
+</script>
+		<script src="src/picturefill-orig.js"></script>
 
-		<script src="src/picturefill-mutations.js" async=""></script>
 
 
 	</head>
