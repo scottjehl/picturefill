@@ -156,6 +156,12 @@
 		};
 		width = pf.findWidthFromSourceSize(sizes);
 		equal(width, 500, "returns 500 when match media returns false");
+
+		pf.matchesMedia = function(media) {
+			return !media || media == "(max-width: 50em)";
+		};
+		width = pf.findWidthFromSourceSize(sizes);
+		equal(width, 750, "returns 750px when match media returns true on (max-width: 50em)");
 	});
 
 	test("parseSize", function() {
@@ -288,11 +294,11 @@
 			}
 		];
 
-		pf.getWidthFromLength = function(width) {
+		pf.getWidthFromLength = function() {
 			return 640;
 		};
 
-		pf.matchesMedia = function(media) {
+		pf.matchesMedia = function() {
 			return true;
 		};
 
@@ -442,6 +448,34 @@
 		];
 		deepEqual(runGetCandiate(srcset10), expectedresult10, "`" + srcset10 + "` is parsed correctly" );
 	});
+
+	test( "pf.mMQ", function(){
+		pf.vW = 480;
+		pf.getEmValue = function(){
+			return 2;
+		};
+
+		ok( pf.mMQ( "(min-width: 480px)" ) );
+		ok( !pf.mMQ( "(min-width: 481px)" ) );
+		ok( pf.mMQ( "(min-width: 479px)" ) );
+
+		ok( pf.mMQ( "(max-width: 480px)" ) );
+		ok( pf.mMQ( "(max-width: 481px)" ) );
+		ok( !pf.mMQ( "(max-width: 479px)" ) );
+
+		ok( !pf.mMQ( "(orientation: landscape)" ) );
+
+		ok( pf.mMQ( "(min-width: 240em)" ) );
+		ok( !pf.mMQ( "(min-width: 241em)" ) );
+		ok( pf.mMQ( "(min-width: 239em)" ) );
+
+		ok( pf.mMQ( "(max-width: 240em)" ) );
+		ok( pf.mMQ( "(max-width: 241em)" ) );
+		ok( !pf.mMQ( "(max-width: 239em)" ) );
+
+		ok( !pf.mMQ( "(min-width: 240ups)" ) );
+
+	} );
 
 	test("verifyTypeSupport", function() {
 		expect( 5 );

@@ -1,4 +1,4 @@
-/*! Picturefill - v2.1.0 - 2014-09-14
+/*! Picturefill - v2.1.0 - 2014-09-15
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -68,6 +68,8 @@ window.matchMedia || (window.matchMedia = function() {
 	var pf = {};
 	var noop = function() {};
 	var image = doc.createElement( "img" );
+	var docElem = doc.documentElement;
+
 
 	// namespace
 	pf.ns = "picturefill" + new Date().getTime();
@@ -117,12 +119,71 @@ window.matchMedia || (window.matchMedia = function() {
 	 * Shortcut property for https://w3c.github.io/webappsec/specs/mixedcontent/#restricts-mixed-content ( for easy overriding in tests )
 	 */
 	pf.restrictsMixedContent = w.location.protocol === "https:";
+
 	/**
 	 * Shortcut method for matchMedia ( for easy overriding in tests )
 	 */
 	pf.matchesMedia = function( media ) {
-		return !media || (w.matchMedia && w.matchMedia( media ).matches);
+		return !media || ( w.matchMedia && w.matchMedia( media ).matches );
 	};
+
+	pf.vW = 0;
+
+	
+	pf.updateView = (function(){
+		var widthProp = "clientWidth";
+		var isCompat = doc.compatMode === "CSS1Compat";
+
+		return function() {
+			pf.vW = isCompat && docElem[ widthProp ] || doc.body[ widthProp ] || docElem[ widthProp ];
+		};
+	})();
+
+	/**
+	 * simplified version of matchesMedia for basic IE8 support
+	 * basically taken from respond project
+	 */
+	var regex = {
+		minw: /\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
+		maxw: /\(\s*max\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/
+	};
+	var mediaCache = {};
+	pf.mMQ = function( media ) {
+		var min, max;
+		var ret = false;
+		if( !media ){ return true; }
+		if ( !mediaCache[ media ] ) {
+
+			min = media.match( regex.minw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" );
+			max = media.match( regex.maxw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" );
+
+
+			if ( min ) {
+				min = parseFloat( min, 10 ) * (min.indexOf( "em" ) > 0 ? pf.getEmValue() : 1);
+			}
+
+			if ( max ) {
+				max = parseFloat( max, 10 ) * (max.indexOf( "em" ) > 0 ? pf.getEmValue() : 1);
+			}
+
+			mediaCache[ media ] = {
+				min: min,
+				max: max
+			};
+		}
+		min = mediaCache[ media ].min;
+		max = mediaCache[ media ].max;
+
+		if ( ( min && pf.vW >= min ) || ( max && pf.vW <= max ) ) {
+			ret = true;
+		}
+
+		return ret;
+	};
+
+	if( !pf.matchesMedia( "only all" ) ) {
+		pf.matchesMedia = pf.mMQ;
+	}
 
 	/**
 	 * Shortcut property for `devicePixelRatio` ( for easy overriding in tests )
@@ -134,6 +195,7 @@ window.matchMedia || (window.matchMedia = function() {
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
 	 */
 	pf.widthCache = {};
+	//Todo: use pf.vW and pf.getEmValue
 	pf.getWidthFromLength = function( length ) {
 		var origLength = length;
 
@@ -158,7 +220,7 @@ window.matchMedia || (window.matchMedia = function() {
 
 			if ( !lengthElInstered ) {
 				lengthElInstered = true;
-				doc.documentElement.insertBefore( lengthEl, doc.documentElement.firstChild );
+				docElem.insertBefore( lengthEl, docElem.firstChild );
 			}
 
 			// set width
@@ -196,7 +258,9 @@ window.matchMedia || (window.matchMedia = function() {
 		var img = doc.createElement( "img" );
 		var complete = function() {
 			clearTimeout(timer);
-			pf.fillImgs();
+			if(pf.isReady){
+				pf.fillImgs();
+			}
 			img = null;
 		};
 
@@ -365,6 +429,45 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	/**
+	 * returns em in px for html/body default size
+	 * function taken from respondjs
+	 */
+	var eminpx;
+	pf.getEmValue = function() {
+
+		if ( !eminpx && doc.body ) {
+			var div = doc.createElement('div'),
+				body = doc.body,
+				originalHTMLFontSize = docElem.style.fontSize,
+				originalBodyFontSize = body && body.style.fontSize;
+
+			div.style.cssText = "position:absolute;font-size:1em;width:1em";
+
+			// 1em in a media query is the value of the default font size of the browser
+			// reset docElem and body to ensure the correct value is returned
+			docElem.style.fontSize = "100%";
+			body.style.fontSize = "100%";
+
+			try {
+				body.appendChild( div );
+				eminpx = div.offsetWidth;
+				body.removeChild( div );
+
+				//also update eminpx before returning
+				eminpx = parseFloat(eminpx, 10);
+			} catch(e){}
+
+			// restore the original values
+			docElem.style.fontSize = originalHTMLFontSize;
+			if( originalBodyFontSize ) {
+				body.style.fontSize = originalBodyFontSize;
+			}
+
+		}
+		return eminpx || 16;
+	};
+
+	/**
 	 * Takes a string of sizes and returns the width in pixels as a number
 	 */
 	pf.findWidthFromSourceSize = function( sourceSizeListStr ) {
@@ -404,8 +507,6 @@ window.matchMedia || (window.matchMedia = function() {
 		if( descriptor.type == 'w' ) { // h = means height: || descriptor.type == 'h' do not handle yet...
 			resCandidate = resCandidate / pf.findWidthFromSourceSize( sizes ) ;
 		}
-
-
 		return resCandidate || 1;
 	};
 
@@ -653,8 +754,6 @@ window.matchMedia || (window.matchMedia = function() {
 				continue;
 			}
 
-
-
 			srcset = source.getAttribute( "srcset" );
 
 			// if source does not have a srcset attribute, skip
@@ -718,7 +817,7 @@ window.matchMedia || (window.matchMedia = function() {
 	pf.teardownRun = function( /*options*/ ) {
 		if ( lengthElInstered ) {
 			lengthElInstered = false;
-			doc.documentElement.removeChild( lengthEl );
+			docElem.removeChild( lengthEl );
 		}
 	};
 
@@ -750,6 +849,7 @@ window.matchMedia || (window.matchMedia = function() {
 		}
 	};
 
+
 	// If picture is supported, well, that's awesome.
 	if ( w.HTMLPictureElement ) {
 		picturefill = noop;
@@ -769,7 +869,9 @@ window.matchMedia || (window.matchMedia = function() {
 	 */
 	if ( !w.HTMLPictureElement ) {
 		(function () {
+			var resizeThrottle;
 			var run = function() {
+
 				// When the document has finished loading, stop checking for new images
 				// https://github.com/ded/domready/blob/master/ready.js#L15
 				if ( /^loade|^c/.test( doc.readyState || "" ) ) {
@@ -780,26 +882,34 @@ window.matchMedia || (window.matchMedia = function() {
 					pf.onReady();
 
 					pf.onReady = noop;
-				} else {
+				} else if( doc.body ) {
 					pf.fillImgs();
 				}
 			};
+
 			var intervalId = setInterval( run, 250);
-			var onResize = function() {
+
+			var resizeEval = function() {
+				pf.updateView();
 				pf.fillImgs({ reevaluate: true });
 			};
-			if ( w.addEventListener && doc.addEventListener ) {
-				var resizeThrottle;
-				w.addEventListener( "resize", function() {
-					w.clearTimeout( resizeThrottle );
-					resizeThrottle = w.setTimeout( onResize, 99 );
-				}, false );
+			var onResize = function() {
+				w.clearTimeout( resizeThrottle );
+				resizeThrottle = w.setTimeout( resizeEval, 99 );
+			};
+			if ( w.addEventListener  ) {
+				w.addEventListener( "resize", onResize, false );
+			} else if ( w.attachEvent ) {
+				w.attachEvent( "onresize",  onResize );
 			}
+
 		})();
 
+		pf.updateView();
 		// test webp support
 		pf.createImageTest( "image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=" );
 	}
+
 
 	/* expose picturefill */
 	if ( typeof module === "object" && typeof module.exports === "object" ) {
