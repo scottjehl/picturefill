@@ -195,46 +195,63 @@ window.matchMedia || (window.matchMedia = function() {
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
 	 */
 	pf.widthCache = {};
-	//Todo: use pf.vW and pf.getEmValue
+	var regEmVw = /^([\d\.]+)(em|vw)$/;
 	pf.getWidthFromLength = function( length ) {
+		var failed, parsedLength;
 		var origLength = length;
 
 
 		if( !pf.widthCache[ origLength ] ){
 			// If a length is specified and doesn’t contain a percentage, and it is greater than 0 or using `calc`, use it. Else, use the `100vw` default.
-			length = length && length.indexOf( "%" ) < 0 && ( parseFloat( length ) > 0 || length.indexOf( "calc(" ) > -1 ) ? length : "100vw";
-			/**
-			* If length is specified in  `vw` units, use `%` instead since the div we’re measuring
-			* is injected at the top of the document.
-			*
-			* TODO: maybe we should put this behind a feature test for `vw`?
-			*/
-			length = length.replace( "vw", "%" );
+			length = length || "100vw";
 
-			// Create a cached element for getting length value widths
-			if ( !lengthEl ) {
-				lengthEl = doc.createElement( "div" );
-				// Positioning styles help prevent padding/margin/width on `html` from throwing calculations off.
-				lengthEl.style.cssText = "position: absolute; left: 0; visibility: hidden; display: block; padding: 0; margin: 0; border: none;";
+			parsedLength = length.match( regEmVw );
+
+			if( parsedLength && ( parsedLength[ 1 ] = parseFloat( parsedLength[ 1 ], 10 ) ) ) {
+
+				if( parsedLength[ 2 ] == 'vw' ) {
+					pf.widthCache[origLength] = pf.vW * parsedLength[ 1 ] / 100;
+				} else  {
+					pf.widthCache[origLength] = pf.getEmValue() * parsedLength[ 1 ];
+				}
+
+			} else {
+				/**
+				* If length is specified in  `vw` units, use `%` instead since the div we’re measuring
+				* is injected at the top of the document.
+				*
+				* TODO: maybe we should put this behind a feature test for `vw`?
+				*/
+				length = length.replace( "vw", "%" );
+
+				// Create a cached element for getting length value widths
+				if ( !lengthEl ) {
+					lengthEl = doc.createElement( "div" );
+					// Positioning styles help prevent padding/margin/width on `html` from throwing calculations off.
+					lengthEl.style.cssText = "position: absolute; left: 0; visibility: hidden; display: block; padding: 0; margin: 0; border: none;";
+				}
+
+				if ( !lengthElInstered ) {
+					lengthElInstered = true;
+					docElem.insertBefore( lengthEl, docElem.firstChild );
+				}
+
+				// set width
+				try {
+					lengthEl.style.width = length;
+				} catch(e){
+					failed = true;
+				}
+
+				if ( failed && lengthEl.offsetWidth <= 0 ) {
+					// Something has gone wrong. `calc()` is in use and unsupported, most likely. Default to `100vw` (`100%`, for broader support.):
+					lengthEl.style.width = "100%";
+				}
+
+				//cache result
+				pf.widthCache[origLength] = lengthEl.offsetWidth;
 			}
 
-			if ( !lengthElInstered ) {
-				lengthElInstered = true;
-				docElem.insertBefore( lengthEl, docElem.firstChild );
-			}
-
-			// set width
-			try {
-				lengthEl.style.width = length;
-			} catch(e){}
-
-			if ( lengthEl.offsetWidth <= 0 ) {
-				// Something has gone wrong. `calc()` is in use and unsupported, most likely. Default to `100vw` (`100%`, for broader support.):
-				lengthEl.style.width = "100%";
-			}
-
-			//cache result
-			pf.widthCache[origLength] = lengthEl.offsetWidth;
 		}
 
 		return pf.widthCache[origLength];
@@ -815,9 +832,13 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	pf.teardownRun = function( /*options*/ ) {
+		var parent;
 		if ( lengthElInstered ) {
 			lengthElInstered = false;
-			docElem.removeChild( lengthEl );
+			parent = lengthEl.parentNode;
+			if ( parent ) {
+				parent.removeChild( lengthEl );
+			}
 		}
 	};
 
@@ -909,7 +930,6 @@ window.matchMedia || (window.matchMedia = function() {
 		// test webp support
 		pf.createImageTest( "image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=" );
 	}
-
 
 	/* expose picturefill */
 	if ( typeof module === "object" && typeof module.exports === "object" ) {
