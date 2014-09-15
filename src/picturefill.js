@@ -325,7 +325,7 @@
 
 				srcset = srcset.slice( pos + 1 );
 
-				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and 
+				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and
 				// let that be descriptors.
 				if ( descriptor === null ) {
 					descpos = srcset.indexOf( "," );
@@ -337,6 +337,7 @@
 						srcset = "";
 					}
 				}
+
 			} else {
 				url = srcset;
 				srcset = "";
@@ -353,44 +354,28 @@
 		return candidate.parsedSrcset;
 	};
 
-	var regPipe = /(^\s+|\s+$)/g;
+
 	var memDescriptor = {};
+	var regDescriptor =  /^([\d\.]+)(w|x)$/; // currently no h
 	pf.parseDescriptor = function( descriptor ) {
 
 		if ( !memDescriptor[ descriptor ] ) {
-			// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list
-			// is the order in which entries are added to the list.
-			var splitDescriptor, i, curr, lastchar, res;
-			var sizeDescriptor = descriptor && descriptor.replace( regPipe, "" );
-			var parsedDescriptor = {
+			var parsedDescriptor = pf.trim( descriptor || "" );
+			var descriptorObj = {
 				value: 1,
 				type: 'x'
 			};
 
-			if ( sizeDescriptor ) {
-				splitDescriptor = sizeDescriptor.split(" ");
-
-				for ( i = splitDescriptor.length + 1; i >= 0; i-- ) {
-					if ( splitDescriptor[ i ] !== undefined ) {
-						curr = splitDescriptor[ i ];
-						lastchar = curr && curr.slice( curr.length - 1 );
-
-						if ( lastchar === "w" ) { // lastchar === "h" is future don't implement it yet.
-							parsedDescriptor.value = parseInt( curr, 10 );
-						} else if ( lastchar === "x" ) {
-							res = curr && parseFloat( curr, 10 );
-							parsedDescriptor.value = res && !isNaN( res ) ? res : 1;
-						}
-						parsedDescriptor.type = lastchar;
-					}
+			if ( parsedDescriptor ) {
+				if( ( parsedDescriptor ).match( regDescriptor ) ) {
+					descriptorObj.value = parseFloat( RegExp.$1, 10 );
+					descriptorObj.type = RegExp.$2;
+				} else {
+					descriptorObj.skip = true;
 				}
 			}
 
-			if( !parsedDescriptor.value ) {
-				parsedDescriptor.value = 1;
-			}
-
-			memDescriptor[ descriptor ] = parsedDescriptor;
+			memDescriptor[ descriptor ] = descriptorObj;
 		}
 
 		return memDescriptor[ descriptor ];
@@ -492,15 +477,18 @@
 		var candidates, candidate;
 		var formattedCandidates = [];
 		if( candidateData ) {
+
 			candidates = pf.parseSrcset( candidateData );
 
 			for ( var i = 0, len = candidates.length; i < len; i++ ) {
 				candidate = candidates[ i ];
 
-				formattedCandidates.push({
-					url: candidate.url,
-					resolution: pf.getResolution( candidate.descriptor, candidateData.sizes )
-				});
+				if( !candidate.descriptor || !candidate.descriptor.skip) {
+					formattedCandidates.push({
+						url: candidate.url,
+						resolution: pf.getResolution( candidate.descriptor, candidateData.sizes )
+					});
+				}
 			}
 		}
 		return formattedCandidates;
@@ -696,7 +684,7 @@
 			// IE9 video workaround
 			pf.removeMediaShim( parent );
 
-			getAllSourceElements( element, parent, element[ pf.ns ].candidates );
+			getAllSourceElements( parent, element[ pf.ns ].candidates );
 		}
 
 		if(fallbackCandidate){
@@ -706,39 +694,25 @@
 		element[ pf.ns ].parsed = true;
 	};
 
-	function getAllSourceElements(element, picture , candidates) {
-		var i, len, source, srcset, nodeName;
+	function getAllSourceElements(picture , candidates) {
+		var i, len, source, srcset;
 
 
-		var sources = picture.childNodes;
+		var sources = pf.qsa(picture, 'source[srcset]');
+
 		for ( i = 0, len = sources.length; i < len; i++ ) {
 			source = sources[ i ];
-
-			if ( source == element ) {
-				break;
-			}
-
-			if( !( nodeName = source.nodeName ) || nodeName.toUpperCase() !== "SOURCE" ){
-				continue;
-			}
-
 			srcset = source.getAttribute( "srcset" );
 
 			// if source does not have a srcset attribute, skip
-			if ( !srcset ) {
-				// if it's a source element has the `src` property set, throw a warning in the console
-				if( pf.hasConsole && picturefill.debug && source.getAttribute( "src" ) ) {
-					console.warn( "Couldn't find srcset attribute on source. Note: The `src` attribute is invalid on `picture` `source` element; use `srcset`." );
-				}
-				continue;
+			if ( srcset ) {
+				candidates.push( {
+					srcset: srcset,
+					media: source.getAttribute( "media" ),
+					type: source.getAttribute( "type" ),
+					sizes: source.getAttribute( "sizes" )
+				} );
 			}
-
-			candidates.push( {
-				srcset: srcset,
-				media: source.getAttribute( "media" ),
-				type: source.getAttribute( "type" ),
-				sizes: source.getAttribute( "sizes" )
-			} );
 		}
 
 	}
