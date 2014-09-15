@@ -57,7 +57,7 @@
 		var anchor = doc.createElement( "a" );
 		return function(src){
 			anchor.href = src;
-			return anchor.getAttribute( "href", 4 );
+			return anchor.href;
 		};
 	})();
 
@@ -818,18 +818,20 @@
 			var resizeThrottle;
 			var run = function() {
 
-				// When the document has finished loading, stop checking for new images
-				// https://github.com/ded/domready/blob/master/ready.js#L15
-				if ( /^loade|^c|^i/.test( doc.readyState || "" ) ) {
-					clearInterval( intervalId );
+				if ( doc.body ) {
+					// When the document has finished loading, stop checking for new images
+					// https://github.com/ded/domready/blob/master/ready.js#L15
+					if ( /^loade|^c|^i/.test( doc.readyState || "" ) ) {
+						clearInterval( intervalId );
 
-					pf.fillImgs();
+						pf.fillImgs();
 
-					pf.onReady();
+						pf.onReady();
 
-					pf.onReady = noop;
-				} else if( doc.body ) {
-					pf.fillImgs();
+						pf.onReady = noop;
+					} else {
+						pf.fillImgs();
+					}
 				}
 			};
 
