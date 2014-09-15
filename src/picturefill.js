@@ -820,7 +820,7 @@
 
 				// When the document has finished loading, stop checking for new images
 				// https://github.com/ded/domready/blob/master/ready.js#L15
-				if ( /^loade|^c/.test( doc.readyState || "" ) ) {
+				if ( /^loade|^c|^i/.test( doc.readyState || "" ) ) {
 					clearInterval( intervalId );
 
 					pf.fillImgs();
