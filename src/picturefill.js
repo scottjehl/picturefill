@@ -476,14 +476,14 @@
 	pf.getCandidatesFromSourceSet = function( candidateData ) {
 		var candidates, candidate;
 		var formattedCandidates = [];
-		if( candidateData ) {
+		if ( candidateData ) {
 
 			candidates = pf.parseSrcset( candidateData );
 
 			for ( var i = 0, len = candidates.length; i < len; i++ ) {
 				candidate = candidates[ i ];
 
-				if( !candidate.descriptor || !candidate.descriptor.skip) {
+				if ( !candidate.descriptor || !candidate.descriptor.skip) {
 					formattedCandidates.push({
 						url: candidate.url,
 						resolution: pf.getResolution( candidate.descriptor, candidateData.sizes )
@@ -498,7 +498,9 @@
 	pf.applyBestCandidateFromSrcSet = function( candidates, picImg ) {
 		var candidate,
 			length,
-			bestCandidate;
+			bestCandidate,
+			loadingSrc,
+			candidateSrc;
 
 		candidates.sort( pf.ascendingSort );
 
@@ -521,20 +523,65 @@
 
 		}
 
-		if ( bestCandidate &&  pf.makeUrl( bestCandidate.url ) != picImg.src ) {
-			if ( pf.restrictsMixedContent && bestCandidate.url.substr(0, "http:".length).toLowerCase() === "http:" ) {
+		loadingSrc = picImg[ pf.ns ].curSrc || picImg.currentSrc || picImg.src;
+
+		if ( bestCandidate &&  ( candidateSrc = pf.makeUrl( bestCandidate.url ) ) != loadingSrc ) {
+			if ( pf.restrictsMixedContent && !bestCandidate.url.indexOf("http:") ) {
 				if ( pf.hasConsole ) {
-					console.warn( "Blocked mixed content image " + bestCandidate.url );
+					console.warn( "Blocked mixed content image " + candidateSrc );
 				}
 			} else {
-				picImg.src = bestCandidate.url;
-				// currentSrc attribute and property to match
-				// http://picture.responsiveimages.org/#the-img-element
 
-				if(!pf.currentSrcSupported){
-					picImg.currentSrc = picImg.src;
-				}
+				pf.loadImg( picImg, candidateSrc);
+
 			}
+		}
+	};
+
+	pf.loadImg = function( img, src ) {
+		var bImg;
+		var load = img[ pf.ns ].loadGC;
+
+		if ( load ) {
+			load();
+		}
+		// currentSrc attribute and property to match
+		// http://picture.responsiveimages.org/#the-img-element
+		if(!pf.currentSrcSupported){
+			img.currentSrc = src;
+		}
+		img[ pf.ns ].curSrc  = src;
+
+		if ( img.complete && img.getAttribute( "src" ) ) {
+			bImg = document.createElement( "img" );
+
+			img[ pf.ns ].loadGC = function(){
+				img[ pf.ns ].loadGC = null;
+				img = null;
+				bImg = null;
+			};
+
+			bImg.onload = function(){
+				var connected;
+				if ( img ) {
+
+					if ( pf.observer && pf.observer.connected ){
+						connected = true;
+						pf.observer.disconnect();
+					}
+
+					img.src = src;
+					img[ pf.ns ].loadGC();
+
+					if ( connected ) {
+						pf.observer.observe();
+					}
+				}
+			};
+			bImg.src = src;
+
+		} else {
+			img.src = src;
 		}
 	};
 
@@ -751,7 +798,7 @@
 
 	pf.setupRun = function( options ) {
 		//invalidate cache
-		if ( !options || options.reevaluate ){
+		if ( !options || options.reevaluate || options.reparse ){
 			pf.widthCache = {};
 		}
 	};
@@ -777,11 +824,11 @@
 			options.reparse = true;
 		}
 
-		if(pf.hasConsole && xParse && !options.elements){
+		if ( xParse && !options.elements ) {
 			throw( "reparse should only run on specific elements." );
 		}
 
-		elements = options.elements || pf.qsa(doc, options.reevaluate ? pf.selector : pf.shortSelector);
+		elements = options.elements || pf.qsa(doc, ( options.reevaluate || options.reparse ) ? pf.selector : pf.shortSelector);
 
 		if( (plen = elements.length) ) {
 			pf.setupRun( options );

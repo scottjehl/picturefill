@@ -88,24 +88,24 @@
 
 		} else {
 			ok( $srcsetImageX.prop( pf.ns ), "Picturefill modifies images in non-supporting browsers." );
-			equal( $srcsetImageX.attr( "src" ), "twoX.jpg", "Picturefill changes source of image" );
+			equal( $srcsetImageX.prop( "src" ), pf.makeUrl("twoX.jpg"), "Picturefill changes source of image" );
 		}
 
 		if(pf.srcsetSupported && pf.sizesSupported){
 			equal( $srcsetImageW.prop( pf.ns ), undefined, "Picturefill doesn't touch images in supporting browsers." );
-			equal( $srcsetImageW.attr( "src" ), null, "Picturefill doesn't touch image sources in supporting browsers." );
+			equal( $srcsetImageW.prop( "src" ), null, "Picturefill doesn't touch image sources in supporting browsers." );
 		} else {
 
 			ok( $srcsetImageW.prop( pf.ns ), "Picturefill modifies images in non-supporting browsers." );
-			equal( $srcsetImageW.attr( "src" ), "small.jpg", "Picturefill changes source of image" );
+			equal( $srcsetImageW.prop( "src" ), pf.makeUrl( "small.jpg" ), "Picturefill changes source of image" );
 		}
 		equal( $normalImg.prop( pf.ns ), undefined, "Picturefill doesn't touch normal images in any browsers." );
-		equal( $normalImg.attr( "src" ), "bar", "Picturefill leaves src attribute of normal images untouched." );
+		equal( $normalImg.prop( "src" ), pf.makeUrl( "bar" ), "Picturefill leaves src attribute of normal images untouched." );
 
 		if( !window.HTMLPictureElement ){
 			window.picturefill({elements: $normalImg});
 			ok( $normalImg.prop( pf.ns).supported, "Picturefill doesn't touch normal images in any browsers too much even if it is called explicitly." );
-			equal( $normalImg.attr( "src" ), "bar", "Picturefill leaves src attribute of normal images untouched." );
+			equal( $normalImg.prop( "src" ), pf.makeUrl( "bar" ), "Picturefill leaves src attribute of normal images untouched." );
 		}
 
 		if( !pf.sizesSupported ){
@@ -118,9 +118,9 @@
 			window.picturefill({reevaluate: true});
 
 			if( !pf.srcsetSupported ){
-				equal( $srcsetImageX.attr( "src" ), "oneX.jpg", "Picturefill changes source of image" );
+				equal( $srcsetImageX.prop( "src" ), pf.makeUrl( "oneX.jpg" ), "Picturefill changes source of image" );
 			}
-			equal( $srcsetImageW.attr( "src" ), "medium.jpg", "Picturefill changes source of image" );
+			equal( $srcsetImageW.prop( "src" ), pf.makeUrl( "medium.jpg" ), "Picturefill changes source of image" );
 		}
 
 	});
@@ -494,18 +494,21 @@
 			src: "not one of the urls"
 		};
 
+		image [pf.ns ] = {};
+
 		pf.DPR = 300;
 
 		pf.applyBestCandidateFromSrcSet( candidates, image );
 
-		deepEqual(image.src, candidates[2].url, "uses the url from the best px fit" );
+		equal(pf.makeUrl( image.src ), pf.makeUrl( candidates[2].url ), "uses the url from the best px fit" );
 
 		if(!pf.currentSrcSupported){
-			deepEqual(image.currentSrc, candidates[2].url, "uses the url from the best px fit" );
+			deepEqual( pf.makeUrl( image.currentSrc ), pf.makeUrl( candidates[2].url ), "uses the url from the best px fit" );
 		}
 
 		image.src = fullPath;
 		image.currentSrc = fullPath;
+		image [pf.ns ].curSrc = fullPath;
 
 		pf.applyBestCandidateFromSrcSet( candidates, image );
 
@@ -678,6 +681,8 @@
 		image = {
 			src: "foo"
 		};
+
+		image [pf.ns ] = {};
 
 		pf.applyBestCandidateFromSrcSet( candidates, image );
 

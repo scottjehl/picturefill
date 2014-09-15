@@ -123,7 +123,9 @@ pre code {
     padding: 0;
 }
 img {
-    max-width: 100%
+    max-width: 100%;
+	width: 100%;
+	height: auto;
 }
 h2 {
     margin: 2em 0;
