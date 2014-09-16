@@ -599,9 +599,9 @@ window.matchMedia || (window.matchMedia = function() {
 		}
 	};
 
-	var testWidth = ( 'naturalHeight' in image ) ? 'naturalHeight' : 'height';
+	var heightProp = ( 'naturalHeight' in image ) ? 'naturalHeight' : 'height';
 	pf.loadImg = function( img, src, data ) {
-		var bImg, timer;
+		var bImg, timer, lastHeight, testHeight;
 		var load = img[ pf.ns ].loadGC;
 
 		if ( load ) {
@@ -653,8 +653,10 @@ window.matchMedia || (window.matchMedia = function() {
 			if(!bImg || bImg.complete || bImg.error){
 				clearInterval(timer);
 			}
-			if ( bImg[ testWidth ] ) {
-				console.log('run', bImg[ testWidth ], bImg.complete);
+			if ( (testHeight = bImg[ heightProp ]) && testHeight != lastHeight && bImg.width ) {
+
+				console.log('run', testHeight, lastHeight, bImg.complete);
+				lastHeight = testHeight;
 				pf.addDimensions( img, bImg, data );
 			}
 		}, 19);
