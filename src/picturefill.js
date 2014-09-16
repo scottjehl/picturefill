@@ -550,9 +550,9 @@
 		}
 	};
 
-
+	var testWidth = ( 'naturalHeight' in image ) ? 'naturalHeight' : 'height';
 	pf.loadImg = function( img, src, data ) {
-		var bImg;
+		var bImg, timer;
 		var load = img[ pf.ns ].loadGC;
 
 		if ( load ) {
@@ -568,7 +568,7 @@
 		bImg = document.createElement( "img" );
 
 		img[ pf.ns ].loadGC = function(){
-
+			clearInterval(timer);
 			img[ pf.ns ].loadGC = null;
 			img = null;
 			bImg = null;
@@ -600,6 +600,15 @@
 
 		bImg.onload.onerror = img[ pf.ns ].loadGC;
 
+		timer = setInterval(function(){
+			if(!bImg || bImg.complete || bImg.error){
+				clearInterval(timer);
+			}
+			if ( bImg[ testWidth ] ) {
+				console.log('run', bImg[ testWidth ], bImg.complete);
+				pf.addDimensions( img, bImg, data );
+			}
+		}, 19);
 
 		bImg.src = src;
 
@@ -624,6 +633,7 @@
 			if ( data.type == "x" && bImg ) {
 
 				img.setAttribute( "width", parseInt(img[ pf.ns ].nW / data.resolution, 10) );
+
 				img.setAttribute( "height", parseInt(img[ pf.ns ].nH / data.resolution, 10) );
 
 			} else if( data.type == "w" ) {
