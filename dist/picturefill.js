@@ -601,8 +601,30 @@ window.matchMedia || (window.matchMedia = function() {
 
 	var heightProp = ( 'naturalHeight' in image ) ? 'naturalHeight' : 'height';
 	pf.loadImg = function( img, src, data ) {
-		var bImg, timer, lastHeight, testHeight;
+		var bImg, timer, lastHeight, testHeight, setSrc;
 		var load = img[ pf.ns ].loadGC;
+
+		var onHasState = function(){
+			var connected;
+			if ( img ) {
+
+				if ( pf.observer && pf.observer.connected ){
+					connected = true;
+					pf.observer.disconnect();
+				}
+
+				if( !setSrc ) {
+					setSrc = true;
+					img.src = src;
+				}
+
+				pf.addDimensions( img, bImg, data );
+
+				if ( connected ) {
+					pf.observer.observe();
+				}
+			}
+		};
 
 		if ( load ) {
 			load();
@@ -624,30 +646,15 @@ window.matchMedia || (window.matchMedia = function() {
 		};
 
 		bImg.onload = function(){
-			var connected;
 			if ( img ) {
-
-				if ( pf.observer && pf.observer.connected ){
-					connected = true;
-					pf.observer.disconnect();
-				}
-
-				img.src = src;
-
-				pf.addDimensions( img, bImg, data );
-
+				onHasState();
 				img[ pf.ns ].loadGC();
-
-				if ( connected ) {
-					pf.observer.observe();
-				}
 			}
 		};
 
-		bImg.onload.onerror = img[ pf.ns ].loadGC;
-		bImg.onload.onabort = img[ pf.ns ].loadGC;
+		bImg.onerror = img[ pf.ns ].loadGC;
+		bImg.onabort = img[ pf.ns ].loadGC;
 
-		bImg.onload.onerror = img[ pf.ns ].loadGC;
 
 		timer = setInterval(function(){
 			if(!bImg || bImg.complete || bImg.error){
@@ -655,13 +662,14 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 			if ( (testHeight = bImg[ heightProp ]) && testHeight != lastHeight && bImg.width ) {
 				lastHeight = testHeight;
-				pf.addDimensions( img, bImg, data );
+				onHasState();
 			}
 		}, 9);
 
 		bImg.src = src;
 
 		if ( img && (!img.complete || !img.getAttribute( "src" )) ) {
+			setSrc = true;
 			img.src = src;
 		}
 
@@ -679,7 +687,7 @@ window.matchMedia || (window.matchMedia = function() {
 				img[ pf.ns ].nH = bImg.naturalHeight || bImg.height;
 			}
 
-			if ( data.type == "x" && bImg ) {
+			if ( data.type == "x" ) {
 
 				img.setAttribute( "width", parseInt(img[ pf.ns ].nW / data.resolution, 10) );
 
