@@ -1,4 +1,4 @@
-/*! Picturefill - v2.1.0 - 2014-09-16
+/*! Picturefill - v2.1.0 - 2014-09-17
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */

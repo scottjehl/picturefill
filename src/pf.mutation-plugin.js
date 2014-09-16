@@ -30,7 +30,7 @@
 	if ( !picturefill._ ) {return pfobserver;}
 	var matches, addMutation;
 	var pf = picturefill._;
-	var observeProps = {src: 1, srcset: 1, sizes: 1, media: 1};
+	var observeProps = {src: 1, srcset: 1, sizes: 1, media: 1, width: 1, height: 1};
 
 	var onMutations = function( mutations ) {
 		var i, len, opts, img;
