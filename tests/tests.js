@@ -190,7 +190,12 @@
 	test("getCandidatesFromSourceSet", function() {
 		// Basic test
 		var runGetCandiate = function(candidate, sizes){
-			return pf.getCandidatesFromSourceSet({srcset: candidate, sizes: sizes || null});
+			return $.map(pf.getCandidatesFromSourceSet({srcset: candidate, sizes: sizes || null}), function( can ){
+				return {
+					resolution: can.resolution,
+					url: can.url
+				};
+			});
 		};
 
 		var candidate1 = "images/pic-medium.png";
