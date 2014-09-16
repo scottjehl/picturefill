@@ -645,12 +645,11 @@ window.matchMedia || (window.matchMedia = function() {
 		bImg.onload.onerror = img[ pf.ns ].loadGC;
 
 
-		if ( !img.complete  ) {
-			img.removeAttribute( "src" );
-		}
-
 		bImg.src = src;
 
+		if ( img && (!img.complete || !img.getAttribute( "src" )) ) {
+			img.src = src;
+		}
 
 		if ( bImg && bImg.complete ) {
 			bImg.onload();
