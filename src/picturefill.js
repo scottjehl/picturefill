@@ -1,8 +1,8 @@
 /*! Picturefill - Responsive Images that work today.
-*  Author: Scott Jehl, Filament Group, 2012 ( new proposal implemented by Shawn Jansepar )
-*  License: MIT/GPLv2
-*  Spec: http://picture.responsiveimages.org/
-*/
+ *  Author: Scott Jehl, Filament Group, 2012 ( new proposal implemented by Shawn Jansepar )
+ *  License: MIT/GPLv2
+ *  Spec: http://picture.responsiveimages.org/
+ */
 (function( w, doc ) {
 	// Enable strict mode
 	"use strict";
@@ -80,12 +80,13 @@
 
 	pf.vW = 0;
 
-	
+
 	pf.updateView = (function(){
 		var widthProp = "clientWidth";
 		var isCompat = doc.compatMode === "CSS1Compat";
 
 		return function() {
+			// todo w.innerWidth ?
 			pf.vW = isCompat && docElem[ widthProp ] || doc.body[ widthProp ] || docElem[ widthProp ];
 		};
 	})();
@@ -168,11 +169,11 @@
 
 			} else {
 				/**
-				* If length is specified in  `vw` units, use `%` instead since the div we’re measuring
-				* is injected at the top of the document.
-				*
-				* TODO: maybe we should put this behind a feature test for `vw`?
-				*/
+				 * If length is specified in  `vw` units, use `%` instead since the div we’re measuring
+				 * is injected at the top of the document.
+				 *
+				 * TODO: maybe we should put this behind a feature test for `vw`?
+				 */
 				length = length.replace( "vw", "%" );
 
 				// Create a cached element for getting length value widths
@@ -250,7 +251,7 @@
 	 * Takes a type string and checks if its supported
 	 */
 
-	//suggested method:
+		//suggested method:
 	pf.verifyTypeSupport = function( type ) {
 		if( type ){
 			return pf.types[ type ];
@@ -282,15 +283,15 @@
 
 	pf.parseSrcset = function( candidate ) {
 		/**
-		* A lot of this was pulled from Boris Smus’ parser for the now-defunct WHATWG `srcset`
-		* https://github.com/borismus/srcset-polyfill/blob/master/js/srcset-info.js
-		*
-		* 1. Let input (`srcset`) be the value passed to this algorithm.
-		* 2. Let position be a pointer into input, initially pointing at the start of the string.
-		* 3. Let raw candidates be an initially empty ordered list of URLs with associated 
-		*    unparsed descriptors. The order of entries in the list is the order in which entries 
-		*    are added to the list.
-		*/
+		 * A lot of this was pulled from Boris Smus’ parser for the now-defunct WHATWG `srcset`
+		 * https://github.com/borismus/srcset-polyfill/blob/master/js/srcset-info.js
+		 *
+		 * 1. Let input (`srcset`) be the value passed to this algorithm.
+		 * 2. Let position be a pointer into input, initially pointing at the start of the string.
+		 * 3. Let raw candidates be an initially empty ordered list of URLs with associated
+		 *    unparsed descriptors. The order of entries in the list is the order in which entries
+		 *    are added to the list.
+		 */
 
 		if( candidate.parsedSrcset ) {
 			return candidate.parsedSrcset;
@@ -453,14 +454,22 @@
 		return pf.getWidthFromLength( winningLength );
 	};
 
-	pf.getResolution = function( descriptor, sizesattr ) {
+	pf.getResolution = function( candidate, sizesattr ) {
+		var descriptor = candidate.descriptor;
 		var sizes = sizesattr || "100vw";
 		var resCandidate = descriptor.value;
 
+		var resolutionCandidate = {
+			url: candidate.url,
+			type: descriptor.type,
+			resolution: descriptor.value || 1
+		};
+
 		if( descriptor.type == 'w' ) { // h = means height: || descriptor.type == 'h' do not handle yet...
-			resCandidate = resCandidate / pf.findWidthFromSourceSize( sizes ) ;
+			resolutionCandidate.computedWidth = pf.findWidthFromSourceSize( sizes );
+			resolutionCandidate.resolution = resCandidate / resolutionCandidate.computedWidth ;
 		}
-		return resCandidate || 1;
+		return resolutionCandidate;
 	};
 
 	/**
@@ -478,16 +487,14 @@
 		var formattedCandidates = [];
 		if ( candidateData ) {
 
+
 			candidates = pf.parseSrcset( candidateData );
 
 			for ( var i = 0, len = candidates.length; i < len; i++ ) {
 				candidate = candidates[ i ];
 
 				if ( !candidate.descriptor || !candidate.descriptor.skip) {
-					formattedCandidates.push({
-						url: candidate.url,
-						resolution: pf.getResolution( candidate.descriptor, candidateData.sizes )
-					});
+					formattedCandidates.push(pf.getResolution( candidate, candidateData.sizes ));
 				}
 			}
 		}
@@ -525,20 +532,25 @@
 
 		loadingSrc = picImg[ pf.ns ].curSrc || picImg.currentSrc || picImg.src;
 
-		if ( bestCandidate &&  ( candidateSrc = pf.makeUrl( bestCandidate.url ) ) != loadingSrc ) {
-			if ( pf.restrictsMixedContent && !bestCandidate.url.indexOf("http:") ) {
-				if ( pf.hasConsole ) {
-					console.warn( "Blocked mixed content image " + candidateSrc );
+		if ( bestCandidate ) {
+
+			if( ( candidateSrc = pf.makeUrl( bestCandidate.url ) ) != loadingSrc ) {
+				if ( pf.restrictsMixedContent && !bestCandidate.url.indexOf("http:") ) {
+					if ( pf.hasConsole ) {
+						console.warn( "Blocked mixed content image " + candidateSrc );
+					}
+				} else {
+
+					pf.loadImg( picImg, candidateSrc, bestCandidate);
+
 				}
-			} else {
-
-				pf.loadImg( picImg, candidateSrc);
-
+			} else if ( bestCandidate.type == "w" ) {
+				pf.addDimensions( picImg, null, bestCandidate );
 			}
 		}
 	};
 
-	pf.loadImg = function( img, src ) {
+	pf.loadImg = function( img, src, data ) {
 		var bImg;
 		var load = img[ pf.ns ].loadGC;
 
@@ -552,36 +564,62 @@
 		}
 		img[ pf.ns ].curSrc  = src;
 
-		if ( img.complete && img.getAttribute( "src" ) ) {
-			bImg = document.createElement( "img" );
+		bImg = document.createElement( "img" );
 
-			img[ pf.ns ].loadGC = function(){
-				img[ pf.ns ].loadGC = null;
-				img = null;
-				bImg = null;
-			};
+		img[ pf.ns ].loadGC = function(){
+			img[ pf.ns ].loadGC = null;
+			img = null;
+			bImg = null;
+		};
 
-			bImg.onload = function(){
-				var connected;
-				if ( img ) {
+		bImg.onload = function(){
+			var connected;
+			if ( img ) {
 
-					if ( pf.observer && pf.observer.connected ){
-						connected = true;
-						pf.observer.disconnect();
-					}
-
-					img.src = src;
-					img[ pf.ns ].loadGC();
-
-					if ( connected ) {
-						pf.observer.observe();
-					}
+				if ( pf.observer && pf.observer.connected ){
+					connected = true;
+					pf.observer.disconnect();
 				}
-			};
-			bImg.src = src;
 
-		} else {
+				img.src = src;
+
+				pf.addDimensions( img, bImg, data );
+
+				img[ pf.ns ].loadGC();
+
+				if ( connected ) {
+					pf.observer.observe();
+				}
+			}
+		};
+
+		bImg.onload.onerror = img[ pf.ns ].loadGC;
+		bImg.src = src;
+
+		if ( !img.complete || !img.getAttribute( "src" ) ) {
 			img.src = src;
+		}
+
+		if ( bImg.complete ) {
+			bImg.onload();
+		}
+	};
+
+	pf.addDimensions = function( img, bImg, data ) {
+
+		if( !img[ pf.ns ].dims ) {
+
+			img.setAttribute( "height", "auto" );
+
+			if ( data.type == "x" && bImg ) {
+				img.setAttribute( "width", parseInt((bImg.naturalWidth || bImg.width) / data.resolution, 10) );
+			} else if( data.type == "w" ) {
+				img.setAttribute( "width", parseInt( data.computedWidth, 10) );
+			} else {
+				img.removeAttribute( "width" );
+				img.removeAttribute( "height" );
+			}
+
 		}
 	};
 
@@ -681,6 +719,10 @@
 
 		if( !('src' in element[ pf.ns ]) || options.reparseSrc ) {
 			element[ pf.ns ].src = element.getAttribute( "src" );
+		}
+
+		if( !('dims' in element[ pf.ns ]) || options.reparseDimensions ) {
+			element[ pf.ns ].dims = element.getAttribute( "width" ) && element.getAttribute( "height" );
 		}
 
 		if ( !('srcset' in element[ pf.ns ]) || options.reparseSrcset ) {
@@ -819,7 +861,7 @@
 
 		var options = opt || {};
 
-		if ( options.reparseSrcset || options.reparseSrc ) {
+		if ( options.reparseSrcset || options.reparseSrc || options.reparseDimensions ) {
 			xParse = true;
 			options.reparse = true;
 		}

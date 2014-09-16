@@ -30,7 +30,7 @@
 	if ( !picturefill._ ) {return pfobserver;}
 	var matches, addMutation;
 	var pf = picturefill._;
-	var observeProps = {src: 1, srcset: 1, sizes: 1, media: 1};
+	var observeProps = {src: 1, srcset: 1, sizes: 1, media: 1, width: 1, height: 1};
 
 	var onMutations = function( mutations ) {
 		var i, len, opts, img;
@@ -58,6 +58,7 @@
 				if ( img._pfOptions ) {
 					opts.reparseSrc = img._pfOptions.reparseSrc || false;
 					opts.reparseSrcset = img._pfOptions.reparseSrcset || false;
+					opts.reparseDimensions = img._pfOptions.reparseDimensions || false;
 					delete img._pfOptions;
 				}
 
@@ -98,12 +99,12 @@
 
 			if ( nodeName == "PICTURE" ) {
 				addToElements( node.getElementsByTagName( "img" )[0], imgs );
-			} else if ( nodeName == "IMG" && matches( node, "img[srcset], picture > img" ) ){
+			} else if ( nodeName == "IMG" && matches( node, pf.selector ) ){
 				addToElements( node, imgs );
 			} else if ( nodeName == "SOURCE" ) {
 				addImgForSource( node, node.parentNode, imgs );
 			} else {
-				addToElements( pf.qsa( node, "img[srcset], picture > img" ), imgs );
+				addToElements( pf.qsa( node, pf.selector ), imgs );
 			}
 		}
 	}
@@ -143,7 +144,7 @@
 		var nodeName = mutation.target.nodeName.toUpperCase();
 		var isImg = nodeName == "IMG";
 		if ( mutation.attributeName == "src" ){
-			if( isImg && matches( mutation.target, "img[srcset], picture > img" ) ) {
+			if( isImg && matches( mutation.target, pf.selector ) ) {
 				if ( !mutation.target._pfOptions ) {
 					mutation.target._pfOptions = {};
 				}
@@ -157,6 +158,14 @@
 						mutation.target._pfOptions = {};
 					}
 					mutation.target._pfOptions.reparseSrcset = true;
+				} else if ( mutation.attributeName == "width" || mutation.attributeName == "height" ) {
+					if( !matches( mutation.target, pf.selector ) ) {
+						return;
+					}
+					if ( !mutation.target._pfOptions ) {
+						mutation.target._pfOptions = {};
+					}
+					mutation.target._pfOptions.reparseDimensions = true;
 				}
 				addToElements( mutation.target, modifiedImgs );
 			} else if ( nodeName == "SOURCE" ) {
