@@ -550,8 +550,9 @@
 		}
 	};
 
+	var testWidth = ( 'naturalWidth' in image ) ? 'naturalWidth' : 'width';
 	pf.loadImg = function( img, src, data ) {
-		var bImg;
+		var bImg, timer;
 		var load = img[ pf.ns ].loadGC;
 
 		if ( load ) {
@@ -567,6 +568,7 @@
 		bImg = document.createElement( "img" );
 
 		img[ pf.ns ].loadGC = function(){
+			clearInterval(timer);
 			img[ pf.ns ].loadGC = null;
 			img = null;
 			bImg = null;
@@ -594,7 +596,18 @@
 		};
 
 		bImg.onload.onerror = img[ pf.ns ].loadGC;
+		bImg.onload.onabort = img[ pf.ns ].loadGC;
 
+		bImg.onload.onerror = img[ pf.ns ].loadGC;
+
+		timer = setInterval(function(){
+			if(!img || img.complete || img.error){
+				clearInterval(timer);
+			}
+			if ( img[ testWidth ] ) {
+				bImg.onload();
+			}
+		}, 9);
 
 		bImg.src = src;
 
@@ -614,6 +627,7 @@
 			img.setAttribute( "height", "auto" );
 
 			if ( data.type == "x" && bImg ) {
+
 				img.setAttribute( "width", parseInt((bImg.naturalWidth || bImg.width) / data.resolution, 10) );
 			} else if( data.type == "w" ) {
 				img.setAttribute( "width", parseInt( data.computedWidth, 10) );
