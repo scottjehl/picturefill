@@ -654,12 +654,10 @@ window.matchMedia || (window.matchMedia = function() {
 				clearInterval(timer);
 			}
 			if ( (testHeight = bImg[ heightProp ]) && testHeight != lastHeight && bImg.width ) {
-
-				console.log('run', testHeight, lastHeight, bImg.complete);
 				lastHeight = testHeight;
 				pf.addDimensions( img, bImg, data );
 			}
-		}, 19);
+		}, 9);
 
 		bImg.src = src;
 
