@@ -531,15 +531,6 @@
 		}
 
 
-		//todo ad some tests
-		if( !bestCandidate && picImg[ pf.ns ].src ){
-			bestCandidate = {
-				url: picImg[ pf.ns ].src,
-				set: {},
-				resolution: 1
-			};
-		}
-
 		loadingSrc = picImg[ pf.ns ].curSrc || picImg.currentSrc || picImg.src;
 
 		if ( bestCandidate ) {
@@ -823,8 +814,15 @@
 			getAllSourceElements( parent, element[ pf.ns ].candidates );
 		}
 
-		if(fallbackCandidate){
+		if( fallbackCandidate ){
 			element[ pf.ns ].candidates.push( fallbackCandidate );
+		}
+
+		if( element[ pf.ns ].src ) {
+			element[ pf.ns ].candidates.push( {
+				srcset: element[ pf.ns ].src,
+				sizes: null
+			} );
 		}
 
 		element[ pf.ns ].parsed = true;
