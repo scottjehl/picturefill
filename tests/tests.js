@@ -132,7 +132,7 @@
 
 			var gotWidth = pf.getWidthFromLength("calc(766px - 1em)");
 
-			return ( Modernizr.csscalc ? gotWidth === 750 : gotWidth === fullWidthEl.offsetWidth );
+			return ( Modernizr.csscalc ? gotWidth === 750 : (gotWidth === fullWidthEl.offsetWidth || $(window).width()) );
 		}());
 
 		equal( pf.getWidthFromLength("750px"), 750, "returns int value of width string" );

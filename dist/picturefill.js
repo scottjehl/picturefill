@@ -88,6 +88,9 @@ window.matchMedia || (window.matchMedia = function() {
 	// especially on sites mixing responsive and non-responsive images
 	pf.shortSelector = "picture > img, img[srcset]";
 	pf.selector = pf.shortSelector;
+	pf.options = {
+		resQuantifier: 1 // 1 = high quality || 0.5-0.9 = performance
+	};
 
 	if ( pf.srcsetSupported ) {
 		pf.selector += ", img[" + pf.picutreFillAttribute + "]";
@@ -561,6 +564,8 @@ window.matchMedia || (window.matchMedia = function() {
 			loadingSrc,
 			candidateSrc;
 
+		var dpr = pf.DPR * pf.options.resQuantifier;
+
 		candidates.sort( pf.ascendingSort );
 
 		length = candidates.length;
@@ -568,7 +573,7 @@ window.matchMedia || (window.matchMedia = function() {
 
 		for ( var i = 0; i < length; i++ ) {
 			candidate = candidates[ i ];
-			if ( candidate.resolution >= pf.DPR ) {
+			if ( candidate.resolution >= dpr ) {
 				bestCandidate = candidate;
 				break;
 			}
@@ -596,14 +601,14 @@ window.matchMedia || (window.matchMedia = function() {
 					pf.loadImg( picImg, candidateSrc, bestCandidate);
 
 				}
-			} else if ( bestCandidate.type == "w" ) {
+			} else if ( bestCandidate.descriptorType == "w" ) {
 				pf.addDimensions( picImg, null, bestCandidate );
 			}
 		}
 	};
 
 	var heightProp = ( 'naturalHeight' in image ) ? 'naturalHeight' : 'height';
-	var hasReflowProblems = 'webkitBackfaceVisibility' in docElem.style;
+	var hasRepaintProblems = 'webkitBackfaceVisibility' in docElem.style;
 	pf.loadImg = function( img, src, data ) {
 		var bImg, timer, lastHeight, testHeight;
 		var cleanUp = img[ pf.ns ].loadGC;
@@ -614,14 +619,11 @@ window.matchMedia || (window.matchMedia = function() {
 			if( !srcWasSet ) {
 				srcWasSet = true;
 
-				if ( hasReflowProblems && data.type == "image/svg+xml" ) {
-					origWidth = img.style.width;
-					img.style.width = (img.offsetWidth + 1) + 'px';
-				}
-
 				img.src = src;
 
-				if ( origWidth !== undefined ) {
+				if ( hasRepaintProblems && data.type == "image/svg+xml" ) {
+					origWidth = img.style.width;
+					img.style.width = (img.offsetWidth + 1) + 'px';
 					// next line only triggers a repaint
 					// assignment is only done to trick dead code removal
 					bImg.rp = img.offsetWidth;
@@ -710,9 +712,9 @@ window.matchMedia || (window.matchMedia = function() {
 
 			if ( data.descriptorType == "x" ) {
 
-				img.setAttribute( "width", parseInt(img[ pf.ns ].nW / data.resolution, 10) );
+				img.setAttribute( "width", parseInt( (img[ pf.ns ].nW / data.resolution) / pf.options.resQuantifier, 10) );
 
-				img.setAttribute( "height", parseInt(img[ pf.ns ].nH / data.resolution, 10) );
+				img.setAttribute( "height", parseInt((img[ pf.ns ].nH / data.resolution) / pf.options.resQuantifier, 10) );
 
 			} else if( data.descriptorType == "w" ) {
 				img.setAttribute( "width", parseInt( data.computedWidth, 10) );
@@ -861,11 +863,7 @@ window.matchMedia || (window.matchMedia = function() {
 		}
 
 
-		if ( hasPicture || srcsetChanged || pf.needsSrcsetPolyfill( fallbackCandidate ) ) {
-			element[ pf.ns ].supported = false;
-		} else {
-			element[ pf.ns ].supported = true;
-		}
+		element[ pf.ns ].supported = !( hasPicture || srcsetChanged || pf.needsSrcsetPolyfill( fallbackCandidate ) );
 
 		element[ pf.ns ].candidates = [];
 
@@ -887,7 +885,6 @@ window.matchMedia || (window.matchMedia = function() {
 
 	function getAllSourceElements(picture , candidates) {
 		var i, len, source, srcset;
-
 
 		var sources = pf.qsa(picture, 'source[srcset]');
 
@@ -957,7 +954,7 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 		}
 	};
-
+	var alreadyRun = false;
 	var picturefill = function ( opt ) {
 		var elements, i, plen, xParse;
 
@@ -972,9 +969,10 @@ window.matchMedia || (window.matchMedia = function() {
 			throw( "reparse should only run on specific elements." );
 		}
 
-		elements = options.elements || pf.qsa(doc, ( options.reevaluate || options.reparse ) ? pf.selector : pf.shortSelector);
+		elements = options.elements || pf.qsa( doc, ( options.reevaluate || options.reparse ) ? pf.selector : pf.shortSelector );
 
 		if( (plen = elements.length) ) {
+			alreadyRun = true;
 			pf.setupRun( options );
 
 			// Loop through all elements
@@ -998,6 +996,15 @@ window.matchMedia || (window.matchMedia = function() {
 
 	//use this internally for easy monkey patching/performance testing
 	pf.fillImgs = picturefill;
+
+	picturefill.setOptions = function(name, value) {
+		if( pf.options[ name ] !== value ) {
+			pf.options[ name ] = value;
+			if ( alreadyRun ) {
+				pf.fillImgs({ reevaluate: true });
+			}
+		}
+	};
 
 	/**
 	 * Sets up picture polyfill by polling the document and running
@@ -1026,7 +1033,7 @@ window.matchMedia || (window.matchMedia = function() {
 				}
 			};
 
-			var intervalId = setInterval( run, 250);
+			var intervalId = setInterval( run, 333);
 
 			var resizeEval = function() {
 				pf.updateView();
@@ -1041,7 +1048,7 @@ window.matchMedia || (window.matchMedia = function() {
 			} else if ( w.attachEvent ) {
 				w.attachEvent( "onresize",  onResize );
 			}
-
+			setTimeout(run, doc.body ? 9 : 99);
 		})();
 
 		pf.updateView();

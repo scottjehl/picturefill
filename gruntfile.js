@@ -90,6 +90,6 @@
 
 		// Default task.
 		grunt.registerTask("default", [ "test", "clean", "concat", "uglify", "bytesize" ]);
-		grunt.registerTask("test", [ "jshint" ]);
+		grunt.registerTask("test", [ "jshint", "qunit" ]);
 	};
 })();
