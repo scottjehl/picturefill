@@ -348,6 +348,9 @@
 			if ( url || descriptor ) {
 				candidate.parsedSrcset.push({
 					url: url,
+					type: candidate.type,
+					media: candidate.media,
+					sizes: candidate.sizes,
 					descriptor: pf.parseDescriptor( descriptor,  candidate.sizes )
 				});
 			}
@@ -461,8 +464,9 @@
 
 		var resolutionCandidate = {
 			url: candidate.url,
-			type: descriptor.type,
-			resolution: descriptor.value || 1
+			descriptorType: descriptor.type,
+			resolution: descriptor.value || 1,
+			type: candidate.type
 		};
 
 		if( descriptor.type == 'w' ) { // h = means height: || descriptor.type == 'h' do not handle yet...
@@ -486,7 +490,6 @@
 		var candidates, candidate;
 		var formattedCandidates = [];
 		if ( candidateData ) {
-
 
 			candidates = pf.parseSrcset( candidateData );
 
@@ -551,9 +554,32 @@
 	};
 
 	var heightProp = ( 'naturalHeight' in image ) ? 'naturalHeight' : 'height';
+	var hasReflowProblems = 'webkitBackfaceVisibility' in docElem.style;
 	pf.loadImg = function( img, src, data ) {
-		var bImg, timer, lastHeight, testHeight, setSrc;
-		var load = img[ pf.ns ].loadGC;
+		var bImg, timer, lastHeight, testHeight;
+		var cleanUp = img[ pf.ns ].loadGC;
+		
+		var srcWasSet = false;
+		var setSrc = function(){
+			var origWidth;
+			if( !srcWasSet ) {
+				srcWasSet = true;
+
+				if ( hasReflowProblems && data.type == "image/svg+xml" ) {
+					origWidth = img.style.width;
+					img.style.width = (img.offsetWidth + 1) + 'px';
+				}
+
+				img.src = src;
+
+				if ( origWidth !== undefined ) {
+					// next line only triggers a repaint
+					// assignment is only done to trick dead code removal
+					bImg.rp = img.offsetWidth;
+					img.style.width = origWidth;
+				}
+			}
+		};
 
 		var onHasState = function(){
 			var connected;
@@ -564,11 +590,7 @@
 					pf.observer.disconnect();
 				}
 
-				if( !setSrc ) {
-					setSrc = true;
-					img.src = src;
-				}
-
+				setSrc();
 				pf.addDimensions( img, bImg, data );
 
 				if ( connected ) {
@@ -577,8 +599,8 @@
 			}
 		};
 
-		if ( load ) {
-			load();
+		if ( cleanUp ) {
+			cleanUp();
 		}
 		// currentSrc attribute and property to match
 		// http://picture.responsiveimages.org/#the-img-element
@@ -620,8 +642,7 @@
 		bImg.src = src;
 
 		if ( img && (!img.complete || !img.getAttribute( "src" )) ) {
-			setSrc = true;
-			img.src = src;
+			setSrc();
 		}
 
 		if ( bImg && bImg.complete ) {
@@ -638,13 +659,13 @@
 				img[ pf.ns ].nH = bImg.naturalHeight || bImg.height;
 			}
 
-			if ( data.type == "x" ) {
+			if ( data.descriptorType == "x" ) {
 
 				img.setAttribute( "width", parseInt(img[ pf.ns ].nW / data.resolution, 10) );
 
 				img.setAttribute( "height", parseInt(img[ pf.ns ].nH / data.resolution, 10) );
 
-			} else if( data.type == "w" ) {
+			} else if( data.descriptorType == "w" ) {
 				img.setAttribute( "width", parseInt( data.computedWidth, 10) );
 				img.setAttribute( "height", parseInt( img[ pf.ns ].nH * ( data.computedWidth / img[ pf.ns ].nW ), 10) );
 			} else {
