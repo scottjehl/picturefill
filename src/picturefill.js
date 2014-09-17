@@ -348,13 +348,11 @@
 			}
 
 			// 7. Add url to raw candidates, associated with descriptors.
-			if ( url || descriptor ) {
+			if ( ( url || descriptor ) && ( descriptor = pf.parseDescriptor( descriptor,  candidate.sizes ) ) ) {
 				candidate.parsedSrcset.push({
 					url: url,
-					type: candidate.type,
-					media: candidate.media,
-					sizes: candidate.sizes,
-					descriptor: pf.parseDescriptor( descriptor,  candidate.sizes )
+					descriptor: descriptor,
+					set: candidate
 				});
 			}
 		}
@@ -366,7 +364,7 @@
 	var regDescriptor =  /^([\d\.]+)(w|x)$/; // currently no h
 	pf.parseDescriptor = function( descriptor ) {
 
-		if ( !memDescriptor[ descriptor ] ) {
+		if ( !(descriptor in memDescriptor) ) {
 			var parsedDescriptor = pf.trim( descriptor || "" );
 			var descriptorObj = {
 				value: 1,
@@ -378,7 +376,7 @@
 					descriptorObj.value = parseFloat( RegExp.$1, 10 );
 					descriptorObj.type = RegExp.$2;
 				} else {
-					descriptorObj.skip = true;
+					descriptorObj = false;
 				}
 			}
 
@@ -419,6 +417,7 @@
 
 			// restore the original values
 			docElem.style.fontSize = originalHTMLFontSize;
+
 			if( originalBodyFontSize ) {
 				body.style.fontSize = originalBodyFontSize;
 			}
@@ -460,23 +459,19 @@
 		return pf.getWidthFromLength( winningLength );
 	};
 
-	pf.getResolution = function( candidate, sizesattr ) {
+	pf.setResolution = function( candidate, sizesattr ) {
 		var descriptor = candidate.descriptor;
 		var sizes = sizesattr || "100vw";
 		var resCandidate = descriptor.value;
 
-		var resolutionCandidate = {
-			url: candidate.url,
-			descriptorType: descriptor.type,
-			resolution: descriptor.value || 1,
-			type: candidate.type
-		};
+		candidate.resolution = descriptor.value || 1;
+		candidate.descriptorType = descriptor.type;
 
 		if( descriptor.type == 'w' ) { // h = means height: || descriptor.type == 'h' do not handle yet...
-			resolutionCandidate.computedWidth = pf.findWidthFromSourceSize( sizes );
-			resolutionCandidate.resolution = resCandidate / resolutionCandidate.computedWidth ;
+			candidate.computedWidth = pf.findWidthFromSourceSize( sizes );
+			candidate.resolution = resCandidate / candidate.computedWidth ;
 		}
-		return resolutionCandidate;
+		return candidate;
 	};
 
 	/**
@@ -491,7 +486,6 @@
 	 */
 	pf.getCandidatesFromSourceSet = function( candidateData ) {
 		var candidates, candidate;
-		var formattedCandidates = [];
 		if ( candidateData ) {
 
 			candidates = pf.parseSrcset( candidateData );
@@ -500,11 +494,11 @@
 				candidate = candidates[ i ];
 
 				if ( !candidate.descriptor || !candidate.descriptor.skip) {
-					formattedCandidates.push(pf.getResolution( candidate, candidateData.sizes ));
+					pf.setResolution( candidate, candidateData.sizes );
 				}
 			}
 		}
-		return formattedCandidates;
+		return candidates;
 	};
 
 
@@ -516,26 +510,34 @@
 			candidateSrc;
 
 		var dpr = pf.DPR * pf.options.resQuantifier;
+		var curCandidate = picImg[ pf.ns ].curCandidate;
 
-		candidates.sort( pf.ascendingSort );
+		if ( curCandidate && candidates[0] && curCandidate.set == candidates[0].set && curCandidate.resolution >= dpr ) {
+			bestCandidate = curCandidate;
+		} else {
 
-		length = candidates.length;
-		bestCandidate = candidates[ length - 1 ];
+			candidates.sort( pf.ascendingSort );
 
-		for ( var i = 0; i < length; i++ ) {
-			candidate = candidates[ i ];
-			if ( candidate.resolution >= dpr ) {
-				bestCandidate = candidate;
-				break;
+			length = candidates.length;
+			bestCandidate = candidates[ length - 1 ];
+
+			for ( var i = 0; i < length; i++ ) {
+				candidate = candidates[ i ];
+				if ( candidate.resolution >= dpr ) {
+					bestCandidate = candidate;
+					break;
+				}
 			}
 		}
 
+
+		//todo ad some tests
 		if( !bestCandidate && picImg[ pf.ns ].src ){
-
 			bestCandidate = {
-				url: picImg[ pf.ns ].src
+				url: picImg[ pf.ns ].src,
+				set: {},
+				resolution: 1
 			};
-
 		}
 
 		loadingSrc = picImg[ pf.ns ].curSrc || picImg.currentSrc || picImg.src;
@@ -558,10 +560,10 @@
 		}
 	};
 
-	var heightProp = ( 'naturalHeight' in image ) ? 'naturalHeight' : 'height';
 	var hasRepaintProblems = 'webkitBackfaceVisibility' in docElem.style;
-	pf.loadImg = function( img, src, data ) {
-		var bImg, timer, lastHeight, testHeight;
+
+	pf.loadImg = function( img, src, bestCandidate ) {
+		var bImg;
 		var cleanUp = img[ pf.ns ].loadGC;
 		
 		var srcWasSet = false;
@@ -572,7 +574,7 @@
 
 				img.src = src;
 
-				if ( hasRepaintProblems && data.type == "image/svg+xml" ) {
+				if ( hasRepaintProblems && bestCandidate.set.type == "image/svg+xml" ) {
 					origWidth = img.style.width;
 					img.style.width = (img.offsetWidth + 1) + 'px';
 					// next line only triggers a repaint
@@ -593,7 +595,7 @@
 				}
 
 				setSrc();
-				pf.addDimensions( img, bImg, data );
+				pf.addDimensions( img, bImg, bestCandidate );
 
 				if ( connected ) {
 					pf.observer.observe();
@@ -610,14 +612,16 @@
 			img.currentSrc = src;
 		}
 		img[ pf.ns ].curSrc  = src;
+		img[ pf.ns ].curCandidate  = bestCandidate;
 
 		bImg = document.createElement( "img" );
 
 		img[ pf.ns ].loadGC = function(){
-			clearInterval(timer);
-			img[ pf.ns ].loadGC = null;
-			img = null;
-			bImg = null;
+			if ( img ) {
+				img[ pf.ns ].loadGC = null;
+				img = null;
+				bImg = null;
+			}
 		};
 
 		bImg.onload = function(){
@@ -629,17 +633,6 @@
 
 		bImg.onerror = img[ pf.ns ].loadGC;
 		bImg.onabort = img[ pf.ns ].loadGC;
-
-
-		timer = setInterval(function(){
-			if(!bImg || bImg.complete || bImg.error){
-				clearInterval(timer);
-			}
-			if ( (testHeight = bImg[ heightProp ]) && testHeight != lastHeight && bImg.width ) {
-				lastHeight = testHeight;
-				onHasState();
-			}
-		}, 9);
 
 		bImg.src = src;
 
@@ -654,7 +647,7 @@
 
 	pf.addDimensions = function( img, bImg, data ) {
 
-		if( !img[ pf.ns ].dims ) {
+		if( pf.options.addDimensions && !img[ pf.ns ].dims ) {
 
 			if ( bImg ) {
 				img[ pf.ns ].nW = bImg.naturalWidth || bImg.width;
@@ -683,8 +676,10 @@
 		var match = pf.getFirstMatch( img );
 
 		if ( match != "pending" ) {
-			srcSetCandidates = pf.getCandidatesFromSourceSet( match );
-			pf.applyBestCandidateFromSrcSet( srcSetCandidates, img );
+			if ( match ) {
+				srcSetCandidates = pf.getCandidatesFromSourceSet( match );
+				pf.applyBestCandidateFromSrcSet( srcSetCandidates, img );
+			}
 			img[ pf.ns ].evaluated = true;
 		}
 	};
@@ -722,6 +717,7 @@
 
 		for ( i = 0; i < candidates.length && !match; i++ ) {
 			candidate = candidates[i];
+
 			if( !candidate.srcset || !pf.matchesMedia( candidate.media ) ) {
 				continue;
 			}

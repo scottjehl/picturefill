@@ -47,10 +47,11 @@
 	});
 
 	test( "picturefill: global integration test", function() {
-		pf.DPR = 2;
+
+		pf.DPR = 1;
 
 		pf.getWidthFromLength = function(){
-			return 160;
+			return 310;
 		};
 		var $srcsetImageW = $( "<img />" )
 			.attr({
@@ -88,7 +89,7 @@
 
 		} else {
 			ok( $srcsetImageX.prop( pf.ns ), "Picturefill modifies images in non-supporting browsers." );
-			equal( $srcsetImageX.prop( "src" ), pf.makeUrl("twoX.jpg"), "Picturefill changes source of image" );
+			equal( $srcsetImageX.prop( "src" ), pf.makeUrl( "oneX.jpg" ), "Picturefill changes source of image" );
 		}
 
 		if(pf.srcsetSupported && pf.sizesSupported){
@@ -109,16 +110,16 @@
 		}
 
 		if( !pf.sizesSupported ){
-			pf.DPR = 1;
+			pf.DPR = 2;
 
 			pf.getWidthFromLength = function(){
-				return 460;
+				return 360;
 			};
 
 			window.picturefill({reevaluate: true});
 
 			if( !pf.srcsetSupported ){
-				equal( $srcsetImageX.prop( "src" ), pf.makeUrl( "oneX.jpg" ), "Picturefill changes source of image" );
+				equal( $srcsetImageX.prop( "src" ), pf.makeUrl("twoX.jpg"), "Picturefill changes source of image" );
 			}
 			equal( $srcsetImageW.prop( "src" ), pf.makeUrl( "medium.jpg" ), "Picturefill changes source of image" );
 		}
@@ -490,9 +491,9 @@
 		var fullPath = pf.makeUrl("foo300");
 
 		candidates = [
-			{ resolution: 100, url: "foo100" },
-			{ resolution: 200, url: "foo200" },
-			{ resolution: 300, url: "foo300" }
+			{ resolution: 100, url: "foo100", set: {} },
+			{ resolution: 200, url: "foo200", set: {} },
+			{ resolution: 300, url: "foo300", set: {} }
 		];
 
 		image = {
