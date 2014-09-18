@@ -23,8 +23,9 @@
 	pf.ns = "picturefill";
 
 	// srcset support test
-	pf.srcsetSupported = "srcset" in doc.createElement( "img" );
-	pf.sizesSupported = w.HTMLImageElement.sizes;
+	var imgEl = doc.createElement( "img" );
+	pf.srcsetSupported = "srcset" in imgEl;
+	pf.sizesSupported = "sizes" in imgEl;
 
 	// just a string trim workaround
 	pf.trim = function( str ) {
