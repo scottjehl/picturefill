@@ -23,7 +23,7 @@
 
 
 	// namespace
-	pf.ns = "picturefill" + new Date().getTime();
+	pf.ns = ("pf" + new Date().getTime()).substr(0, 9);
 	pf.onReady = function() {pf.isReady = true;};
 	pf.isReady = false;
 
@@ -31,43 +31,44 @@
 	pf.srcsetSupported = "srcset" in image;
 	pf.sizesSupported = "sizes" in image;
 	pf.currentSrcSupported = 'currentSrc' in image;
-	pf.hasConsole = w.console && typeof console.warn == "function";
 
-	pf.picutreFillAttribute = 'data-'+pf.ns+'srcset';
+	pf.srcsetAttr = "data-srcset"+pf.ns;
 
-	// using qsa instead of dom traversing does scale much better,
+	// using pf.qsa instead of dom traversing does scale much better,
 	// especially on sites mixing responsive and non-responsive images
 	pf.shortSelector = "picture > img, img[srcset]";
 	pf.selector = pf.shortSelector;
 	pf.options = {
-		resQuantifier: 1 // 1 = high quality || 0.5-0.9 = performance
+		resQuantifier: 1 // 1 = normal quality || 0.5-0.9 = performance || 1.1 - 1.3 high zoom quality
 	};
 
 	if ( pf.srcsetSupported ) {
-		pf.selector += ", img[" + pf.picutreFillAttribute + "]";
+		pf.selector += ", img[" + pf.srcsetAttr + "]";
 	}
 
 
-	pf.qsa = function(context, sel){
+	pf.qsa = function (context, sel){
 		return context.querySelectorAll(sel);
 	};
 
-	pf.qs = function(context, sel){
-		return context.querySelector(sel);
-	};
 
-	pf.makeUrl = (function(){
-		var anchor = doc.createElement( "a" );
-		return function(src){
-			anchor.href = src;
-			return anchor.href;
-		};
-	})();
+	var anchor = doc.createElement( "a" );
+	pf.makeUrl = function(src){
+		anchor.href = src;
+		return anchor.href;
+	};
 
 	// just a string trim workaround
-	pf.trim = function( str ) {
+	function trim( str ) {
 		return str.trim ? str.trim() : str.replace( /^\s+|\s+$/g, "" );
-	};
+	}
+
+	var warn = ( w.console && typeof console.warn == "function" ) ?
+		function( message ) {
+			console.warn( message );
+		} :
+		noop
+	;
 
 	/**
 	 * Shortcut property for https://w3c.github.io/webappsec/specs/mixedcontent/#restricts-mixed-content ( for easy overriding in tests )
@@ -84,15 +85,9 @@
 	pf.vW = 0;
 
 
-	pf.updateView = (function(){
-		var widthProp = "clientWidth";
-		var isCompat = doc.compatMode === "CSS1Compat";
-
-		return function() {
-			// todo w.innerWidth ?
-			pf.vW = isCompat && docElem[ widthProp ] || doc.body[ widthProp ] || docElem[ widthProp ];
-		};
-	})();
+	function updateView() {
+		pf.vW = w.innerWidth || docElem.clientWidth;
+	}
 
 	/**
 	 * simplified version of matchesMedia for basic IE8 support
@@ -136,7 +131,7 @@
 		return ret;
 	};
 
-	if( !pf.matchesMedia( "only all" ) ) {
+	if( !pf.matchesMedia( "(min-width: 0.1em)" ) ) {
 		pf.matchesMedia = pf.mMQ;
 	}
 
@@ -149,25 +144,27 @@
 	 * Get width in css pixel value from a "length" value
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
 	 */
-	pf.widthCache = {};
-	var regEmVw = /^([\d\.]+)(em|vw)$/;
-	pf.getWidthFromLength = function( length ) {
+	pf.lengthCache = {};
+	var regLength = /^([\d\.]+)(em|vw|px)$/;
+	pf.calcLength = function( length ) {
 		var failed, parsedLength;
 		var origLength = length;
 
 
-		if( !pf.widthCache[ origLength ] ){
+		if( !pf.lengthCache[ origLength ] ){
 			// If a length is specified and doesn’t contain a percentage, and it is greater than 0 or using `calc`, use it. Else, use the `100vw` default.
 			length = length || "100vw";
 
-			parsedLength = length.match( regEmVw );
+			parsedLength = length.match( regLength );
 
 			if( parsedLength && ( parsedLength[ 1 ] = parseFloat( parsedLength[ 1 ], 10 ) ) ) {
 
-				if( parsedLength[ 2 ] == 'vw' ) {
-					pf.widthCache[origLength] = pf.vW * parsedLength[ 1 ] / 100;
+				if( parsedLength[ 2 ] == "vw" ) {
+					pf.lengthCache[origLength] = pf.vW * parsedLength[ 1 ] / 100;
+				} else if( parsedLength[ 2 ] == "em") {
+					pf.lengthCache[origLength] = pf.getEmValue() * parsedLength[ 1 ];
 				} else  {
-					pf.widthCache[origLength] = pf.getEmValue() * parsedLength[ 1 ];
+					pf.lengthCache[origLength] = parsedLength[ 1 ];
 				}
 
 			} else {
@@ -204,12 +201,12 @@
 				}
 
 				//cache result
-				pf.widthCache[origLength] = lengthEl.offsetWidth;
+				pf.lengthCache[origLength] = lengthEl.offsetWidth;
 			}
 
 		}
 
-		return pf.widthCache[origLength];
+		return pf.lengthCache[origLength];
 	};
 
 	// container of supported mime types that one might need to qualify before using
@@ -284,7 +281,7 @@
 		};
 	})();
 
-	pf.parseSrcset = function( candidate ) {
+	pf.parseSet = function( set ) {
 		/**
 		 * A lot of this was pulled from Boris Smus’ parser for the now-defunct WHATWG `srcset`
 		 * https://github.com/borismus/srcset-polyfill/blob/master/js/srcset-info.js
@@ -292,91 +289,84 @@
 		 * 1. Let input (`srcset`) be the value passed to this algorithm.
 		 * 2. Let position be a pointer into input, initially pointing at the start of the string.
 		 * 3. Let raw candidates be an initially empty ordered list of URLs with associated
-		 *    unparsed descriptors. The order of entries in the list is the order in which entries
-		 *    are added to the list.
+		 * unparsed descriptors. The order of entries in the list is the order in which entries
+		 * are added to the list.
 		 */
 
-		if( candidate.parsedSrcset ) {
-			return candidate.parsedSrcset;
-		}
+		if( !set.candidates ) {
 
-		var pos, url, descriptor, last, descpos;
+			var pos, url, descriptor, last, descpos;
+			var srcset = set.srcset;
 
-		var srcset = candidate.srcset;
+			set.candidates = [];
 
-		candidate.parsedSrcset = [];
-
-		while ( srcset ) {
-			srcset = srcset.replace(/^\s+/g,"");
-
-			// 5. Collect a sequence of characters that are not space characters, and let that be url.
-			pos = srcset.search(/\s/g);
-			descriptor = null;
-
-			if ( pos !== -1 ) {
-				url = srcset.slice( 0, pos );
-
-				last = url.charAt( url.length - 1 );
-
-				// 6. If url ends with a U+002C COMMA character (,), remove that character from url
-				// and let descriptors be the empty string. Otherwise, follow these substeps
-				// 6.1. If url is empty, then jump to the step labeled descriptor parser.
-
-				if ( last === "," || url === "" ) {
-					url = url.replace(/,+$/, "");
-					descriptor = "";
-				}
-
-				srcset = srcset.slice( pos + 1 );
-
-				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and
-				// let that be descriptors.
-				if ( descriptor === null ) {
-					descpos = srcset.indexOf( "," );
-					if ( descpos !== -1 ) {
-						descriptor = srcset.slice( 0, descpos );
-						srcset = srcset.slice( descpos + 1 );
-					} else {
-						descriptor = srcset;
-						srcset = "";
+			while ( srcset ) {
+				srcset = srcset.replace(/^\s+/g,"");
+				// 5. Collect a sequence of characters that are not space characters, and let that be url.
+				pos = srcset.search(/\s/g);
+				descriptor = null;
+				if ( pos !== -1 ) {
+					url = srcset.slice( 0, pos );
+					last = url.charAt( url.length - 1 );
+					// 6. If url ends with a U+002C COMMA character (,), remove that character from url
+					// and let descriptors be the empty string. Otherwise, follow these substeps
+					// 6.1. If url is empty, then jump to the step labeled descriptor parser.
+					if ( last === "," || url === "" ) {
+						url = url.replace(/,+$/, "");
+						descriptor = "";
 					}
+					srcset = srcset.slice( pos + 1 );
+					// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and
+					// let that be descriptors.
+					if ( descriptor === null ) {
+						descpos = srcset.indexOf( "," );
+						if ( descpos !== -1 ) {
+							descriptor = srcset.slice( 0, descpos );
+							srcset = srcset.slice( descpos + 1 );
+						} else {
+							descriptor = srcset;
+							srcset = "";
+						}
+					}
+				} else {
+					url = srcset;
+					srcset = "";
 				}
 
-			} else {
-				url = srcset;
-				srcset = "";
-			}
-
-			// 7. Add url to raw candidates, associated with descriptors.
-			if ( ( url || descriptor ) && ( descriptor = pf.parseDescriptor( descriptor,  candidate.sizes ) ) ) {
-				candidate.parsedSrcset.push({
-					url: url,
-					descriptor: descriptor,
-					set: candidate
-				});
+				// 7. Add url to raw candidates, associated with descriptors.
+				if ( ( url || descriptor ) && ( descriptor = parseDescriptor( descriptor ) ) ) {
+					set.candidates.push({
+						url: url,
+						desc: descriptor,
+						set: set
+					});
+				}
 			}
 		}
-		return candidate.parsedSrcset;
+
+		return set.candidates;
 	};
 
 
 	var memDescriptor = {};
 	var regDescriptor =  /^([\d\.]+)(w|x)$/; // currently no h
-	pf.parseDescriptor = function( descriptor ) {
+
+	function parseDescriptor( descriptor ) {
 
 		if ( !(descriptor in memDescriptor) ) {
-			var parsedDescriptor = pf.trim( descriptor || "" );
 			var descriptorObj = {
-				value: 1,
+				val: 1,
 				type: 'x'
 			};
+			var parsedDescriptor = trim( descriptor || "" );
 
 			if ( parsedDescriptor ) {
 				if( ( parsedDescriptor ).match( regDescriptor ) ) {
-					descriptorObj.value = parseFloat( RegExp.$1, 10 );
+					descriptorObj.val = parseFloat( RegExp.$1, 10 );
 					descriptorObj.type = RegExp.$2;
 				} else {
 					descriptorObj = false;
+					warn( "unknown descriptor used: " + descriptor );
 				}
 			}
 
@@ -384,7 +374,7 @@
 		}
 
 		return memDescriptor[ descriptor ];
-	};
+	}
 
 	/**
 	 * returns em in px for html/body default size
@@ -417,10 +407,7 @@
 
 			// restore the original values
 			docElem.style.fontSize = originalHTMLFontSize;
-
-			if( originalBodyFontSize ) {
-				body.style.fontSize = originalBodyFontSize;
-			}
+			body.style.fontSize = originalBodyFontSize;
 
 		}
 		return eminpx || 16;
@@ -429,11 +416,11 @@
 	/**
 	 * Takes a string of sizes and returns the width in pixels as a number
 	 */
-	pf.findWidthFromSourceSize = function( sourceSizeListStr ) {
+	pf.calcLengthFromList = function( sourceSizeListStr ) {
 		// Split up source size list, ie ( max-width: 30em ) 100%, ( max-width: 50em ) 50%, 33%
 		//                            or (min-width:30em) calc(30% - 15px)
 		var winningLength, sourceSize, parsedSize, length, media, i, len;
-		var sourceSizeList = pf.trim( sourceSizeListStr ).split( /\s*,\s*/ );
+		var sourceSizeList = trim( sourceSizeListStr ).split( /\s*,\s*/ );
 
 		for ( i = 0, len = sourceSizeList.length; i < len; i++ ) {
 			// Match <media-condition>? length, ie ( min-width: 50em ) 100%
@@ -456,20 +443,17 @@
 
 		// pass the length to a method that can properly determine length
 		// in pixels based on these formats: http://dev.w3.org/csswg/css-values-3/#length-value
-		return pf.getWidthFromLength( winningLength );
+		return pf.calcLength( winningLength );
 	};
 
 	pf.setResolution = function( candidate, sizesattr ) {
-		var descriptor = candidate.descriptor;
-		var sizes = sizesattr || "100vw";
-		var resCandidate = descriptor.value;
-
-		candidate.resolution = descriptor.value || 1;
-		candidate.descriptorType = descriptor.type;
+		var descriptor = candidate.desc;
 
 		if( descriptor.type == 'w' ) { // h = means height: || descriptor.type == 'h' do not handle yet...
-			candidate.computedWidth = pf.findWidthFromSourceSize( sizes );
-			candidate.resolution = resCandidate / candidate.computedWidth ;
+			candidate.cWidth = pf.calcLengthFromList( sizesattr || "100vw" );
+			candidate.res = descriptor.val / candidate.cWidth ;
+		} else {
+			candidate.res = descriptor.val;
 		}
 		return candidate;
 	};
@@ -482,19 +466,19 @@
 	 * Get an array of image candidates in the form of
 	 *      {url: "/foo/bar.png", resolution: 1}
 	 * where resolution is http://dev.w3.org/csswg/css-values-3/#resolution-value
-	 * If sizes is specified, resolution is calculated
+	 * If sizes is specified, res is calculated
 	 */
-	pf.getCandidatesFromSourceSet = function( candidateData ) {
+	pf.prepareCandidates = function( set ) {
 		var candidates, candidate;
-		if ( candidateData ) {
+		if ( set ) {
 
-			candidates = pf.parseSrcset( candidateData );
+			candidates = pf.parseSet( set );
 
 			for ( var i = 0, len = candidates.length; i < len; i++ ) {
 				candidate = candidates[ i ];
 
 				if ( !candidate.descriptor || !candidate.descriptor.skip) {
-					pf.setResolution( candidate, candidateData.sizes );
+					pf.setResolution( candidate, set.sizes );
 				}
 			}
 		}
@@ -502,7 +486,7 @@
 	};
 
 
-	pf.applyBestCandidateFromSrcSet = function( candidates, picImg ) {
+	pf.applyCandidateFromSet = function( candidates, picImg ) {
 		var candidate,
 			length,
 			bestCandidate,
@@ -512,18 +496,18 @@
 		var dpr = pf.DPR * pf.options.resQuantifier;
 		var curCandidate = picImg[ pf.ns ].curCandidate;
 
-		if ( curCandidate && candidates[0] && curCandidate.set == candidates[0].set && curCandidate.resolution >= dpr ) {
+		if ( curCandidate && candidates[0] && curCandidate.set == candidates[0].set && curCandidate.res >= dpr ) {
 			bestCandidate = curCandidate;
 		} else {
 
-			candidates.sort( pf.ascendingSort );
+			candidates.sort( ascendingSort );
 
 			length = candidates.length;
 			bestCandidate = candidates[ length - 1 ];
 
 			for ( var i = 0; i < length; i++ ) {
 				candidate = candidates[ i ];
-				if ( candidate.resolution >= dpr ) {
+				if ( candidate.res >= dpr ) {
 					bestCandidate = candidate;
 					break;
 				}
@@ -536,60 +520,40 @@
 		if ( bestCandidate ) {
 
 			if( ( candidateSrc = pf.makeUrl( bestCandidate.url ) ) != loadingSrc ) {
-				if ( pf.restrictsMixedContent && !bestCandidate.url.indexOf("http:") ) {
-					if ( pf.hasConsole ) {
-						console.warn( "Blocked mixed content image " + candidateSrc );
-					}
+				if ( pf.restrictsMixedContent && !bestCandidate.url.indexOf( "http:" ) ) {
+					warn( "insecure: " + candidateSrc );
 				} else {
-
-					pf.loadImg( picImg, candidateSrc, bestCandidate);
+					pf.loadImg( picImg, bestCandidate, candidateSrc);
 
 				}
-			} else if ( bestCandidate.descriptorType == "w" ) {
+			} else if ( bestCandidate.desc.type == "w" ) {
 				pf.addDimensions( picImg, null, bestCandidate );
 			}
 		}
 	};
 
-	var hasRepaintProblems = 'webkitBackfaceVisibility' in docElem.style;
-
-	pf.loadImg = function( img, src, bestCandidate ) {
+	pf.loadImg = function( img, bestCandidate, src ) {
 		var bImg;
 		var cleanUp = img[ pf.ns ].loadGC;
 		
+		var directSrcChange = ( !img.complete || !img.getAttribute( "src" ) );
+
 		var srcWasSet = false;
 		var setSrc = function(){
 			var origWidth;
 			if( !srcWasSet ) {
 				srcWasSet = true;
 
-				img.src = src;
+				img.src = bestCandidate.url;
 
-				if ( hasRepaintProblems && bestCandidate.set.type == "image/svg+xml" ) {
+				// although this is a specific Safari issue, we don't want to take too much different code paths
+				if ( bestCandidate.set.type == "image/svg+xml" ) {
 					origWidth = img.style.width;
-					img.style.width = (img.offsetWidth + 1) + 'px';
+					img.style.width = (img.offsetWidth + 1) + "px";
 					// next line only triggers a repaint
 					// assignment is only done to trick dead code removal
 					bImg.rp = img.offsetWidth;
 					img.style.width = origWidth;
-				}
-			}
-		};
-
-		var onHasState = function(){
-			var connected;
-			if ( img ) {
-
-				if ( pf.observer && pf.observer.connected ){
-					connected = true;
-					pf.observer.disconnect();
-				}
-
-				setSrc();
-				pf.addDimensions( img, bImg, bestCandidate );
-
-				if ( connected ) {
-					pf.observer.observe();
 				}
 			}
 		};
@@ -602,38 +566,53 @@
 		if(!pf.currentSrcSupported){
 			img.currentSrc = src;
 		}
+
 		img[ pf.ns ].curSrc  = src;
 		img[ pf.ns ].curCandidate  = bestCandidate;
 
-		bImg = document.createElement( "img" );
 
-		img[ pf.ns ].loadGC = function(){
-			if ( img ) {
-				img[ pf.ns ].loadGC = null;
-				img = null;
-				bImg = null;
-			}
-		};
+		//IE8 needs background loading for addDimensions feature + and it doesn't harm other browsers
+		if( pf.options.addDimensions || !directSrcChange ) {
 
-		bImg.onload = function(){
-			if ( img ) {
-				onHasState();
-				img[ pf.ns ].loadGC();
-			}
-		};
+			bImg = document.createElement( "img" );
 
-		bImg.onerror = img[ pf.ns ].loadGC;
-		bImg.onabort = img[ pf.ns ].loadGC;
+			img[ pf.ns ].loadGC = function(){
+				if ( img ) {
+					img[ pf.ns ].loadGC = null;
+					img = null;
+					bImg = null;
+				}
+			};
 
-		bImg.src = src;
+			bImg.onload = function(){
+				var connected;
+				if ( img ) {
+					if ( pf.observer && pf.observer.connected ){
+						connected = true;
+						pf.observer.disconnect();
+					}
 
-		if ( img && (!img.complete || !img.getAttribute( "src" )) ) {
+					setSrc();
+					pf.addDimensions( img, bImg, bestCandidate );
+
+					if ( connected ) {
+						pf.observer.observe();
+					}
+					img[ pf.ns ].loadGC();
+				}
+			};
+
+			bImg.onerror = img[ pf.ns ].loadGC;
+			bImg.onabort = img[ pf.ns ].loadGC;
+
+			bImg.src = bestCandidate.url;
+		}
+
+
+		if ( directSrcChange ) {
 			setSrc();
 		}
 
-		if ( bImg && bImg.complete ) {
-			bImg.onload();
-		}
 	};
 
 	pf.addDimensions = function( img, bImg, data ) {
@@ -645,15 +624,16 @@
 				img[ pf.ns ].nH = bImg.naturalHeight || bImg.height;
 			}
 
-			if ( data.descriptorType == "x" ) {
+			if ( data.desc.type == "x" ) {
 
-				img.setAttribute( "width", parseInt( (img[ pf.ns ].nW / data.resolution) / pf.options.resQuantifier, 10) );
+				img.setAttribute( "width", parseInt( (img[ pf.ns ].nW / data.res) / pf.options.resQuantifier, 10) );
 
-				img.setAttribute( "height", parseInt((img[ pf.ns ].nH / data.resolution) / pf.options.resQuantifier, 10) );
+				img.setAttribute( "height", parseInt((img[ pf.ns ].nH / data.res) / pf.options.resQuantifier, 10) );
 
-			} else if( data.descriptorType == "w" ) {
-				img.setAttribute( "width", parseInt( data.computedWidth, 10) );
-				img.setAttribute( "height", parseInt( img[ pf.ns ].nH * ( data.computedWidth / img[ pf.ns ].nW ), 10) );
+			} else if( data.desc.type == "w" ) {
+				//Todo: https://github.com/scottjehl/picturefill/issues/266#issuecomment-55789534
+				img.setAttribute( "width", parseInt( data.cWidth, 10) );
+				img.setAttribute( "height", parseInt( img[ pf.ns ].nH * ( data.cWidth / img[ pf.ns ].nW ), 10) );
 			} else {
 				img.removeAttribute( "width" );
 				img.removeAttribute( "height" );
@@ -664,66 +644,45 @@
 
 	pf.applyBestCandidate = function( img ){
 		var srcSetCandidates;
-		var match = pf.getFirstMatch( img );
+		var matchingSet = pf.getSet( img );
 
-		if ( match != "pending" ) {
-			if ( match ) {
-				srcSetCandidates = pf.getCandidatesFromSourceSet( match );
-				pf.applyBestCandidateFromSrcSet( srcSetCandidates, img );
+		if ( matchingSet != "pending" ) {
+			if ( matchingSet ) {
+				srcSetCandidates = pf.prepareCandidates( matchingSet );
+				pf.applyCandidateFromSet( srcSetCandidates, img );
 			}
 			img[ pf.ns ].evaluated = true;
 		}
 	};
 
-	pf.ascendingSort = function( a, b ) {
-		return a.resolution - b.resolution;
-	};
-
-	/*
-	 * In IE9, <source> elements get removed if they aren't children of
-	 * video elements. Thus, we conditionally wrap source elements
-	 * using <!--[if IE 9]><audio><![endif]-->
-	 * and must account for that here by moving those source elements
-	 * back into the picture element.
-	 */
-	pf.removeMediaShim = function( picture ) {
-		var vsources;
-		var media = pf.qs( picture, "video, audio" );
-
-		if ( media ) {
-			vsources = media.getElementsByTagName( "source" );
-			while ( vsources.length ) {
-				picture.insertBefore( vsources[ 0 ], media );
-			}
-			// Remove the video element once we're finished removing its children
-			media.parentNode.removeChild( media );
-		}
-	};
+	function ascendingSort( a, b ) {
+		return a.res - b.res;
+	}
 
 
-	pf.getFirstMatch = function( img ) {
-		var i, candidate, supportsType;
+	pf.getSet = function( img ) {
+		var i, set, supportsType;
 		var match = false;
-		var candidates = img [ pf.ns ].candidates;
+		var sets = img [ pf.ns ].sets;
 
-		for ( i = 0; i < candidates.length && !match; i++ ) {
-			candidate = candidates[i];
+		for ( i = 0; i < sets.length && !match; i++ ) {
+			set = sets[i];
 
-			if( !candidate.srcset || !pf.matchesMedia( candidate.media ) ) {
+			if( !set.srcset || !pf.matchesMedia( set.media ) ) {
 				continue;
 			}
 
-			supportsType = pf.verifyTypeSupport( candidate.type );
+			supportsType = pf.verifyTypeSupport( set.type );
 
 			if( !supportsType ) {
 				continue;
 			}
 
 			if( supportsType == "pending" ){
-				candidate = supportsType;
+				set = supportsType;
 			}
 
-			match = candidate;
+			match = set;
 			break;
 		}
 
@@ -732,7 +691,7 @@
 
 	pf.hasNonXDescriptor = function( candidate ) {
 		var i;
-		var srcset = pf.parseSrcset( candidate );
+		var srcset = pf.parseSet( candidate );
 		var ret = false;
 		for( i = 0; i < srcset.length; i++ ) {
 			if ( srcset[ 0 ].descriptor && srcset[ 0 ].descriptor.type != 'x' ) {
@@ -754,7 +713,7 @@
 		return needsPolyfill;
 	};
 
-	pf.parseCanditates = function( element, parent, options ) {
+	pf.parseSets = function( element, parent, options ) {
 		var srcsetAttribute, fallbackCandidate , srcsetChanged;
 
 		var hasPicture = parent.nodeName.toUpperCase() === "PICTURE";
@@ -776,7 +735,7 @@
 
 			if ( pf.srcsetSupported ) {
 				if ( srcsetAttribute ) {
-					element.setAttribute( pf.picutreFillAttribute, srcsetAttribute );
+					element.setAttribute( pf.srcsetAttr, srcsetAttribute );
 					if ( pf.srcsetSupported && !pf.sizesSupported ) {
 						element.srcset = "";
 					} else {
@@ -784,9 +743,20 @@
 					}
 
 				} else {
-					element.removeAttribute( pf.picutreFillAttribute );
+					element.removeAttribute( pf.srcsetAttr );
 				}
 			}
+		}
+
+
+		element[ pf.ns ].sets = [];
+
+
+
+		if( hasPicture ){
+			// IE9 video workaround
+
+			getAllSourceElements( parent, element[ pf.ns ].sets );
 		}
 
 		if( element[ pf.ns ].srcset ){
@@ -794,36 +764,18 @@
 				srcset: element[ pf.ns ].srcset,
 				sizes: element.getAttribute( "sizes" )
 			};
+			element[ pf.ns ].sets.push( fallbackCandidate );
 
-			if ( !hasPicture ) {
-				pf.parseSrcset( fallbackCandidate );
-			}
-		}
-
-
-		element[ pf.ns ].supported = !( hasPicture || srcsetChanged || pf.needsSrcsetPolyfill( fallbackCandidate ) );
-
-		element[ pf.ns ].candidates = [];
-
-
-
-		if( hasPicture ){
-			// IE9 video workaround
-			pf.removeMediaShim( parent );
-
-			getAllSourceElements( parent, element[ pf.ns ].candidates );
-		}
-
-		if( fallbackCandidate ){
-			element[ pf.ns ].candidates.push( fallbackCandidate );
 		}
 
 		if( element[ pf.ns ].src ) {
-			element[ pf.ns ].candidates.push( {
+			element[ pf.ns ].sets.push( {
 				srcset: element[ pf.ns ].src,
 				sizes: null
 			} );
 		}
+
+		element[ pf.ns ].supported = !( hasPicture || srcsetChanged || pf.needsSrcsetPolyfill( fallbackCandidate ) );
 
 		element[ pf.ns ].parsed = true;
 	};
@@ -864,7 +816,7 @@
 		}
 
 		if( !element[ pf.ns ].parsed || options.reparse ) {
-			pf.parseCanditates( element, element.parentNode, options );
+			pf.parseSets( element, element.parentNode, options );
 		}
 
 		if( !element[ pf.ns ].supported ){
@@ -885,7 +837,7 @@
 	pf.setupRun = function( options ) {
 		//invalidate cache
 		if ( !options || options.reevaluate || options.reparse ){
-			pf.widthCache = {};
+			pf.lengthCache = {};
 		}
 	};
 
@@ -981,7 +933,7 @@
 			var intervalId = setInterval( run, 333);
 
 			var resizeEval = function() {
-				pf.updateView();
+				updateView();
 				pf.fillImgs({ reevaluate: true });
 			};
 			var onResize = function() {
@@ -996,7 +948,7 @@
 			setTimeout(run, doc.body ? 9 : 99);
 		})();
 
-		pf.updateView();
+		updateView();
 		// test webp support
 		pf.createImageTest( "image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=" );
 	}
