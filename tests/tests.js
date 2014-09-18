@@ -143,6 +143,7 @@
 
 	test("calcLengthFromList", function() {
 		var width;
+		var invalidSizes = "(min-width: 1px) 1002pysa, (min-width: 1px), -20px, (min-width: 1px) 10%";
 		var sizes = "	(max-width: 30em) 1000px,	(max-width: 50em) 750px, 500px	";
 
 		pf.matchesMedia = function(media) {
@@ -153,9 +154,16 @@
 
 		equal(width, 1000, "returns 1000 when match media returns true");
 
+		width = pf.calcLengthFromList(invalidSizes + ", (min-width: 2px) 10px");
+		equal(width, 10, "iterates through until finds valid value");
+
+		width = pf.calcLengthFromList(invalidSizes);
+		equal(width, pf.vW, "if no valid size is given defaults to viewport width");
+
 		pf.matchesMedia = function(media) {
 			return !media || false;
 		};
+
 		width = pf.calcLengthFromList(sizes);
 		equal(width, 500, "returns 500 when match media returns false");
 

@@ -194,29 +194,34 @@ window.matchMedia || (window.matchMedia = function() {
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
 	 */
 	pf.lengthCache = {};
-	var regLength = /^([\d\.]+)(em|vw|px)$/;
+	var regLength = /^([\d\.\-]+)(em|vw|px|%)$/;
 	pf.calcLength = function( length ) {
 		var failed, parsedLength;
 		var origLength = length;
+		var value = false;
 
 
 		if( !pf.lengthCache[ origLength ] ){
 			// If a length is specified and doesn’t contain a percentage, and it is greater than 0 or using `calc`, use it. Else, use the `100vw` default.
-			length = length || "100vw";
 
 			parsedLength = length.match( regLength );
 
-			if( parsedLength && ( parsedLength[ 1 ] = parseFloat( parsedLength[ 1 ], 10 ) ) ) {
+			if( parsedLength ) {
 
-				if( parsedLength[ 2 ] == "vw" ) {
-					pf.lengthCache[origLength] = pf.vW * parsedLength[ 1 ] / 100;
+				parsedLength[ 1 ] = parseFloat( parsedLength[ 1 ], 10 );
+
+				if( !parsedLength[ 1 ] || parsedLength[ 1 ] <= 0 || parsedLength[ 2 ] == "%" ) {
+					value = false;
+				} else if( parsedLength[ 2 ] == "vw" ) {
+					value = pf.vW * parsedLength[ 1 ] / 100;
 				} else if( parsedLength[ 2 ] == "em") {
-					pf.lengthCache[origLength] = pf.getEmValue() * parsedLength[ 1 ];
+					value = pf.getEmValue() * parsedLength[ 1 ];
 				} else  {
-					pf.lengthCache[origLength] = parsedLength[ 1 ];
+					value = parsedLength[ 1 ];
 				}
 
-			} else {
+			} else if ( length.indexOf('calc') > -1 || parseInt(length) ) {
+
 				/**
 				 * If length is specified in  `vw` units, use `%` instead since the div we’re measuring
 				 * is injected at the top of the document.
@@ -238,21 +243,26 @@ window.matchMedia || (window.matchMedia = function() {
 				}
 
 				// set width
+				lengthEl.style.width = 0;
 				try {
 					lengthEl.style.width = length;
 				} catch(e){
 					failed = true;
 				}
 
-				if ( failed && lengthEl.offsetWidth <= 0 ) {
-					// Something has gone wrong. `calc()` is in use and unsupported, most likely. Default to `100vw` (`100%`, for broader support.):
-					lengthEl.style.width = "100%";
-				}
+				value = lengthEl.offsetWidth;
 
-				//cache result
-				pf.lengthCache[origLength] = lengthEl.offsetWidth;
+				if ( failed || value <= 0 ) {
+					// Something has gone wrong. `calc()` is in use and unsupported, most likely. Default to `100vw` (`100%`, for broader support.):
+					value = false;
+				}
 			}
 
+			pf.lengthCache[origLength] = value;
+
+			if ( value === false ) {
+				warn( "invalid source size value: " + origLength );
+			}
 		}
 
 		return pf.lengthCache[origLength];
@@ -468,9 +478,9 @@ window.matchMedia || (window.matchMedia = function() {
 	pf.calcLengthFromList = function( sourceSizeListStr ) {
 		// Split up source size list, ie ( max-width: 30em ) 100%, ( max-width: 50em ) 50%, 33%
 		//                            or (min-width:30em) calc(30% - 15px)
-		var winningLength, sourceSize, parsedSize, length, media, i, len;
+		var sourceSize, parsedSize, length, media, i, len;
 		var sourceSizeList = trim( sourceSizeListStr ).split( /\s*,\s*/ );
-
+		var winningLength = false;
 		for ( i = 0, len = sourceSizeList.length; i < len; i++ ) {
 			// Match <media-condition>? length, ie ( min-width: 50em ) 100%
 			sourceSize = sourceSizeList[ i ];
@@ -482,17 +492,16 @@ window.matchMedia || (window.matchMedia = function() {
 			if ( !length ) {
 				continue;
 			}
-			if ( pf.matchesMedia( media ) ) {
-				// if there is no media query or it matches, choose this as our winning length
-				// and end algorithm
-				winningLength = length;
+			// if there is no media query or it matches, choose this as our winning length
+			// and end algorithm
+			if ( pf.matchesMedia( media ) && (winningLength = pf.calcLength( length )) !== false ) {
 				break;
 			}
 		}
 
 		// pass the length to a method that can properly determine length
 		// in pixels based on these formats: http://dev.w3.org/csswg/css-values-3/#length-value
-		return pf.calcLength( winningLength );
+		return winningLength === false ? pf.vW : winningLength;
 	};
 
 	pf.setResolution = function( candidate, sizesattr ) {
@@ -620,7 +629,7 @@ window.matchMedia || (window.matchMedia = function() {
 		img[ pf.ns ].curCandidate  = bestCandidate;
 
 
-		//IE8 needs backgroundimage for addDimensions feature
+		//IE8 needs background loading for addDimensions feature + and it doesn't harm other browsers
 		if( pf.options.addDimensions || !directSrcChange ) {
 
 			bImg = document.createElement( "img" );
@@ -680,6 +689,7 @@ window.matchMedia || (window.matchMedia = function() {
 				img.setAttribute( "height", parseInt((img[ pf.ns ].nH / data.res) / pf.options.resQuantifier, 10) );
 
 			} else if( data.desc.type == "w" ) {
+				//Todo: https://github.com/scottjehl/picturefill/issues/266#issuecomment-55789534
 				img.setAttribute( "width", parseInt( data.cWidth, 10) );
 				img.setAttribute( "height", parseInt( img[ pf.ns ].nH * ( data.cWidth / img[ pf.ns ].nW ), 10) );
 			} else {
