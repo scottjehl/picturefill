@@ -143,7 +143,7 @@
 
 	test("calcLengthFromList", function() {
 		var width;
-		var invalidSizes = "(min-width: 1px) 1002pysa, (min-width: 1px), -20px, (min-width: 1px) 10%";
+		var invalidSizes = "(min-width: 1px) 1002pysa, (min-width: 2px) -20px, (min-width: 3px) 10%";
 		var sizes = "	(max-width: 30em) 1000px,	(max-width: 50em) 750px, 500px	";
 
 		pf.matchesMedia = function(media) {
