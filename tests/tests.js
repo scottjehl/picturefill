@@ -198,6 +198,7 @@
 	});
 
 	test("prepareCandidates", function() {
+		var srcset, expected, sizes;
 		// Basic test
 		var runGetCandiate = function(candidate, sizes){
 			return $.map(pf.prepareCandidates({srcset: candidate, sizes: sizes || null}), function( can ){
@@ -208,40 +209,26 @@
 			});
 		};
 
-		var candidate1 = "images/pic-medium.png";
-		var expectedFormattedCandidates1 = [
+		srcset = "images/pic-medium.png";
+		expected = [
 			{
 				res: 1,
 				url: "images/pic-medium.png"
 			}
 		];
-		deepEqual(runGetCandiate(candidate1), expectedFormattedCandidates1, "`" + candidate1 + "` is parsed correctly");
+		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly");
 
-		var candidate1a = "images/pic-medium.png 1x";
-		var expectedFormattedCandidates1a = [
+		srcset = "images/pic-medium.png 1x";
+		expected = [
 			{
 				res: 1,
 				url: "images/pic-medium.png"
 			}
 		];
-		deepEqual(runGetCandiate(candidate1a), expectedFormattedCandidates1a, "`" + candidate1a + "` is parsed correctly" );
+		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
 
-		var candidate2 = "images/pic-medium.png, images/pic-medium-2x.png 2x";
-		var expectedFormattedCandidates2 = [
-			{
-				res: 1,
-				url: "images/pic-medium.png"
-			},
-			{
-				res: 2,
-				url: "images/pic-medium-2x.png"
-			}
-		];
-
-		deepEqual(runGetCandiate(candidate2), expectedFormattedCandidates2, "`" + candidate2 + "` is parsed correctly" );
-
-		var candidate2a = "images/pic-medium.png 1x, images/pic-medium-2x.png 2x";
-		var expectedFormattedCandidates2a = [
+		srcset = "images/pic-medium.png, images/pic-medium-2x.png 2x";
+		expected = [
 			{
 				res: 1,
 				url: "images/pic-medium.png"
@@ -252,15 +239,29 @@
 			}
 		];
 
-		deepEqual(runGetCandiate(candidate2a), expectedFormattedCandidates2a, "`" + candidate2a + "` is parsed correctly");
+		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
+
+		srcset = "images/pic-medium.png 1x, images/pic-medium-2x.png 2x";
+		expected = [
+			{
+				res: 1,
+				url: "images/pic-medium.png"
+			},
+			{
+				res: 2,
+				url: "images/pic-medium-2x.png"
+			}
+		];
+
+		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly");
 
 		// Test with multiple spaces
-		var candidate3 = "			images/pic-medium.png		 1x		,		 images/pic-medium-2x.png		 2x		";
-		deepEqual(runGetCandiate(candidate3), expectedFormattedCandidates2, "`" + candidate3 + "` is parsed correctly" );
+		srcset = "			images/pic-medium.png		 1x		,		 images/pic-medium-2x.png		 2x		";
+		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
 
 		// Test with decimals
-		var candidate4 = "			images/pic-smallest.png		0.25x	,		images/pic-small.png		0.5x	, images/pic-medium.png 1x";
-		var expectedFormattedCandidates4 = [
+		srcset = "			images/pic-smallest.png		0.25x	,		images/pic-small.png		0.5x	, images/pic-medium.png 1x";
+		expected = [
 			{
 				res: 0.25,
 				url: "images/pic-smallest.png"
@@ -274,19 +275,19 @@
 				url: "images/pic-medium.png"
 			}
 		];
-		//deepEqual(runGetCandiate(candidate4), expectedFormattedCandidates4, "`" + candidate4 + "` is parsed correctly" );
+		//deepEqual(runGetCandiate(srcset), expectedFormattedCandidates4, "`" + srcset + "` is parsed correctly" );
 
 		// Test with "sizes" passed with a px length specified
-		var candidate5 = "			images/pic-smallest.png		 250w		,		 images/pic-small.png		 500w		, images/pic-medium.png 1000w";
-		var sizes5 = "1000px";
+		srcset = "			images/pic-smallest.png		 250w		,		 images/pic-small.png		 500w		, images/pic-medium.png 1000w";
+		sizes = "1000px";
+		deepEqual(runGetCandiate(srcset, sizes), expected, "`" + srcset + "` is parsed correctly");
 
-		deepEqual(runGetCandiate(candidate5, sizes5), expectedFormattedCandidates4, "`" + candidate4 + "` is parsed correctly");
 
 		// Test with "sizes" passed with % lengths specified
-		var candidate6 = "\npic320.png 320w	, pic640.png		640w, pic768.png 768w, \
+		srcset = "\npic320.png 320w	, pic640.png		640w, pic768.png 768w, \
 		\npic1536.png 1536w, pic2048.png	2048w	";
-		var sizes6 = "	(max-width: 30em) 100%,	(max-width: 50em) 50%, 33%";
-		var expectedCandidates = [
+		sizes = "	(max-width: 30em) 100%,	(max-width: 50em) 50%, 33%";
+		expected = [
 			{
 				res: 0.5,
 				url: "pic320.png"
@@ -317,10 +318,11 @@
 			return true;
 		};
 
-		deepEqual(runGetCandiate(candidate6, sizes6), expectedCandidates, "`" + candidate6 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(srcset, sizes), expected, "`" + srcset + "` is parsed correctly" );
 
-		var srcset1 = "foo,bar.png 320w, bar,baz.png 320w";
-		var expectedresult1 = [
+
+		srcset = "foo,bar.png 320w, bar,baz.png 320w";
+		expected = [
 			{
 				url: "foo,bar.png",
 				res: 0.5
@@ -329,10 +331,11 @@
 				res: 0.5
 			}
 		];
-		deepEqual(runGetCandiate(srcset1), expectedresult1, "`" + srcset1 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
 
-		var srcset2 = "foo,bar.png 320w,bar,baz.png 320w";
-		var expectedresult2 = [
+
+		srcset = "foo,bar.png 320w,bar,baz.png 320w";
+		expected = [
 			{
 				url: "foo,bar.png",
 				res: 0.5
@@ -341,29 +344,31 @@
 				res: 0.5
 			}
 		];
+		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
 
-		deepEqual(runGetCandiate(srcset2), expectedresult2, "`" + srcset2 + "` is parsed correctly" );
 
-		var srcset3 = "foo.png 1x, bar.png -2x";
-		var expectedresult3 = [
+		srcset = "foo.png 1x, bar.png -2x";
+		expected = [
 			{
 				url: "foo.png",
 				res: 1
 			}
 		];
-		deepEqual(runGetCandiate(srcset3), expectedresult3, "`" + srcset3 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
 
-		var srcset4 = "foo.png 1x, bar.png 2q";
-		var expectedresult4 = [
+
+		srcset = "foo.png 1x, bar.png 2q";
+		expected = [
 			{
 				url: "foo.png",
 				res: 1
 			}
 		];
-		deepEqual(runGetCandiate(srcset4), expectedresult4, "`" + srcset4 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
 
-		var srcset5 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg 1x, bar.png 2x";
-		var expectedresult5 = [
+
+		srcset = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg 1x, bar.png 2x";
+		expected = [
 			{
 				url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg",
 				res: 1
@@ -372,10 +377,11 @@
 				res: 2
 			}
 		];
-		deepEqual(runGetCandiate(srcset5), expectedresult5, "`" + srcset5 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
 
-		var srcset6 = "2.png 1x,1.png 2x";
-		var expectedresult6 = [
+
+		srcset = "2.png 1x,1.png 2x";
+		expected = [
 			{
 				url: "2.png",
 				res: 1
@@ -384,10 +390,11 @@
 				res: 2
 			}
 		];
-		deepEqual(runGetCandiate(srcset6), expectedresult6, "`" + srcset6 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
 
-		var srcset7 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg 2x, 1x.gif 1x, data:image/png;base64,iVBORw0KGgoAAAANSUhEUg";
-		var expectedresult7 = [
+
+		srcset = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg 2x, 1x.gif 1x, data:image/png;base64,iVBORw0KGgoAAAANSUhEUg";
+		expected = [
 			{
 				url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg",
 				res: 2
@@ -399,10 +406,11 @@
 				res: 1
 			}
 		];
-		deepEqual(runGetCandiate(srcset7), expectedresult7, "`" + srcset7 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
 
-		var srcset8 = "400.gif 400w, 6000.gif 6000w";
-		var expectedresult8 = [
+
+		srcset = "400.gif 400w, 6000.gif 6000w";
+		expected = [
 			{
 				url: "400.gif",
 				res: 0.625
@@ -411,10 +419,11 @@
 				res: 9.375
 			}
 		];
-		deepEqual(runGetCandiate(srcset8), expectedresult8, "`" + srcset8 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
 
-		var srcset9 = "800.gif 2x, 1600.gif 1600w";
-		var expectedresult9 = [
+
+		srcset = "800.gif 2x, 1600.gif 1600w";
+		expected = [
 			{
 				url: "800.gif",
 				res: 2
@@ -423,9 +432,11 @@
 				res: 2.5
 			}
 		];
-		deepEqual(runGetCandiate(srcset9), expectedresult9, "`" + srcset9 + "` is parsed correctly" );
-		var srcset10 = "1x,,  ,   x    ,2x	, 1x.gif, , 3x, 4x.gif 4x 100h,,, 5x.gif 5, dx.gif dx, 2x.gif   2x,";
-		var expectedresult10 = [
+		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
+
+
+		srcset = "1x,,  ,   x    ,2x	, 1x.gif, , 3x, 4x.gif 4x 100h,,, 5x.gif 5, dx.gif dx, 2x.gif   2x,";
+		expected = [
 			{
 				url: "1x",
 				res: 1
@@ -446,7 +457,22 @@
 				res: 2
 			}
 		];
-		deepEqual(runGetCandiate(srcset10), expectedresult10, "`" + srcset10 + "` is parsed correctly" );
+		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
+
+
+		srcset = ",,,,foo.png 1x, ,,,,,bar 2x";
+		expected = [
+			{
+				url: "foo.png",
+				res: 1
+			},
+			{
+				url: "bar",
+				res: 2
+			}
+		];
+		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
+
 	});
 
 	test( "pf.mMQ", function(){

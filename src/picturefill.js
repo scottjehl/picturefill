@@ -346,7 +346,7 @@
 				// 7. Add url to raw candidates, associated with descriptors.
 				if ( ( url || descriptor ) && ( descriptor = parseDescriptor( descriptor ) ) ) {
 					set.candidates.push({
-						url: url,
+						url: url.replace(/^,+/, ""),
 						desc: descriptor,
 						set: set
 					});
@@ -783,6 +783,7 @@
 
 		}
 
+		//todo: https://github.com/scottjehl/picturefill/issues/263
 		if( element[ pf.ns ].src ) {
 			element[ pf.ns ].sets.push( {
 				srcset: element[ pf.ns ].src,
@@ -868,7 +869,17 @@
 			}
 		}
 	};
+
+	/**
+	 * alreadyRun flag used for setOptions. is it true setOptions will reevaluate
+	 * @type {boolean}
+	 */
 	var alreadyRun = false;
+
+	/**
+	 *
+	 * @param opt
+	 */
 	var picturefill = function ( opt ) {
 		var elements, i, plen, xParse;
 
