@@ -358,6 +358,7 @@
 	};
 
 
+
 	var memDescriptor = {};
 	var regDescriptor =  /^([\d\.]+)(w|x)$/; // currently no h
 
@@ -541,8 +542,9 @@
 		}
 	};
 
+	//TODO: minimize amount of closures
 	pf.loadImg = function( img, bestCandidate, src ) {
-		var bImg;
+
 		var cleanUp = img[ pf.ns ].loadGC;
 		
 		var directSrcChange = ( !img.complete || !img.getAttribute( "src" ) );
@@ -559,10 +561,13 @@
 				if ( bestCandidate.set.type == "image/svg+xml" ) {
 					origWidth = img.style.width;
 					img.style.width = (img.offsetWidth + 1) + "px";
-					// next line only triggers a repaint
-					// assignment is only done to trick dead code removal
-					bImg.rp = img.offsetWidth;
-					img.style.width = origWidth;
+
+					// next line only should trigger a repaint
+					// if... is only done to trick dead code removal
+					if( img.offsetWidth + 1 ){
+						img.style.width = origWidth;
+					}
+
 				}
 			}
 		};
@@ -582,39 +587,7 @@
 
 		//IE8 needs background loading for addDimensions feature + and it doesn't harm other browsers
 		if( pf.options.addDimensions || !directSrcChange ) {
-
-			bImg = document.createElement( "img" );
-
-			img[ pf.ns ].loadGC = function(){
-				if ( img ) {
-					img[ pf.ns ].loadGC = null;
-					img = null;
-					bImg = null;
-				}
-			};
-
-			bImg.onload = function(){
-				var connected;
-				if ( img ) {
-					if ( pf.observer && pf.observer.connected ){
-						connected = true;
-						pf.observer.disconnect();
-					}
-
-					setSrc();
-					pf.addDimensions( img, bImg, bestCandidate );
-
-					if ( connected ) {
-						pf.observer.observe();
-					}
-					img[ pf.ns ].loadGC();
-				}
-			};
-
-			bImg.onerror = img[ pf.ns ].loadGC;
-			bImg.onabort = img[ pf.ns ].loadGC;
-
-			bImg.src = bestCandidate.url;
+			loadInBackground( img, bestCandidate, setSrc );
 		}
 
 
@@ -623,6 +596,42 @@
 		}
 
 	};
+
+	function loadInBackground( img, bestCandidate, setSrc ){
+		var bImg = document.createElement( "img" );
+
+		img[ pf.ns ].loadGC = function(){
+			if ( img ) {
+				img[ pf.ns ].loadGC = null;
+				img = null;
+				bImg = null;
+			}
+		};
+
+		bImg.onload = function(){
+			var connected;
+			if ( img ) {
+				if ( pf.observer && pf.observer.connected ){
+					connected = true;
+					pf.observer.disconnect();
+				}
+
+				setSrc();
+
+				pf.addDimensions( img, bImg, bestCandidate );
+
+				if ( connected ) {
+					pf.observer.observe();
+				}
+				img[ pf.ns ].loadGC();
+			}
+		};
+
+		bImg.onerror = img[ pf.ns ].loadGC;
+		bImg.onabort = img[ pf.ns ].loadGC;
+
+		bImg.src = bestCandidate.url;
+	}
 
 	pf.addDimensions = function( img, bImg, data ) {
 
