@@ -1,4 +1,4 @@
-/*! Picturefill - v2.1.0 - 2014-08-20
+/*! Picturefill - v2.1.0 - 2014-09-19
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -72,8 +72,11 @@ window.matchMedia || (window.matchMedia = function() {
 	pf.ns = "picturefill";
 
 	// srcset support test
-	pf.srcsetSupported = "srcset" in doc.createElement( "img" );
-	pf.sizesSupported = w.HTMLImageElement.sizes;
+	(function() {
+		var img = doc.createElement( "img" );
+		pf.srcsetSupported = "srcset" in img;
+		pf.sizesSupported = "sizes" in img;
+	})();
 
 	// just a string trim workaround
 	pf.trim = function( str ) {
@@ -239,8 +242,8 @@ window.matchMedia || (window.matchMedia = function() {
 		*
 		* 1. Let input (`srcset`) be the value passed to this algorithm.
 		* 2. Let position be a pointer into input, initially pointing at the start of the string.
-		* 3. Let raw candidates be an initially empty ordered list of URLs with associated 
-		*    unparsed descriptors. The order of entries in the list is the order in which entries 
+		* 3. Let raw candidates be an initially empty ordered list of URLs with associated
+		*    unparsed descriptors. The order of entries in the list is the order in which entries
 		*    are added to the list.
 		*/
 		var candidates = [];
@@ -267,7 +270,7 @@ window.matchMedia || (window.matchMedia = function() {
 				}
 				srcset = srcset.slice( pos + 1 );
 
-				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and 
+				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and
 				// let that be descriptors.
 				if ( descriptor === null ) {
 					var descpos = srcset.indexOf(",");
@@ -296,7 +299,7 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	pf.parseDescriptor = function( descriptor, sizesattr ) {
-		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list 
+		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list
 		// is the order in which entries are added to the list.
 		var sizes = sizesattr || "100vw",
 			sizeDescriptor = descriptor && descriptor.replace(/(^\s+|\s+$)/g, ""),
@@ -630,4 +633,4 @@ window.matchMedia || (window.matchMedia = function() {
 		w.picturefill = picturefill;
 	}
 
-} )( this, this.document );
+} )( window, window.document );
