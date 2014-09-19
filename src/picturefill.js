@@ -741,6 +741,8 @@
 			if ( pf.srcsetSupported ) {
 				if ( srcsetAttribute ) {
 					element.setAttribute( pf.srcsetAttr, srcsetAttribute );
+					// FF with enabled picture crashes on removeAttribute with update to 33
+					// the workaround can be removed
 					if ( pf.srcsetSupported && !pf.sizesSupported ) {
 						element.srcset = "";
 					} else {
@@ -788,6 +790,8 @@
 	function getAllSourceElements(picture , candidates) {
 		var i, len, source, srcset;
 
+		// SPEC mismatch intended for size and perf:
+		// actually only source elements preceding the img should be used
 		var sources = pf.qsa(picture, 'source[srcset]');
 
 		for ( i = 0, len = sources.length; i < len; i++ ) {
