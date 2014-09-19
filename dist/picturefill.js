@@ -692,11 +692,7 @@ window.matchMedia || (window.matchMedia = function() {
 				//Todo: https://github.com/scottjehl/picturefill/issues/266#issuecomment-55789534
 				img.setAttribute( "width", parseInt( data.cWidth, 10) );
 				//img.setAttribute( "height", parseInt( img[ pf.ns ].nH * ( data.cWidth / img[ pf.ns ].nW ), 10) );
-			} else {
-				img.removeAttribute( "width" );
-				//img.removeAttribute( "height" );
 			}
-
 		}
 	};
 
