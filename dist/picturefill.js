@@ -1,4 +1,4 @@
-/*! Picturefill - v2.1.0 - 2014-09-18
+/*! Picturefill - v2.1.0 - 2014-09-19
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -686,15 +686,15 @@ window.matchMedia || (window.matchMedia = function() {
 
 				img.setAttribute( "width", parseInt( (img[ pf.ns ].nW / data.res) / pf.options.resQuantifier, 10) );
 
-				img.setAttribute( "height", parseInt((img[ pf.ns ].nH / data.res) / pf.options.resQuantifier, 10) );
+				//img.setAttribute( "height", parseInt((img[ pf.ns ].nH / data.res) / pf.options.resQuantifier, 10) );
 
 			} else if( data.desc.type == "w" ) {
 				//Todo: https://github.com/scottjehl/picturefill/issues/266#issuecomment-55789534
 				img.setAttribute( "width", parseInt( data.cWidth, 10) );
-				img.setAttribute( "height", parseInt( img[ pf.ns ].nH * ( data.cWidth / img[ pf.ns ].nW ), 10) );
+				//img.setAttribute( "height", parseInt( img[ pf.ns ].nH * ( data.cWidth / img[ pf.ns ].nW ), 10) );
 			} else {
 				img.removeAttribute( "width" );
-				img.removeAttribute( "height" );
+				//img.removeAttribute( "height" );
 			}
 
 		}

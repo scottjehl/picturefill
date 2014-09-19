@@ -637,15 +637,15 @@
 
 				img.setAttribute( "width", parseInt( (img[ pf.ns ].nW / data.res) / pf.options.resQuantifier, 10) );
 
-				img.setAttribute( "height", parseInt((img[ pf.ns ].nH / data.res) / pf.options.resQuantifier, 10) );
+				//img.setAttribute( "height", parseInt((img[ pf.ns ].nH / data.res) / pf.options.resQuantifier, 10) );
 
 			} else if( data.desc.type == "w" ) {
 				//Todo: https://github.com/scottjehl/picturefill/issues/266#issuecomment-55789534
 				img.setAttribute( "width", parseInt( data.cWidth, 10) );
-				img.setAttribute( "height", parseInt( img[ pf.ns ].nH * ( data.cWidth / img[ pf.ns ].nW ), 10) );
+				//img.setAttribute( "height", parseInt( img[ pf.ns ].nH * ( data.cWidth / img[ pf.ns ].nW ), 10) );
 			} else {
 				img.removeAttribute( "width" );
-				img.removeAttribute( "height" );
+				//img.removeAttribute( "height" );
 			}
 
 		}
