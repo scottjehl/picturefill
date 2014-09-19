@@ -542,7 +542,6 @@
 		}
 	};
 
-	//TODO: minimize amount of closures
 	pf.loadImg = function( img, bestCandidate, src ) {
 
 		var cleanUp = img[ pf.ns ].loadGC;
