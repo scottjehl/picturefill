@@ -1,5 +1,4 @@
 (function(window, jQuery) {
-	/* jscs: enable */
 
 	var pf = picturefill._;
 

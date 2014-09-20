@@ -142,7 +142,7 @@
 		var origLength = length;
 		var value = false;
 
-		if ( !pf.lengthCache[ origLength ] ) {
+		if ( !(origLength in pf.lengthCache) ) {
 			// If a length is specified and doesn’t contain a percentage, and it is greater than 0 or using `calc`, use it. Else, use the `100vw` default.
 
 			parsedLength = length.match( regLength );
@@ -397,7 +397,7 @@
 				body.removeChild( div );
 
 				//also update eminpx before returning
-				eminpx = parseFloat(eminpx, 10);
+				eminpx = parseFloat( eminpx, 10 );
 			} catch(e){}
 
 			// restore the original values
@@ -676,6 +676,7 @@
 		return match;
 	};
 
+	var alwaysCheckWDescriptor = pf.srcsetSupported && !pf.sizesSupported;
 	pf.parseSets = function( element, parent, options ) {
 
 		var srcsetAttribute, fallbackCandidate, srcsetChanged, hasWDescripor;
@@ -721,7 +722,9 @@
 			};
 			element[ pf.ns ].sets.push( fallbackCandidate );
 
-			hasWDescripor = pf.hasWDescripor( fallbackCandidate );
+			hasWDescripor = (alwaysCheckWDescriptor || element[ pf.ns ].src) ?
+				pf.hasWDescripor( fallbackCandidate ) :
+				false;
 
 			// add normal src as candidate, if source has no w descriptor, we do not test for 1x descriptor,
 			// because this doesn't change computation. i.e.: we might have one candidate more, but this candidate
@@ -852,7 +855,16 @@
 			throw( "reparse should only run on specific elements." );
 		}
 
-		elements = options.elements || pf.qsa( doc, ( options.reevaluate || options.reparse ) ? pf.selector : pf.shortSelector );
+		if( options.elements && options.elements.nodeType === 1 ) {
+			if ( options.elements.nodeName.toUpperCase() === "IMG" ) {
+				options.elements =  [options.elements];
+			} else {
+				options.context = options.elements;
+				options.elements =  null;
+			}
+		}
+
+		elements = options.elements || pf.qsa( (options.context || doc), ( options.reevaluate || options.reparse ) ? pf.selector : pf.shortSelector );
 
 		if ( (plen = elements.length) ) {
 			alreadyRun = true;
