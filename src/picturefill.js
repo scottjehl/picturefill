@@ -199,14 +199,14 @@
 				}
 			}
 
-			pf.lengthCache[origLength] = value;
+			pf.lengthCache[ origLength ] = value;
 
 			if ( value === false ) {
 				warn( "invalid source size value: " + origLength );
 			}
 		}
 
-		return pf.lengthCache[origLength];
+		return pf.lengthCache[ origLength ];
 	};
 
 	// container of supported mime types that one might need to qualify before using
@@ -677,6 +677,7 @@
 	};
 
 	pf.parseSets = function( element, parent, options ) {
+
 		var srcsetAttribute, fallbackCandidate, srcsetChanged, hasWDescripor;
 
 		var hasPicture = parent.nodeName.toUpperCase() === "PICTURE";
@@ -710,8 +711,6 @@
 		element[ pf.ns ].sets = [];
 
 		if ( hasPicture ) {
-			// IE9 video workaround
-
 			getAllSourceElements( parent, element[ pf.ns ].sets );
 		}
 
@@ -723,10 +722,15 @@
 			element[ pf.ns ].sets.push( fallbackCandidate );
 
 			hasWDescripor = pf.hasWDescripor( fallbackCandidate );
-		}
 
-		// add normal src as candidate, if source has no w descriptor
-		if ( element[ pf.ns ].src && !hasWDescripor ) {
+			// add normal src as candidate, if source has no w descriptor, we do not test for 1x descriptor,
+			// because this doesn't change computation. i.e.: we might have one candidate more, but this candidate
+			// would never be  chosen
+			if ( !hasWDescripor && element[ pf.ns ].src ) {
+				fallbackCandidate.srcset += ", " + element[ pf.ns ].src;
+				fallbackCandidate.candidates = false;
+			}
+		} else if ( element[ pf.ns ].src ) {
 			element[ pf.ns ].sets.push( {
 				srcset: element[ pf.ns ].src,
 				sizes: null
@@ -740,16 +744,16 @@
 		element[ pf.ns ].parsed = true;
 	};
 
-	pf.hasWDescripor = function( candidate ) {
+	pf.hasWDescripor = function( set ) {
 
-		if ( !candidate ) {
+		if ( !set ) {
 			return false;
 		}
 		var i;
-		var srcset = pf.parseSet( candidate );
+		var candidates = pf.parseSet( set );
 		var ret = false;
-		for ( i = 0; i < srcset.length; i++ ) {
-			if ( srcset[ 0 ].descriptor && srcset[ 0 ].descriptor.type === "w" ) {
+		for ( i = 0; i < candidates.length; i++ ) {
+			if ( candidates[ 0 ].desc.type === "w" ) {
 				ret = true;
 				break;
 			}

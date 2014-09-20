@@ -6,7 +6,6 @@
 	var saveCache = {};
 
 	var forceElementParsing = function( element, options ){
-
 		if ( !element[ pf.ns ] ) {
 			element[ pf.ns ] = {};
 			pf.parseSets( element, element.parentNode, options || {} );
@@ -125,6 +124,68 @@
 			equal( $srcsetImageW.prop( "src" ), pf.makeUrl( "medium.jpg" ), "Picturefill changes source of image" );
 		}
 
+	});
+
+	test("parseSets", function(){
+		//forceElementParsing
+		var $srcsetImageW = $( "<img />" )
+				.attr({
+					srcset: "medium.jpg 480w,\n small.jpg  320w",
+					src: "normalw.jpg"
+				})
+				.prependTo('#qunit-fixture')
+			;
+		var $srcsetImageX = $( "<img />" )
+				.attr({
+					srcset: "twoX.jpg 2x, threeX.png 3x",
+					src: "normalx.jpg"
+				})
+				.prependTo('#qunit-fixture')
+			;
+		var $pictureSet = $( "<picture />" )
+				.html( "" +
+					"<source srcset='twoX.jpg 2x, threeX.png 3x' media='(min-width: 800px)' />" +
+					"<img src='normal.jpg' />" +
+				"" )
+				.prependTo('#qunit-fixture')
+			;
+
+		$.each([
+			{
+				name: "srcset with w descriptor + additional src",
+				elem: $srcsetImageW,
+				sets: 1,
+				candidates: [2]
+			},
+			{
+				name: "srcset with x descriptor + additional src",
+				elem: $srcsetImageX,
+				sets: 1,
+				candidates: [3]
+			},
+			{
+				name: "srcset with x descriptor + additional src",
+				elem: $pictureSet.find( "img" ),
+				sets: 2,
+				candidates: [2, 1]
+			}
+		], function(i, testData){
+
+
+
+			forceElementParsing( testData.elem[0] );
+			var sets = testData.elem.prop( pf.ns ).sets;
+
+
+
+			equal( sets.length, testData.sets, "parseSets parses right amount of sets. " + testData.name );
+
+			$.each( sets, function( i, set ){
+				pf.parseSet( set );
+				equal( set.candidates.length, testData.candidates[ i ], "parseSets parses right amount of candidates inside a set. " + testData.name );
+			} );
+
+		});
 	});
 
 	test("calcLength", function() {
