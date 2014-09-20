@@ -193,8 +193,8 @@
 		*
 		* 1. Let input (`srcset`) be the value passed to this algorithm.
 		* 2. Let position be a pointer into input, initially pointing at the start of the string.
-		* 3. Let raw candidates be an initially empty ordered list of URLs with associated 
-		*    unparsed descriptors. The order of entries in the list is the order in which entries 
+		* 3. Let raw candidates be an initially empty ordered list of URLs with associated
+		*    unparsed descriptors. The order of entries in the list is the order in which entries
 		*    are added to the list.
 		*/
 		var candidates = [];
@@ -221,7 +221,7 @@
 				}
 				srcset = srcset.slice( pos + 1 );
 
-				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and 
+				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and
 				// let that be descriptors.
 				if ( descriptor === null ) {
 					var descpos = srcset.indexOf(",");
@@ -250,7 +250,7 @@
 	};
 
 	pf.parseDescriptor = function( descriptor, sizesattr ) {
-		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list 
+		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list
 		// is the order in which entries are added to the list.
 		var sizes = sizesattr || "100vw",
 			sizeDescriptor = descriptor && descriptor.replace(/(^\s+|\s+$)/g, ""),
@@ -579,9 +579,9 @@
 	} else if ( typeof define === "function" && define.amd ){
 		// AMD support
 		define( function() { return picturefill; } );
-	} else if ( typeof w === "object" ) {
-		// If no AMD and we are in the browser, attach to window
-		w.picturefill = picturefill;
 	}
 
-} )( this, this.document );
+	// Attach to window
+	w.picturefill = picturefill;
+
+} )( window, window.document );
