@@ -1,4 +1,4 @@
-/*! Picturefill - v2.1.0 - 2014-09-19
+/*! Picturefill - v2.1.0 - 2014-09-20
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -395,7 +395,7 @@ window.matchMedia || (window.matchMedia = function() {
 				// 7. Add url to raw candidates, associated with descriptors.
 				if ( ( url || descriptor ) && ( descriptor = parseDescriptor( descriptor ) ) ) {
 					set.candidates.push({
-						url: url,
+						url: url.replace(/^,+/, ""),
 						desc: descriptor,
 						set: set
 					});
@@ -591,7 +591,6 @@ window.matchMedia || (window.matchMedia = function() {
 		}
 	};
 
-	//TODO: minimize amount of closures
 	pf.loadImg = function( img, bestCandidate, src ) {
 
 		var cleanUp = img[ pf.ns ].loadGC;
@@ -752,32 +751,8 @@ window.matchMedia || (window.matchMedia = function() {
 		return match;
 	};
 
-	pf.hasNonXDescriptor = function( candidate ) {
-		var i;
-		var srcset = pf.parseSet( candidate );
-		var ret = false;
-		for( i = 0; i < srcset.length; i++ ) {
-			if ( srcset[ 0 ].descriptor && srcset[ 0 ].descriptor.type != 'x' ) {
-				ret = true;
-				break;
-			}
-		}
-		return ret;
-	};
-
-	pf.needsSrcsetPolyfill = function( candidate ) {
-		if ( !candidate ) { return false; }
-		var needsPolyfill = !pf.srcsetSupported;
-
-		if ( !needsPolyfill && !pf.sizesSupported &&
-			( candidate.sizes || pf.hasNonXDescriptor( candidate ) ) ) {
-			needsPolyfill = true;
-		}
-		return needsPolyfill;
-	};
-
 	pf.parseSets = function( element, parent, options ) {
-		var srcsetAttribute, fallbackCandidate , srcsetChanged;
+		var srcsetAttribute, fallbackCandidate , srcsetChanged, hasWDescripor;
 
 		var hasPicture = parent.nodeName.toUpperCase() === "PICTURE";
 
@@ -799,13 +774,7 @@ window.matchMedia || (window.matchMedia = function() {
 			if ( pf.srcsetSupported ) {
 				if ( srcsetAttribute ) {
 					element.setAttribute( pf.srcsetAttr, srcsetAttribute );
-					// FF with enabled picture crashes on removeAttribute with update to 33
-					// the workaround can be removed
-					if ( pf.srcsetSupported && !pf.sizesSupported ) {
-						element.srcset = "";
-					} else {
-						element.removeAttribute( "srcset" );
-					}
+					element.removeAttribute( "srcset" );
 
 				} else {
 					element.removeAttribute( pf.srcsetAttr );
@@ -831,18 +800,40 @@ window.matchMedia || (window.matchMedia = function() {
 			};
 			element[ pf.ns ].sets.push( fallbackCandidate );
 
+			hasWDescripor = pf.hasWDescripor( fallbackCandidate );
 		}
 
-		if( element[ pf.ns ].src ) {
+
+		// add normal src has candidate, if source has no w descriptor
+		if( element[ pf.ns ].src && !hasWDescripor ) {
 			element[ pf.ns ].sets.push( {
 				srcset: element[ pf.ns ].src,
 				sizes: null
 			} );
 		}
 
-		element[ pf.ns ].supported = !( hasPicture || srcsetChanged || pf.needsSrcsetPolyfill( fallbackCandidate ) );
+		// if img has picture or the srcset was removed or has a srcset and does not support or
+		// has a w descriptor (and does not support sizes) set support to false to evaluate
+		element[ pf.ns ].supported = !( hasPicture || srcsetChanged || ( fallbackCandidate && !pf.srcsetSupported ) || hasWDescripor );
 
 		element[ pf.ns ].parsed = true;
+	};
+
+	pf.hasWDescripor = function( candidate ) {
+
+		if( !candidate ) {
+			return false;
+		}
+		var i;
+		var srcset = pf.parseSet( candidate );
+		var ret = false;
+		for( i = 0; i < srcset.length; i++ ) {
+			if ( srcset[ 0 ].descriptor && srcset[ 0 ].descriptor.type == "w" ) {
+				ret = true;
+				break;
+			}
+		}
+		return ret;
 	};
 
 	function getAllSourceElements(picture , candidates) {
@@ -918,7 +909,17 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 		}
 	};
+
+	/**
+	 * alreadyRun flag used for setOptions. is it true setOptions will reevaluate
+	 * @type {boolean}
+	 */
 	var alreadyRun = false;
+
+	/**
+	 *
+	 * @param opt
+	 */
 	var picturefill = function ( opt ) {
 		var elements, i, plen, xParse;
 

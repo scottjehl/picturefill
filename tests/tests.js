@@ -460,7 +460,7 @@
 		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
 
 
-		srcset = ",,,,foo.png 1x, ,,,,,bar 2x";
+		srcset = ",,,,foo.png 1x, ,,,,,bar 2x, , ,bar2 3x";
 		expected = [
 			{
 				url: "foo.png",
@@ -469,6 +469,10 @@
 			{
 				url: "bar",
 				res: 2
+			},
+			{
+				url: "bar2", //why not ,bar2?
+				res: 3
 			}
 		];
 		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );

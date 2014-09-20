@@ -702,32 +702,8 @@
 		return match;
 	};
 
-	pf.hasNonXDescriptor = function( candidate ) {
-		var i;
-		var srcset = pf.parseSet( candidate );
-		var ret = false;
-		for( i = 0; i < srcset.length; i++ ) {
-			if ( srcset[ 0 ].descriptor && srcset[ 0 ].descriptor.type != 'x' ) {
-				ret = true;
-				break;
-			}
-		}
-		return ret;
-	};
-
-	pf.needsSrcsetPolyfill = function( candidate ) {
-		if ( !candidate ) { return false; }
-		var needsPolyfill = !pf.srcsetSupported;
-
-		if ( !needsPolyfill && !pf.sizesSupported &&
-			( candidate.sizes || pf.hasNonXDescriptor( candidate ) ) ) {
-			needsPolyfill = true;
-		}
-		return needsPolyfill;
-	};
-
 	pf.parseSets = function( element, parent, options ) {
-		var srcsetAttribute, fallbackCandidate , srcsetChanged;
+		var srcsetAttribute, fallbackCandidate , srcsetChanged, hasWDescripor;
 
 		var hasPicture = parent.nodeName.toUpperCase() === "PICTURE";
 
@@ -749,13 +725,7 @@
 			if ( pf.srcsetSupported ) {
 				if ( srcsetAttribute ) {
 					element.setAttribute( pf.srcsetAttr, srcsetAttribute );
-					// FF with enabled picture crashes on removeAttribute with update to 33
-					// the workaround can be removed
-					if ( pf.srcsetSupported && !pf.sizesSupported ) {
-						element.srcset = "";
-					} else {
-						element.removeAttribute( "srcset" );
-					}
+					element.removeAttribute( "srcset" );
 
 				} else {
 					element.removeAttribute( pf.srcsetAttr );
@@ -781,19 +751,40 @@
 			};
 			element[ pf.ns ].sets.push( fallbackCandidate );
 
+			hasWDescripor = pf.hasWDescripor( fallbackCandidate );
 		}
 
-		//todo: https://github.com/scottjehl/picturefill/issues/263
-		if( element[ pf.ns ].src ) {
+
+		// add normal src has candidate, if source has no w descriptor
+		if( element[ pf.ns ].src && !hasWDescripor ) {
 			element[ pf.ns ].sets.push( {
 				srcset: element[ pf.ns ].src,
 				sizes: null
 			} );
 		}
 
-		element[ pf.ns ].supported = !( hasPicture || srcsetChanged || pf.needsSrcsetPolyfill( fallbackCandidate ) );
+		// if img has picture or the srcset was removed or has a srcset and does not support or
+		// has a w descriptor (and does not support sizes) set support to false to evaluate
+		element[ pf.ns ].supported = !( hasPicture || srcsetChanged || ( fallbackCandidate && !pf.srcsetSupported ) || hasWDescripor );
 
 		element[ pf.ns ].parsed = true;
+	};
+
+	pf.hasWDescripor = function( candidate ) {
+
+		if( !candidate ) {
+			return false;
+		}
+		var i;
+		var srcset = pf.parseSet( candidate );
+		var ret = false;
+		for( i = 0; i < srcset.length; i++ ) {
+			if ( srcset[ 0 ].descriptor && srcset[ 0 ].descriptor.type == "w" ) {
+				ret = true;
+				break;
+			}
+		}
+		return ret;
 	};
 
 	function getAllSourceElements(picture , candidates) {

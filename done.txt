@@ -17,11 +17,11 @@ https://github.com/scottjehl/picturefill/issues/270
 https://github.com/scottjehl/picturefill/issues/266 (but needs to be enabled by option)
 https://github.com/scottjehl/picturefill/issues/244
 https://github.com/scottjehl/picturefill/issues/142
+https://github.com/scottjehl/picturefill/issues/263
 
 
 Needs discussion:
 https://github.com/scottjehl/picturefill/issues/317
-https://github.com/scottjehl/picturefill/issues/263 (need info)
 
 Can't reproduce:
 https://github.com/scottjehl/picturefill/issues/241
