@@ -1,27 +1,45 @@
+-------------------
+Done things:
+-------------------
+
+In general:
+Main refactoring for runtime performance. Performance was increased by about 4x for parsing and evaluation. Performance
+increase for reevaluation was increased by 10.
+Refactoring also included, that all unit tests can also be run in supporting browsers, additionally the picturefill main function
+was added to an object, so it can be spied on. (Also good for performance testing).
+
+While refactoring some bugs without an corresponding issue where found and fixed.
+
+Following is the list of fixed bugs in your bug tracker.
+
+I laxed following the spec at one point and really would like to keep it:
+It isn't tested anymore, wether the source elements do precede the img tag. I will explain, if you want to change that.
+
 Fixed issues:
-https://github.com/scottjehl/picturefill/issues/333
-https://github.com/scottjehl/picturefill/issues/332
-https://github.com/scottjehl/picturefill/issues/331
-https://github.com/scottjehl/picturefill/issues/329
-https://github.com/scottjehl/picturefill/issues/327
-https://github.com/scottjehl/picturefill/issues/322 (but not descriptor tokenizer)
+https://github.com/scottjehl/picturefill/issues/333 (no test needed/possible)
+https://github.com/scottjehl/picturefill/issues/332 (no test needed/possible)
+https://github.com/scottjehl/picturefill/issues/331 (no test needed/possible)
+https://github.com/scottjehl/picturefill/issues/329 (no test needed/possible)
+https://github.com/scottjehl/picturefill/issues/327 (has new tests)
+https://github.com/scottjehl/picturefill/issues/322 (has new tests || but not descriptor tokenizer)
 https://github.com/scottjehl/picturefill/issues/318 (as plugin, but needs tests)
-https://github.com/scottjehl/picturefill/issues/314
-https://github.com/scottjehl/picturefill/issues/313
-https://github.com/scottjehl/picturefill/issues/311
-https://github.com/scottjehl/picturefill/issues/309 (mainly fixed, most values are calculated without element + element is removed from document)
-https://github.com/scottjehl/picturefill/issues/304
-https://github.com/scottjehl/picturefill/issues/303
-https://github.com/scottjehl/picturefill/issues/292 (not reproduced, but should be fixed because of new calculation method)
-https://github.com/scottjehl/picturefill/issues/270
-https://github.com/scottjehl/picturefill/issues/266 (but needs to be enabled by option)
-https://github.com/scottjehl/picturefill/issues/244
-https://github.com/scottjehl/picturefill/issues/142
-https://github.com/scottjehl/picturefill/issues/263
+https://github.com/scottjehl/picturefill/issues/314 (no test needed/possible)
+https://github.com/scottjehl/picturefill/issues/313 (width test)
+https://github.com/scottjehl/picturefill/issues/311 (no test needed/possible)
+https://github.com/scottjehl/picturefill/issues/309 (has new tests, mainly fixed, most values are calculated without element + element is removed from document)
+https://github.com/scottjehl/picturefill/issues/304 (will write some tests soon)
+https://github.com/scottjehl/picturefill/issues/303 (see #304)
+https://github.com/scottjehl/picturefill/issues/292 (not reproduced, but should be fixed because of new calculation method see #309)
+https://github.com/scottjehl/picturefill/issues/270 (no test needed/possible)
+https://github.com/scottjehl/picturefill/issues/266 (as an option, documented, but no tests)
+https://github.com/scottjehl/picturefill/issues/244 (no tests possible/needed)
+https://github.com/scottjehl/picturefill/issues/142 (no tests possible)
+https://github.com/scottjehl/picturefill/issues/263 (tests will be similiar to #304/#303)
+https://github.com/scottjehl/picturefill/issues/317 (no tests possible/needed)
 
-
-Needs discussion:
-https://github.com/scottjehl/picturefill/issues/317
+-------------------
+Not done things:
+-------------------
 
 Can't reproduce:
 https://github.com/scottjehl/picturefill/issues/241
