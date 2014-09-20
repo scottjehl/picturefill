@@ -855,9 +855,9 @@
 			throw( "reparse should only run on specific elements." );
 		}
 
-		if( options.elements && options.elements.nodeType === 1 ) {
+		if ( options.elements && options.elements.nodeType === 1 ) {
 			if ( options.elements.nodeName.toUpperCase() === "IMG" ) {
-				options.elements =  [options.elements];
+				options.elements =  [ options.elements ];
 			} else {
 				options.context = options.elements;
 				options.elements =  null;

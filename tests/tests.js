@@ -4,7 +4,7 @@
 
 	var saveCache = {};
 
-	var forceElementParsing = function( element, options ){
+	var forceElementParsing = function( element, options ) {
 		if ( !element[ pf.ns ] ) {
 			element[ pf.ns ] = {};
 			pf.parseSets( element, element.parentNode, options || {} );
@@ -16,7 +16,7 @@
 	module( "method", {
 		setup: function() {
 			var prop;
-			for( prop in pf ){
+			for ( prop in pf ) {
 				if ( pf.hasOwnProperty( prop ) ) {
 					saveCache[ prop ] = pf[ prop ];
 				}
@@ -25,14 +25,13 @@
 
 		teardown: function() {
 			var prop;
-			for( prop in saveCache ){
-				if( pf.hasOwnProperty(prop) && saveCache[prop] != pf[ prop ] ){
+			for ( prop in saveCache ) {
+				if ( pf.hasOwnProperty(prop) && saveCache[prop] != pf[ prop ] ) {
 					pf[prop] = saveCache[prop];
 				}
 			}
 		}
 	});
-
 
 	test( "picturefill: Picture fill is loaded and has its API ready", function() {
 		ok( window.picturefill );
@@ -48,7 +47,7 @@
 
 		pf.DPR = 1;
 
-		pf.calcLength = function(){
+		pf.calcLength = function() {
 			return 310;
 		};
 		
@@ -56,34 +55,34 @@
 			.attr({
 				srcset: "medium.jpg 480w,\n small.jpg  320w"
 			})
-			.prependTo('#qunit-fixture')
+			.prependTo("#qunit-fixture")
 		;
 		var $srcsetImageX = $( "<img />" )
 			.attr({
 				srcset: "oneX.jpg 1x, twoX.jpg 2x"
 			})
-			.prependTo('#qunit-fixture')
+			.prependTo("#qunit-fixture")
 		;
 
-		var $normalImg = $('.prop-check');
+		var $normalImg = $(".prop-check");
 
 		window.picturefill();
 		window.picturefill._.fillImgs();
 
-		$( "img[srcset], picture > img" ).each( function(){
+		$( "img[srcset], picture > img" ).each( function() {
 			picturefill._.fillImg( this, {} );
 		} );
 
 		if ( window.HTMLPictureElement ) {
-			equal( $('picture > img' ).prop( pf.ns ), undefined, "Picturefill doesn't touch images in supporting browsers." );
+			equal( $("picture > img" ).prop( pf.ns ), undefined, "Picturefill doesn't touch images in supporting browsers." );
 		} else {
 
-			ok( $('picture > img' ).prop( pf.ns ), "Picturefill modifies images in non-supporting browsers." );
+			ok( $("picture > img" ).prop( pf.ns ), "Picturefill modifies images in non-supporting browsers." );
 		}
 
 		if ( pf.srcsetSupported ) {
 
-			equal( ($srcsetImageX.prop( pf.ns ) || {supported: true}).supported, true, "Picturefill doesn't touch images in supporting browsers." );
+			equal( ($srcsetImageX.prop( pf.ns ) || { supported: true }).supported, true, "Picturefill doesn't touch images in supporting browsers." );
 			equal( $srcsetImageX.attr( "src" ), null, "Picturefill doesn't touch image sources in supporting browsers." );
 
 		} else {
@@ -91,62 +90,61 @@
 			equal( $srcsetImageX.prop( "src" ), pf.makeUrl( "oneX.jpg" ), "Picturefill changes source of image" );
 		}
 
-		if(pf.srcsetSupported && pf.sizesSupported){
+		if ( pf.srcsetSupported && pf.sizesSupported ) {
 			equal( $srcsetImageW.prop( pf.ns ), undefined, "Picturefill doesn't touch images in supporting browsers." );
 			equal( $srcsetImageW.prop( "src" ), null, "Picturefill doesn't touch image sources in supporting browsers." );
 		} else {
-
 			ok( $srcsetImageW.prop( pf.ns ), "Picturefill modifies images in non-supporting browsers." );
 			equal( $srcsetImageW.prop( "src" ), pf.makeUrl( "small.jpg" ), "Picturefill changes source of image" );
 		}
+
 		equal( $normalImg.prop( pf.ns ), undefined, "Picturefill doesn't touch normal images in any browsers." );
 		equal( $normalImg.prop( "src" ), pf.makeUrl( "bar" ), "Picturefill leaves src attribute of normal images untouched." );
 
-		if( !window.HTMLPictureElement ){
-			window.picturefill({elements: $normalImg});
+		if ( !window.HTMLPictureElement ) {
+			window.picturefill( { elements: $normalImg } );
 			ok( $normalImg.prop( pf.ns).supported, "Picturefill doesn't touch normal images in any browsers too much even if it is called explicitly." );
 			equal( $normalImg.prop( "src" ), pf.makeUrl( "bar" ), "Picturefill leaves src attribute of normal images untouched." );
 		}
 
-		if( !pf.sizesSupported ){
+		if ( !pf.sizesSupported ) {
 			pf.DPR = 2;
 
-			pf.calcLength = function(){
+			pf.calcLength = function() {
 				return 360;
 			};
 
-			window.picturefill({reevaluate: true});
+			window.picturefill( { reevaluate: true } );
 
-			if( !pf.srcsetSupported ){
+			if ( !pf.srcsetSupported ) {
 				equal( $srcsetImageX.prop( "src" ), pf.makeUrl("twoX.jpg"), "Picturefill changes source of image" );
 			}
 			equal( $srcsetImageW.prop( "src" ), pf.makeUrl( "medium.jpg" ), "Picturefill changes source of image" );
 		}
-
 	});
 
-	test("parseSets", function(){
+	test("parseSets", function() {
 		//forceElementParsing
 		var $srcsetImageW = $( "<img />" )
 				.attr({
 					srcset: "medium.jpg 480w,\n small.jpg  320w",
 					src: "normalw.jpg"
 				})
-				.prependTo('#qunit-fixture')
+				.prependTo("#qunit-fixture")
 			;
 		var $srcsetImageX = $( "<img />" )
 				.attr({
 					srcset: "twoX.jpg 2x, threeX.png 3x",
 					src: "normalx.jpg"
 				})
-				.prependTo('#qunit-fixture')
+				.prependTo("#qunit-fixture")
 			;
 		var $pictureSet = $( "<picture />" )
 				.html( "" +
 					"<source srcset='twoX.jpg 2x, threeX.png 3x' media='(min-width: 800px)' />" +
 					"<img src='normal.jpg' />" +
 				"" )
-				.prependTo('#qunit-fixture')
+				.prependTo("#qunit-fixture")
 			;
 
 		$.each([
@@ -154,32 +152,28 @@
 				name: "srcset with w descriptor + additional src",
 				elem: $srcsetImageW,
 				sets: 1,
-				candidates: [2]
+				candidates: [ 2 ]
 			},
 			{
 				name: "srcset with x descriptor + additional src",
 				elem: $srcsetImageX,
 				sets: 1,
-				candidates: [3]
+				candidates: [ 3 ]
 			},
 			{
 				name: "srcset with x descriptor + additional src",
 				elem: $pictureSet.find( "img" ),
 				sets: 2,
-				candidates: [2, 1]
+				candidates: [ 2, 1 ]
 			}
-		], function(i, testData){
-
-
+		], function(i, testData) {
 
 			forceElementParsing( testData.elem[0] );
 			var sets = testData.elem.prop( pf.ns ).sets;
 
-
-
 			equal( sets.length, testData.sets, "parseSets parses right amount of sets. " + testData.name );
 
-			$.each( sets, function( i, set ){
+			$.each( sets, function( i, set ) {
 				pf.parseSet( set );
 				equal( set.candidates.length, testData.candidates[ i ], "parseSets parses right amount of candidates inside a set. " + testData.name );
 			} );
@@ -260,8 +254,8 @@
 	test("prepareCandidates", function() {
 		var srcset, expected, sizes;
 		// Basic test
-		var runGetCandiate = function(candidate, sizes){
-			return $.map(pf.prepareCandidates({srcset: candidate, sizes: sizes || null}), function( can ){
+		var runGetCandiate = function(candidate, sizes) {
+			return $.map(pf.prepareCandidates( { srcset: candidate, sizes: sizes || null } ), function( can ) {
 				return {
 					res: can.res,
 					url: can.url
@@ -342,7 +336,6 @@
 		sizes = "1000px";
 		deepEqual(runGetCandiate(srcset, sizes), expected, "`" + srcset + "` is parsed correctly");
 
-
 		// Test with "sizes" passed with % lengths specified
 		srcset = "\npic320.png 320w	, pic640.png		640w, pic768.png 768w, \
 		\npic1536.png 1536w, pic2048.png	2048w	";
@@ -380,7 +373,6 @@
 
 		deepEqual(runGetCandiate(srcset, sizes), expected, "`" + srcset + "` is parsed correctly" );
 
-
 		srcset = "foo,bar.png 320w, bar,baz.png 320w";
 		expected = [
 			{
@@ -392,7 +384,6 @@
 			}
 		];
 		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
-
 
 		srcset = "foo,bar.png 320w,bar,baz.png 320w";
 		expected = [
@@ -406,7 +397,6 @@
 		];
 		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
 
-
 		srcset = "foo.png 1x, bar.png -2x";
 		expected = [
 			{
@@ -416,7 +406,6 @@
 		];
 		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
 
-
 		srcset = "foo.png 1x, bar.png 2q";
 		expected = [
 			{
@@ -425,7 +414,6 @@
 			}
 		];
 		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
-
 
 		srcset = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg 1x, bar.png 2x";
 		expected = [
@@ -439,7 +427,6 @@
 		];
 		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
 
-
 		srcset = "2.png 1x,1.png 2x";
 		expected = [
 			{
@@ -451,7 +438,6 @@
 			}
 		];
 		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
-
 
 		srcset = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg 2x, 1x.gif 1x, data:image/png;base64,iVBORw0KGgoAAAANSUhEUg";
 		expected = [
@@ -468,7 +454,6 @@
 		];
 		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
 
-
 		srcset = "400.gif 400w, 6000.gif 6000w";
 		expected = [
 			{
@@ -481,7 +466,6 @@
 		];
 		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
 
-
 		srcset = "800.gif 2x, 1600.gif 1600w";
 		expected = [
 			{
@@ -493,7 +477,6 @@
 			}
 		];
 		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
-
 
 		srcset = "1x,,  ,   x    ,2x	, 1x.gif, , 3x, 4x.gif 4x 100h,,, 5x.gif 5, dx.gif dx, 2x.gif   2x,";
 		expected = [
@@ -519,7 +502,6 @@
 		];
 		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
 
-
 		srcset = ",,,,foo.png 1x, ,,,,,bar 2x, , ,bar2 3x";
 		expected = [
 			{
@@ -536,12 +518,11 @@
 			}
 		];
 		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
-
 	});
 
-	test( "pf.mMQ", function(){
+	test( "pf.mMQ", function() {
 		pf.vW = 480;
-		pf.getEmValue = function(){
+		pf.getEmValue = function() {
 			return 2;
 		};
 
@@ -607,7 +588,7 @@
 
 		equal(pf.makeUrl( image.src ), pf.makeUrl( candidates[2].url ), "uses the url from the best px fit" );
 
-		if(!pf.currentSrcSupported){
+		if (!pf.currentSrcSupported) {
 			deepEqual( pf.makeUrl( image.currentSrc ), pf.makeUrl( candidates[2].url ), "uses the url from the best px fit" );
 		}
 
@@ -619,7 +600,7 @@
 
 		deepEqual(image.src, fullPath, "src left alone when matched" );
 
-		if(!pf.currentSrcSupported){
+		if (!pf.currentSrcSupported) {
 			deepEqual(image.currentSrc, fullPath, "currentSrc left alone when matched" );
 		}
 
@@ -694,7 +675,6 @@
 		equal( pf.getSet( img ).srcset, img.parentNode.getElementsByTagName( "source" )[0].getAttribute( "srcset" ) );
 	});
 
-
 	test( "getMatch returns false when no match is found", function() {
 		pf.matchesMedia = function( media ) {
 			return !media || false;
@@ -706,7 +686,6 @@
 
 		equal( pf.getSet( img ), false );
 	});
-
 
 	test( "getSet returns false when no srcset is found", function() {
 		var img = $( ".no-srcset-check ")[0];
@@ -752,9 +731,8 @@
 			return [ { url: "foo" } ];
 		};
 
-
 		picturefill({ reevaluate: false, elements: [ mockPicture ] });
-		if( !window.HTMLPictureElement ) {
+		if ( !window.HTMLPictureElement ) {
 			ok( mockPicture[ pf.ns ].evaluated );
 		} else {
 			ok( !mockPicture[ pf.ns ] );
