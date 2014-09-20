@@ -979,12 +979,17 @@ window.matchMedia || (window.matchMedia = function() {
 	if ( !w.HTMLPictureElement ) {
 		(function () {
 			var resizeThrottle;
+			var regReady = (w.attachEvent) ?
+				/^loade|^c/ :
+				/^loade|^c|^i/;
+
 			var run = function() {
 
 				if ( doc.body ) {
 					// When the document has finished loading, stop checking for new images
 					// https://github.com/ded/domready/blob/master/ready.js#L15
-					if ( /^loade|^c|^i/.test( doc.readyState || "" ) ) {
+					// IE8/9/10 is checked longer for new updates, due to a browser bug
+					if ( regReady.test( doc.readyState || "" ) ) {
 						clearInterval( intervalId );
 
 						pf.fillImgs();

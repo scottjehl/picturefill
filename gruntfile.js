@@ -46,12 +46,12 @@
 					options: {
 						jshintrc: true
 					},
-					src: [ "src/*.js", "!gruntfile.js" ] //, "Gruntfile.js", "tests/*.js"
+					src: [ "src/*.js", "tests/*.js", "!Gruntfile.js" ] //, "Gruntfile.js", "tests/*.js"
 				}
 			},
 			jscs: {
 				all: {
-					src: "<%= jshint.all.src %>"
+					src:["src/*.js"]
 				}
 			},
 			watch: {
@@ -91,5 +91,6 @@
 		// Default task.
 		grunt.registerTask("default", [ "test", "clean", "concat", "uglify", "bytesize" ]);
 		grunt.registerTask("test", [ "jshint", "qunit" ]);
+		grunt.registerTask("cleanup", [ "jshint", "jscs" ]);
 	};
 })();

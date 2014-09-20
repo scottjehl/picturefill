@@ -1,6 +1,6 @@
 {
 	"curly": true,
-	"eqeqeq": false,
+	"eqeqeq": true,
 	"immed": true,
 	"latedef": true,
 	"newcap": true,
@@ -8,8 +8,8 @@
 	"sub": true,
 	"undef": true,
 	"unused": true,
-	"boss": false,
+	"boss": true,
 	"eqnull": true,
 	"node": true,
-	"predef": [ "define", "module", "jQuery", "Sizzle", "window", "document", "Element", "MutationObserver" ]
+	"predef": [ "define", "module" ]
 }

@@ -12,30 +12,22 @@
 			// Picture element HTML shim|v it for old IE (pairs with Picturefill.js)
 			document.createElement( "picture" );
 		</script>
-		<script src="../src/picturefill.js"></script>
-		<script>
-			picturefill.setOptions('addDimensions', true);
-		</script>
-		<script src="../src/pf.mutation-plugin.js" async=""></script>
+		<script async="" src="../dist/picturefill.js"></script>
 	</head>
 	<body>
-	<picture>
-		<source media="(min-width: 1024px)" srcset="http://andreasbovens.github.io/playground/tc-picturefill/opera-big.jpg" />
-		<img src="http://andreasbovens.github.io/playground/tc-picturefill/opera-small.jpg" alt="The Oslo Opera House" />
-	</picture>
 		<a href="http://responsiveimages.org/" class="ricg"><img src="https://raw.github.com/ResponsiveImagesCG/meta/master/logo/Web/RICG_logo_small.png"></a>
 
 
 
 		<h3>An img with "srcset" and sizes" attributes:</h3>
 <pre><code>&lt;img sizes=&quot;(min-width: 40em) 80vw, 100vw&quot;
-srcset=&quot;../examples/images/medium.jpg 680w, ../examples/images/large.jpg 980w, ../examples/images/extralarge.jpg 1400w&quot; alt=&quot;A giant stone face at The Bayon temple in Angkor Thom, Cambodia&quot;&gt;
+srcset=&quot;../examples/images/medium.jpg 375w, ../examples/images/large.jpg 480w, ../examples/images/extralarge.jpg 768w&quot; alt=&quot;A giant stone face at The Bayon temple in Angkor Thom, Cambodia&quot;&gt;
 </code></pre>
 
 		<p>Here's how that renders in the browser. Feel free to resize to see it change.</p>
 
 		<img sizes="(min-width: 40em) 80vw, 100vw"
-				srcset="../examples/images/small.jpg 680w, ../examples/images/large.jpg 980w, ../examples/images/extralarge.jpg 1400w" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+				srcset="../examples/images/small.jpg 375w, ../examples/images/large.jpg 480w, ../examples/images/extralarge.jpg 768w" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 
 	</body>
 </html>
