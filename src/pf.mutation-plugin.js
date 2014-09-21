@@ -1,7 +1,7 @@
-(function( w, factory ) {
+(function( factory ) {
 	"use strict";
-	if ( w.picturefill ) {
-		factory( w.picturefill );
+	if ( window.picturefill ) {
+		factory( window.picturefill );
 		factory = function() {};
 	} else if ( typeof define === "function" && define.amd ) {
 		// AMD. Register as an anonymous module.
@@ -15,14 +15,14 @@
 		throw( "you need to include picturefill" );
 	}
 
-}( this.window || this, function( picturefill ) {
+}( function( picturefill ) {
 	"use strict";
-	var w = this && this.window || this;
-	var document = w.document;
-	var Element = w.Element;
-	var MutationObserver = w.MutationObserver;
+
+	var document = window.document;
+	var Element = window.Element;
+	var MutationObserver = window.MutationObserver;
 	var noop = function() {};
-	var jQuery = w.jQuery;
+	var jQuery = window.jQuery;
 	var pfobserver = {
 		disconnect: noop,
 		take: noop,
@@ -71,7 +71,7 @@
 			pf.teardownRun();
 		}
 	};
-	
+
 	var elemProto = Element && Element.prototype;
 
 	if ( elemProto && !elemProto.matches ) {
@@ -227,8 +227,8 @@
 			var run;
 			var running = false;
 			var mutations = [];
-			var setImmediate = w.setImmediate || w.setTimeout;
-			return w.HTMLPictureElement ?
+			var setImmediate = window.setImmediate || window.setTimeout;
+			return window.HTMLPictureElement ?
 				noop :
 				function(mutation) {
 				if ( !running ) {
@@ -299,7 +299,7 @@
 		};
 	})();
 
-	if ( !w.HTMLPictureElement && MutationObserver ) {
+	if ( !window.HTMLPictureElement && MutationObserver ) {
 		(function() {
 			var oldOnReady = pf.onReady;
 			if ( pf.isReady ) {
