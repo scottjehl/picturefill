@@ -1,7 +1,7 @@
-(function( window, factory ) {
+(function( w, factory ) {
 	"use strict";
-	if ( window.picturefill ) {
-		factory( window.picturefill );
+	if ( w.picturefill ) {
+		factory( w.picturefill );
 		factory = function() {};
 	} else if ( typeof define === "function" && define.amd ) {
 		// AMD. Register as an anonymous module.
@@ -17,12 +17,12 @@
 
 }( this.window || this, function( picturefill ) {
 	"use strict";
-	var window = window || this;
-	var document = window.document;
-	var Element = window.Element;
-	var MutationObserver = window.MutationObserver;
+	var w = this && this.window || this;
+	var document = w.document;
+	var Element = w.Element;
+	var MutationObserver = w.MutationObserver;
 	var noop = function() {};
-	var jQuery = window.jQuery;
+	var jQuery = w.jQuery;
 	var pfobserver = {
 		disconnect: noop,
 		take: noop,
@@ -227,8 +227,8 @@
 			var run;
 			var running = false;
 			var mutations = [];
-			var setImmediate = window.setImmediate || window.setTimeout;
-			return window.HTMLPictureElement ?
+			var setImmediate = w.setImmediate || w.setTimeout;
+			return w.HTMLPictureElement ?
 				noop :
 				function(mutation) {
 				if ( !running ) {
@@ -299,7 +299,7 @@
 		};
 	})();
 
-	if ( !window.HTMLPictureElement && MutationObserver ) {
+	if ( !w.HTMLPictureElement && MutationObserver ) {
 		(function() {
 			var oldOnReady = pf.onReady;
 			if ( pf.isReady ) {
