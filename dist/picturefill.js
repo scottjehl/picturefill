@@ -1,4 +1,4 @@
-/*! Picturefill - v2.1.0 - 2014-09-20
+/*! Picturefill - v2.1.0 - 2014-09-21
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -832,6 +832,8 @@ window.matchMedia || (window.matchMedia = function() {
 					type: source.getAttribute( "type" ),
 					sizes: source.getAttribute( "sizes" )
 				} );
+			} else if ( source.getAttribute( "src" ) ) {
+				warn( "The `src` attribute is invalid on `picture source` element, use `srcset`." );
 			}
 		}
 	}
@@ -904,9 +906,9 @@ window.matchMedia || (window.matchMedia = function() {
 			throw( "reparse should only run on specific elements." );
 		}
 
-		if( options.elements && options.elements.nodeType === 1 ) {
+		if ( options.elements && options.elements.nodeType === 1 ) {
 			if ( options.elements.nodeName.toUpperCase() === "IMG" ) {
-				options.elements =  [options.elements];
+				options.elements =  [ options.elements ];
 			} else {
 				options.context = options.elements;
 				options.elements =  null;

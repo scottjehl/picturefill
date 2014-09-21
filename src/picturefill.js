@@ -783,6 +783,8 @@
 					type: source.getAttribute( "type" ),
 					sizes: source.getAttribute( "sizes" )
 				} );
+			} else if ( source.getAttribute( "src" ) ) {
+				warn( "The `src` attribute is invalid on `picture source` element, use `srcset`." );
 			}
 		}
 	}

@@ -51,7 +51,7 @@
 			},
 			jscs: {
 				all: {
-					src:["src/*.js"]
+					src:["<%= jshint.all.src %>"]
 				}
 			},
 			watch: {
@@ -90,7 +90,6 @@
 
 		// Default task.
 		grunt.registerTask("default", [ "test", "clean", "concat", "uglify", "bytesize" ]);
-		grunt.registerTask("test", [ "jshint", "qunit" ]);
-		grunt.registerTask("cleanup", [ "jshint", "jscs" ]);
+		grunt.registerTask("test", [ "jshint", "jscs", "qunit" ]);
 	};
 })();
