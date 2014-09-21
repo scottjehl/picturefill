@@ -59,9 +59,9 @@
 		noop
 	;
 
-	function qsa(context, sel) {
+	pf.qsa = function(context, sel) {
 		return context.querySelectorAll(sel);
-	}
+	};
 
 	/**
 	 * Shortcut property for https://w3c.github.io/webappsec/specs/mixedcontent/#restricts-mixed-content ( for easy overriding in tests )
@@ -491,20 +491,19 @@
 
 		//if current candidate is comming from the same set and also fit, do not change
 		if ( curCandidate && candidates[0] && curCandidate.set === candidates[0].set && curCandidate.res >= dpr ) {
-			bestCandidate = curCandidate;
-		} else {
+			return;
+		}
 
-			candidates.sort( ascendingSort );
+		candidates.sort( ascendingSort );
 
-			length = candidates.length;
-			bestCandidate = candidates[ length - 1 ];
+		length = candidates.length;
+		bestCandidate = candidates[ length - 1 ];
 
-			for ( var i = 0; i < length; i++ ) {
-				candidate = candidates[ i ];
-				if ( candidate.res >= dpr ) {
-					bestCandidate = candidate;
-					break;
-				}
+		for ( var i = 0; i < length; i++ ) {
+			candidate = candidates[ i ];
+			if ( candidate.res >= dpr ) {
+				bestCandidate = candidate;
+				break;
 			}
 		}
 
@@ -874,7 +873,7 @@
 			}
 		}
 
-		elements = options.elements || qsa( (options.context || doc), ( options.reevaluate || options.reparse ) ? pf.selector : pf.shortSelector );
+		elements = options.elements || pf.qsa( (options.context || doc), ( options.reevaluate || options.reparse ) ? pf.selector : pf.shortSelector );
 
 		if ( (plen = elements.length) ) {
 			alreadyRun = true;

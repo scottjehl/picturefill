@@ -224,7 +224,6 @@
 		var domMethods = [ "appendChild", "insertBefore", "removeChild" ];
 
 		addMutation = (function() {
-			var run;
 			var running = false;
 			var mutations = [];
 			var setImmediate = window.setImmediate || window.setTimeout;
@@ -235,12 +234,14 @@
 					running = true;
 					if ( !addMutation.take ) {
 						addMutation.take = function() {
-							pf.onMutations( mutations );
-							mutations = [];
+							if ( mutations.length ) {
+								pf.onMutations( mutations );
+								mutations = [];
+							}
 							running = false;
 						};
 					}
-					setImmediate( run );
+					setImmediate( addMutation.take );
 				}
 				mutations.push( mutation );
 			};
