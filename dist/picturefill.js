@@ -865,11 +865,18 @@ window.matchMedia || (window.matchMedia = function() {
 		}
 	};
 
+	var resizeThrottle;
 	pf.setupRun = function( options ) {
-		//invalidate cache
-		if ( !options || options.reevaluate || options.reparse ){
+		//invalidate length cache
+		if ( !options || options.reevaluate || options.reparse ) {
 			pf.lengthCache = {};
 		}
+
+		// if all images are reevaluated clear the resizetimer
+		if ( options && options.reevaluate && !options.elements && !options.context ) {
+			clearTimeout( resizeThrottle );
+		}
+		updateView();
 	};
 
 	pf.teardownRun = function( /*options*/ ) {
@@ -959,7 +966,6 @@ window.matchMedia || (window.matchMedia = function() {
 	 */
 	if ( !w.HTMLPictureElement ) {
 		(function() {
-			var resizeThrottle;
 			var regReady = (w.attachEvent) ?
 				/^loade|^c/ :
 				/^loade|^c|^i/;
@@ -987,7 +993,7 @@ window.matchMedia || (window.matchMedia = function() {
 			var intervalId = setInterval( run, 333);
 
 			var resizeEval = function() {
-				updateView();
+
 				pf.fillImgs({ reevaluate: true });
 			};
 			var onResize = function() {
@@ -1001,8 +1007,6 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 			setTimeout(run, doc.body ? 9 : 99);
 		})();
-
-		updateView();
 		// test webp support
 		pf.createImageTest( "image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=" );
 	}
