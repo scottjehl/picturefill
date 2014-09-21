@@ -17,7 +17,7 @@
 
 }( this.window || this, function( picturefill ) {
 	"use strict";
-	var window = this.window || this;
+	var window = window || this;
 	var document = window.document;
 	var Element = window.Element;
 	var MutationObserver = window.MutationObserver;
