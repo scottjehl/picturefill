@@ -4,17 +4,31 @@ Done things:
 
 In general:
 Main refactoring including some caches (element specific caches and some global caches).
-30+ Test (old had 50 assertions, new has now 80).
+31+ Test (old had 50 assertions, new has now 81).
 Performance increase for reevaluation is now 10x faster. On normal pages with 5-20 image/source elements there is
-no performance improvement for initialisation (but it's in total just about 2-5ms). Because I needed
-to add some additional checks to fix some bugs. But If you use a lot of img/source elements
+no performance improvement for initialisation, because I needed  to add some additional checks to fix some
+bugs (but it's in total just about 2-5ms, so no problem). But If you use a lot of img/source elements
 the new cache mechanism kicks in and the new picturefill becomes significantly faster
 compared to the old version (especially on Safari and IE8+). So it scales much much better.
-(I.e. with 100 images about 10 different formats/variations Safari needs 8ms while old picturefill takes about 30ms).
+(For example if about 80 images/sources are used, Safari needs 8ms while old picturefill took about 30ms).
 Refactoring also included, that all unit tests can now be run in supporting browsers (Chrome) and I made some
 tweaks to also run the unit tests in IE8+.
 
 A small compare view: https://github.com/aFarkas/picturefill/compare/scottjehl:master...master
+
+New features:
+
+- simple mediaqueries are now also supported in IE8
+- Performance (Resize-Performance, "Scales better", Network-Performance see below)
+- Does not download a new image,
+	- if it has already a better candidate from the same set (maybe needs an option, some people might not understand this and think it's a bug)
+	- while window is resized
+- Loads new candidates in background for "smooth" Transition between candidates
+- addDimensions (option)
+- resQuantifier (option)
+- the ``elements`` parameter can now also handle a DOM node (if an img is passed this is polyfilled, if another element is used this is used as the context)
+- Mutationobserver (plugin)
+- improved errormessages for bad descriptors, bad sizes and wrong source positioning
 
 Additionally I found some unknown/undocumented bugs and fixed them.
 
@@ -42,24 +56,10 @@ https://github.com/scottjehl/picturefill/issues/142 (no tests possible)
 https://github.com/scottjehl/picturefill/issues/263 (with tests see 303)
 https://github.com/scottjehl/picturefill/issues/317 (no tests possible/needed)
 
-
 IMPORTANT/CAUTION
 ------------------
 I relaxed the implementation at one point and really would like to keep it:
 It isn't tested anymore, wether the source elements do precede the img tag. I will explain, if you want to change that.
-
-New features:
-
-- Performance (Resize-Performance, Scales better", Network-Performance see below)
-- Does not download a new image,
-	- if it has already a better candidate from the same set
-	- while window is resized
-- Loads new candidates in background for "smooth" Transition between candidates
-- addDimensions (option)
-- resQuantifier (option)
-- Mutationobserver (plugin)
-
-
 
 -------------------
 Not done things:

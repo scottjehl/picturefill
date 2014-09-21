@@ -41,10 +41,6 @@
 		pf.selector += ", img[" + pf.srcsetAttr + "]";
 	}
 
-	pf.qsa = function(context, sel) {
-		return context.querySelectorAll(sel);
-	};
-
 	var anchor = doc.createElement( "a" );
 	pf.makeUrl = function(src) {
 		anchor.href = src;
@@ -62,6 +58,10 @@
 		} :
 		noop
 	;
+
+	function qsa(context, sel) {
+		return context.querySelectorAll(sel);
+	}
 
 	/**
 	 * Shortcut property for https://w3c.github.io/webappsec/specs/mixedcontent/#restricts-mixed-content ( for easy overriding in tests )
@@ -764,17 +764,18 @@
 		return ret;
 	};
 
-	function getAllSourceElements(picture, candidates) {
+	function getAllSourceElements( picture, candidates ) {
 		var i, len, source, srcset;
 
 		// SPEC mismatch intended for size and perf:
 		// actually only source elements preceding the img should be used
-		var sources = pf.qsa(picture, "source[srcset]");
+		// also note: don't use qsa here, because IE8 sometimes doesn't like source as the key part in a selector
+		var sources = picture.getElementsByTagName( "source" );
 
 		for ( i = 0, len = sources.length; i < len; i++ ) {
 			source = sources[ i ];
-			srcset = source.getAttribute( "srcset" );
 
+			srcset = source.getAttribute( "srcset" );
 			// if source does not have a srcset attribute, skip
 			if ( srcset ) {
 				candidates.push( {
@@ -866,7 +867,7 @@
 			}
 		}
 
-		elements = options.elements || pf.qsa( (options.context || doc), ( options.reevaluate || options.reparse ) ? pf.selector : pf.shortSelector );
+		elements = options.elements || qsa( (options.context || doc), ( options.reevaluate || options.reparse ) ? pf.selector : pf.shortSelector );
 
 		if ( (plen = elements.length) ) {
 			alreadyRun = true;

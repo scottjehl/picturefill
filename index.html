@@ -195,19 +195,19 @@ picturefill();
 		<p>When running the <code>picturefill()</code> function, you can pass options specifying the following settings:</p>
 
 		<ul>
-			<li><strong>Elements:</strong> An array of <code>picture</code> and <code>img[srcset]</code> elements you'd like picturefill to evaluate. The Default value for <code>options.elements</code> is all <code>picture > img</code> and <code>img[srcset]</code> elements in the page.
+			<li><strong>Elements:</strong> Takes either an array or array-like object of <code>picture > img</code> and <code>img[srcset]</code> elements you'd like picturefill to evaluate or a DOM element, in which picturefill should to query for <code>picture > img, img[srcset]</code>. The Default value for <code>options.elements</code> is all <code>picture > img</code> and <code>img[srcset]</code> elements in the document.
 <pre><code>picturefill( {
-	elements: [ document.getElementById( "myPicture" ) ]
+	elements: [ document.getElementById( "myImage" ) ]
 } );
 </code></pre>
 			</li>
-			<li><strong>Reevaluate:</strong> Force picturefill to evaluate all elements in the <code>options.elements</code> array, even if they've already been evaluated. The default is <code>false</code>, except when a resize event triggers Picturefill to run (<code>options.reevaluate</code> is <code>true</code> in that case).
+			<li><strong>Reevaluate:</strong> Force picturefill to <code>reevaluate</code> all elements in the <code>options.elements</code> array, even if they've already been evaluated. The default is <code>false</code>, except when a resize event triggers Picturefill to run (<code>options.reevaluate</code> is <code>true</code> in that case).
 <pre><code>picturefill( {
 	reevaluate: true
 } );
 </code></pre>
 			</li>
-			<li><strong>Reparse:</strong> Force picturefill to reparse and reevaluate all elements in the <code>options.elements</code> array, even if they've already been parsed evaluated. The default is <code>false</code>. This is usefull in case a new source element was dynamically added. For sophisticated DOM changes consider using the MutationObserver plugin.
+			<li><strong>Reparse:</strong> Force picturefill to <code>reparse</code> and reevaluate all elements in the <code>options.elements</code> array, even if they've already been parsed and evaluated. The default is <code>false</code>. This is useful in cases a new source element was dynamically added or the srcset of an source element was changed. For sophisticated DOM changes consider using the MutationObserver plugin.
 <pre><code>picturefill( {
 	reparse: true
 	} );
@@ -216,26 +216,26 @@ picturefill();
 		</ul>
 
 		<h3>Picturefill setOptions method</h3>
-		<p>Picturefill also adds a setOptions method to the picturefill function.</p>
+		<p>Picturefill also adds a <code>setOptions</code> method to the picturefill function.</p>
 <pre><code>picturefill.setOptions( "addDimensions", true );
 </code></pre>
 
-		<h3>Possible options for picturefill</h3>
+		<h3>Possible options for picturefill.setOptions</h3>
 		<ul>
-			<li><strong>addDimensions:</strong> If addDimension is set to <code>true</code> picturefill will add the intrinsic width based on the desriptor of the img element to its width content attribute.
+			<li><strong>addDimensions:</strong> If addDimension is set to <code>true</code> picturefill will add the intrinsic width based on the descriptor of the source candidate to the width content attribute of the image element.
 <pre><code>picturefill.setOptions( "addDimensions", true );
 </code></pre>
-				<p>To fully support this feature in IE8, the following fallback style should be used in your CSS file:</p>
+				<p>To fully support this feature in IE8, the following fallback style should be used in your CSS file (in the normalization section):</p>
 <pre><code>img {
 	height: auto;
 	width: auto;
 }
 </code></pre>
 			</li>
-			<li><strong>resQuantifier:</strong> The <code>resQuantifier</code> defaults to <code>1</code> and manipulates the calculation of the best image candidate for polyfilled browsers. In case the quantifier is above <code>1</code> a picture with a higher density (good for high quality) and in case a value below <code>1</code> is chosen an image with a lower density is chosen.
+			<li><strong>resQuantifier:</strong> The <code>resQuantifier</code> defaults to <code>1</code> and manipulates the calculation of the best image candidate for polyfilled browsers. In case <code>resQuantifier</code> is above <code>1</code> a picture with a higher density (good for high quality) and in case the value is below <code>1</code> an image with a lower density is chosen (good for performance).
 <pre><code>picturefill.setOptions( "resQuantifier", 0.8 );
 </code></pre>
-				<p>This option can be adjusted for testing or in conjunction with feature detection conditionally changed. But please use it responsible. You can't control erverything.</p>
+				<p>This option can be adjusted for testing or in conjunction with feature detection (lowbandwidth, lowbattery, lowcpu or vice versa etc.) conditionally changed. But please use it responsible. You can't feature detect and control everything.</p>
 			</li>
 		</ul>
 

@@ -5,7 +5,7 @@
 	var saveCache = {};
 
 	var forceElementParsing = function( element, options ) {
-		if ( !element[ pf.ns ] ) {
+		if ( true || !element[ pf.ns ] ) {
 			element[ pf.ns ] = {};
 			pf.parseSets( element, element.parentNode, options || {} );
 		}
@@ -50,7 +50,8 @@
 		pf.calcLength = function() {
 			return 310;
 		};
-		
+		var countedElements = 0;
+		var polyfillElements = 10;
 		var $srcsetImageW = $( "<img />" )
 			.attr({
 				srcset: "medium.jpg 480w,\n small.jpg  320w"
@@ -67,11 +68,24 @@
 		var $normalImg = $(".prop-check");
 
 		window.picturefill();
-		window.picturefill._.fillImgs();
 
 		$( "img[srcset], picture > img" ).each( function() {
+			if ( $(this).prop( pf.ns ) ){
+				countedElements++;
+			}
+
 			picturefill._.fillImg( this, {} );
+
+			if ( $(this).prop( pf.ns ) ) {
+				countedElements++;
+			}
 		} );
+
+		if ( window.HTMLPictureElement && pf.srcsetSupported ) {
+			equal( countedElements, 0, "Picturefill is noop in supporting browsers");
+		} else if ( !window.HTMLPictureElement && !pf.srcsetSupported ) {
+			equal( countedElements, polyfillElements * 2, "Picturefill finds all elements and polyfills them");
+		}
 
 		if ( window.HTMLPictureElement ) {
 			equal( $("picture > img" ).prop( pf.ns ), undefined, "Picturefill doesn't touch images in supporting browsers." );
@@ -80,19 +94,19 @@
 			ok( $("picture > img" ).prop( pf.ns ), "Picturefill modifies images in non-supporting browsers." );
 		}
 
-		if ( pf.srcsetSupported ) {
+		if ( window.HTMLPictureElement || pf.srcsetSupported ) {
 
 			equal( ($srcsetImageX.prop( pf.ns ) || { supported: true }).supported, true, "Picturefill doesn't touch images in supporting browsers." );
-			equal( $srcsetImageX.attr( "src" ), null, "Picturefill doesn't touch image sources in supporting browsers." );
+			equal( $srcsetImageX.prop( "src" ), "", "Picturefill doesn't touch image sources in supporting browsers." );
 
 		} else {
 			ok( $srcsetImageX.prop( pf.ns ), "Picturefill modifies images in non-supporting browsers." );
 			equal( $srcsetImageX.prop( "src" ), pf.makeUrl( "oneX.jpg" ), "Picturefill changes source of image" );
 		}
 
-		if ( pf.srcsetSupported && pf.sizesSupported ) {
+		if ( window.HTMLPictureElement || (pf.srcsetSupported && pf.sizesSupported) ) {
 			equal( $srcsetImageW.prop( pf.ns ), undefined, "Picturefill doesn't touch images in supporting browsers." );
-			equal( $srcsetImageW.prop( "src" ), null, "Picturefill doesn't touch image sources in supporting browsers." );
+			equal( $srcsetImageW.prop( "src" ), "", "Picturefill doesn't touch image sources in supporting browsers." );
 		} else {
 			ok( $srcsetImageW.prop( pf.ns ), "Picturefill modifies images in non-supporting browsers." );
 			equal( $srcsetImageW.prop( "src" ), pf.makeUrl( "small.jpg" ), "Picturefill changes source of image" );
@@ -139,11 +153,14 @@
 				})
 				.prependTo("#qunit-fixture")
 			;
+		var $source = $( document.createElement( "source" ) )
+			.attr({
+				srcset: "twoX.jpg 2x, threeX.png 3x",
+				media: "(min-width: 800px)"
+			});
 		var $pictureSet = $( "<picture />" )
-				.html( "" +
-					"<source srcset='twoX.jpg 2x, threeX.png 3x' media='(min-width: 800px)' />" +
-					"<img src='normal.jpg' />" +
-				"" )
+				.append( $source )
+				.append("<img src='normal.jpg' />")
 				.prependTo("#qunit-fixture")
 			;
 
@@ -155,13 +172,13 @@
 				candidates: [ 2 ]
 			},
 			{
-				name: "srcset with x descriptor + additional src",
+				name: "picture srcset with x descriptor + additional src",
 				elem: $srcsetImageX,
 				sets: 1,
 				candidates: [ 3 ]
 			},
 			{
-				name: "srcset with x descriptor + additional src",
+				name: "picture srcset with x descriptor + additional src",
 				elem: $pictureSet.find( "img" ),
 				sets: 2,
 				candidates: [ 2, 1 ]
@@ -170,7 +187,6 @@
 
 			forceElementParsing( testData.elem[0] );
 			var sets = testData.elem.prop( pf.ns ).sets;
-
 			equal( sets.length, testData.sets, "parseSets parses right amount of sets. " + testData.name );
 
 			$.each( sets, function( i, set ) {
@@ -606,32 +622,6 @@
 
 	});
 
-	/*
-	test( "removeMediaShim: video", function() {
-		var $videoShim = $( ".video-shim" );
-
-		equal( $videoShim.find( "video" ).length, 1 );
-		equal( $videoShim.find( "source" ).length, 2 );
-
-		pf.removeMediaShim( $videoShim[0] );
-
-		equal( $videoShim.find( "video" ).length, 0 );
-		equal( $videoShim.find( "source" ).length, 2 );
-	});
-
-	test( "removeMediaShim: audio", function() {
-		var $audioShim = $( ".audio-shim" );
-
-		equal( $audioShim.find( "audio" ).length, 1 );
-		equal( $audioShim.find( "source" ).length, 2 );
-
-		pf.removeMediaShim( $audioShim[0] );
-
-		equal( $audioShim.find( "video" ).length, 0 );
-		equal( $audioShim.find( "source" ).length, 2 );
-	});
-	*/
-
 	test("getSet returns the first matching `source`", function() {
 		var img = $( ".first-match" )[ 0 ];
 		var firstsource = img.parentNode.getElementsByTagName( "source" )[ 0 ];
@@ -640,20 +630,6 @@
 
 		equal( pf.getSet( img ).srcset, firstsource.getAttribute( "srcset" ) );
 	});
-/*
-	test("Each `img` should then check if its parent is `picture`, then loop through `source` elements until finding the `img` that triggered the loop.", function() {
-		var firstSource;
-		var img = $( ".match" )[ 0 ];
-		var img2 = $( ".match-second" )[ 0 ];
-
-		forceElementParsing( img );
-		forceElementParsing( img2 );
-
-		firstSource = img.parentNode.getElementsByTagName( "source" )[ 0 ];
-
-		ok( pf.getSet( img ) === false && pf.getSet( img2).srcset === firstSource.getAttribute('srcset') );
-	});
-*/
 
 	test( "getSet returns 'pending' when a source type is pending", function() {
 		var img = $(".pending-check")[0];
@@ -694,20 +670,7 @@
 
 		equal( pf.getSet( img ), false );
 	});
-/*
-	test( "getMatch returns only sources preceding fallback img", function() {
-		var $ignoredSource = $( ".ignored-source-check" );
 
-		forceElementParsing( $ignoredSource[ 0 ] );
-
-		// ensure the construction of the fixture
-		equal($ignoredSource[0].nodeName, "IMG" );
-		equal($ignoredSource.next()[0].nodeName, "SOURCE" );
-
-		// ensure that the result is undefined so the picture is grabbed later
-		equal( pf.getSet( $ignoredSource[0]).srcset, "imgsrcset", "no source srcset found" );
-	});
-*/
 	test( "picturefill ignores elements when they are marked with a property", function() {
 		expect( 0 );
 
