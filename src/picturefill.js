@@ -11,22 +11,24 @@
 	doc.createElement( "picture" );
 
 	// local object for method references and testing exposure
-	var lengthElInstered, lengthEl;
+	var lengthElInstered, lengthEl, srcsetAttr, currentSrcSupported;
 	var pf = {};
 	var noop = function() {};
 	var image = doc.createElement( "img" );
 	var docElem = doc.documentElement;
+	var types = {};
 
 	// namespace
 	pf.ns = ("pf" + new Date().getTime()).substr(0, 9);
+	srcsetAttr = "data-srcset" + pf.ns;
+
+	currentSrcSupported = "currentSrc" in image;
+
 	pf.isReady = false;
 
 	// srcset support test
 	pf.srcsetSupported = "srcset" in image;
 	pf.sizesSupported = "sizes" in image;
-	pf.currentSrcSupported = "currentSrc" in image;
-
-	pf.srcsetAttr = "data-srcset" + pf.ns;
 
 	// using pf.qsa instead of dom traversing does scale much better,
 	// especially on sites mixing responsive and non-responsive images
@@ -46,6 +48,10 @@
 		return anchor.href;
 	};
 
+	pf.qsa = function(context, sel) {
+		return context.querySelectorAll(sel);
+	};
+
 	// just a string trim workaround
 	function trim( str ) {
 		return str.trim ? str.trim() : str.replace( /^\s+|\s+$/g, "" );
@@ -58,14 +64,10 @@
 		noop
 	;
 
-	pf.qsa = function(context, sel) {
-		return context.querySelectorAll(sel);
-	};
-
 	/**
 	 * Shortcut property for https://w3c.github.io/webappsec/specs/mixedcontent/#restricts-mixed-content ( for easy overriding in tests )
 	 */
-	pf.restrictsMixedContent = w.location.protocol === "https:";
+	pf.isSSL = w.location.protocol === "https:";
 
 	/**
 	 * Shortcut method for matchMedia ( for easy overriding in tests )
@@ -134,14 +136,16 @@
 	 * Get width in css pixel value from a "length" value
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
 	 */
-	pf.lengthCache = {};
+	var lengthCache = {};
 	var regLength = /^([\d\.\-]+)(em|vw|px|%)$/;
+	// baseStyle also used by getEmValue (i.e.: width: 1em is important)
+	var baseStyle = "position: absolute; left: 0; visibility: hidden; display: block; padding: 0; margin: 0; border: none;font-size:1em;width:1em;";
 	pf.calcLength = function( length ) {
 		var failed, parsedLength;
 		var origLength = length;
 		var value = false;
 
-		if ( !(origLength in pf.lengthCache) ) {
+		if ( !(origLength in lengthCache) ) {
 			// If a length is specified and doesn’t contain a percentage, and it is greater than 0 or using `calc`, use it. Else, use the `100vw` default.
 
 			parsedLength = length.match( regLength );
@@ -174,7 +178,7 @@
 				if ( !lengthEl ) {
 					lengthEl = doc.createElement( "div" );
 					// Positioning styles help prevent padding/margin/width on `html` from throwing calculations off.
-					lengthEl.style.cssText = "position: absolute; left: 0; visibility: hidden; display: block; padding: 0; margin: 0; border: none;";
+					lengthEl.style.cssText = baseStyle;
 				}
 
 				if ( !lengthElInstered ) {
@@ -182,7 +186,7 @@
 					docElem.insertBefore( lengthEl, docElem.firstChild );
 				}
 
-				// set width
+				// set width to 0, so we can detect, wether style is invalid/unsupported
 				lengthEl.style.width = 0;
 				try {
 					lengthEl.style.width = length;
@@ -193,31 +197,31 @@
 				value = lengthEl.offsetWidth;
 
 				if ( failed || value <= 0 ) {
-					// Something has gone wrong. `calc()` is in use and unsupported, most likely. Default to `100vw` (`100%`, for broader support.):
+					// Something has gone wrong. `calc()` is in use and unsupported, most likely.
 					value = false;
 				}
 			}
 
-			pf.lengthCache[ origLength ] = value;
+			lengthCache[ origLength ] = value;
 
 			if ( value === false ) {
-				warn( "invalid source size value: " + origLength );
+				warn( "invalid source size: " + origLength );
 			}
 		}
 
-		return pf.lengthCache[ origLength ];
+		return lengthCache[ origLength ];
 	};
 
 	// container of supported mime types that one might need to qualify before using
-	pf.types =  {};
+	pf.types =  types;
 
 	// Add support for standard mime types.
-	pf.types["image/jpeg"] = true;
-	pf.types["image/gif"] = true;
-	pf.types["image/png"] = true;
+	types["image/jpeg"] = true;
+	types["image/gif"] = true;
+	types["image/png"] = true;
 
 	// test svg support
-	pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature( "http://www.w3.org/TR/SVG11/feature#Image", "1.1" );
+	types[ "image/svg+xml" ] = doc.implementation.hasFeature( "http://www.w3.org/TR/SVG11/feature#Image", "1.1" );
 
 	pf.createImageTest = function( type, src ) {
 		// based on Modernizr's lossless img-webp test
@@ -232,14 +236,14 @@
 			img = null;
 		};
 
-		pf.types[ type ] = "pending";
+		types[ type ] = "pending";
 
 		img.onerror = function() {
-			pf.types[ type ] = false;
+			types[ type ] = false;
 			complete();
 		};
 		img.onload = function() {
-			pf.types[ type ] = img.width === 1;
+			types[ type ] = img.width === 1;
 			complete();
 		};
 		timer = setTimeout(img.onerror, 300);
@@ -252,29 +256,27 @@
 
 		//suggested method:
 	pf.verifyTypeSupport = function( type ) {
-		return ( type ) ? pf.types[ type ] : true;
+		return ( type ) ? types[ type ] : true;
 	};
 
 	/**
 	 * Parses an individual `size` and returns the length, and optional media query
 	 */
-	pf.parseSize = (function() {
-		var regSize = /(\([^)]+\))?\s*(.+)/;
-		var memSize = {};
-		return function( sourceSizeStr ) {
-			var match;
+	var regSize = /(\([^)]+\))?\s*(.+)/;
+	var memSize = {};
+	pf.parseSize = function( sourceSizeStr ) {
+		var match;
 
-			if ( !memSize[ sourceSizeStr ] ) {
-				match = ( sourceSizeStr || "" ).match(regSize);
-				memSize[ sourceSizeStr ] = {
-					media: match && match[1],
-					length: match && match[2]
-				};
-			}
+		if ( !memSize[ sourceSizeStr ] ) {
+			match = ( sourceSizeStr || "" ).match(regSize);
+			memSize[ sourceSizeStr ] = {
+				media: match && match[1],
+				length: match && match[2]
+			};
+		}
 
-			return memSize[ sourceSizeStr ];
-		};
-	})();
+		return memSize[ sourceSizeStr ];
+	};
 
 	pf.parseSet = function( set ) {
 		/**
@@ -360,7 +362,7 @@
 					descriptorObj.type = RegExp.$2;
 				} else {
 					descriptorObj = false;
-					warn( "unknown descriptor used: " + descriptor );
+					warn( "unknown descriptor: " + descriptor );
 				}
 			}
 
@@ -383,21 +385,19 @@
 				originalHTMLFontSize = docElem.style.fontSize,
 				originalBodyFontSize = body && body.style.fontSize;
 
-			div.style.cssText = "position:absolute;font-size:1em;width:1em";
+			div.style.cssText = baseStyle;
 
 			// 1em in a media query is the value of the default font size of the browser
 			// reset docElem and body to ensure the correct value is returned
 			docElem.style.fontSize = "100%";
 			body.style.fontSize = "100%";
 
-			try {
-				body.appendChild( div );
-				eminpx = div.offsetWidth;
-				body.removeChild( div );
+			body.appendChild( div );
+			eminpx = div.offsetWidth;
+			body.removeChild( div );
 
-				//also update eminpx before returning
-				eminpx = parseFloat( eminpx, 10 );
-			} catch(e){}
+			//also update eminpx before returning
+			eminpx = parseFloat( eminpx, 10 );
 
 			// restore the original values
 			docElem.style.fontSize = originalHTMLFontSize;
@@ -511,7 +511,7 @@
 		if ( bestCandidate ) {
 
 			if ( (candidateSrc = pf.makeUrl( bestCandidate.url )) !== loadingSrc ) {
-				if ( pf.restrictsMixedContent && !bestCandidate.url.indexOf( "http:" ) ) {
+				if ( pf.isSSL && !bestCandidate.url.indexOf( "http:" ) ) {
 					warn( "insecure: " + candidateSrc );
 				} else {
 					pf.loadImg( picImg, bestCandidate, candidateSrc);
@@ -519,6 +519,23 @@
 				}
 			} else if ( bestCandidate.desc.type === "w" ) {
 				pf.addDimensions( picImg, null, bestCandidate );
+			}
+		}
+	};
+
+	pf.setSrc = function( img, bestCandidate ) {
+		var origWidth;
+		img.src = bestCandidate.url;
+
+		// although this is a specific Safari issue, we don't want to take too much different code paths
+		if ( bestCandidate.set.type === "image/svg+xml" ) {
+			origWidth = img.style.width;
+			img.style.width = (img.offsetWidth + 1) + "px";
+
+			// next line only should trigger a repaint
+			// if... is only done to trick dead code removal
+			if ( img.offsetWidth + 1 ) {
+				img.style.width = origWidth;
 			}
 		}
 	};
@@ -531,24 +548,10 @@
 
 		var srcWasSet = false;
 		var setSrc = function() {
-			var origWidth;
+
 			if ( !srcWasSet ) {
 				srcWasSet = true;
-
-				img.src = bestCandidate.url;
-
-				// although this is a specific Safari issue, we don't want to take too much different code paths
-				if ( bestCandidate.set.type === "image/svg+xml" ) {
-					origWidth = img.style.width;
-					img.style.width = (img.offsetWidth + 1) + "px";
-
-					// next line only should trigger a repaint
-					// if... is only done to trick dead code removal
-					if ( img.offsetWidth + 1 ) {
-						img.style.width = origWidth;
-					}
-
-				}
+				pf.setSrc( img, bestCandidate );
 			}
 		};
 
@@ -557,7 +560,7 @@
 		}
 		// currentSrc attribute and property to match
 		// http://picture.responsiveimages.org/#the-img-element
-		if ( !pf.currentSrcSupported ) {
+		if ( !currentSrcSupported ) {
 			img.currentSrc = src;
 		}
 
@@ -587,20 +590,13 @@
 		};
 
 		bImg.onload = function() {
-			var connected;
+
 			if ( img ) {
-				if ( pf.observer && pf.observer.connected ){
-					connected = true;
-					pf.observer.disconnect();
-				}
 
 				setSrc();
 
 				pf.addDimensions( img, bImg, bestCandidate );
 
-				if ( connected ) {
-					pf.observer.observe();
-				}
 				img[ pf.ns ].loadGC();
 			}
 		};
@@ -699,8 +695,9 @@
 			if ( pf.srcsetSupported ) {
 				if ( srcsetAttribute ) {
 					element.setAttribute( pf.srcsetAttr, srcsetAttribute );
-					element.removeAttribute( "srcset" );
-
+					// current FF crashes with srcset enabled and removeAttribute,
+					// maybe change this line after FF34 release
+					element.srcset = "";
 				} else {
 					element.removeAttribute( pf.srcsetAttr );
 				}
@@ -783,7 +780,7 @@
 					sizes: source.getAttribute( "sizes" )
 				} );
 			} else if ( source.getAttribute( "src" ) ) {
-				warn( "The `src` attribute is invalid on `picture source` element, use `srcset`." );
+				warn( "`src` on `source` invalid, use `srcset`." );
 			}
 		}
 	}
@@ -819,7 +816,7 @@
 
 		//invalidate length cache
 		if ( !options || options.reevaluate || options.reparse ) {
-			pf.lengthCache = {};
+			lengthCache = {};
 			updateView();
 
 			// if all images are reevaluated clear the resizetimer
@@ -861,7 +858,7 @@
 		}
 
 		if ( xParse && !options.elements ) {
-			throw( "reparse should only run on specific elements." );
+			throw( "run reparse only on specific elements." );
 		}
 
 		if ( options.elements && options.elements.nodeType === 1 ) {
@@ -937,7 +934,6 @@
 			var intervalId = setInterval( run, 333);
 
 			var resizeEval = function() {
-
 				pf.fillImgs({ reevaluate: true });
 			};
 			var onResize = function() {

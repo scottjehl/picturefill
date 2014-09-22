@@ -715,7 +715,7 @@
 	});
 
 	test( "Mixed content should be blocked", function() {
-		pf.restrictsMixedContent = true;
+		pf.isSSL = true;
 		var image, candidates;
 
 		candidates = [

@@ -14,6 +14,7 @@
 <body>
 <div id="qunit"></div>
 <script type="text/html" id="template">
+	<img class="simple-img" />
 	<picture>
 		<audio>
 			<source srcset="../examples/images/small.jpg" media="(max-wdith: 480px)">
@@ -22,10 +23,11 @@
 		<img srcset="../examples/images/extralarge.jpg" />
 	</picture>
 
-	<img srcset="../examples/images/small.jpg 300w, ../examples/images/extralarge.jpg 600w" sizes="33vw" />
-	<img srcset="../examples/images/small.jpg 1.x, ../examples/images/extralarge.jpg 2x" />
+	<img class="w" srcset="../examples/images/small.jpg 300w, ../examples/images/extralarge.jpg 600w" sizes="33vw" />
+	<img class="x" srcset="../examples/images/small.jpg 1.x, ../examples/images/extralarge.jpg 2x" />
 
 	<div class="wrapper">
+		<img class="simple-img" />
 		<picture>
 			<audio>
 				<source srcset="../examples/images/small.jpg" media="(max-wdith: 480px)">
@@ -34,11 +36,14 @@
 			<img srcset="../examples/images/extralarge.jpg" />
 		</picture>
 
-		<img srcset="../examples/images/small.jpg 300w, ../examples/images/extralarge.jpg 600w" sizes="33vw" />
-		<img srcset="../examples/images/small.jpg 1.x, ../examples/images/extralarge.jpg 2x" />
+		<img class="w" srcset="../examples/images/small.jpg 300w, ../examples/images/extralarge.jpg 600w" sizes="33vw" />
+		<img class="x" srcset="../examples/images/small.jpg 1.x, ../examples/images/extralarge.jpg 2x" />
 	</div>
 </script>
-<div id="qunit-fixture"></div>
+<div id="qunit-fixture">
+	<div id="mutation-fixture"></div>
+	<div id="picturefill-fixture"></div>
+</div>
 <script>
 	//make sure QUnit gets a clean fixture
 	(function(){

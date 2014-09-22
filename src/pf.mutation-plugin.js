@@ -27,6 +27,8 @@
 		disconnect: noop,
 		take: noop,
 		observe: noop,
+		start: noop,
+		stop: noop,
 		connected: false
 	};
 
@@ -183,22 +185,60 @@
 
 	function createObserver() {
 		var allowConnect = true;
-		var oldSetup = pf.setupRun;
-		var oldTeardown = pf.teardownRun;
+		var sup = {};
+		var monkeyPatch = function( name, fn ) {
+			sup[ name ] = pf[ name ];
+			pf[ name ] = fn;
+		};
 		var attrFilter = Object.keys( observeProps );
 		var config = { attributes: true, childList: true, subtree: true, attributeFilter: attrFilter };
 
 		var observer = new MutationObserver( pf.onMutations );
 
-		pf.setupRun = function() {
+		monkeyPatch( "setupRun", function() {
 			pfobserver.disconnect();
-			oldSetup.apply( this, arguments );
-		};
+			return sup.setupRun.apply( this, arguments );
+		});
 
-		pf.teardownRun = function() {
-			oldTeardown.apply( this, arguments );
+		monkeyPatch( "teardownRun", function() {
+			var ret = sup.setupRun.apply( this, arguments );
 			pfobserver.observe();
-		};
+			return ret;
+		});
+
+		monkeyPatch( "setSrc", function() {
+			var ret;
+			var wasConnected = pfobserver.connected;
+
+			if ( wasConnected ) {
+				pfobserver.disconnect();
+			}
+
+			ret = sup.setSrc.apply( this, arguments );
+
+			if ( wasConnected ) {
+				pfobserver.observe();
+			}
+
+			return ret;
+		});
+
+		monkeyPatch( "addDimensions", function() {
+			var ret;
+			var wasConnected = pfobserver.connected;
+
+			if ( wasConnected ) {
+				pfobserver.disconnect();
+			}
+
+			ret = sup.addDimensions.apply( this, arguments );
+
+			if ( wasConnected ) {
+				pfobserver.observe();
+			}
+
+			return ret;
+		});
 
 		pfobserver.observe = function() {
 			if ( allowConnect ) {
@@ -269,16 +309,18 @@
 
 		for ( i = 0; i < domMethods.length; i++ ) {
 			/*jshint loopfunc: true */
-			picturefill[ domMethods[ i ] ] = function( main, dom ) {
-				var mutation = domMethods[ i ] === "removeChild" ?
-					{ type: "childList", addedNodes: [], removedNodes: [ dom ], target: main } :
-					{ type: "childList", addedNodes: [ dom ], removedNodes: [], target: main }
-				;
-				pfobserver.disconnect();
-				main[ domMethods[ i ] ]( dom );
-				addMutation( mutation );
-				pfobserver.observe();
-			};
+			(function( fnName ) {
+				picturefill[ fnName ] = function( main, dom ) {
+					var mutation = fnName === "removeChild" ?
+						{ type: "childList", addedNodes: [], removedNodes: [ dom ], target: main } :
+						{ type: "childList", addedNodes: [ dom ], removedNodes: [], target: main };
+
+					pfobserver.disconnect();
+					main[ fnName ]( dom );
+					addMutation( mutation );
+					pfobserver.observe();
+				};
+			})( domMethods[ i ] );
 			/*jshint loopfunc: false */
 		}
 
