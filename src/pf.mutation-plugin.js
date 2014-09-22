@@ -40,7 +40,7 @@
 		var modifiedImgs = [];
 
 		for (i = 0, len = mutations.length; i < len; i++) {
-			if ( mutations[i].type === "childList" ) {
+			if ( pf.isReady && mutations[i].type === "childList" ) {
 				pf.onSubtreeChange( mutations[i], modifiedImgs );
 			} else if ( mutations[i].type === "attributes" ) {
 				pf.onAttrChange( mutations[i], modifiedImgs );
@@ -126,7 +126,10 @@
 
 	pf.addImgForSource = function( node, parent, imgs ) {
 		if ( parent && ( parent.nodeName || "" ).toUpperCase() !== "PICTURE" ) {
-			parent = node.parentNode;
+			parent = parent.parentNode;
+		}
+		if ( !parent || ( parent.nodeName || "" ).toUpperCase() !== "PICTURE" ) {
+			return;
 		}
 		pf.addToElements( parent.getElementsByTagName( "img" )[0], imgs );
 	};
@@ -179,6 +182,7 @@
 	};
 
 	function createObserver() {
+		var allowConnect = true;
 		var oldSetup = pf.setupRun;
 		var oldTeardown = pf.teardownRun;
 		var attrFilter = Object.keys( observeProps );
@@ -191,17 +195,16 @@
 			oldSetup.apply( this, arguments );
 		};
 
-		pf.teardownRun = function( options ) {
+		pf.teardownRun = function() {
 			oldTeardown.apply( this, arguments );
-
-			if ( !options || !options.disableObserver ) {
-				pfobserver.observe();
-			}
+			pfobserver.observe();
 		};
 
 		pfobserver.observe = function() {
-			pfobserver.connected = true;
-			observer.observe( document.body, config );
+			if ( allowConnect ) {
+				pfobserver.connected = true;
+				observer.observe( document.body, config );
+			}
 		};
 
 		pfobserver.disconnect = function() {
@@ -216,7 +219,17 @@
 			}
 		};
 
-		pfobserver.observe();
+		pfobserver.start = function() {
+			allowConnect = true;
+			pfobserver.observe();
+		};
+
+		pfobserver.stop = function() {
+			allowConnect = false;
+			pfobserver.disconnect();
+		};
+
+		pfobserver.start();
 	}
 
 	(function() {
@@ -248,10 +261,10 @@
 		})();
 
 		picturefill.html = function( dom, html ) {
-				pfobserver.disconnect();
-				dom.innerHTML = html;
-				addMutation( { type: "childList", addedNodes: [ dom ], removedNodes: [] } );
-				pfobserver.observe();
+			pfobserver.disconnect();
+			dom.innerHTML = html;
+			addMutation( { type: "childList", addedNodes: [ dom ], removedNodes: [] } );
+			pfobserver.observe();
 		};
 
 		for ( i = 0; i < domMethods.length; i++ ) {
@@ -298,20 +311,12 @@
 			pfobserver.observe();
 
 		};
+
+		//additionally we could also add jQuery attribute hooks?
 	})();
 
 	if ( !window.HTMLPictureElement && MutationObserver ) {
-		(function() {
-			var oldOnReady = pf.onReady;
-			if ( pf.isReady ) {
-				createObserver();
-			} else {
-				pf.onReady = function() {
-					oldOnReady.apply( this, arguments );
-					createObserver();
-				};
-			}
-		})();
+		createObserver();
 	}
 
 	pf.observer = pfobserver;

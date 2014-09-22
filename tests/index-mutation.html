@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>picturefill tests</title>
+	<link rel="stylesheet" href="resources/qunit-1.15.0.css" />
+	<script src="resources/qunit-1.15.0.js"></script>
+	<script src="resources/jquery-1.11.1.js"></script>
+	<script>
+		document.createElement('picture');
+	</script>
+	<script src="resources/modernizr.js"></script>
+</head>
+<body>
+<div id="qunit"></div>
+<script type="text/html" id="template">
+	<picture>
+		<audio>
+			<source srcset="../examples/images/small.jpg" media="(max-wdith: 480px)">
+			<source srcset="../examples/images/extralarge.jpg" media="(max-wdith: 1280px)">
+		</audio>
+		<img srcset="../examples/images/extralarge.jpg" />
+	</picture>
+
+	<img srcset="../examples/images/small.jpg 300w, ../examples/images/extralarge.jpg 600w" sizes="33vw" />
+	<img srcset="../examples/images/small.jpg 1.x, ../examples/images/extralarge.jpg 2x" />
+
+	<div class="wrapper">
+		<picture>
+			<audio>
+				<source srcset="../examples/images/small.jpg" media="(max-wdith: 480px)">
+				<source srcset="../examples/images/extralarge.jpg" media="(max-wdith: 1280px)">
+			</audio>
+			<img srcset="../examples/images/extralarge.jpg" />
+		</picture>
+
+		<img srcset="../examples/images/small.jpg 300w, ../examples/images/extralarge.jpg 600w" sizes="33vw" />
+		<img srcset="../examples/images/small.jpg 1.x, ../examples/images/extralarge.jpg 2x" />
+	</div>
+</script>
+<div id="qunit-fixture"></div>
+<script>
+	//make sure QUnit gets a clean fixture
+	(function(){
+		var fixtureHTML = jQuery( "#qunit-fixture").html();
+		QUnit.reset = function(){
+			$("#qunit-fixture").html( fixtureHTML );
+		};
+	})();
+
+</script>
+<script src="../src/external/matchmedia.js"></script>
+<script src="../src/picturefill.js"></script>
+<script src="../src/pf.mutation-plugin.js"></script>
+<script src="tests-mutations.js"></script>
+</body>
+</html>

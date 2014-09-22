@@ -1,4 +1,4 @@
-/*! Picturefill - v2.1.0 - 2014-09-21
+/*! Picturefill - v2.1.0 - 2014-09-22
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -68,7 +68,6 @@ window.matchMedia || (window.matchMedia = function() {
 
 	// namespace
 	pf.ns = ("pf" + new Date().getTime()).substr(0, 9);
-	pf.onReady = function() {pf.isReady = true;};
 	pf.isReady = false;
 
 	// srcset support test
@@ -866,16 +865,17 @@ window.matchMedia || (window.matchMedia = function() {
 
 	var resizeThrottle;
 	pf.setupRun = function( options ) {
+
 		//invalidate length cache
 		if ( !options || options.reevaluate || options.reparse ) {
 			pf.lengthCache = {};
-		}
+			updateView();
 
-		// if all images are reevaluated clear the resizetimer
-		if ( options && options.reevaluate && !options.elements && !options.context ) {
-			clearTimeout( resizeThrottle );
+			// if all images are reevaluated clear the resizetimer
+			if ( options && !options.elements && !options.context ) {
+				clearTimeout( resizeThrottle );
+			}
 		}
-		updateView();
 	};
 
 	pf.teardownRun = function( /*options*/ ) {
@@ -977,15 +977,9 @@ window.matchMedia || (window.matchMedia = function() {
 					// IE8/9/10 is checked longer for new updates, due to a browser bug
 					if ( regReady.test( doc.readyState || "" ) ) {
 						clearInterval( intervalId );
-
-						pf.fillImgs();
-
-						pf.onReady();
-
-						pf.onReady = noop;
-					} else {
-						pf.fillImgs();
+						pf.isReady = true;
 					}
+					pf.fillImgs();
 				}
 			};
 
@@ -1006,6 +1000,8 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 			setTimeout(run, doc.body ? 9 : 99);
 		})();
+
+		updateView();
 		// test webp support
 		pf.createImageTest( "image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=" );
 	}
