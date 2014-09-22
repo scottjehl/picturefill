@@ -723,7 +723,7 @@
 
 			// add normal src as candidate, if source has no w descriptor, we do not test for 1x descriptor,
 			// because this doesn't change computation. i.e.: we might have one candidate more, but this candidate
-			// would never be  chosen
+			// should never be chosen
 			if ( !hasWDescripor && element[ pf.ns ].src ) {
 				fallbackCandidate.srcset += ", " + element[ pf.ns ].src;
 				fallbackCandidate.candidates = false;
@@ -735,8 +735,8 @@
 			} );
 		}
 
-		// if img has picture or the srcset was removed or has a srcset and does not support or
-		// has a w descriptor (and does not support sizes) set support to false to evaluate
+		// if img has picture or the srcset was removed or has a srcset and does not support srcset at all
+		// or has a w descriptor (and does not support sizes) set support to false to evaluate
 		element[ pf.ns ].supported = !( hasPicture || srcsetChanged || ( fallbackCandidate && !pf.srcsetSupported ) || hasWDescripor );
 
 		element[ pf.ns ].parsed = true;
@@ -792,7 +792,7 @@
 		}
 
 		// if the element has already been evaluated, skip it
-		// unless `options.force` is set to true ( this, for example,
+		// unless `options.reevaluate` is set to true ( this, for example,
 		// is set to true when running `picturefill` on `resize` ).
 		if ( !options.reevaluate && !options.reparse && element[ pf.ns ].evaluated ) {
 			return;
