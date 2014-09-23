@@ -1,4 +1,4 @@
-/*! Picturefill - v2.1.0 - 2014-09-22
+/*! Picturefill - v2.1.0 - 2014-09-23
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -722,7 +722,7 @@ window.matchMedia || (window.matchMedia = function() {
 	var alwaysCheckWDescriptor = pf.srcsetSupported && !pf.sizesSupported;
 	pf.parseSets = function( element, parent, options ) {
 
-		var srcsetAttribute, fallbackCandidate, srcsetChanged, hasWDescripor;
+		var srcsetAttribute, fallbackCandidate, srcsetChanged, hasWDescripor, srcsetParsed;
 
 		var hasPicture = parent.nodeName.toUpperCase() === "PICTURE";
 
@@ -740,17 +740,8 @@ window.matchMedia || (window.matchMedia = function() {
 			srcsetChanged = !srcsetAttribute && element[ pf.ns ].srcset;
 
 			element[ pf.ns ].srcset = srcsetAttribute;
+			srcsetParsed = true;
 
-			if ( pf.srcsetSupported ) {
-				if ( srcsetAttribute ) {
-					element.setAttribute( pf.srcsetAttr, srcsetAttribute );
-					// current FF crashes with srcset enabled and removeAttribute,
-					// maybe change this line after FF34 release
-					element.srcset = "";
-				} else {
-					element.removeAttribute( pf.srcsetAttr );
-				}
-			}
 		}
 
 		element[ pf.ns ].sets = [];
@@ -772,7 +763,7 @@ window.matchMedia || (window.matchMedia = function() {
 
 			// add normal src as candidate, if source has no w descriptor, we do not test for 1x descriptor,
 			// because this doesn't change computation. i.e.: we might have one candidate more, but this candidate
-			// would never be  chosen
+			// should never be chosen
 			if ( !hasWDescripor && element[ pf.ns ].src ) {
 				fallbackCandidate.srcset += ", " + element[ pf.ns ].src;
 				fallbackCandidate.candidates = false;
@@ -784,9 +775,20 @@ window.matchMedia || (window.matchMedia = function() {
 			} );
 		}
 
-		// if img has picture or the srcset was removed or has a srcset and does not support or
-		// has a w descriptor (and does not support sizes) set support to false to evaluate
+		// if img has picture or the srcset was removed or has a srcset and does not support srcset at all
+		// or has a w descriptor (and does not support sizes) set support to false to evaluate
 		element[ pf.ns ].supported = !( hasPicture || srcsetChanged || ( fallbackCandidate && !pf.srcsetSupported ) || hasWDescripor );
+
+		if ( srcsetParsed && pf.srcsetSupported && !element[ pf.ns ].supported ) {
+			if ( srcsetAttribute ) {
+				element.setAttribute( pf.srcsetAttr, srcsetAttribute );
+				// current FF crashes with srcset enabled and removeAttribute,
+				// maybe change this line after FF34 release
+				element.srcset = "";
+			} else {
+				element.removeAttribute( pf.srcsetAttr );
+			}
+		}
 
 		element[ pf.ns ].parsed = true;
 	};
@@ -841,7 +843,7 @@ window.matchMedia || (window.matchMedia = function() {
 		}
 
 		// if the element has already been evaluated, skip it
-		// unless `options.force` is set to true ( this, for example,
+		// unless `options.reevaluate` is set to true ( this, for example,
 		// is set to true when running `picturefill` on `resize` ).
 		if ( !options.reevaluate && !options.reparse && element[ pf.ns ].evaluated ) {
 			return;

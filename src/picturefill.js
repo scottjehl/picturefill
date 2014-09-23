@@ -673,7 +673,7 @@
 	var alwaysCheckWDescriptor = pf.srcsetSupported && !pf.sizesSupported;
 	pf.parseSets = function( element, parent, options ) {
 
-		var srcsetAttribute, fallbackCandidate, srcsetChanged, hasWDescripor;
+		var srcsetAttribute, fallbackCandidate, srcsetChanged, hasWDescripor, srcsetParsed;
 
 		var hasPicture = parent.nodeName.toUpperCase() === "PICTURE";
 
@@ -691,17 +691,8 @@
 			srcsetChanged = !srcsetAttribute && element[ pf.ns ].srcset;
 
 			element[ pf.ns ].srcset = srcsetAttribute;
+			srcsetParsed = true;
 
-			if ( pf.srcsetSupported ) {
-				if ( srcsetAttribute ) {
-					element.setAttribute( pf.srcsetAttr, srcsetAttribute );
-					// current FF crashes with srcset enabled and removeAttribute,
-					// maybe change this line after FF34 release
-					element.srcset = "";
-				} else {
-					element.removeAttribute( pf.srcsetAttr );
-				}
-			}
 		}
 
 		element[ pf.ns ].sets = [];
@@ -738,6 +729,17 @@
 		// if img has picture or the srcset was removed or has a srcset and does not support srcset at all
 		// or has a w descriptor (and does not support sizes) set support to false to evaluate
 		element[ pf.ns ].supported = !( hasPicture || srcsetChanged || ( fallbackCandidate && !pf.srcsetSupported ) || hasWDescripor );
+
+		if ( srcsetParsed && pf.srcsetSupported && !element[ pf.ns ].supported ) {
+			if ( srcsetAttribute ) {
+				element.setAttribute( pf.srcsetAttr, srcsetAttribute );
+				// current FF crashes with srcset enabled and removeAttribute,
+				// maybe change this line after FF34 release
+				element.srcset = "";
+			} else {
+				element.removeAttribute( pf.srcsetAttr );
+			}
+		}
 
 		element[ pf.ns ].parsed = true;
 	};

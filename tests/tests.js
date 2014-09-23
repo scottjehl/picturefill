@@ -97,7 +97,8 @@
 		if ( window.HTMLPictureElement || pf.srcsetSupported ) {
 
 			equal( ($srcsetImageX.prop( pf.ns ) || { supported: true }).supported, true, "Picturefill doesn't touch images in supporting browsers." );
-			equal( $srcsetImageX.prop( "src" ), "", "Picturefill doesn't touch image sources in supporting browsers." );
+			equal( $srcsetImageX.prop( "src" ), "", "Picturefill doesn't touch image src in supporting browsers." );
+			equal( $srcsetImageX.attr( "srcset" ), "oneX.jpg 1x, twoX.jpg 2x", "Picturefill doesn't touch image srcset in supporting browsers." );
 
 		} else {
 			ok( $srcsetImageX.prop( pf.ns ), "Picturefill modifies images in non-supporting browsers." );
