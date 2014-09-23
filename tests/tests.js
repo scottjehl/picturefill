@@ -1,6 +1,7 @@
 (function(window, jQuery) {
 
 	var pf = picturefill._;
+	var currentSrcSupported = "currentSrc" in document.createElement("img");
 
 	var saveCache = {};
 
@@ -605,7 +606,7 @@
 
 		equal(pf.makeUrl( image.src ), pf.makeUrl( candidates[2].url ), "uses the url from the best px fit" );
 
-		if (!pf.currentSrcSupported) {
+		if (!currentSrcSupported) {
 			deepEqual( pf.makeUrl( image.currentSrc ), pf.makeUrl( candidates[2].url ), "uses the url from the best px fit" );
 		}
 
@@ -617,7 +618,7 @@
 
 		deepEqual(image.src, fullPath, "src left alone when matched" );
 
-		if (!pf.currentSrcSupported) {
+		if (!currentSrcSupported) {
 			deepEqual(image.currentSrc, fullPath, "currentSrc left alone when matched" );
 		}
 

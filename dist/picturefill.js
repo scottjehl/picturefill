@@ -69,7 +69,7 @@ window.matchMedia || (window.matchMedia = function() {
 
 	// namespace
 	pf.ns = ("pf" + new Date().getTime()).substr(0, 9);
-	srcsetAttr = "data-srcset" + pf.ns;
+	srcsetAttr = "data-pfsrcset";
 
 	currentSrcSupported = "currentSrc" in image;
 
@@ -794,20 +794,12 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	pf.hasWDescripor = function( set ) {
-
 		if ( !set ) {
 			return false;
 		}
-		var i;
 		var candidates = pf.parseSet( set );
-		var ret = false;
-		for ( i = 0; i < candidates.length; i++ ) {
-			if ( candidates[ 0 ].desc.type === "w" ) {
-				ret = true;
-				break;
-			}
-		}
-		return ret;
+
+		return !candidates[ 0 ] || candidates[ 0 ].desc.type === "w";
 	};
 
 	function getAllSourceElements( picture, candidates ) {
