@@ -1,4 +1,4 @@
-/*! Picturefill - v2.1.0 - 2014-08-20
+/*! Picturefill - v2.1.0 - 2014-09-23
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -72,8 +72,11 @@ window.matchMedia || (window.matchMedia = function() {
 	pf.ns = "picturefill";
 
 	// srcset support test
-	pf.srcsetSupported = "srcset" in doc.createElement( "img" );
-	pf.sizesSupported = w.HTMLImageElement.sizes;
+	(function() {
+		var img = doc.createElement( "img" );
+		pf.srcsetSupported = "srcset" in img;
+		pf.sizesSupported = "sizes" in img;
+	})();
 
 	// just a string trim workaround
 	pf.trim = function( str ) {
@@ -128,6 +131,9 @@ window.matchMedia || (window.matchMedia = function() {
 
 		// Positioning styles help prevent padding/margin/width on `html` from throwing calculations off.
 		pf.lengthEl.style.cssText = "position: absolute; left: 0; width: " + length + ";";
+
+		// Add a class, so that everyone knows where this element comes from
+		pf.lengthEl.className = "helper-from-picturefill-js";
 
 		if ( pf.lengthEl.offsetWidth <= 0 ) {
 			// Something has gone wrong. `calc()` is in use and unsupported, most likely. Default to `100vw` (`100%`, for broader support.):
@@ -598,18 +604,23 @@ window.matchMedia || (window.matchMedia = function() {
 				return;
 			}
 		}, 250 );
-		if ( w.addEventListener ) {
+
+		function checkResize() {
 			var resizeThrottle;
-			w.addEventListener( "resize", function() {
-				if (!w._picturefillWorking) {
-					w._picturefillWorking = true;
-					w.clearTimeout( resizeThrottle );
-					resizeThrottle = w.setTimeout( function() {
-						picturefill({ reevaluate: true });
-						w._picturefillWorking = false;
-					}, 60 );
-				}
-			}, false );
+			if (!w._picturefillWorking) {
+				w._picturefillWorking = true;
+				w.clearTimeout( resizeThrottle );
+				resizeThrottle = w.setTimeout( function() {
+					picturefill({ reevaluate: true });
+					w._picturefillWorking = false;
+				}, 60 );
+			}
+		}
+
+		if ( w.addEventListener ) {
+			w.addEventListener( "resize", checkResize, false );
+		} else if ( w.attachEvent ) {
+			w.attachEvent( "onresize", checkResize );
 		}
 	}
 
