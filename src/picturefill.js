@@ -750,7 +750,7 @@
 		}
 		var candidates = pf.parseSet( set );
 
-		return !candidates[ 0 ] || candidates[ 0 ].desc.type === "w";
+		return candidates[ 0 ] && candidates[ 0 ].desc.type === "w";
 	};
 
 	function getAllSourceElements( picture, candidates ) {
