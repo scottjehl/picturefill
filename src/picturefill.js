@@ -552,18 +552,23 @@
 				return;
 			}
 		}, 250 );
-		if ( w.addEventListener ) {
+
+		function checkResize() {
 			var resizeThrottle;
-			w.addEventListener( "resize", function() {
-				if (!w._picturefillWorking) {
-					w._picturefillWorking = true;
-					w.clearTimeout( resizeThrottle );
-					resizeThrottle = w.setTimeout( function() {
-						picturefill({ reevaluate: true });
-						w._picturefillWorking = false;
-					}, 60 );
-				}
-			}, false );
+			if (!w._picturefillWorking) {
+				w._picturefillWorking = true;
+				w.clearTimeout( resizeThrottle );
+				resizeThrottle = w.setTimeout( function() {
+					picturefill({ reevaluate: true });
+					w._picturefillWorking = false;
+				}, 60 );
+			}
+		}
+
+		if ( w.addEventListener ) {
+			w.addEventListener( "resize", checkResize, false );
+		} else if ( w.attachEvent ) {
+			w.attachEvent( "onresize", checkResize );
 		}
 	}
 
