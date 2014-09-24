@@ -278,10 +278,8 @@ window.matchMedia || (window.matchMedia = function() {
 	pf.createImageTest = function( type, src ) {
 		// based on Modernizr's lossless img-webp test
 		// note: asynchronous
-		var timer;
 		var img = doc.createElement( "img" );
 		var complete = function() {
-			clearTimeout(timer);
 			if ( pf.isReady ) {
 				pf.fillImgs();
 			}
@@ -298,7 +296,7 @@ window.matchMedia || (window.matchMedia = function() {
 			types[ type ] = img.width === 1;
 			complete();
 		};
-		timer = setTimeout(img.onerror, 300);
+
 		img.src = src;
 	};
 
