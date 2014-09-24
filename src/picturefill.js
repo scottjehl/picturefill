@@ -348,7 +348,7 @@
 	};
 
 	var memDescriptor = {};
-	var regDescriptor =  /^([\d\.]+)(w|x)$/; // currently no h
+	var regDescriptor =  /^([e\d\.]+)(w|x)$/; // currently no h
 
 	function parseDescriptor( descriptor ) {
 
@@ -361,10 +361,15 @@
 
 			if ( parsedDescriptor ) {
 				if ( ( parsedDescriptor ).match( regDescriptor ) ) {
-					descriptorObj.val = parseFloat( RegExp.$1, 10 );
+					descriptorObj.val =  RegExp.$1 * 1;
 					descriptorObj.type = RegExp.$2;
+
+					if ( PFDEBUG && (descriptorObj.val < 0 || isNaN( descriptorObj.val )) ) {
+						warn( "bad descriptor: " + descriptor );
+					}
 				} else {
 					descriptorObj = false;
+
 					if ( PFDEBUG ) {
 						warn( "unknown descriptor: " + descriptor );
 					}

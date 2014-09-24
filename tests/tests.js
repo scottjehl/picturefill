@@ -391,7 +391,7 @@
 
 		deepEqual(runGetCandiate(srcset, sizes), expected, "`" + srcset + "` is parsed correctly" );
 
-		srcset = "foo,bar.png 320w, bar,baz.png 320w";
+		srcset = "foo,bar.png 320w, bar,baz.png 320w, ";
 		expected = [
 			{
 				url: "foo,bar.png",
@@ -533,6 +533,23 @@
 			{
 				url: "bar2", //why not ,bar2?
 				res: 3
+			}
+		];
+		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
+
+		pf.calcLength = function() {
+			return 100;
+		};
+
+		srcset = "foo.png 2e2w, bar.jpg 1e2w";
+		expected = [
+			{
+				url: "foo.png",
+				res: 2
+			},
+			{
+				url: "bar.jpg",
+				res: 1
 			}
 		];
 		deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
