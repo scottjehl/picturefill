@@ -31,7 +31,14 @@
 			},
 			uglify: {
 				options: {
-					banner: "<%= banner %>"
+					banner: "<%= banner %>",
+
+					compress: {
+						global_defs: {
+							"PFDEBUG": false
+						},
+						dead_code: true
+					}
 				},
 				dist: {
 					src: [ "<%= concat.dist.src %>" ],

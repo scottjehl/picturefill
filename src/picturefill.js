@@ -6,6 +6,9 @@
 (function( w, doc ) {
 	// Enable strict mode
 	"use strict";
+	if ( typeof PFDEBUG === "undefined" ) {
+		w.PFDEBUG = true;
+	}
 
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
 	doc.createElement( "picture" );
@@ -204,7 +207,7 @@
 
 			lengthCache[ origLength ] = value;
 
-			if ( value === false ) {
+			if ( PFDEBUG && value === false ) {
 				warn( "invalid source size: " + origLength );
 			}
 		}
@@ -362,7 +365,9 @@
 					descriptorObj.type = RegExp.$2;
 				} else {
 					descriptorObj = false;
-					warn( "unknown descriptor: " + descriptor );
+					if ( PFDEBUG ) {
+						warn( "unknown descriptor: " + descriptor );
+					}
 				}
 			}
 
@@ -706,6 +711,7 @@
 				srcset: element[ pf.ns ].srcset,
 				sizes: element.getAttribute( "sizes" )
 			};
+
 			element[ pf.ns ].sets.push( fallbackCandidate );
 
 			hasWDescripor = (alwaysCheckWDescriptor || element[ pf.ns ].src) ?
@@ -773,8 +779,15 @@
 					type: source.getAttribute( "type" ),
 					sizes: source.getAttribute( "sizes" )
 				} );
-			} else if ( source.getAttribute( "src" ) ) {
+			} else if ( PFDEBUG && source.getAttribute( "src" ) ) {
 				warn( "`src` on `source` invalid, use `srcset`." );
+			}
+		}
+
+		if ( PFDEBUG ) {
+			var srcTest = pf.qsa( picture, "source, img ");
+			if ( srcTest[ srcTest.length - 1].nodeName.toUpperCase() === "SOURCE" ) {
+				warn( "all sources inside picture have to precede the img element" );
 			}
 		}
 	}

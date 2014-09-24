@@ -12,5 +12,5 @@
 	"eqnull": true,
 	"node": true,
 	"browser": true,
-	"predef": [ "define", "module" ]
+	"predef": [ "define", "module", "PFDEBUG" ]
 }

@@ -1,4 +1,4 @@
-/*! Picturefill - v2.1.0 - 2014-09-23
+/*! Picturefill - v2.1.0 - 2014-09-24
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -55,6 +55,9 @@ window.matchMedia || (window.matchMedia = function() {
 (function( w, doc ) {
 	// Enable strict mode
 	"use strict";
+	if ( typeof PFDEBUG === "undefined" ) {
+		w.PFDEBUG = true;
+	}
 
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
 	doc.createElement( "picture" );
@@ -253,7 +256,7 @@ window.matchMedia || (window.matchMedia = function() {
 
 			lengthCache[ origLength ] = value;
 
-			if ( value === false ) {
+			if ( PFDEBUG && value === false ) {
 				warn( "invalid source size: " + origLength );
 			}
 		}
@@ -411,7 +414,9 @@ window.matchMedia || (window.matchMedia = function() {
 					descriptorObj.type = RegExp.$2;
 				} else {
 					descriptorObj = false;
-					warn( "unknown descriptor: " + descriptor );
+					if ( PFDEBUG ) {
+						warn( "unknown descriptor: " + descriptor );
+					}
 				}
 			}
 
@@ -755,6 +760,7 @@ window.matchMedia || (window.matchMedia = function() {
 				srcset: element[ pf.ns ].srcset,
 				sizes: element.getAttribute( "sizes" )
 			};
+
 			element[ pf.ns ].sets.push( fallbackCandidate );
 
 			hasWDescripor = (alwaysCheckWDescriptor || element[ pf.ns ].src) ?
@@ -822,8 +828,15 @@ window.matchMedia || (window.matchMedia = function() {
 					type: source.getAttribute( "type" ),
 					sizes: source.getAttribute( "sizes" )
 				} );
-			} else if ( source.getAttribute( "src" ) ) {
+			} else if ( PFDEBUG && source.getAttribute( "src" ) ) {
 				warn( "`src` on `source` invalid, use `srcset`." );
+			}
+		}
+
+		if ( PFDEBUG ) {
+			var srcTest = pf.qsa( picture, "source, img ");
+			if ( srcTest[ srcTest.length - 1].nodeName.toUpperCase() === "SOURCE" ) {
+				warn( "all sources inside picture have to precede the img element" );
 			}
 		}
 	}
