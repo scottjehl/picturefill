@@ -25,7 +25,7 @@
 					stripBanners: true
 				},
 				dist: {
-					src: [ "src/external/matchmedia.js", "src/picturefill.js" ],
+					src: [ "src/picturefill.js" ],
 					dest: "dist/picturefill.js"
 				}
 			},

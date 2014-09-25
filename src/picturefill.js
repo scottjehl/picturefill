@@ -75,8 +75,22 @@
 	/**
 	 * Shortcut method for matchMedia ( for easy overriding in tests )
 	 */
-	pf.matchesMedia = function( media ) {
-		return !media || ( w.matchMedia && w.matchMedia( media ).matches );
+	var matchMediaTest = "(min-width: 0.1em)";
+	var Mod = w.Modernizr;
+	pf.matchesMedia = function() {
+		if ( w.matchMedia && w.matchMedia( matchMediaTest).matches ) {
+			pf.matchesMedia = function( media ) {
+				return !media || ( w.matchMedia( media ).matches );
+			};
+		} else if ( Mod && Mod.mq  && Mod.mq( matchMediaTest ) ) {
+			pf.matchesMedia = function( media ) {
+				return !media || ( Mod.mq( matchMediaTest ) );
+			};
+		} else {
+			pf.matchesMedia = pf.mMQ;
+		}
+
+		return pf.matchesMedia.apply( this, arguments );
 	};
 
 	pf.vW = 0;
@@ -125,10 +139,6 @@
 
 		return ret;
 	};
-
-	if ( !pf.matchesMedia( "(min-width: 0.1em)" ) ) {
-		pf.matchesMedia = pf.mMQ;
-	}
 
 	/**
 	 * Shortcut property for `devicePixelRatio` ( for easy overriding in tests )

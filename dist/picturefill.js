@@ -1,52 +1,6 @@
-/*! Picturefill - v2.1.0 - 2014-09-24
+/*! Picturefill - v2.1.0 - 2014-09-25
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
-/*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
-
-window.matchMedia || (window.matchMedia = function() {
-	"use strict";
-
-	// For browsers that support matchMedium api such as IE 9 and webkit
-	var styleMedia = (window.styleMedia || window.media);
-
-	// For those that don't support matchMedium
-	if (!styleMedia) {
-		var style       = document.createElement('style'),
-			script      = document.getElementsByTagName('script')[0],
-			info        = null;
-
-		style.type  = 'text/css';
-		style.id    = 'matchmediajs-test';
-
-		script.parentNode.insertBefore(style, script);
-
-		// 'style.currentStyle' is used by IE <= 8 and 'window.getComputedStyle' for all other browsers
-		info = ('getComputedStyle' in window) && window.getComputedStyle(style, null) || style.currentStyle;
-
-		styleMedia = {
-			matchMedium: function(media) {
-				var text = '@media ' + media + '{ #matchmediajs-test { width: 1px; } }';
-
-				// 'style.styleSheet' is used by IE <= 8 and 'style.textContent' for all other browsers
-				if (style.styleSheet) {
-					style.styleSheet.cssText = text;
-				} else {
-					style.textContent = text;
-				}
-
-				// Test if media query is true or false
-				return info.width === '1px';
-			}
-		};
-	}
-
-	return function(media) {
-		return {
-			matches: styleMedia.matchMedium(media || 'all'),
-			media: media || 'all'
-		};
-	};
-}());
 /*! Picturefill - Responsive Images that work today.
  *  Author: Scott Jehl, Filament Group, 2012 ( new proposal implemented by Shawn Jansepar )
  *  License: MIT/GPLv2
@@ -124,8 +78,22 @@ window.matchMedia || (window.matchMedia = function() {
 	/**
 	 * Shortcut method for matchMedia ( for easy overriding in tests )
 	 */
-	pf.matchesMedia = function( media ) {
-		return !media || ( w.matchMedia && w.matchMedia( media ).matches );
+	var matchMediaTest = "(min-width: 0.1em)";
+	var Mod = w.Modernizr;
+	pf.matchesMedia = function() {
+		if ( w.matchMedia && w.matchMedia( matchMediaTest).matches ) {
+			pf.matchesMedia = function( media ) {
+				return !media || ( w.matchMedia( media ).matches );
+			};
+		} else if ( Mod && Mod.mq  && Mod.mq( matchMediaTest ) ) {
+			pf.matchesMedia = function( media ) {
+				return !media || ( Mod.mq( matchMediaTest ) );
+			};
+		} else {
+			pf.matchesMedia = pf.mMQ;
+		}
+
+		return pf.matchesMedia.apply( this, arguments );
 	};
 
 	pf.vW = 0;
@@ -174,10 +142,6 @@ window.matchMedia || (window.matchMedia = function() {
 
 		return ret;
 	};
-
-	if ( !pf.matchesMedia( "(min-width: 0.1em)" ) ) {
-		pf.matchesMedia = pf.mMQ;
-	}
 
 	/**
 	 * Shortcut property for `devicePixelRatio` ( for easy overriding in tests )
