@@ -125,11 +125,14 @@ window.matchMedia || (window.matchMedia = function() {
 		// Create a cached element for getting length value widths
 		if ( !pf.lengthEl ) {
 			pf.lengthEl = doc.createElement( "div" );
-			doc.documentElement.insertBefore( pf.lengthEl, doc.documentElement.firstChild );
+
+			// Positioning styles help prevent padding/margin/width on `html` or `body` from throwing calculations off.
+			pf.lengthEl.style.cssText = "border:0;display:block;font-size:1em;left:0;margin:0;padding:0;position:absolute;visibility:hidden";
 		}
 
-		// Positioning styles help prevent padding/margin/width on `html` from throwing calculations off.
-		pf.lengthEl.style.cssText = "position: absolute; left: 0; width: " + length + ";";
+		pf.lengthEl.style.width = length;
+
+		doc.body.appendChild(pf.lengthEl);
 
 		// Add a class, so that everyone knows where this element comes from
 		pf.lengthEl.className = "helper-from-picturefill-js";
@@ -139,7 +142,11 @@ window.matchMedia || (window.matchMedia = function() {
 			pf.lengthEl.style.cssText = "width: 100%;";
 		}
 
-		return pf.lengthEl.offsetWidth;
+		var offsetWidth = pf.lengthEl.offsetWidth;
+
+		doc.body.removeChild( pf.lengthEl );
+
+		return offsetWidth;
 	};
 
 	// container of supported mime types that one might need to qualify before using
@@ -413,12 +420,11 @@ window.matchMedia || (window.matchMedia = function() {
 				// http://picture.responsiveimages.org/#the-img-element
 				picImg.currentSrc = picImg.src;
 
-				var
-				style = picImg.style || {},
-				hasWebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
-				currentZoom = style.zoom;
+				var style = picImg.style || {},
+					hasWebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
+					currentZoom = style.zoom;
 
-				if (hasWebkitBackfaceVisibility) {
+				if (hasWebkitBackfaceVisibility) { // See: https://github.com/scottjehl/picturefill/issues/332
 					style.zoom = ".999";
 
 					hasWebkitBackfaceVisibility = picImg.offsetWidth;
