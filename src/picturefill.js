@@ -363,6 +363,19 @@
 				// currentSrc attribute and property to match
 				// http://picture.responsiveimages.org/#the-img-element
 				picImg.currentSrc = picImg.src;
+
+				var
+				style = picImg.style || {},
+				hasWebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
+				currentZoom = style.zoom;
+
+				if (hasWebkitBackfaceVisibility) {
+					style.zoom = ".999";
+
+					hasWebkitBackfaceVisibility = picImg.offsetWidth;
+
+					style.zoom = currentZoom;
+				}
 			}
 		}
 	};
