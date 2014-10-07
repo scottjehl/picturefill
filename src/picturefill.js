@@ -3,7 +3,7 @@
 *  License: MIT/GPLv2
 *  Spec: http://picture.responsiveimages.org/
 */
-(function( w, doc ) {
+(function( w, doc, image ) {
 	// Enable strict mode
 	"use strict";
 
@@ -24,9 +24,8 @@
 
 	// srcset support test
 	(function() {
-		var img = doc.createElement( "img" );
-		pf.srcsetSupported = "srcset" in img;
-		pf.sizesSupported = "sizes" in img;
+		pf.srcsetSupported = "srcset" in image;
+		pf.sizesSupported = "sizes" in image;
 	})();
 
 	// just a string trim workaround
@@ -109,18 +108,17 @@
 	pf.types[ "image/webp" ] = function() {
 		// based on Modernizr's lossless img-webp test
 		// note: asynchronous
-		var img = new w.Image(),
-			type = "image/webp";
+		var type = "image/webp";
 
-		img.onerror = function() {
+		image.onerror = function() {
 			pf.types[ type ] = false;
 			picturefill();
 		};
-		img.onload = function() {
-			pf.types[ type ] = img.width === 1;
+		image.onload = function() {
+			pf.types[ type ] = image.width === 1;
 			picturefill();
 		};
-		img.src = "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=";
+		image.src = "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=";
 	};
 
 	/**
@@ -592,4 +590,4 @@
 		w.picturefill = picturefill;
 	}
 
-} )( this, this.document );
+} )( this, this.document, new this.Image() );
