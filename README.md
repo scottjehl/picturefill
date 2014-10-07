@@ -56,6 +56,7 @@ Upon finding a matching `span[data-src]` element, picturefill will generate an `
 		<span class="sml" data-src="small.jpg"></span>
 		<span class="med" data-src="medium.jpg"     data-media="(min-width: 400px)"></span>
 		<span class="lrg" data-src="large.jpg"      data-media="(min-width: 800px)"></span>
+	</span>
 ````
 
 ...then you could write styles specific to each of the images, which may be handy for certain layout situations.
