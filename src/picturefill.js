@@ -364,10 +364,9 @@
 				// http://picture.responsiveimages.org/#the-img-element
 				picImg.currentSrc = picImg.src;
 
-				var
-				style = picImg.style || {},
-				hasWebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
-				currentZoom = style.zoom;
+				var style = picImg.style || {},
+					hasWebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
+					currentZoom = style.zoom;
 
 				if (hasWebkitBackfaceVisibility) {
 					style.zoom = ".999";
