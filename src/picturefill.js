@@ -88,7 +88,7 @@
 
 		if ( pf.lengthEl.offsetWidth <= 0 ) {
 			// Something has gone wrong. `calc()` is in use and unsupported, most likely. Default to `100vw` (`100%`, for broader support.):
-			pf.lengthEl.style.cssText = doc.documentElement.offsetWidth;
+			pf.lengthEl.style.width = doc.documentElement.offsetWidth + "px";
 		}
 
 		return pf.lengthEl.offsetWidth;
