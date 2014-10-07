@@ -365,13 +365,13 @@
 				picImg.currentSrc = picImg.src;
 
 				var style = picImg.style || {},
-					hasWebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
+					WebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
 					currentZoom = style.zoom;
 
-				if (hasWebkitBackfaceVisibility) { // See: https://github.com/scottjehl/picturefill/issues/332
+				if (WebkitBackfaceVisibility) { // See: https://github.com/scottjehl/picturefill/issues/332
 					style.zoom = ".999";
 
-					hasWebkitBackfaceVisibility = picImg.offsetWidth;
+					WebkitBackfaceVisibility = picImg.offsetWidth;
 
 					style.zoom = currentZoom;
 				}
