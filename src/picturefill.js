@@ -268,17 +268,15 @@
 			if ( sizeDescriptor ) {
 				var splitDescriptor = sizeDescriptor.split(" ");
 
-				for (var i = splitDescriptor.length + 1; i >= 0; i--) {
-					if ( splitDescriptor[ i ] !== undefined ) {
-						var curr = splitDescriptor[ i ],
-							lastchar = curr && curr.slice( curr.length - 1 );
+				for (var i = splitDescriptor.length - 1; i >= 0; i--) {
+					var curr = splitDescriptor[ i ],
+						lastchar = curr && curr.slice( curr.length - 1 );
 
-						if ( ( lastchar === "h" || lastchar === "w" ) && !pf.sizesSupported ) {
-							resCandidate = parseFloat( ( parseInt( curr, 10 ) / widthInCssPixels ) );
-						} else if ( lastchar === "x" ) {
-							var res = curr && parseFloat( curr, 10 );
-							resCandidate = res && !isNaN( res ) ? res : 1;
-						}
+					if ( ( lastchar === "h" || lastchar === "w" ) && !pf.sizesSupported ) {
+						resCandidate = parseFloat( ( parseInt( curr, 10 ) / widthInCssPixels ) );
+					} else if ( lastchar === "x" ) {
+						var res = curr && parseFloat( curr, 10 );
+						resCandidate = res && !isNaN( res ) ? res : 1;
 					}
 				}
 			}
