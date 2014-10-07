@@ -43,7 +43,7 @@
 			(document.body || document.documentElement).appendChild( fullWidthEl );
 
 			var gotWidth = pf.getWidthFromLength("calc(766px - 1em)");
-			var returnValue = ( gotWidth === 750 || gotWidth === fullWidthEl.offsetWidth );
+			var returnValue = ( gotWidth === 750 || gotWidth === document.documentElement.offsetWidth );
 
 			fullWidthEl.parentNode.removeChild( fullWidthEl );
 
