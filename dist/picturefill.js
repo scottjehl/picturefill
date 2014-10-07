@@ -259,7 +259,7 @@ window.matchMedia || (window.matchMedia = function() {
 			if ( pos !== -1 ) {
 				url = srcset.slice( 0, pos );
 
-				var last = url[ url.length - 1 ];
+				var last = url.slice(-1);
 
 				// 6. If url ends with a U+002C COMMA character (,), remove that character from url
 				// and let descriptors be the empty string. Otherwise, follow these substeps
