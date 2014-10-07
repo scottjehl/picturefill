@@ -368,7 +368,7 @@
 					hasWebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
 					currentZoom = style.zoom;
 
-				if (hasWebkitBackfaceVisibility) {
+				if (hasWebkitBackfaceVisibility) { // See: https://github.com/scottjehl/picturefill/issues/332
 					style.zoom = ".999";
 
 					hasWebkitBackfaceVisibility = picImg.offsetWidth;
