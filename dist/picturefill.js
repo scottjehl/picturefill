@@ -1,4 +1,4 @@
-/*! Picturefill - v2.1.0 - 2014-10-06
+/*! Picturefill - v2.1.0 - 2014-10-07
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -412,6 +412,19 @@ window.matchMedia || (window.matchMedia = function() {
 				// currentSrc attribute and property to match
 				// http://picture.responsiveimages.org/#the-img-element
 				picImg.currentSrc = picImg.src;
+
+				var
+				style = picImg.style || {},
+				hasWebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
+				currentZoom = style.zoom;
+
+				if (hasWebkitBackfaceVisibility) {
+					style.zoom = ".999";
+
+					hasWebkitBackfaceVisibility = picImg.offsetWidth;
+
+					style.zoom = currentZoom;
+				}
 			}
 		}
 	};
