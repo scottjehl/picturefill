@@ -195,7 +195,7 @@ picturefill();
 		<p>When running the <code>picturefill()</code> function, you can pass options specifying the following settings:</p>
 
 		<ul>
-			<li><strong>Elements:</strong> An array of <code>picture</code> and <code>img[srcset]</code> elements you'd like picturefill to evaluate. The Default value for <code>options.elements</code> is all <code>picture</code> and <code>img[srcset]</code> elements in the page.
+			<li><strong>Elements:</strong> An array of <code>img</code> elements you'd like picturefill to evaluate. The Default value for <code>options.elements</code> is all <code>img</code> elements in the page that have a <code>srcset</code> attribute or have a <code>picture</code> element as a direct parent.
 <pre><code>picturefill( {
 	elements: [ document.getElementById( "myPicture" ) ]
 } );
