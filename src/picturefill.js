@@ -64,6 +64,7 @@
 	pf.getWidthFromLength = function( length ) {
 		// If a length is specified and doesn’t contain a percentage, and it is greater than 0 or using `calc`, use it. Else, use the `100vw` default.
 		length = length && length.indexOf( "%" ) > -1 === false && ( parseFloat( length ) > 0 || length.indexOf( "calc(" ) > -1 ) ? length : "100vw";
+
 		/**
 		 * If length is specified in  `vw` units, use `%` instead since the div we’re measuring
 		 * is injected at the top of the document.
@@ -89,7 +90,7 @@
 
 		if ( pf.lengthEl.offsetWidth <= 0 ) {
 			// Something has gone wrong. `calc()` is in use and unsupported, most likely. Default to `100vw` (`100%`, for broader support.):
-			pf.lengthEl.style.cssText = "width: 100%;";
+			pf.lengthEl.style.width = doc.documentElement.offsetWidth + "px";
 		}
 
 		var offsetWidth = pf.lengthEl.offsetWidth;
@@ -363,13 +364,13 @@
 				picImg.currentSrc = picImg.src;
 
 				var style = picImg.style || {},
-					hasWebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
+					WebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
 					currentZoom = style.zoom;
 
-				if (hasWebkitBackfaceVisibility) { // See: https://github.com/scottjehl/picturefill/issues/332
+				if (WebkitBackfaceVisibility) { // See: https://github.com/scottjehl/picturefill/issues/332
 					style.zoom = ".999";
 
-					hasWebkitBackfaceVisibility = picImg.offsetWidth;
+					WebkitBackfaceVisibility = picImg.offsetWidth;
 
 					style.zoom = currentZoom;
 				}
