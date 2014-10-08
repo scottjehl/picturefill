@@ -23,7 +23,7 @@
 	// If picture is supported, well, that's awesome. Let's get outta here...
 	if ( w.HTMLPictureElement ) {
 		w.picturefill = function() { };
-		return;
+		return w.picturefill;
 	}
 
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
