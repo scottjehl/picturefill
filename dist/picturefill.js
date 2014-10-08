@@ -1,4 +1,4 @@
-/*! Picturefill - v2.1.0 - 2014-10-07
+/*! Picturefill - v2.1.0 - 2014-10-08
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -52,14 +52,27 @@ window.matchMedia || (window.matchMedia = function() {
 *  License: MIT/GPLv2
 *  Spec: http://picture.responsiveimages.org/
 */
-(function( w, doc, image ) {
+(function( root, factory ) {
+    if ( typeof define === "function" && define.amd ) {
+        // AMD. Register as an anonymous module.
+        define(function() {
+            return factory(root, root.document, new root.Image());
+        });
+    } else if ( typeof exports === "object" ) {
+        // CommonJS, just export
+        module.exports = factory(root, root.document, new root.Image());
+    } else {
+        // Browser globals (root is window)
+        root.picturefill = factory(root, root.document, new root.Image());
+    }
+}( this, function( w, doc, image ) {
 	// Enable strict mode
 	"use strict";
 
 	// If picture is supported, well, that's awesome. Let's get outta here...
 	if ( w.HTMLPictureElement ) {
 		w.picturefill = function() { };
-		return;
+		return w.picturefill;
 	}
 
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
@@ -246,8 +259,8 @@ window.matchMedia || (window.matchMedia = function() {
 		 *
 		 * 1. Let input (`srcset`) be the value passed to this algorithm.
 		 * 2. Let position be a pointer into input, initially pointing at the start of the string.
-		 * 3. Let raw candidates be an initially empty ordered list of URLs with associated 
-		 *    unparsed descriptors. The order of entries in the list is the order in which entries 
+		 * 3. Let raw candidates be an initially empty ordered list of URLs with associated
+		 *    unparsed descriptors. The order of entries in the list is the order in which entries
 		 *    are added to the list.
 		 */
 		var candidates = [];
@@ -274,7 +287,7 @@ window.matchMedia || (window.matchMedia = function() {
 				}
 				srcset = srcset.slice( pos + 1 );
 
-				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and 
+				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and
 				// let that be descriptors.
 				if ( descriptor === null ) {
 					var descpos = srcset.indexOf( "," );
@@ -303,7 +316,7 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	pf.parseDescriptor = function( descriptor, sizesattr ) {
-		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list 
+		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list
 		// is the order in which entries are added to the list.
 		var sizes = sizesattr || "100vw",
 			sizeDescriptor = descriptor && descriptor.replace( /(^\s+|\s+$)/g, "" ),
@@ -645,15 +658,5 @@ window.matchMedia || (window.matchMedia = function() {
 	picturefill._ = pf;
 
 	/* expose picturefill */
-	if ( typeof module === "object" && typeof module.exports === "object" ) {
-		// CommonJS, just export
-		module.exports = picturefill;
-	} else if ( typeof define === "function" && define.amd ) {
-		// AMD support
-		define( function() { return picturefill; } );
-	} else if ( typeof w === "object" ) {
-		// If no AMD and we are in the browser, attach to window
-		w.picturefill = picturefill;
-	}
-
-} )( this, this.document, new this.Image() );
+	return picturefill;
+} ));
