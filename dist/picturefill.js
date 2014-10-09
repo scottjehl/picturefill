@@ -1,4 +1,4 @@
-/*! Picturefill - v2.1.0 - 2014-10-08
+/*! Picturefill - v2.1.0 - 2014-10-09
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -71,8 +71,7 @@ window.matchMedia || (window.matchMedia = function() {
 
 	// If picture is supported, well, that's awesome. Let's get outta here...
 	if ( w.HTMLPictureElement ) {
-		w.picturefill = function() { };
-		return;
+		return function() { };
 	}
 
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
