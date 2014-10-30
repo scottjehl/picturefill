@@ -3,4 +3,6 @@
 node_modules
 **/.sass-cache
 **/.sass-cache/*
+*.bak
+*.zip
 
