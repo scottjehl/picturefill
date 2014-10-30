@@ -3,7 +3,7 @@
 *  License: MIT/GPLv2
 *  Spec: http://picture.responsiveimages.org/
 */
-(function( w, doc ) {
+(function( w, doc, image ) {
 	// Enable strict mode
 	"use strict";
 
@@ -23,8 +23,10 @@
 	pf.ns = "picturefill";
 
 	// srcset support test
-	pf.srcsetSupported = "srcset" in doc.createElement( "img" );
-	pf.sizesSupported = w.HTMLImageElement.sizes;
+	(function() {
+		pf.srcsetSupported = "srcset" in image;
+		pf.sizesSupported = "sizes" in image;
+	})();
 
 	// just a string trim workaround
 	pf.trim = function( str ) {
@@ -37,15 +39,20 @@
 	};
 
 	/**
+	 * Shortcut method for https://w3c.github.io/webappsec/specs/mixedcontent/#restricts-mixed-content ( for easy overriding in tests )
+	 */
+	pf.restrictsMixedContent = function() {
+		return w.location.protocol === "https:";
+	};
+	/**
 	 * Shortcut method for matchMedia ( for easy overriding in tests )
 	 */
+
 	pf.matchesMedia = function( media ) {
 		return w.matchMedia && w.matchMedia( media ).matches;
 	};
 
-	/**
-	 * Shortcut method for `devicePixelRatio` ( for easy overriding in tests )
-	 */
+	// Shortcut method for `devicePixelRatio` ( for easy overriding in tests )
 	pf.getDpr = function() {
 		return ( w.devicePixelRatio || 1 );
 	};
@@ -55,41 +62,51 @@
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
 	 */
 	pf.getWidthFromLength = function( length ) {
-		// If no length was specified, or it is 0 or negative, default to `100vw` (per the spec).
-		length = length && ( parseFloat( length ) > 0 || length.indexOf( "calc(" ) > -1 ) ? length : "100vw";
+		// If a length is specified and doesn’t contain a percentage, and it is greater than 0 or using `calc`, use it. Else, use the `100vw` default.
+		length = length && length.indexOf( "%" ) > -1 === false && ( parseFloat( length ) > 0 || length.indexOf( "calc(" ) > -1 ) ? length : "100vw";
 
 		/**
-		* If length is specified in  `vw` units, use `%` instead since the div we’re measuring
-		* is injected at the top of the document.
-		*
-		* TODO: maybe we should put this behind a feature test for `vw`?
-		*/
+		 * If length is specified in  `vw` units, use `%` instead since the div we’re measuring
+		 * is injected at the top of the document.
+		 *
+		 * TODO: maybe we should put this behind a feature test for `vw`?
+		 */
 		length = length.replace( "vw", "%" );
 
 		// Create a cached element for getting length value widths
 		if ( !pf.lengthEl ) {
 			pf.lengthEl = doc.createElement( "div" );
-			doc.documentElement.insertBefore( pf.lengthEl, doc.documentElement.firstChild );
+
+			// Positioning styles help prevent padding/margin/width on `html` or `body` from throwing calculations off.
+			pf.lengthEl.style.cssText = "border:0;display:block;font-size:1em;left:0;margin:0;padding:0;position:absolute;visibility:hidden";
 		}
 
-		// Positioning styles help prevent padding/margin/width on `html` from throwing calculations off.
-		pf.lengthEl.style.cssText = "position: absolute; left: 0; width: " + length + ";";
+		pf.lengthEl.style.width = length;
+
+		doc.body.appendChild(pf.lengthEl);
+
+		// Add a class, so that everyone knows where this element comes from
+		pf.lengthEl.className = "helper-from-picturefill-js";
 
 		if ( pf.lengthEl.offsetWidth <= 0 ) {
 			// Something has gone wrong. `calc()` is in use and unsupported, most likely. Default to `100vw` (`100%`, for broader support.):
-			pf.lengthEl.style.cssText = "width: 100%;";
+			pf.lengthEl.style.width = doc.documentElement.offsetWidth + "px";
 		}
 
-		return pf.lengthEl.offsetWidth;
+		var offsetWidth = pf.lengthEl.offsetWidth;
+
+		doc.body.removeChild( pf.lengthEl );
+
+		return offsetWidth;
 	};
 
 	// container of supported mime types that one might need to qualify before using
 	pf.types =  {};
 
-	// Add support for standard mime types.
-	pf.types["image/jpeg"] = true;
-	pf.types["image/gif"] = true;
-	pf.types["image/png"] = true;
+	// Add support for standard mime types
+	pf.types[ "image/jpeg" ] = true;
+	pf.types[ "image/gif" ] = true;
+	pf.types[ "image/png" ] = true;
 
 	// test svg support
 	pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Image", "1.1");
@@ -98,18 +115,17 @@
 	pf.types[ "image/webp" ] = function() {
 		// based on Modernizr's lossless img-webp test
 		// note: asynchronous
-		var img = new w.Image(),
-			type = "image/webp";
+		var type = "image/webp";
 
-		img.onerror = function() {
+		image.onerror = function() {
 			pf.types[ type ] = false;
 			picturefill();
 		};
-		img.onload = function() {
-			pf.types[ type ] = img.width === 1;
+		image.onload = function() {
+			pf.types[ type ] = image.width === 1;
 			picturefill();
 		};
-		img.src = "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=";
+		image.src = "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=";
 	};
 
 	/**
@@ -134,9 +150,7 @@
 		}
 	};
 
-	/**
-	* Parses an individual `size` and returns the length, and optional media query
-	*/
+	// Parses an individual `size` and returns the length, and optional media query
 	pf.parseSize = function( sourceSizeStr ) {
 		var match = /(\([^)]+\))?\s*(.+)/g.exec( sourceSizeStr );
 		return {
@@ -145,9 +159,7 @@
 		};
 	};
 
-	/**
-	 * Takes a string of sizes and returns the width in pixels as a number
-	 */
+	// Takes a string of sizes and returns the width in pixels as a number
 	pf.findWidthFromSourceSize = function( sourceSizeListStr ) {
 		// Split up source size list, ie ( max-width: 30em ) 100%, ( max-width: 50em ) 50%, 33%
 		//                            or (min-width:30em) calc(30% - 15px)
@@ -180,19 +192,19 @@
 
 	pf.parseSrcset = function( srcset ) {
 		/**
-		* A lot of this was pulled from Boris Smus’ parser for the now-defunct WHATWG `srcset`
-		* https://github.com/borismus/srcset-polyfill/blob/master/js/srcset-info.js
-		*
-		* 1. Let input (`srcset`) be the value passed to this algorithm.
-		* 2. Let position be a pointer into input, initially pointing at the start of the string.
-		* 3. Let raw candidates be an initially empty ordered list of URLs with associated 
-		*    unparsed descriptors. The order of entries in the list is the order in which entries 
-		*    are added to the list.
-		*/
+		 * A lot of this was pulled from Boris Smus’ parser for the now-defunct WHATWG `srcset`
+		 * https://github.com/borismus/srcset-polyfill/blob/master/js/srcset-info.js
+		 *
+		 * 1. Let input (`srcset`) be the value passed to this algorithm.
+		 * 2. Let position be a pointer into input, initially pointing at the start of the string.
+		 * 3. Let raw candidates be an initially empty ordered list of URLs with associated 
+		 *    unparsed descriptors. The order of entries in the list is the order in which entries 
+		 *    are added to the list.
+		 */
 		var candidates = [];
 
 		while ( srcset !== "" ) {
-			srcset = srcset.replace(/^\s+/g,"");
+			srcset = srcset.replace( /^\s+/g, "" );
 
 			// 5. Collect a sequence of characters that are not space characters, and let that be url.
 			var pos = srcset.search(/\s/g),
@@ -201,14 +213,14 @@
 			if ( pos !== -1 ) {
 				url = srcset.slice( 0, pos );
 
-				var last = url[ url.length - 1 ];
+				var last = url.slice(-1);
 
 				// 6. If url ends with a U+002C COMMA character (,), remove that character from url
 				// and let descriptors be the empty string. Otherwise, follow these substeps
 				// 6.1. If url is empty, then jump to the step labeled descriptor parser.
 
 				if ( last === "," || url === "" ) {
-					url = url.replace(/,+$/, "");
+					url = url.replace( /,+$/, "" );
 					descriptor = "";
 				}
 				srcset = srcset.slice( pos + 1 );
@@ -216,7 +228,7 @@
 				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and 
 				// let that be descriptors.
 				if ( descriptor === null ) {
-					var descpos = srcset.indexOf(",");
+					var descpos = srcset.indexOf( "," );
 					if ( descpos !== -1 ) {
 						descriptor = srcset.slice( 0, descpos );
 						srcset = srcset.slice( descpos + 1 );
@@ -245,24 +257,22 @@
 		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list 
 		// is the order in which entries are added to the list.
 		var sizes = sizesattr || "100vw",
-			sizeDescriptor = descriptor && descriptor.replace(/(^\s+|\s+$)/g, ""),
+			sizeDescriptor = descriptor && descriptor.replace( /(^\s+|\s+$)/g, "" ),
 			widthInCssPixels = pf.findWidthFromSourceSize( sizes ),
 			resCandidate;
 
 			if ( sizeDescriptor ) {
 				var splitDescriptor = sizeDescriptor.split(" ");
 
-				for (var i = splitDescriptor.length + 1; i >= 0; i--) {
-					if ( splitDescriptor[ i ] !== undefined ) {
-						var curr = splitDescriptor[ i ],
-							lastchar = curr && curr.slice( curr.length - 1 );
+				for (var i = splitDescriptor.length - 1; i >= 0; i--) {
+					var curr = splitDescriptor[ i ],
+						lastchar = curr && curr.slice( curr.length - 1 );
 
-						if ( ( lastchar === "h" || lastchar === "w" ) && !pf.sizesSupported ) {
-							resCandidate = parseFloat( ( parseInt( curr, 10 ) / widthInCssPixels ) );
-						} else if ( lastchar === "x" ) {
-							var res = curr && parseFloat( curr, 10 );
-							resCandidate = res && !isNaN( res ) ? res : 1;
-						}
+					if ( ( lastchar === "h" || lastchar === "w" ) && !pf.sizesSupported ) {
+						resCandidate = parseFloat( ( parseInt( curr, 10 ) / widthInCssPixels ) );
+					} else if ( lastchar === "x" ) {
+						var res = curr && parseFloat( curr, 10 );
+						resCandidate = res && !isNaN( res ) ? res : 1;
 					}
 				}
 			}
@@ -294,7 +304,7 @@
 		return formattedCandidates;
 	};
 
-	/*
+	/**
 	 * if it's an img element and it has a srcset property,
 	 * we need to remove the attribute so we can manipulate src
 	 * (the property's existence infers native srcset support, and a srcset-supporting browser will prioritize srcset's value over our winning picture candidate)
@@ -307,9 +317,7 @@
 		}
 	};
 
-	/*
-	 * Accept a source or img element and process its srcset and sizes attrs
-	 */
+	// Accept a source or img element and process its srcset and sizes attrs
 	pf.processSourceSet = function( el ) {
 		var srcset = el.getAttribute( "srcset" ),
 			sizes = el.getAttribute( "sizes" ),
@@ -345,10 +353,28 @@
 		}
 
 		if ( bestCandidate && !pf.endsWith( picImg.src, bestCandidate.url ) ) {
-			picImg.src = bestCandidate.url;
-			// currentSrc attribute and property to match
-			// http://picture.responsiveimages.org/#the-img-element
-			picImg.currentSrc = picImg.src;
+			if ( pf.restrictsMixedContent() && bestCandidate.url.substr(0, "http:".length).toLowerCase() === "http:" ) {
+				if ( typeof console !== undefined ) {
+					console.warn( "Blocked mixed content image " + bestCandidate.url );
+				}
+			} else {
+				picImg.src = bestCandidate.url;
+				// currentSrc attribute and property to match
+				// http://picture.responsiveimages.org/#the-img-element
+				picImg.currentSrc = picImg.src;
+
+				var style = picImg.style || {},
+					WebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
+					currentZoom = style.zoom;
+
+				if (WebkitBackfaceVisibility) { // See: https://github.com/scottjehl/picturefill/issues/332
+					style.zoom = ".999";
+
+					WebkitBackfaceVisibility = picImg.offsetWidth;
+
+					style.zoom = currentZoom;
+				}
+			}
 		}
 	};
 
@@ -356,7 +382,7 @@
 		return a.resolution - b.resolution;
 	};
 
-	/*
+	/**
 	 * In IE9, <source> elements get removed if they aren't children of
 	 * video elements. Thus, we conditionally wrap source elements
 	 * using <!--[if IE 9]><video style="display: none;"><![endif]-->
@@ -376,7 +402,7 @@
 		}
 	};
 
-	/*
+	/**
 	 * Find all `img` elements, and add them to the candidate list if they have
 	 * a `picture` parent, a `sizes` attribute in basic `srcset` supporting browsers,
 	 * a `srcset` attribute at all, and they haven’t been evaluated already.
@@ -389,8 +415,8 @@
 			var currImg = imgs[ h ];
 
 			if ( currImg.parentNode.nodeName.toUpperCase() === "PICTURE" ||
-				( currImg.getAttribute( "srcset" ) !== null ) || currImg[ pf.ns ] && currImg[ pf.ns ].srcset !== null ) {
-					elems.push( currImg );
+			( currImg.getAttribute( "srcset" ) !== null ) || currImg[ pf.ns ] && currImg[ pf.ns ].srcset !== null ) {
+				elems.push( currImg );
 			}
 		}
 		return elems;
@@ -420,7 +446,7 @@
 				continue;
 			}
 			// if it's a source element that has the `src` property set, throw a warning in the console
-			if ( source.getAttribute( "src" ) !== null && typeof console !== undefined ){
+			if ( source.getAttribute( "src" ) !== null && typeof console !== undefined ) {
 				console.warn("The `src` attribute is invalid on `picture` `source` element; instead, use `srcset`.");
 			}
 
@@ -453,8 +479,8 @@
 			parent,
 			firstMatch,
 			candidates,
+			options = opt || {};
 
-		options = opt || {};
 		elements = options.elements || pf.getAllElements();
 
 		// Loop through all elements
@@ -464,13 +490,18 @@
 			firstMatch = undefined;
 			candidates = undefined;
 
+			// immediately skip non-`img` nodes
+			if ( element.nodeName.toUpperCase() !== "IMG" ) {
+				continue;
+			}
+
 			// expando for caching data on the img
 			if ( !element[ pf.ns ] ) {
 				element[ pf.ns ] = {};
 			}
 
-			// if the element has already been evaluated, skip it
-			// unless `options.force` is set to true ( this, for example,
+			// if the element has already been evaluated, skip it unless
+			// `options.reevaluate` is set to true ( this, for example,
 			// is set to true when running `picturefill` on `resize` ).
 			if ( !options.reevaluate && element[ pf.ns ].evaluated ) {
 				continue;
@@ -538,18 +569,24 @@
 				return;
 			}
 		}, 250 );
-		if ( w.addEventListener ) {
+
+		function checkResize() {
 			var resizeThrottle;
-			w.addEventListener( "resize", function() {
-				if (!w._picturefillWorking) {
-					w._picturefillWorking = true;
-					w.clearTimeout( resizeThrottle );
-					resizeThrottle = w.setTimeout( function() {
-						picturefill({ reevaluate: true });
-						w._picturefillWorking = false;
-					}, 60 );
-				}
-			}, false );
+
+			if ( !w._picturefillWorking ) {
+				w._picturefillWorking = true;
+				w.clearTimeout( resizeThrottle );
+				resizeThrottle = w.setTimeout( function() {
+					picturefill({ reevaluate: true });
+					w._picturefillWorking = false;
+				}, 60 );
+			}
+		}
+
+		if ( w.addEventListener ) {
+			w.addEventListener( "resize", checkResize, false );
+		} else if ( w.attachEvent ) {
+			w.attachEvent( "onresize", checkResize );
 		}
 	}
 
@@ -562,7 +599,7 @@
 	if ( typeof module === "object" && typeof module.exports === "object" ) {
 		// CommonJS, just export
 		module.exports = picturefill;
-	} else if ( typeof define === "function" && define.amd ){
+	} else if ( typeof define === "function" && define.amd ) {
 		// AMD support
 		define( function() { return picturefill; } );
 	} else if ( typeof w === "object" ) {
@@ -570,4 +607,4 @@
 		w.picturefill = picturefill;
 	}
 
-} )( this, this.document );
+} )( this, this.document, new this.Image() );

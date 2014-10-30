@@ -12,7 +12,8 @@
 		originalVideoShimMethod,
 		originalMatchesMedia,
 		originalProcessSourceSet,
-		originalGetWidthFromLength;
+		originalGetWidthFromLength,
+		originalRestrictsMixedContentMethod;
 
 	pf = picturefill._;
 
@@ -24,6 +25,7 @@
 			originalMatchesMedia = pf.matchesMedia;
 			originalProcessSourceSet = pf.processSourceSet;
 			originalGetWidthFromLength = pf.getWidthFromLength;
+			originalrestrictsMixedContentMethod = pf.restrictsMixedContent;
 		},
 
 		teardown: function() {
@@ -31,17 +33,21 @@
 			pf.removeVideoShim = originalVideoShimMethod;
 			pf.matchesMedia = originalMatchesMedia;
 			pf.processSourceSet = originalProcessSourceSet;
+			pf.restrictsMixedContent = originalrestrictsMixedContentMethod;
 		}
 	});
 
 	test("getWidthFromLength", function() {
 		var calcTest = (function() {
 			var fullWidthEl = document.createElement( "div" );
-			document.documentElement.insertBefore( fullWidthEl, document.documentElement.firstChild );
+			(document.body || document.documentElement).appendChild( fullWidthEl );
 
 			var gotWidth = pf.getWidthFromLength("calc(766px - 1em)");
+			var returnValue = ( gotWidth === 750 || gotWidth === document.documentElement.offsetWidth );
 
-			return ( gotWidth === 750 || gotWidth === fullWidthEl.offsetWidth );
+			fullWidthEl.parentNode.removeChild( fullWidthEl );
+
+			return returnValue;
 		}());
 
 		equal( pf.getWidthFromLength("750px"), 750, "returns int value of width string" );
@@ -537,9 +543,31 @@
 
 		el.setAttribute( "sizes", "100vw" );
 		el.setAttribute( "class", "no-src" );
-		el.insertBefore( document.documentElement.firstChild, null );
+		(document.body || document.documentElement).appendChild( el );
 
 		try { picturefill({ reevaluate: false, elements: document.querySelector( ".no-src" ) }); } catch (e) { console.log( e ); ok( false ); }
+
+		el.parentNode.removeChild( el );
+	});
+
+	test( "Mixed content should be blocked", function() {
+		pf.restrictsMixedContent = function() {
+			return true;
+		};
+		var image, candidates;
+
+		candidates = [
+			{ resolution: 1, url: "http://example.org/bar" },
+		];
+
+		image = {
+			src: "foo"
+		};
+
+		pf.applyBestCandidate( candidates, image );
+
+		equal( image.src, "foo" );
+
 	});
 
 })( window, jQuery );
