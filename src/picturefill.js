@@ -199,7 +199,7 @@
 	// Takes a string of sizes and returns the width in pixels as a number
 	pf.findWidthFromSourceSize = function( sourceSizeListStr ) {
 		// Split up source size list, ie ( max-width: 30em ) 100%, ( max-width: 50em ) 50%, 33%
-		//	                        or (min-width:30em) calc(30% - 15px)
+		//                            or (min-width:30em) calc(30% - 15px)
 		var sourceSizeList = pf.trim( sourceSizeListStr ).split( /\s*,\s*/ ),
 			winningLength;
 
