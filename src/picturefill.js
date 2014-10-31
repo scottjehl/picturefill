@@ -602,8 +602,22 @@
 	} else if ( typeof define === "function" && define.amd ) {
 		// AMD support
 		define( function() { return picturefill; } );
-	} else if ( typeof w === "object" ) {
-		// If no AMD and we are in the browser, attach to window
+	} 
+
+	if ( typeof w === "object" ) {
+		/*
+		If we are in the browser, attach to window
+		
+		Why do this even when AMD is available?
+		If you want to asynchronously load picturefill in the <head> and are 
+		loading	an AMD loader further down the page it's possible that picturefill 
+		will register itself as an AMD module even though that might not have been
+		the intention.
+
+		To make picturefill behave more predictable we always register it on
+		the window object also. This way you can use it both as an AMD module
+		as well as using it outside of an AMD loader.
+		*/
 		w.picturefill = picturefill;
 	}
 
