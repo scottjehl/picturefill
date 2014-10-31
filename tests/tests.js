@@ -40,11 +40,14 @@
 	test("getWidthFromLength", function() {
 		var calcTest = (function() {
 			var fullWidthEl = document.createElement( "div" );
-			document.documentElement.insertBefore( fullWidthEl, document.documentElement.firstChild );
+			(document.body || document.documentElement).appendChild( fullWidthEl );
 
 			var gotWidth = pf.getWidthFromLength("calc(766px - 1em)");
+			var returnValue = ( gotWidth === 750 || gotWidth === document.documentElement.offsetWidth );
 
-			return ( gotWidth === 750 || gotWidth === fullWidthEl.offsetWidth );
+			fullWidthEl.parentNode.removeChild( fullWidthEl );
+
+			return returnValue;
 		}());
 
 		equal( pf.getWidthFromLength("750px"), 750, "returns int value of width string" );
@@ -540,9 +543,11 @@
 
 		el.setAttribute( "sizes", "100vw" );
 		el.setAttribute( "class", "no-src" );
-		el.insertBefore( document.documentElement.firstChild, null );
+		(document.body || document.documentElement).appendChild( el );
 
 		try { picturefill({ reevaluate: false, elements: document.querySelector( ".no-src" ) }); } catch (e) { console.log( e ); ok( false ); }
+
+		el.parentNode.removeChild( el );
 	});
 
 	test( "Mixed content should be blocked", function() {
