@@ -596,15 +596,22 @@
 	picturefill._ = pf;
 
 	/* expose picturefill */
-	if ( typeof module === "object" && typeof module.exports === "object" ) {
-		// CommonJS, just export
-		module.exports = picturefill;
-	} else if ( typeof define === "function" && define.amd ) {
-		// AMD support
-		define( function() { return picturefill; } );
-	} else if ( typeof w === "object" ) {
+	var defined = false;
+	var tryDefine = (typeof w === "object" && typeof w.picturefillConfig === "object" ? w.picturefillConfig.define !== false : true );
+
+	if (tryDefine) {
+		if ( typeof module === "object" && typeof module.exports === "object" ) {
+			// CommonJS, just export
+			module.exports = picturefill;
+			defined = true;
+		} else if ( typeof define === "function" && define.amd ){
+			define( function() { return picturefill; } );	
+			defined = true;
+		}
+	}
+	
+	if ( typeof w === "object" && !defined ) {
 		// If no AMD and we are in the browser, attach to window
 		w.picturefill = picturefill;
 	}
-
 } )( this, this.document, new this.Image() );

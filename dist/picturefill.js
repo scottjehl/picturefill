@@ -1,4 +1,4 @@
-/*! Picturefill - v2.2.0-beta - 2014-10-30
+/*! Picturefill - v2.2.1-beta - 2014-10-31
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -645,15 +645,22 @@ window.matchMedia || (window.matchMedia = function() {
 	picturefill._ = pf;
 
 	/* expose picturefill */
-	if ( typeof module === "object" && typeof module.exports === "object" ) {
-		// CommonJS, just export
-		module.exports = picturefill;
-	} else if ( typeof define === "function" && define.amd ) {
-		// AMD support
-		define( function() { return picturefill; } );
-	} else if ( typeof w === "object" ) {
+	var defined = false;
+	var tryDefine = (typeof w === "object" && typeof w.picturefillConfig === "object" ? w.picturefillConfig.define !== false : true );
+
+	if (tryDefine) {
+		if ( typeof module === "object" && typeof module.exports === "object" ) {
+			// CommonJS, just export
+			module.exports = picturefill;
+			defined = true;
+		} else if ( typeof define === "function" && define.amd ){
+			define( function() { return picturefill; } );	
+			defined = true;
+		}
+	}
+	
+	if ( typeof w === "object" && !defined ) {
 		// If no AMD and we are in the browser, attach to window
 		w.picturefill = picturefill;
 	}
-
 } )( this, this.document, new this.Image() );
