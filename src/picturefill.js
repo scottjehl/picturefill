@@ -601,7 +601,7 @@
 		module.exports = picturefill;
 	} else if ( typeof define === "function" && define.amd ) {
 		// AMD support
-		define( function() { return picturefill; } );
+		define("picturefill", function() { return picturefill; } );
 	} else if ( typeof w === "object" ) {
 		// If no AMD and we are in the browser, attach to window
 		w.picturefill = picturefill;
