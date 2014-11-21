@@ -1,4 +1,5 @@
 # Picturefill
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/scottjehl/picturefill?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 A [responsive image](http://www.whatwg.org/specs/web-apps/current-work/multipage/embedded-content.html#embedded-content) polyfill.
 * Authors: Scott Jehl, Mat Marquis, Shawn Jansepar (2.0 refactor lead), and many more: see Authors.txt
 * License: MIT
