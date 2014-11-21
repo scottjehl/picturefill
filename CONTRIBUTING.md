@@ -25,7 +25,6 @@ Assuming that you don't see any red, you're ready to go. Just be sure to run `gr
 ### Development Workflow
 
 1. If no issue already exists for the work you’ll be doing, create one to document the problem(s) being solved and self-assign.
-1. Flag the issue with the “in progress” label, so we’re not stepping on each others’ toes.
 1. Create a new branch—please don't work in your `master` branch directly. We reccomend naming the branch to match the issue being addressed (`issue-777`).
 1. Add failing tests for the change you want to make. Run `grunt` to see the tests fail.
 1. Fix stuff.
