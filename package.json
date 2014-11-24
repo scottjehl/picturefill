@@ -1,6 +1,8 @@
 {
-	"name": "Picturefill",
+	"name": "picturefill",
+	"description": "A responsive image polyfill.",
 	"version": "2.2.0",
+	"repo": "https://github.com/scottjehl/picturefill.git",
 	"engines": {
 		"node": ">= 0.8.0"
 	},
