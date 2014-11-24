@@ -85,7 +85,7 @@
 			pf.lengthEl.style.cssText = "border:0;display:block;font-size:1em;left:0;margin:0;padding:0;position:absolute;visibility:hidden";
 		}
 
-		pf.lengthEl.style.width = '0px';
+		pf.lengthEl.style.width = "0px";
 
 		pf.lengthEl.style.width = length;
 
