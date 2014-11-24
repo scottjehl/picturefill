@@ -69,6 +69,10 @@
 		};
 		width = pf.findWidthFromSourceSize(sizes);
 		equal(width, 500, "returns 500 when match media returns false");
+
+		sizes = "100foo, 200px";
+		width = pf.findWidthFromSourceSize(sizes);
+		equal(width, 200, "returns 200 when there was an unknown css length");
 	});
 
 	test("parseSize", function() {
