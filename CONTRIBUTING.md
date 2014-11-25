@@ -34,6 +34,14 @@ Assuming that you don't see any red, you're ready to go. Just be sure to run `gr
 1. Push to your fork or push your issue-specific branch to the main repo, then submit a pull request against `master`.
 1. Once tested and +1’d by another team member (with no outstanding objections), self-merge into `master`.
 
+### Versioning
+
+The rules of [semver](http://semver.org/) don’t necessarily apply here in the case of major releases (as a polyfill for a stable spec, we _shouldn’t_ have breaking changes), so we’re using the following:
+
+1. MAJOR versions at maintaners’ discretion following significant changes to the codebase (e.g. refactoring core)
+1. MINOR versions for backwards-compatible enhancements (e.g. performance improvements)
+1. PATCH versions for backwards-compatible bug fixes (e.g. spec compliance bugs, support issues)
+
 ### Important notes
 
 Please don't edit files in the `dist` subdirectory as they are generated via Grunt. You'll find source code in the `src` subdirectory!
