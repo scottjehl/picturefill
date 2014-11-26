@@ -302,7 +302,7 @@
 
 		// pass the length to a method that can properly determine length
 		// in pixels based on these formats: http://dev.w3.org/csswg/css-values-3/#length-value
-		return winningLength || Math.max(w.innerWidth || 0, doc.document.clientWidth);
+		return winningLength || pf.units.width;
 	};
 
 	pf.parseSrcset = function( srcset ) {
