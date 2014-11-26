@@ -71,6 +71,23 @@
 		equal(width, 500, "returns 500 when match media returns false");
 	});
 
+	test("setInherentSize", function() {
+		var fakeImg = document.createElement( "img" );
+
+		fakeImg[ pf.ns ] = {};
+		fakeImg.src = "../examples/images/small.jpg";
+
+		fakeImg.setAttribute( "width", 10 );
+
+		pf.setInherentSize( 2, fakeImg );
+		deepEqual( fakeImg.width, 10, "No natural width calculation is performed if a `width` attribute already exists." );
+
+		fakeImg.removeAttribute( "width" );
+		fakeImg[ pf.ns ].reeval = true;
+		pf.setInherentSize( 2, fakeImg );
+		deepEqual( fakeImg.width, 90, "width attribute is set to `naturalWidth / resolution`" );
+	});
+
 	test("parseSize", function() {
 		var size1 = "";
 		var expected1 = {
