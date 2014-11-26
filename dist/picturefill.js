@@ -111,6 +111,7 @@ window.matchMedia || (window.matchMedia = function() {
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
 	 */
 	pf.getWidthFromLength = function( length ) {
+		var cssValue;
 		// If a length is specified and doesn’t contain a percentage, and it is greater than 0 or using `calc`, use it. Else, use the `100vw` default.
 		length = length && length.indexOf( "%" ) > -1 === false && ( parseFloat( length ) > 0 || length.indexOf( "calc(" ) > -1 ) ? length : "100vw";
 
@@ -126,6 +127,9 @@ window.matchMedia || (window.matchMedia = function() {
 		if ( !pf.lengthEl ) {
 			pf.lengthEl = doc.createElement( "div" );
 
+			// Add a class, so that everyone knows where this element comes from
+			pf.lengthEl.className = "helper-from-picturefill-js";
+
 			// Positioning styles help prevent padding/margin/width on `html` or `body` from throwing calculations off.
 			pf.lengthEl.style.cssText = "border:0;display:block;font-size:1em;left:0;margin:0;padding:0;position:absolute;visibility:hidden";
 		}
@@ -134,19 +138,15 @@ window.matchMedia || (window.matchMedia = function() {
 
 		doc.body.appendChild(pf.lengthEl);
 
-		// Add a class, so that everyone knows where this element comes from
-		pf.lengthEl.className = "helper-from-picturefill-js";
+		cssValue = pf.lengthEl.offsetWidth;
 
 		if ( pf.lengthEl.offsetWidth <= 0 ) {
-			// Something has gone wrong. `calc()` is in use and unsupported, most likely. Default to `100vw` (`100%`, for broader support.):
-			pf.lengthEl.style.width = doc.documentElement.offsetWidth + "px";
+			cssValue = false;
 		}
-
-		var offsetWidth = pf.lengthEl.offsetWidth;
 
 		doc.body.removeChild( pf.lengthEl );
 
-		return offsetWidth;
+		return cssValue;
 	};
 
 	// container of supported mime types that one might need to qualify before using
@@ -226,17 +226,17 @@ window.matchMedia || (window.matchMedia = function() {
 			if ( !length ) {
 				continue;
 			}
-			if ( !media || pf.matchesMedia( media ) ) {
-				// if there is no media query or it matches, choose this as our winning length
-				// and end algorithm
-				winningLength = length;
+
+			// if there is no media query or it matches, choose this as our winning length
+			// and end algorithm
+			if ( (!media || pf.matchesMedia( media )) && (winningLength = pf.getWidthFromLength( length )) ) {
 				break;
 			}
 		}
 
 		// pass the length to a method that can properly determine length
 		// in pixels based on these formats: http://dev.w3.org/csswg/css-values-3/#length-value
-		return pf.getWidthFromLength( winningLength );
+		return winningLength || Math.max(w.innerWidth || 0, doc.document.clientWidth);
 	};
 
 	pf.parseSrcset = function( srcset ) {
