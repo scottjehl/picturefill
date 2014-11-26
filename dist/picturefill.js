@@ -384,11 +384,41 @@ window.matchMedia || (window.matchMedia = function() {
 		return candidates;
 	};
 
-	pf.inherentSize = function( res, picImg ) {
-		picImg.setAttribute( "width", picImg.naturalWidth / res );
+	pf.backfaceVisibilityFix = function( picImg ) {
+		// See: https://github.com/scottjehl/picturefill/issues/332
+		var style = picImg.style || {},
+			WebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
+			currentZoom = style.zoom;
 
-		// Remove the load event:
-		picImg.load = null;
+		if (WebkitBackfaceVisibility) { 
+			style.zoom = ".999";
+
+			WebkitBackfaceVisibility = picImg.offsetWidth;
+
+			style.zoom = currentZoom;
+		}
+	};
+
+	pf.setInherentSize = function( res, picImg ) {
+		var ns = picImg[ pf.ns ] || {},
+			reeval = ns.reeval,
+			widthPreset = reeval === undefined && ( picImg.getAttribute && picImg.getAttribute( "width" ) !== null ),
+			setWidth = function( res, picImg ) {
+				if ( picImg.setAttribute ) {
+					picImg.setAttribute( "width", picImg.naturalWidth / res );
+				}
+			};
+
+		if ( res && !widthPreset ) {
+			if ( reeval === undefined ) {
+				window.addEventListener( "load", function() {
+					setWidth( res, picImg );
+					ns.reeval = true;
+				});
+			} else {
+				setWidth( res, picImg );
+			}
+		}
 	};
 
 	pf.applyBestCandidate = function( candidates, picImg ) {
@@ -420,28 +450,8 @@ window.matchMedia || (window.matchMedia = function() {
 				// http://picture.responsiveimages.org/#the-img-element
 				picImg.currentSrc = picImg.src;
 
-				var style = picImg.style || {},
-					WebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
-					currentZoom = style.zoom;
-
-				if (WebkitBackfaceVisibility) { // See: https://github.com/scottjehl/picturefill/issues/332
-					style.zoom = ".999";
-
-					WebkitBackfaceVisibility = picImg.offsetWidth;
-
-					style.zoom = currentZoom;
-				}
-
-				// If there’s a resolution option:
-				if ( bestCandidate.resolution ) {
-					// Hide the image during the resize:
-
-					// Kludge to keep things sync-ish:
-					setTimeout(function() {
-						// Once the image loads, set the inherent size:
-						picImg.load = pf.inherentSize( bestCandidate.resolution, picImg );
-					}, 100);
-				}
+				pf.backfaceVisibilityFix( picImg );
+				pf.setInherentSize( bestCandidate.resolution, picImg );
 			}
 		}
 	};
