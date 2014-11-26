@@ -342,14 +342,14 @@
 
 			if ( picImg[ pf.ns].dims ) { return; }
 
-			if ( urlCache[bestCandidate.aUrl] ) {
+			if ( urlCache[bestCandidate.url] ) {
 				setSize( picImg, urlCache[bestCandidate.url], bestCandidate.resolution );
 			} else {
 				img = doc.createElement( "img" );
 				img.onload = function() {
 					urlCache[bestCandidate.url] = img.width;
 
-					if ( picImg.src === bestCandidate.aUrl ) {
+					if ( picImg.src === bestCandidate.url ) {
 						setSize( picImg, urlCache[bestCandidate.url], bestCandidate.resolution );
 					}
 
@@ -358,7 +358,7 @@
 					img = null;
 				};
 
-				img.src = bestCandidate.aUrl;
+				img.src = bestCandidate.url;
 			}
 		};
 	})();
@@ -400,9 +400,9 @@
 
 		if ( bestCandidate ) {
 
-			bestCandidate.aUrl = pf.makeUrl(bestCandidate.url);
+			bestCandidate.url = pf.makeUrl(bestCandidate.url);
 
-			if ( picImg.src !== bestCandidate.aUrl ) {
+			if ( picImg.src !== bestCandidate.url ) {
 				if ( pf.restrictsMixedContent() && bestCandidate.url.substr(0, "http:".length).toLowerCase() === "http:" ) {
 					if ( typeof console !== undefined ) {
 						console.warn( "Blocked mixed content image " + bestCandidate.url );
