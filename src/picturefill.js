@@ -33,11 +33,6 @@
 		return str.trim ? str.trim() : str.replace( /^\s+|\s+$/g, "" );
 	};
 
-	// just a string endsWith workaround
-	pf.endsWith = function( str, suffix ) {
-		return str.endsWith ? str.endsWith( suffix ) : str.indexOf( suffix, str.length - suffix.length ) !== -1;
-	};
-
 	/**
 	 * Shortcut method for https://w3c.github.io/webappsec/specs/mixedcontent/#restricts-mixed-content ( for easy overriding in tests )
 	 */
@@ -56,6 +51,19 @@
 	pf.getDpr = function() {
 		return ( w.devicePixelRatio || 1 );
 	};
+
+	/**
+	 * Gets a string and returns the absolute URL
+	 * @param src
+	 * @returns {String} absolute URL
+	 */
+	pf.makeUrl = (function() {
+		var anchor = doc.createElement( "a" );
+		return function(src) {
+			anchor.href = src;
+			return anchor.href;
+		};
+	})();
 
 	/**
 	 * Get width in css pixel value from a "length" value
@@ -317,6 +325,44 @@
 		}
 	};
 
+	pf.setIntrinsicSize = (function() {
+		var urlCache = {};
+		var setSize = function( picImg, width, res ) {
+			picImg.setAttribute( "width", width / res );
+		};
+
+		return function( picImg, bestCandidate ) {
+			var img;
+			if ( !picImg[ pf.ns ] ) {
+				return;
+			}
+			if ( picImg[ pf.ns ].dims === undefined ) {
+				picImg[ pf.ns].dims = picImg.getAttribute("width") || picImg.getAttribute("height");
+			}
+
+			if ( picImg[ pf.ns].dims ) { return; }
+
+			if ( urlCache[bestCandidate.aUrl] ) {
+				setSize( picImg, urlCache[bestCandidate.url], bestCandidate.resolution );
+			} else {
+				img = doc.createElement( "img" );
+				img.onload = function() {
+					urlCache[bestCandidate.url] = img.width;
+
+					if ( picImg.src === bestCandidate.aUrl ) {
+						setSize( picImg, urlCache[bestCandidate.url], bestCandidate.resolution );
+					}
+
+					picImg = null;
+					img.onload = null;
+					img = null;
+				};
+
+				img.src = bestCandidate.aUrl;
+			}
+		};
+	})();
+
 	// Accept a source or img element and process its srcset and sizes attrs
 	pf.processSourceSet = function( el ) {
 		var srcset = el.getAttribute( "srcset" ),
@@ -352,28 +398,35 @@
 			}
 		}
 
-		if ( bestCandidate && !pf.endsWith( picImg.src, bestCandidate.url ) ) {
-			if ( pf.restrictsMixedContent() && bestCandidate.url.substr(0, "http:".length).toLowerCase() === "http:" ) {
-				if ( typeof console !== undefined ) {
-					console.warn( "Blocked mixed content image " + bestCandidate.url );
+		if ( bestCandidate ) {
+
+			bestCandidate.aUrl = pf.makeUrl(bestCandidate.url);
+
+			if ( picImg.src !== bestCandidate.aUrl ) {
+				if ( pf.restrictsMixedContent() && bestCandidate.url.substr(0, "http:".length).toLowerCase() === "http:" ) {
+					if ( typeof console !== undefined ) {
+						console.warn( "Blocked mixed content image " + bestCandidate.url );
+					}
+				} else {
+					picImg.src = bestCandidate.url;
+					// currentSrc attribute and property to match
+					// http://picture.responsiveimages.org/#the-img-element
+					picImg.currentSrc = picImg.src;
+
+					var style = picImg.style || {},
+						WebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
+						currentZoom = style.zoom;
+
+					if (WebkitBackfaceVisibility) { // See: https://github.com/scottjehl/picturefill/issues/332
+						style.zoom = ".999";
+
+						WebkitBackfaceVisibility = picImg.offsetWidth;
+
+						style.zoom = currentZoom;
+					}
 				}
-			} else {
-				picImg.src = bestCandidate.url;
-				// currentSrc attribute and property to match
-				// http://picture.responsiveimages.org/#the-img-element
-				picImg.currentSrc = picImg.src;
 
-				var style = picImg.style || {},
-					WebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
-					currentZoom = style.zoom;
-
-				if (WebkitBackfaceVisibility) { // See: https://github.com/scottjehl/picturefill/issues/332
-					style.zoom = ".999";
-
-					WebkitBackfaceVisibility = picImg.offsetWidth;
-
-					style.zoom = currentZoom;
-				}
+				pf.setIntrinsicSize(picImg, bestCandidate);
 			}
 		}
 	};

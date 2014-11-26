@@ -428,13 +428,6 @@
 		deepEqual(image.src, candidates[2].url, "uses the url from the best px fit" );
 		deepEqual(image.currentSrc, candidates[2].url, "uses the url from the best px fit" );
 
-		image.src = "foo300";
-		image.currentSrc = "foo300";
-
-		pf.applyBestCandidate( candidates, image );
-
-		deepEqual(image.src, "foo300", "src left alone when matched" );
-		deepEqual(image.currentSrc, "foo300", "currentSrc left alone when matched" );
 	});
 
 	test( "removeVideoShim", function() {
