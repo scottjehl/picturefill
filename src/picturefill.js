@@ -335,6 +335,13 @@
 		return candidates;
 	};
 
+	pf.inherentSize = function( res, picImg ) {
+		picImg.setAttribute( "width", picImg.naturalWidth / res );
+
+		// Remove the load event:
+		picImg.load = null;
+	};
+
 	pf.applyBestCandidate = function( candidates, picImg ) {
 		var candidate,
 			length,
@@ -374,6 +381,17 @@
 					WebkitBackfaceVisibility = picImg.offsetWidth;
 
 					style.zoom = currentZoom;
+				}
+
+				// If there’s a resolution option:
+				if ( bestCandidate.resolution ) {
+					// Hide the image during the resize:
+
+					// Kludge to keep things sync-ish:
+					setTimeout(function() {
+						// Once the image loads, set the inherent size:
+						picImg.load = pf.inherentSize( bestCandidate.resolution, picImg );
+					}, 100);
 				}
 			}
 		}

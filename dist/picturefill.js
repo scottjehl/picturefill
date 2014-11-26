@@ -1,4 +1,4 @@
-/*! Picturefill - v2.2.0 - 2014-11-24
+/*! Picturefill - v2.2.0 - 2014-11-26
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -362,7 +362,8 @@ window.matchMedia || (window.matchMedia = function() {
 	pf.dodgeSrcset = function( img ) {
 		if ( img.srcset ) {
 			img[ pf.ns ].srcset = img.srcset;
-			img.removeAttribute( "srcset" );
+			img.srcset = "";
+			img.setAttribute( "data-pfsrcset", img[ pf.ns ].srcset );
 		}
 	};
 
@@ -381,6 +382,13 @@ window.matchMedia || (window.matchMedia = function() {
 			candidates = pf.getCandidatesFromSourceSet( srcset, sizes );
 		}
 		return candidates;
+	};
+
+	pf.inherentSize = function( res, picImg ) {
+		picImg.setAttribute( "width", picImg.naturalWidth / res );
+
+		// Remove the load event:
+		picImg.load = null;
 	};
 
 	pf.applyBestCandidate = function( candidates, picImg ) {
@@ -422,6 +430,17 @@ window.matchMedia || (window.matchMedia = function() {
 					WebkitBackfaceVisibility = picImg.offsetWidth;
 
 					style.zoom = currentZoom;
+				}
+
+				// If there’s a resolution option:
+				if ( bestCandidate.resolution ) {
+					// Hide the image during the resize:
+
+					// Kludge to keep things sync-ish:
+					setTimeout(function() {
+						// Once the image loads, set the inherent size:
+						picImg.load = pf.inherentSize( bestCandidate.resolution, picImg );
+					}, 100);
 				}
 			}
 		}
