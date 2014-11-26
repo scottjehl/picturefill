@@ -313,7 +313,8 @@
 	pf.dodgeSrcset = function( img ) {
 		if ( img.srcset ) {
 			img[ pf.ns ].srcset = img.srcset;
-			img.removeAttribute( "srcset" );
+			img.srcset = "";
+			img.setAttribute( "data-pfsrcset", img[ pf.ns ].srcset );
 		}
 	};
 
