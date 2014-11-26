@@ -8,50 +8,56 @@
 		return;
 	}
 
-	var pf, originalDprMethod,
-		originalVideoShimMethod,
-		originalMatchesMedia,
-		originalProcessSourceSet,
-		originalGetWidthFromLength,
-		originalRestrictsMixedContentMethod;
+	var saveCache = {};
 
-	pf = picturefill._;
+	var pf = picturefill._;
 
 	// reset stubbing
 	module( "method", {
 		setup: function() {
-			originalDprMethod = pf.getDpr;
-			originalVideoShimMethod = pf.removeVideoShim;
-			originalMatchesMedia = pf.matchesMedia;
-			originalProcessSourceSet = pf.processSourceSet;
-			originalGetWidthFromLength = pf.getWidthFromLength;
-			originalrestrictsMixedContentMethod = pf.restrictsMixedContent;
+			var prop;
+			pf.vwCache = {};
+			pf.cache = {};
+			for ( prop in pf ) {
+				if ( pf.hasOwnProperty( prop ) && prop != "types" ) {
+					if ( $.isPlainObject(pf[ prop ]) ) {
+						saveCache[ prop ] = $.extend(true, {}, pf[ prop ]);
+					} else {
+						saveCache[ prop ] = pf[ prop ];
+					}
+				}
+			}
 		},
 
 		teardown: function() {
-			pf.getDpr = originalDprMethod;
-			pf.removeVideoShim = originalVideoShimMethod;
-			pf.matchesMedia = originalMatchesMedia;
-			pf.processSourceSet = originalProcessSourceSet;
-			pf.restrictsMixedContent = originalrestrictsMixedContentMethod;
+			var prop;
+
+			for ( prop in saveCache ) {
+				if ( pf.hasOwnProperty(prop) && (prop in saveCache) && saveCache[prop] != pf[ prop ] ) {
+					if ( $.isPlainObject(pf[ prop ]) && $.isPlainObject(saveCache[prop]) ) {
+						$.extend(true, pf[prop], saveCache[prop]);
+					} else {
+						pf[prop] = saveCache[prop];
+					}
+				}
+			}
 		}
 	});
 
 	test("getWidthFromLength", function() {
-		var calcTest = (function() {
-			var fullWidthEl = document.createElement( "div" );
-			(document.body || document.documentElement).appendChild( fullWidthEl );
 
-			var gotWidth = pf.getWidthFromLength("calc(766px - 1em)");
-			var returnValue = ( gotWidth === 750 || gotWidth === document.documentElement.offsetWidth );
+		pf.units.em = 16;
+		pf.getEmValue = function() {
+			return 16;
+		};
 
-			fullWidthEl.parentNode.removeChild( fullWidthEl );
-
-			return returnValue;
-		}());
+		pf.units.vw = 2;
 
 		equal( pf.getWidthFromLength("750px"), 750, "returns int value of width string" );
-		ok( calcTest, "If `calc` is supported, `calc(766px - 1em)` returned `750px`. If `calc` is unsupported, the value was discarded and defaulted to `100vw`.");
+		equal( pf.getWidthFromLength("calc(766px - 1em)"), 750, "calc(766px - 1em) returned `750px`. If `calc` is unsupported, the value was discarded and defaulted to `100vw`.");
+		equal( pf.getWidthFromLength("calc(160px / 1em * 1vw)"), 20, "calc(160px / 1em * 1vw)");
+		equal( pf.getWidthFromLength("calc(160px + 1em)"), 176, "calc(160px + 1em)");
+		equal( pf.getWidthFromLength("calc(160px + 1de)"), false, "calc(160px + 1de)");
 	});
 
 	test("findWidthFromSourceSize", function() {
@@ -69,6 +75,10 @@
 		};
 		width = pf.findWidthFromSourceSize(sizes);
 		equal(width, 500, "returns 500 when match media returns false");
+
+		sizes = "100foo, 200px";
+		width = pf.findWidthFromSourceSize(sizes);
+		equal(width, 200, "returns 200 when there was an unknown css length");
 	});
 
 	test("parseSize", function() {
@@ -93,6 +103,33 @@
 		};
 		deepEqual(pf.parseSize(size3), expected3, "Length and Media are properly parsed");
 	});
+
+	test( "pf.evalCSS as matchesMedia alternative", function() {
+		pf.units.width = 480;
+		pf.units.em = 2;
+		pf.getEmValue = function() {
+			return 2;
+		};
+
+		ok( pf.evalCSS( "(min-width: 480px)" ) );
+		ok( !pf.evalCSS( "(min-width: 481px)" ) );
+		ok( pf.evalCSS( "(min-width: 479px)" ) );
+
+		ok( pf.evalCSS( "(max-width: 480px)" ) );
+		ok( pf.evalCSS( "(max-width: 481px)" ) );
+		ok( !pf.evalCSS( "(max-width: 479px)" ) );
+
+		ok( pf.evalCSS( "(min-width: 240em)" ) );
+		ok( !pf.evalCSS( "(min-width: 241em)" ) );
+		ok( pf.evalCSS( "(min-width: 239em)" ) );
+
+		ok( pf.evalCSS( "(max-width: 240em)" ) );
+		ok( pf.evalCSS( "(max-width: 241em)" ) );
+		ok( !pf.evalCSS( "(max-width: 239em)" ) );
+
+		ok( !pf.evalCSS( "(min-width: 240ups)" ) );
+
+	} );
 
 	test("getCandidatesFromSourceSet", function() {
 		// Basic test

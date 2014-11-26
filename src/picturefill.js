@@ -16,11 +16,18 @@
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
 	doc.createElement( "picture" );
 
+	var docElem = doc.documentElement;
 	// local object for method references and testing exposure
 	var pf = {};
 
 	// namespace
 	pf.ns = "picturefill";
+
+	// cache that will be invalidated on resize
+	pf.vwCache = {};
+
+	// cache that never will be invalidated
+	pf.cache = {};
 
 	// srcset support test
 	(function() {
@@ -44,12 +51,15 @@
 	pf.restrictsMixedContent = function() {
 		return w.location.protocol === "https:";
 	};
-	/**
-	 * Shortcut method for matchMedia ( for easy overriding in tests )
-	 */
 
-	pf.matchesMedia = function( media ) {
-		return w.matchMedia && w.matchMedia( media ).matches;
+	/**
+	 * A simplified matchMedia implementation for IE8 and IE9
+	 * handles only min-width/max-width with px or em values
+	 * @param media
+	 * @returns {boolean}
+	 */
+	pf.mMQ = function( media ) {
+		return pf.evalCSS(media);
 	};
 
 	// Shortcut method for `devicePixelRatio` ( for easy overriding in tests )
@@ -62,42 +72,12 @@
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
 	 */
 	pf.getWidthFromLength = function( length ) {
-		// If a length is specified and doesn’t contain a percentage, and it is greater than 0 or using `calc`, use it. Else, use the `100vw` default.
-		length = length && length.indexOf( "%" ) > -1 === false && ( parseFloat( length ) > 0 || length.indexOf( "calc(" ) > -1 ) ? length : "100vw";
-
-		/**
-		 * If length is specified in  `vw` units, use `%` instead since the div we’re measuring
-		 * is injected at the top of the document.
-		 *
-		 * TODO: maybe we should put this behind a feature test for `vw`?
-		 */
-		length = length.replace( "vw", "%" );
-
-		// Create a cached element for getting length value widths
-		if ( !pf.lengthEl ) {
-			pf.lengthEl = doc.createElement( "div" );
-
-			// Positioning styles help prevent padding/margin/width on `html` or `body` from throwing calculations off.
-			pf.lengthEl.style.cssText = "border:0;display:block;font-size:1em;left:0;margin:0;padding:0;position:absolute;visibility:hidden";
+		var value = pf.evalCSS(length, true) || false;
+		if ( value < 0 ) {
+			value = false;
 		}
+		return value;
 
-		pf.lengthEl.style.width = length;
-
-		doc.body.appendChild(pf.lengthEl);
-
-		// Add a class, so that everyone knows where this element comes from
-		pf.lengthEl.className = "helper-from-picturefill-js";
-
-		if ( pf.lengthEl.offsetWidth <= 0 ) {
-			// Something has gone wrong. `calc()` is in use and unsupported, most likely. Default to `100vw` (`100%`, for broader support.):
-			pf.lengthEl.style.width = doc.documentElement.offsetWidth + "px";
-		}
-
-		var offsetWidth = pf.lengthEl.offsetWidth;
-
-		doc.body.removeChild( pf.lengthEl );
-
-		return offsetWidth;
 	};
 
 	// container of supported mime types that one might need to qualify before using
@@ -159,6 +139,141 @@
 		};
 	};
 
+	/**
+	 * creates CSS units and invalidates the viewport depending cache
+	 */
+	pf.updateUnits = function() {
+		pf.vwCache = {};
+		pf.units = {
+			px: 1,
+			width: Math.max(w.innerWidth || 0, docElem.clientWidth),
+			height: Math.max(w.innerHeight || 0, docElem.clientHeight),
+			em: pf.getEmValue(),
+			rem: pf.getEmValue()
+		};
+
+		pf.units.vw = pf.units.width / 100;
+		pf.units.vh = pf.units.height / 100;
+	};
+
+	/**
+	 * gets a mediaquery and returns a boolean or gets a css length and returns a number
+	 * @param css mediaqueries or css length
+	 * @returns {boolean|number}
+	 *
+	 * based on: https://gist.github.com/jonathantneal/db4f77009b155f083738
+	 */
+	pf.evalCSS = (function() {
+
+		var cache = {};
+		var regLength = /^([\d\.]+)(em|vw|px)$/;
+		var replace = function() {
+			var args = arguments, index = 0, string = args[0];
+			while (++index in args) {
+				string = string.replace(args[index], args[++index]);
+			}
+			return string;
+		};
+
+		var buidlStr = function(css) {
+			if (!cache[css]) {
+				cache[css] = "return " + replace((css || "").toLowerCase(),
+					// interpret `and`
+					/\band\b/g, "&&",
+
+					// interpret `,`
+					/,/g, "||",
+
+					// interpret `min-` as >=
+					/min-([a-z-\s]+):/g, "e.$1>=",
+
+					// interpret `min-` as <=
+					/max-([a-z-\s]+):/g, "e.$1<=",
+
+					//calc value
+					/calc([^)]+)/g, "($1)",
+
+					// interpret css values
+					/(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)",
+					//make eval less evil
+					/^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/ig, ""
+				) + ";";
+
+			}
+
+			return cache[css];
+		};
+
+		return function(css, length) {
+			var parsedLength;
+			if (!(css in pf.vwCache)) {
+				pf.vwCache[css] = false;
+				if (length && (parsedLength = css.match( regLength ))) {
+					pf.vwCache[css] = parsedLength[ 1 ] * pf.units[parsedLength[ 2 ]];
+				} else {
+					/*jshint evil:true */
+					try{
+						pf.vwCache[css] = new Function("e", buidlStr(css))(pf.units);
+					} catch(e){}
+					/*jshint evil:false */
+				}
+			}
+			return pf.vwCache[css];
+		};
+	})();
+
+	/**
+	 * Shortcut method for matchMedia ( for easy overriding in tests )
+	 */
+	if ( w.matchMedia && (matchMedia( "(min-width: 0.1em)" ) || {}).matches ) {
+		pf.matchesMedia = function(media) {
+			return w.matchMedia(media).matches;
+		};
+	} else {
+		pf.matchesMedia = pf.evalCSS;
+	}
+
+	/**
+	 * returns 1em in css px for html/body default size
+	 * function taken from respondjs
+	 * @returns {number}
+	 */
+	pf.getEmValue = (function() {
+		var eminpx;
+		// baseStyle also used by getEmValue (i.e.: width: 1em is important)
+		var baseStyle = "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;overflow:hidden;clip:rect(0px, 0px, 0px, 0px)";
+		var fsCss = "font-size:100%!important;";
+
+		return function() {
+			var body;
+			if ( !eminpx && (body = doc.body) ) {
+				var div = doc.createElement( "div" ),
+					originalHTMLCSS = docElem.style.cssText,
+					originalBodyCSS = body.style.cssText;
+
+				div.style.cssText = baseStyle;
+
+				// 1em in a media query is the value of the default font size of the browser
+				// reset docElem and body to ensure the correct value is returned
+				docElem.style.cssText = fsCss;
+				body.style.cssText = fsCss;
+
+				body.appendChild( div );
+				eminpx = div.offsetWidth;
+				body.removeChild( div );
+
+				//also update eminpx before returning
+				eminpx = parseFloat( eminpx, 10 );
+
+				// restore the original values
+				docElem.style.cssText = originalHTMLCSS;
+				body.style.cssText = originalBodyCSS;
+
+			}
+			return eminpx || 16;
+		};
+	})();
+
 	// Takes a string of sizes and returns the width in pixels as a number
 	pf.findWidthFromSourceSize = function( sourceSizeListStr ) {
 		// Split up source size list, ie ( max-width: 30em ) 100%, ( max-width: 50em ) 50%, 33%
@@ -177,17 +292,17 @@
 			if ( !length ) {
 				continue;
 			}
-			if ( !media || pf.matchesMedia( media ) ) {
-				// if there is no media query or it matches, choose this as our winning length
-				// and end algorithm
-				winningLength = length;
+
+			// if there is no media query or it matches, choose this as our winning length
+			// and end algorithm
+			if ( (!media || pf.matchesMedia( media )) && (winningLength = pf.getWidthFromLength( length )) ) {
 				break;
 			}
 		}
 
 		// pass the length to a method that can properly determine length
 		// in pixels based on these formats: http://dev.w3.org/csswg/css-values-3/#length-value
-		return pf.getWidthFromLength( winningLength );
+		return winningLength || pf.units.width;
 	};
 
 	pf.parseSrcset = function( srcset ) {
@@ -483,6 +598,10 @@
 			options = opt || {};
 
 		elements = options.elements || pf.getAllElements();
+
+		if ( elements.length && ( !pf.units || options.reevaluate ) ){
+			pf.updateUnits();
+		}
 
 		// Loop through all elements
 		for ( var i = 0, plen = elements.length; i < plen; i++ ) {
