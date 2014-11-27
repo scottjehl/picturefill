@@ -1,4 +1,4 @@
-/*! Picturefill - v2.2.0 - 2014-11-24
+/*! Picturefill - v2.2.0 - 2014-11-27
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -362,7 +362,8 @@ window.matchMedia || (window.matchMedia = function() {
 	pf.dodgeSrcset = function( img ) {
 		if ( img.srcset ) {
 			img[ pf.ns ].srcset = img.srcset;
-			img.removeAttribute( "srcset" );
+			img.srcset = "";
+			img.setAttribute( "data-pfsrcset", img[ pf.ns ].srcset );
 		}
 	};
 
@@ -403,7 +404,7 @@ window.matchMedia || (window.matchMedia = function() {
 
 		if ( bestCandidate && !pf.endsWith( picImg.src, bestCandidate.url ) ) {
 			if ( pf.restrictsMixedContent() && bestCandidate.url.substr(0, "http:".length).toLowerCase() === "http:" ) {
-				if ( typeof console !== undefined ) {
+				if ( window.console !== undefined ) {
 					console.warn( "Blocked mixed content image " + bestCandidate.url );
 				}
 			} else {

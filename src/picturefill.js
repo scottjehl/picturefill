@@ -355,7 +355,7 @@
 
 		if ( bestCandidate && !pf.endsWith( picImg.src, bestCandidate.url ) ) {
 			if ( pf.restrictsMixedContent() && bestCandidate.url.substr(0, "http:".length).toLowerCase() === "http:" ) {
-				if ( typeof console !== undefined ) {
+				if ( window.console !== undefined ) {
 					console.warn( "Blocked mixed content image " + bestCandidate.url );
 				}
 			} else {
