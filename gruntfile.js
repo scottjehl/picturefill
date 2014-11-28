@@ -115,8 +115,8 @@
           case "svg":
             includes.push("src/includes/" + arg + ".js");
         }
-        grunt.task.run("default");
       }
+      grunt.task.run("default");
       console.log("files to include", includes);
 	} );
 	
