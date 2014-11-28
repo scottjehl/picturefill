@@ -108,62 +108,12 @@
 	pf.types[ "image/gif" ] = true;
 	pf.types[ "image/png" ] = true;
 
-	// test svg support
-	pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Image", "1.1");
-
-	// test webp support, only when the markup calls for it
-	pf.types[ "image/webp" ] = function() {
-		// based on Modernizr's lossless img-webp test
-		// note: asynchronous
-		var img = new w.Image(),
-			type = "image/webp";
-
-		img.onerror = function() {
-			pf.types[ type ] = false;
-			picturefill();
-		};
-		img.onload = function() {
-			pf.types[ type ] = img.width === 1;
-			picturefill();
-		};
-		img.src = "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=";
-	};
 	
-	// test jpeg xr support, only when the markup calls for it
-	pf.types[ "image/vnd.ms-photo" ] = function() {
-		// based on Modernizr's lossless img-webp test
-		// note: asynchronous
-		var img = new w.Image(),
-			type = "image/vnd.ms-photo";
-
-		img.onerror = function() {
-			pf.types[ type ] = false;
-			picturefill();
-		};
-		img.onload = function() {
-			pf.types[ type ] = img.width === 1;
-			picturefill();
-		};
-		img.src = "data:image/vnd.ms-photo;base64,SUm8AQgAAAAFAAG8AQAQAAAASgAAAIC8BAABAAAAAQAAAIG8BAABAAAAAQAAAMC8BAABAAAAWgAAAMG8BAABAAAAHwAAAAAAAAAkw91vA07+S7GFPXd2jckNV01QSE9UTwAZAYBxAAAAABP/gAAEb/8AAQAAAQAAAA==";
-	};
 	
-	// test jpeg2000 support, only when the markup calls for it
-	pf.types[ "image/jp2" ] = function() {
-		// based on Modernizr's lossless img-webp test
-		// note: asynchronous
-		var img = new w.Image(),
-			type = "image/jp2";
-
-		img.onerror = function() {
-			pf.types[ type ] = false;
-			picturefill();
-		};
-		img.onload = function() {
-			pf.types[ type ] = img.width === 1;
-			picturefill();
-		};
-		img.src = "data:image/jp2;base64,/0//UQAyAAAAAAABAAAAAgAAAAAAAAAAAAAABAAAAAQAAAAAAAAAAAAEBwEBBwEBBwEBBwEB/1IADAAAAAEAAAQEAAH/XAAEQED/ZAAlAAFDcmVhdGVkIGJ5IE9wZW5KUEVHIHZlcnNpb24gMi4wLjD/kAAKAAAAAABYAAH/UwAJAQAABAQAAf9dAAUBQED/UwAJAgAABAQAAf9dAAUCQED/UwAJAwAABAQAAf9dAAUDQED/k8+kEAGvz6QQAa/PpBABr994EAk//9k=";
-	};
+	
+	// Do not delete or change the comment below.  It will be replaced with support for alternative
+	// image formats if it is desired by the dev.
+	//>> insert picture types
 
 	/**
 	 * Takes a source element and checks if its type attribute is present and if so, supported
@@ -350,7 +300,8 @@
 	pf.dodgeSrcset = function( img ) {
 		if ( img.srcset ) {
 			img[ pf.ns ].srcset = img.srcset;
-			img.removeAttribute( "srcset" );
+			img.srcset = "";
+			img.setAttribute( "data-pfsrcset", img[ pf.ns ].srcset );
 		}
 	};
 
