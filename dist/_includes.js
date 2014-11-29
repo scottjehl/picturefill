@@ -3,13 +3,11 @@
 		// note: asynchronous
 		var img = new w.Image();
 		
-		console.log("detecting", "'" + type + "'", pf.types);
 		img.onerror = function() {
 			pf.types[type] = false;
 			picturefill();
 		};
 		img.onload = function() {
-			console.log(type + " is supported");
 			pf.types[type] = img.width === 1;
 			picturefill();
 		};

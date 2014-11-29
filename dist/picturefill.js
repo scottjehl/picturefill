@@ -167,13 +167,11 @@ window.matchMedia || (window.matchMedia = function() {
 		// note: asynchronous
 		var img = new w.Image();
 		
-		console.log("detecting", "'" + type + "'", pf.types);
 		img.onerror = function() {
 			pf.types[type] = false;
 			picturefill();
 		};
 		img.onload = function() {
-			console.log(type + " is supported");
 			pf.types[type] = img.width === 1;
 			picturefill();
 		};
@@ -214,11 +212,9 @@ window.matchMedia || (window.matchMedia = function() {
 		} else {
 			// if the type test is a function, run it and return "pending" status. The function will rerun picturefill on pending elements once finished.
 			if ( typeof( pf.types[ type ] ) === "function" ) {
-				console.log("first time", type);
 				pf.types[ type ]();
 				return "pending";
 			} else {
-				console.log("ran before:", "'" + type + "'", pf.types[ type ], pf.types);
 				return pf.types[ type ];
 			}
 		}

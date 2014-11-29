@@ -129,11 +129,9 @@
 		} else {
 			// if the type test is a function, run it and return "pending" status. The function will rerun picturefill on pending elements once finished.
 			if ( typeof( pf.types[ type ] ) === "function" ) {
-				console.log("first time", type);
 				pf.types[ type ]();
 				return "pending";
 			} else {
-				console.log("ran before:", "'" + type + "'", pf.types[ type ], pf.types);
 				return pf.types[ type ];
 			}
 		}
