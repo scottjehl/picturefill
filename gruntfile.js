@@ -3,7 +3,7 @@
   "use strict";
 
   var pkg, includes = [];
-
+  console.log("running!", includes);
   module.exports = function(grunt) {
 
     // Project configuration.

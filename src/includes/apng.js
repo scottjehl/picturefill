@@ -7,5 +7,6 @@
 		};
 		apngTest.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACGFjVEwAAAABAAAAAcMq2TYAAAANSURBVAiZY2BgYPgPAAEEAQB9ssjfAAAAGmZjVEwAAAAAAAAAAQAAAAEAAAAAAAAAAAD6A+gBAbNU+2sAAAARZmRBVAAAAAEImWNgYGBgAAAABQAB6MzFdgAAAABJRU5ErkJggg==";
 		// frame 1 (skipped on apng-supporting browsers): [0, 0, 0, 255]
-		// frame 2: [0, 0, 0, 0]
+		// frame 2: [0, 0, 0, 0];
+		return "pending";
 	}; 
