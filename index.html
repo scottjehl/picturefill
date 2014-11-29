@@ -155,8 +155,17 @@ srcset=&quot;examples/images/medium.jpg 375w, examples/images/medium.jpg 480w, e
 	<p><a href="examples/demo-03.html">View standalone demo</a></p>
 
 	<h3 id="types"><code>media</code> example with one webp source qualified with a <code>type</code> attribute.</h3>
-		<p>Note: Picturefill supports SVG and WebP types on any source element, and will disregard a <code>source</code> if its type is not supported in a particular environment:</p>
+		<p>
+		  Note: Picturefill can support SVG, WebP, JPEG-XR, JPEG-2000 and APNG types on any source element, and will disregard a <code>source</code> if its type is not supported in a particular environment.  
+		  <strong>This option will only work if picturefill is built by setting the <code>support-types</code> grunt task correctly when building picturefill.</strong>
+		    For example, to support all these formats, build picturefill with this grunt task:</strong></p>
+<pre><code>grunt support-types:svg:webp:jxr:jp2:apng</code></pre>
 
+    <p>
+      If you wish to remove support for any of these formats, take them out of <code>support-types</code> task.  If you wish picturefill to support
+      none of these alternative formats, you can leave out the <code>support-types</code> task out of the grunt build altogether.  
+    </p>
+      
 <pre><code>&lt;picture&gt;
 	&lt;!--[if IE 9]&gt;&lt;video style=&quot;display: none;&quot;&gt;&lt;![endif]--&gt;
 	&lt;source srcset=&quot;examples/images/large.webp&quot; media=&quot;(min-width: 800px)&quot; type=&quot;image/webp&quot;&gt;
