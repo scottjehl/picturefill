@@ -350,25 +350,23 @@
 		}
 	};
 
-	pf.setInherentSize = function( res, picImg ) {
-		var ns = picImg[ pf.ns ] || {},
-			reeval = ns.reeval,
-			widthPreset = reeval === undefined && ( picImg.getAttribute && picImg.getAttribute( "width" ) !== null ),
+	pf.setInherentSize = function( res, picImg, readyState ) {
+		var ready = readyState !== undefined ? readyState : picImg.complete,
+			widthPreset = !ready && picImg.getAttribute && picImg.getAttribute( "width" ) !== null,
 			setWidth = function( res, picImg ) {
 				if ( picImg.setAttribute ) {
 					picImg.setAttribute( "width", picImg.naturalWidth / res );
 				}
-			};
+			},
+			widthInterval;
 
-		if ( res && !widthPreset ) {
-			if ( reeval === undefined ) {
-				window.addEventListener( "load", function() {
-					setWidth( res, picImg );
-					ns.reeval = true;
-				});
-			} else {
-				setWidth( res, picImg );
-			}
+		if ( ready && res && !widthPreset ) {
+			setWidth( res, picImg );
+		}
+		if ( !ready ) {
+			widthInterval = setTimeout(function() {
+				pf.setInherentSize( res, picImg, picImg.complete );
+			}, 250);
 		}
 	};
 
@@ -593,6 +591,7 @@
 			// When the document has finished loading, stop checking for new images
 			// https://github.com/ded/domready/blob/master/ready.js#L15
 			picturefill();
+
 			if ( /^loaded|^i|^c/.test( doc.readyState ) ) {
 				clearInterval( intervalId );
 				return;

@@ -1,4 +1,4 @@
-/*! Picturefill - v2.2.0 - 2014-11-26
+/*! Picturefill - v2.2.0 - 2014-12-04
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -399,25 +399,23 @@ window.matchMedia || (window.matchMedia = function() {
 		}
 	};
 
-	pf.setInherentSize = function( res, picImg ) {
-		var ns = picImg[ pf.ns ] || {},
-			reeval = ns.reeval,
-			widthPreset = reeval === undefined && ( picImg.getAttribute && picImg.getAttribute( "width" ) !== null ),
+	pf.setInherentSize = function( res, picImg, readyState ) {
+		var ready = readyState !== undefined ? readyState : picImg.complete,
+			widthPreset = !ready && picImg.getAttribute && picImg.getAttribute( "width" ) !== null,
 			setWidth = function( res, picImg ) {
 				if ( picImg.setAttribute ) {
 					picImg.setAttribute( "width", picImg.naturalWidth / res );
 				}
-			};
+			},
+			widthInterval;
 
-		if ( res && !widthPreset ) {
-			if ( reeval === undefined ) {
-				window.addEventListener( "load", function() {
-					setWidth( res, picImg );
-					ns.reeval = true;
-				});
-			} else {
-				setWidth( res, picImg );
-			}
+		if ( ready && res && !widthPreset ) {
+			setWidth( res, picImg );
+		}
+		if ( !ready ) {
+			widthInterval = setTimeout(function() {
+				pf.setInherentSize( res, picImg, picImg.complete );
+			}, 250);
 		}
 	};
 
@@ -642,6 +640,7 @@ window.matchMedia || (window.matchMedia = function() {
 			// When the document has finished loading, stop checking for new images
 			// https://github.com/ded/domready/blob/master/ready.js#L15
 			picturefill();
+
 			if ( /^loaded|^i|^c/.test( doc.readyState ) ) {
 				clearInterval( intervalId );
 				return;
