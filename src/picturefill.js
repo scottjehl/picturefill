@@ -328,7 +328,7 @@
 	pf.setIntrinsicSize = (function() {
 		var urlCache = {};
 		var setSize = function( picImg, width, res ) {
-			picImg.setAttribute( "width", width / res );
+			picImg.setAttribute( "width", parseInt(width / res, 10) );
 		};
 
 		return function( picImg, bestCandidate ) {
@@ -425,9 +425,8 @@
 						style.zoom = currentZoom;
 					}
 				}
-
-				pf.setIntrinsicSize(picImg, bestCandidate);
 			}
+			pf.setIntrinsicSize(picImg, bestCandidate);
 		}
 	};
 
