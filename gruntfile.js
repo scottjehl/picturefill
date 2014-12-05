@@ -2,8 +2,8 @@
 (function() {
   "use strict";
 
-  var pkg;
-
+  var pkg, includes = [];
+  console.log("running!", includes);
   module.exports = function(grunt) {
 
     // Project configuration.
@@ -20,13 +20,18 @@
         files: [ "dist" ]
       },
       concat: {
-        options: {
-          banner: "<%= banner %>",
-          stripBanners: true
-        },
+        
         dist: {
+          options: {
+            banner: "<%= banner %>",
+            stripBanners: true
+          },
           src: [ "src/external/matchmedia.js", "src/picturefill.js" ],
           dest: "dist/picturefill.js"
+        },
+        types: {
+          src: includes,
+          dest: "dist/_includes.js"
         }
       },
       uglify: {
@@ -37,6 +42,16 @@
           src: [ "<%= concat.dist.src %>" ],
           dest: "dist/picturefill.min.js"
         }
+      },
+      insert: {
+        options: {
+        	backup: true
+        },
+        main: {
+          src: "dist/_includes.js",
+          dest: "dist/picturefill.js",
+          match: "//>> insert picture types"
+        },
       },
       qunit: {
         files: [ "tests/**/*.html" ]
@@ -80,9 +95,33 @@
     grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-jscs-checker");
+    grunt.loadNpmTasks("grunt-insert");
 
-    // Default task.
-    grunt.registerTask("default", [ "test", "clean", "concat", "uglify" ]);
+    
+    grunt.task.registerTask("support-types", "insert support for image types dev wants to include", function() {
+      
+      for (var i = 0; i < arguments.length; i++) {
+      	var arg = arguments[i];
+      	
+        switch ( arg ) {
+          case "webp": 
+          case "jxr":
+          case "jp2":
+            if (includes.length === 0 || !includes[0].match(/bitmap.js$/)) {
+              includes.unshift("src/includes/bitmap.js");
+            }
+            /* falls through */
+          case "apng":
+          case "svg":
+            includes.push("src/includes/" + arg + ".js");
+        }
+      }
+      grunt.task.run("default");
+      console.log("files to include", includes);
+	} );
+	
+	// Default task.
+    grunt.registerTask("default", [ "test", "clean", "concat",  "insert", "uglify" ]);
     grunt.registerTask("test", [ "jscs", "jshint", "qunit" ]);
   };
 })();

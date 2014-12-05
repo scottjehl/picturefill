@@ -108,25 +108,12 @@
 	pf.types[ "image/gif" ] = true;
 	pf.types[ "image/png" ] = true;
 
-	// test svg support
-	pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Image", "1.1");
-
-	// test webp support, only when the markup calls for it
-	pf.types[ "image/webp" ] = function() {
-		// based on Modernizr's lossless img-webp test
-		// note: asynchronous
-		var type = "image/webp";
-
-		image.onerror = function() {
-			pf.types[ type ] = false;
-			picturefill();
-		};
-		image.onload = function() {
-			pf.types[ type ] = image.width === 1;
-			picturefill();
-		};
-		image.src = "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=";
-	};
+	
+	
+	
+	// Do not delete or change the comment below.  It will be replaced with support for alternative
+	// image formats if it is desired by the dev.
+	//>> insert picture types
 
 	/**
 	 * Takes a source element and checks if its type attribute is present and if so, supported
