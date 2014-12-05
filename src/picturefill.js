@@ -335,6 +335,41 @@
 		return candidates;
 	};
 
+	pf.backfaceVisibilityFix = function( picImg ) {
+		// See: https://github.com/scottjehl/picturefill/issues/332
+		var style = picImg.style || {},
+			WebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
+			currentZoom = style.zoom;
+
+		if (WebkitBackfaceVisibility) { 
+			style.zoom = ".999";
+
+			WebkitBackfaceVisibility = picImg.offsetWidth;
+
+			style.zoom = currentZoom;
+		}
+	};
+
+	pf.setInherentSize = function( res, picImg, readyState ) {
+		var ready = readyState !== undefined ? readyState : picImg.complete,
+			widthPreset = !ready && picImg.getAttribute && picImg.getAttribute( "width" ) !== null,
+			setWidth = function( res, picImg ) {
+				if ( picImg.setAttribute ) {
+					picImg.setAttribute( "width", picImg.naturalWidth / res );
+				}
+			},
+			widthInterval;
+
+		if ( ready && res && !widthPreset ) {
+			setWidth( res, picImg );
+		}
+		if ( !ready ) {
+			widthInterval = setTimeout(function() {
+				pf.setInherentSize( res, picImg, picImg.complete );
+			}, 250);
+		}
+	};
+
 	pf.applyBestCandidate = function( candidates, picImg ) {
 		var candidate,
 			length,
@@ -364,17 +399,8 @@
 				// http://picture.responsiveimages.org/#the-img-element
 				picImg.currentSrc = picImg.src;
 
-				var style = picImg.style || {},
-					WebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
-					currentZoom = style.zoom;
-
-				if (WebkitBackfaceVisibility) { // See: https://github.com/scottjehl/picturefill/issues/332
-					style.zoom = ".999";
-
-					WebkitBackfaceVisibility = picImg.offsetWidth;
-
-					style.zoom = currentZoom;
-				}
+				pf.backfaceVisibilityFix( picImg );
+				pf.setInherentSize( bestCandidate.resolution, picImg );
 			}
 		}
 	};
@@ -565,6 +591,7 @@
 			// When the document has finished loading, stop checking for new images
 			// https://github.com/ded/domready/blob/master/ready.js#L15
 			picturefill();
+
 			if ( /^loaded|^i|^c/.test( doc.readyState ) ) {
 				clearInterval( intervalId );
 				return;

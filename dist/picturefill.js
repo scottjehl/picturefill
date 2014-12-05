@@ -1,4 +1,4 @@
-/*! Picturefill - v2.2.0 - 2014-11-27
+/*! Picturefill - v2.2.0 - 2014-12-05
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -246,8 +246,8 @@ window.matchMedia || (window.matchMedia = function() {
 		 *
 		 * 1. Let input (`srcset`) be the value passed to this algorithm.
 		 * 2. Let position be a pointer into input, initially pointing at the start of the string.
-		 * 3. Let raw candidates be an initially empty ordered list of URLs with associated 
-		 *    unparsed descriptors. The order of entries in the list is the order in which entries 
+		 * 3. Let raw candidates be an initially empty ordered list of URLs with associated
+		 *    unparsed descriptors. The order of entries in the list is the order in which entries
 		 *    are added to the list.
 		 */
 		var candidates = [];
@@ -274,7 +274,7 @@ window.matchMedia || (window.matchMedia = function() {
 				}
 				srcset = srcset.slice( pos + 1 );
 
-				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and 
+				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and
 				// let that be descriptors.
 				if ( descriptor === null ) {
 					var descpos = srcset.indexOf( "," );
@@ -303,7 +303,7 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	pf.parseDescriptor = function( descriptor, sizesattr ) {
-		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list 
+		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list
 		// is the order in which entries are added to the list.
 		var sizes = sizesattr || "100vw",
 			sizeDescriptor = descriptor && descriptor.replace( /(^\s+|\s+$)/g, "" ),
@@ -384,6 +384,41 @@ window.matchMedia || (window.matchMedia = function() {
 		return candidates;
 	};
 
+	pf.backfaceVisibilityFix = function( picImg ) {
+		// See: https://github.com/scottjehl/picturefill/issues/332
+		var style = picImg.style || {},
+			WebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
+			currentZoom = style.zoom;
+
+		if (WebkitBackfaceVisibility) { 
+			style.zoom = ".999";
+
+			WebkitBackfaceVisibility = picImg.offsetWidth;
+
+			style.zoom = currentZoom;
+		}
+	};
+
+	pf.setInherentSize = function( res, picImg, readyState ) {
+		var ready = readyState !== undefined ? readyState : picImg.complete,
+			widthPreset = !ready && picImg.getAttribute && picImg.getAttribute( "width" ) !== null,
+			setWidth = function( res, picImg ) {
+				if ( picImg.setAttribute ) {
+					picImg.setAttribute( "width", picImg.naturalWidth / res );
+				}
+			},
+			widthInterval;
+
+		if ( ready && res && !widthPreset ) {
+			setWidth( res, picImg );
+		}
+		if ( !ready ) {
+			widthInterval = setTimeout(function() {
+				pf.setInherentSize( res, picImg, picImg.complete );
+			}, 250);
+		}
+	};
+
 	pf.applyBestCandidate = function( candidates, picImg ) {
 		var candidate,
 			length,
@@ -413,17 +448,8 @@ window.matchMedia || (window.matchMedia = function() {
 				// http://picture.responsiveimages.org/#the-img-element
 				picImg.currentSrc = picImg.src;
 
-				var style = picImg.style || {},
-					WebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
-					currentZoom = style.zoom;
-
-				if (WebkitBackfaceVisibility) { // See: https://github.com/scottjehl/picturefill/issues/332
-					style.zoom = ".999";
-
-					WebkitBackfaceVisibility = picImg.offsetWidth;
-
-					style.zoom = currentZoom;
-				}
+				pf.backfaceVisibilityFix( picImg );
+				pf.setInherentSize( bestCandidate.resolution, picImg );
 			}
 		}
 	};
@@ -614,6 +640,7 @@ window.matchMedia || (window.matchMedia = function() {
 			// When the document has finished loading, stop checking for new images
 			// https://github.com/ded/domready/blob/master/ready.js#L15
 			picturefill();
+
 			if ( /^loaded|^i|^c/.test( doc.readyState ) ) {
 				clearInterval( intervalId );
 				return;
@@ -657,4 +684,4 @@ window.matchMedia || (window.matchMedia = function() {
 		w.picturefill = picturefill;
 	}
 
-} )( this, this.document, new this.Image() );
+} )( window, window.document, new window.Image() );
