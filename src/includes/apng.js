@@ -1,4 +1,8 @@
-	pf.types["image/x-apng"] = function() {
+(function( w, doc ) {
+	var pf = w.picturefill || {};
+	pf.types = pf.types || {};
+
+	pf.types[ "image/webp" ] = w.picturefill.types["image/x-apng"] = function() {
 		var apngTest = new Image(), ctx = document.createElement("canvas").getContext("2d");
 		apngTest.onload = function() {
 			ctx.drawImage(apngTest, 0, 0);
@@ -10,3 +14,6 @@
 		// frame 2: [0, 0, 0, 0];
 		return "pending";
 	}; 
+
+	w.picturefill = pf;
+} )( window, window.document );

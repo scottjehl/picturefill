@@ -2,8 +2,7 @@
 (function() {
   "use strict";
 
-  var pkg, includes = [];
-  console.log("running!", includes);
+  var pkg;
   module.exports = function(grunt) {
 
     // Project configuration.
@@ -28,10 +27,6 @@
           },
           src: [ "src/external/matchmedia.js", "src/picturefill.js" ],
           dest: "dist/picturefill.js"
-        },
-        types: {
-          src: includes,
-          dest: "dist/_includes.js"
         }
       },
       uglify: {
@@ -97,29 +92,6 @@
     grunt.loadNpmTasks("grunt-jscs-checker");
     grunt.loadNpmTasks("grunt-insert");
 
-    
-    grunt.task.registerTask("support-types", "insert support for image types dev wants to include", function() {
-      
-      for (var i = 0; i < arguments.length; i++) {
-      	var arg = arguments[i];
-      	
-        switch ( arg ) {
-          case "webp": 
-          case "jxr":
-          case "jp2":
-            if (includes.length === 0 || !includes[0].match(/bitmap.js$/)) {
-              includes.unshift("src/includes/bitmap.js");
-            }
-            /* falls through */
-          case "apng":
-          case "svg":
-            includes.push("src/includes/" + arg + ".js");
-        }
-      }
-      grunt.task.run("default");
-      console.log("files to include", includes);
-	} );
-	
 	// Default task.
     grunt.registerTask("default", [ "test", "clean", "concat",  "insert", "uglify" ]);
     grunt.registerTask("test", [ "jscs", "jshint", "qunit" ]);

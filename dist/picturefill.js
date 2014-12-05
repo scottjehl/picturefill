@@ -66,7 +66,7 @@ window.matchMedia || (window.matchMedia = function() {
 	doc.createElement( "picture" );
 
 	// local object for method references and testing exposure
-	var pf = {};
+	var pf = w.picturefill || {};
 
 	// namespace
 	pf.ns = "picturefill";
@@ -150,26 +150,31 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	// container of supported mime types that one might need to qualify before using
-	pf.types =  {};
+	pf.types = pf.types || {};
 
 	// Add support for standard mime types
 	pf.types[ "image/jpeg" ] = true;
 	pf.types[ "image/gif" ] = true;
 	pf.types[ "image/png" ] = true;
+	pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Image", "1.1");
+	pf.types[ "image/webp" ] = "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=";
 
-	
-	
-	
-	// Do not delete or change the comment below.  It will be replaced with support for alternative
-	// image formats if it is desired by the dev.
-	
+	pf.detectTypeSupport = function( type, typeUri ) {
+		// based on Modernizr's lossless img-webp test
+		// note: asynchronous
+		var image = new w.Image();
 
-	/**
-	 * Takes a source element and checks if its type attribute is present and if so, supported
-	 * Note: for type tests that require a async logic,
-	 * you can define them as a function that'll run only if that type needs to be tested. Just make the test function call picturefill again when it is complete.
-	 * see the async webp test above for example
-	 */
+		image.onerror = function() {
+			pf.types[ type ] = false;
+			picturefill();
+		};
+		image.onload = function() {
+			pf.types[ type ] = image.width === 1;
+			picturefill();
+		};
+		image.src = typeUri;
+	}; 
+
 	pf.verifyTypeSupport = function( source ) {
 		var type = source.getAttribute( "type" );
 		// if type attribute exists, return test result, otherwise return true
@@ -177,7 +182,10 @@ window.matchMedia || (window.matchMedia = function() {
 			return true;
 		} else {
 			// if the type test is a function, run it and return "pending" status. The function will rerun picturefill on pending elements once finished.
-			if ( typeof( pf.types[ type ] ) === "function" ) {
+			if ( typeof pf.types[ type ] === "string" ) {
+				pf.types[ type ] = pf.detectTypeSupport( type, pf.types[ type ] );
+				return "pending";
+			} else if ( typeof pf.types[ type ] === "function" ) {
 				pf.types[ type ]();
 				return "pending";
 			} else {
