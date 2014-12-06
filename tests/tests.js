@@ -71,6 +71,22 @@
 		equal(width, 500, "returns 500 when match media returns false");
 	});
 
+	test("setInherentSize", function() {
+		var fakeImg = document.createElement( "img" );
+
+		fakeImg.src = "../examples/images/small.jpg";
+
+		fakeImg.setAttribute( "width", 10 );
+
+		pf.setInherentSize( 2, fakeImg, false );
+		deepEqual( fakeImg.width, 10, "No natural width calculation is performed if a `width` attribute already exists." );
+
+		fakeImg.removeAttribute( "width" );
+
+		pf.setInherentSize( 2, fakeImg, true );
+		deepEqual( fakeImg.width, 90, "width attribute is set to `naturalWidth / resolution`" );
+	});
+
 	test("parseSize", function() {
 		var size1 = "";
 		var expected1 = {
@@ -352,7 +368,7 @@
 	});
 
 	test("verifyTypeSupport", function() {
-		expect( 7 );
+		expect( 6 );
 
 		// Test widely supported mime types.
 		ok(pf.verifyTypeSupport({
@@ -387,10 +403,6 @@
 			}
 		}));
 
-		pf.types[ "foo" ] = function() {
-			ok( true, "foo type function executed" );
-		};
-
 		pf.verifyTypeSupport({
 			getAttribute: function() {
 				return "foo";
@@ -399,7 +411,7 @@
 
 		pf.types[ "bar" ] = "baz";
 
-		equal( "baz", pf.verifyTypeSupport({
+		equal( "pending", pf.verifyTypeSupport({
 			getAttribute: function() {
 				return "bar";
 			}

@@ -1,6 +1,6 @@
 /*! Picturefill - Responsive Images that work today.
 *  Author: Scott Jehl, Filament Group, 2012 ( new proposal implemented by Shawn Jansepar )
-*  License: MIT/GPLv2
+*  License: MIT/GPLv2 
 *  Spec: http://picture.responsiveimages.org/
 */
 (function( w, doc, image ) {
@@ -17,7 +17,7 @@
 	doc.createElement( "picture" );
 
 	// local object for method references and testing exposure
-	var pf = {};
+	var pf = w.picturefill || {};
 
 	// namespace
 	pf.ns = "picturefill";
@@ -69,7 +69,7 @@
 		 * If length is specified in  `vw` units, use `%` instead since the div we’re measuring
 		 * is injected at the top of the document.
 		 *
-		 * TODO: maybe we should put this behind a feature test for `vw`?
+		 * TODO: maybe we should put this behind a feature test for `vw`? The risk of doing this is possible browser inconsistancies with vw vs % 
 		 */
 		length = length.replace( "vw", "%" );
 
@@ -100,39 +100,48 @@
 		return offsetWidth;
 	};
 
+    pf.detectTypeSupport = function( type, typeUri ) {
+        // based on Modernizr's lossless img-webp test
+        // note: asynchronous
+        var image = new w.Image();
+        image.onerror = function() {
+            pf.types[ type ] = false;
+            picturefill();
+        };
+        image.onload = function() {
+            pf.types[ type ] = image.width === 1;
+            picturefill();
+        };
+        image.src = typeUri;
+        
+        return "pending";
+    }; 
 	// container of supported mime types that one might need to qualify before using
-	pf.types =  {};
+	pf.types = pf.types || {};
 
 	// Add support for standard mime types
 	pf.types[ "image/jpeg" ] = true;
 	pf.types[ "image/gif" ] = true;
 	pf.types[ "image/png" ] = true;
+	pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Image", "1.1");
+	pf.types[ "image/webp" ] = pf.detectTypeSupport("image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=");
 
-	
-	
-	
-	// Do not delete or change the comment below.  It will be replaced with support for alternative
-	// image formats if it is desired by the dev.
-	//>> insert picture types
-
-	/**
-	 * Takes a source element and checks if its type attribute is present and if so, supported
-	 * Note: for type tests that require a async logic,
-	 * you can define them as a function that'll run only if that type needs to be tested. Just make the test function call picturefill again when it is complete.
-	 * see the async webp test above for example
-	 */
 	pf.verifyTypeSupport = function( source ) {
 		var type = source.getAttribute( "type" );
 		// if type attribute exists, return test result, otherwise return true
 		if ( type === null || type === "" ) {
 			return true;
 		} else {
+		    var pfType = pf.types[ type ];
 			// if the type test is a function, run it and return "pending" status. The function will rerun picturefill on pending elements once finished.
-			if ( typeof( pf.types[ type ] ) === "function" ) {
-				pf.types[ type ]();
+			if ( typeof pfType === "string" && pfType !== "pending") {
+			    pf.types[ type ] = pf.detectTypeSupport( type, pfType );
+				return "pending";
+			} else if ( typeof pfType === "function" ) {
+			    pfType();
 				return "pending";
 			} else {
-				return pf.types[ type ];
+			    return pfType;
 			}
 		}
 	};
@@ -184,8 +193,8 @@
 		 *
 		 * 1. Let input (`srcset`) be the value passed to this algorithm.
 		 * 2. Let position be a pointer into input, initially pointing at the start of the string.
-		 * 3. Let raw candidates be an initially empty ordered list of URLs with associated 
-		 *    unparsed descriptors. The order of entries in the list is the order in which entries 
+		 * 3. Let raw candidates be an initially empty ordered list of URLs with associated
+		 *    unparsed descriptors. The order of entries in the list is the order in which entries
 		 *    are added to the list.
 		 */
 		var candidates = [];
@@ -212,7 +221,7 @@
 				}
 				srcset = srcset.slice( pos + 1 );
 
-				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and 
+				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and
 				// let that be descriptors.
 				if ( descriptor === null ) {
 					var descpos = srcset.indexOf( "," );
@@ -241,7 +250,7 @@
 	};
 
 	pf.parseDescriptor = function( descriptor, sizesattr ) {
-		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list 
+		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list
 		// is the order in which entries are added to the list.
 		var sizes = sizesattr || "100vw",
 			sizeDescriptor = descriptor && descriptor.replace( /(^\s+|\s+$)/g, "" ),
@@ -322,6 +331,41 @@
 		return candidates;
 	};
 
+	pf.backfaceVisibilityFix = function( picImg ) {
+		// See: https://github.com/scottjehl/picturefill/issues/332
+		var style = picImg.style || {},
+			WebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
+			currentZoom = style.zoom;
+
+		if (WebkitBackfaceVisibility) { 
+			style.zoom = ".999";
+
+			WebkitBackfaceVisibility = picImg.offsetWidth;
+
+			style.zoom = currentZoom;
+		}
+	};
+
+	pf.setInherentSize = function( res, picImg, readyState ) {
+		var ready = readyState !== undefined ? readyState : picImg.complete,
+			widthPreset = !ready && picImg.getAttribute && picImg.getAttribute( "width" ) !== null,
+			setWidth = function( res, picImg ) {
+				if ( picImg.setAttribute ) {
+					picImg.setAttribute( "width", picImg.naturalWidth / res );
+				}
+			},
+			widthInterval;
+
+		if ( ready && res && !widthPreset ) {
+			setWidth( res, picImg );
+		}
+		if ( !ready ) {
+			widthInterval = setTimeout(function() {
+				pf.setInherentSize( res, picImg, picImg.complete );
+			}, 250);
+		}
+	};
+
 	pf.applyBestCandidate = function( candidates, picImg ) {
 		var candidate,
 			length,
@@ -351,17 +395,8 @@
 				// http://picture.responsiveimages.org/#the-img-element
 				picImg.currentSrc = picImg.src;
 
-				var style = picImg.style || {},
-					WebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
-					currentZoom = style.zoom;
-
-				if (WebkitBackfaceVisibility) { // See: https://github.com/scottjehl/picturefill/issues/332
-					style.zoom = ".999";
-
-					WebkitBackfaceVisibility = picImg.offsetWidth;
-
-					style.zoom = currentZoom;
-				}
+				pf.backfaceVisibilityFix( picImg );
+				pf.setInherentSize( bestCandidate.resolution, picImg );
 			}
 		}
 	};
@@ -552,6 +587,7 @@
 			// When the document has finished loading, stop checking for new images
 			// https://github.com/ded/domready/blob/master/ready.js#L15
 			picturefill();
+
 			if ( /^loaded|^i|^c/.test( doc.readyState ) ) {
 				clearInterval( intervalId );
 				return;
@@ -595,4 +631,4 @@
 		w.picturefill = picturefill;
 	}
 
-} )( this, this.document, new this.Image() );
+} )( window, window.document, new window.Image() );

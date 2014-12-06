@@ -1,1 +1,0 @@
-	pf.types[ "image/webp" ] = pf.detectImageSupport("image/webp", "UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=");

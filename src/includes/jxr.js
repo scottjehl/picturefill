@@ -1,1 +1,6 @@
-	pf.types[ "image/vnd.ms-photo" ] = pf.detectImageSupport("image/vnd.ms-photo", "SUm8AQgAAAAFAAG8AQAQAAAASgAAAIC8BAABAAAAAQAAAIG8BAABAAAAAQAAAMC8BAABAAAAWgAAAMG8BAABAAAAHwAAAAAAAAAkw91vA07+S7GFPXd2jckNV01QSE9UTwAZAYBxAAAAABP/gAAEb/8AAQAAAQAAAA==");
+(function( w ) {
+	var pf = w.picturefill || { _: { types: {} } };
+	pf._.types[ "image/vnd.ms-photo" ] = pf._.detectTypeSupport("image/vnd.ms-photo","data:image/vnd.ms-photo;base64,SUm8AQgAAAAFAAG8AQAQAAAASgAAAIC8BAABAAAAAQAAAIG8BAABAAAAAQAAAMC8BAABAAAAWgAAAMG8BAABAAAAHwAAAAAAAAAkw91vA07+S7GFPXd2jckNV01QSE9UTwAZAYBxAAAAABP/gAAEb/8AAQAAAQAAAA==");
+
+	w.picturefill = pf;
+} )( window );

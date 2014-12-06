@@ -2,8 +2,7 @@
 (function() {
   "use strict";
 
-  var pkg, includes = [];
-  console.log("running!", includes);
+  var pkg, toConcat = [ "src/external/matchmedia.js", "src/picturefill.js" ], supportTypes = "";
   module.exports = function(grunt) {
 
     // Project configuration.
@@ -26,12 +25,8 @@
             banner: "<%= banner %>",
             stripBanners: true
           },
-          src: [ "src/external/matchmedia.js", "src/picturefill.js" ],
+          src: toConcat,
           dest: "dist/picturefill.js"
-        },
-        types: {
-          src: includes,
-          dest: "dist/_includes.js"
         }
       },
       uglify: {
@@ -43,16 +38,7 @@
           dest: "dist/picturefill.min.js"
         }
       },
-      insert: {
-        options: {
-        	backup: true
-        },
-        main: {
-          src: "dist/_includes.js",
-          dest: "dist/picturefill.js",
-          match: "//>> insert picture types"
-        },
-      },
+      
       qunit: {
         files: [ "tests/**/*.html" ]
       },
@@ -61,7 +47,7 @@
           options: {
             jshintrc: true
           },
-          src: [ "Gruntfile.js", "src/*.js", "tests/*.js" ]
+          src: [ "Gruntfile.js", "src/*.js", "src/includes/*.js", "tests/*.js" ]
         }
       },
       jscs: {
@@ -71,8 +57,11 @@
       },
       watch: {
         gruntfile: {
-          files: [ "Gruntfile.js", "src/*.js", "tests/*.js" ],
-          tasks: [ "default" ]
+          files: [ "Gruntfile.js", "src/*.js", "src/includes/*.js", "tests/*.js" ],
+          tasks: [ "support-types" +  supportTypes, "default" ],
+          options: {
+            spawn: false
+          }
         }
       }
     });
@@ -95,33 +84,35 @@
     grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-jscs-checker");
-    grunt.loadNpmTasks("grunt-insert");
-
     
     grunt.task.registerTask("support-types", "insert support for image types dev wants to include", function() {
-      
+      var supportTypes = "";
       for (var i = 0; i < arguments.length; i++) {
-      	var arg = arguments[i];
-      	
+        var arg = arguments[i];
+        
         switch ( arg ) {
           case "webp": 
+          case "svg":
           case "jxr":
           case "jp2":
-            if (includes.length === 0 || !includes[0].match(/bitmap.js$/)) {
-              includes.unshift("src/includes/bitmap.js");
-            }
-            /* falls through */
           case "apng":
-          case "svg":
-            includes.push("src/includes/" + arg + ".js");
+          
+            toConcat.push("src/includes/" + arg + ".js");
         }
+        
+        supportTypes += ":" + arg;
+        
+      }
+      
+      if (!supportTypes) {
+        supportTypes = supportTypes;
       }
       grunt.task.run("default");
-      console.log("files to include", includes);
-	} );
-	
+      console.log("files to concatenate", toConcat);
+    } );
+
 	// Default task.
-    grunt.registerTask("default", [ "test", "clean", "concat",  "insert", "uglify" ]);
+    grunt.registerTask("default", [ "test", "clean", "concat", "uglify" ]);
     grunt.registerTask("test", [ "jscs", "jshint", "qunit" ]);
   };
 })();

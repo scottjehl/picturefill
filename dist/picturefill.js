@@ -1,4 +1,4 @@
-/*! Picturefill - v2.2.0 - 2014-11-29
+/*! Picturefill - v2.2.0 - 2014-12-06
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -49,7 +49,7 @@ window.matchMedia || (window.matchMedia = function() {
 }());
 /*! Picturefill - Responsive Images that work today.
 *  Author: Scott Jehl, Filament Group, 2012 ( new proposal implemented by Shawn Jansepar )
-*  License: MIT/GPLv2
+*  License: MIT/GPLv2 
 *  Spec: http://picture.responsiveimages.org/
 */
 (function( w, doc, image ) {
@@ -66,7 +66,7 @@ window.matchMedia || (window.matchMedia = function() {
 	doc.createElement( "picture" );
 
 	// local object for method references and testing exposure
-	var pf = {};
+	var pf = w.picturefill || {};
 
 	// namespace
 	pf.ns = "picturefill";
@@ -118,7 +118,7 @@ window.matchMedia || (window.matchMedia = function() {
 		 * If length is specified in  `vw` units, use `%` instead since the div we’re measuring
 		 * is injected at the top of the document.
 		 *
-		 * TODO: maybe we should put this behind a feature test for `vw`?
+		 * TODO: maybe we should put this behind a feature test for `vw`? The risk of doing this is possible browser inconsistancies with vw vs % 
 		 */
 		length = length.replace( "vw", "%" );
 
@@ -149,73 +149,48 @@ window.matchMedia || (window.matchMedia = function() {
 		return offsetWidth;
 	};
 
+    pf.detectTypeSupport = function( type, typeUri ) {
+        // based on Modernizr's lossless img-webp test
+        // note: asynchronous
+        var image = new w.Image();
+        image.onerror = function() {
+            pf.types[ type ] = false;
+            picturefill();
+        };
+        image.onload = function() {
+            pf.types[ type ] = image.width === 1;
+            picturefill();
+        };
+        image.src = typeUri;
+        
+        return "pending";
+    }; 
 	// container of supported mime types that one might need to qualify before using
-	pf.types =  {};
+	pf.types = pf.types || {};
 
 	// Add support for standard mime types
 	pf.types[ "image/jpeg" ] = true;
 	pf.types[ "image/gif" ] = true;
 	pf.types[ "image/png" ] = true;
-
-	
-	
-	
-	// Do not delete or change the comment below.  It will be replaced with support for alternative
-	// image formats if it is desired by the dev.
-		pf.detectImageSupport = function(type, base64Str) {
-		// based on Modernizr's lossless img-webp test
-		// note: asynchronous
-		var img = new w.Image();
-		
-		img.onerror = function() {
-			pf.types[type] = false;
-			picturefill();
-		};
-		img.onload = function() {
-			pf.types[type] = img.width === 1;
-			picturefill();
-		};
-		img.src = "data:" + type + ";" + "base64," + base64Str;
-		
-		return "pending";
-	}; 
-	// test svg support
 	pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Image", "1.1");
+	pf.types[ "image/webp" ] = pf.detectTypeSupport("image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=");
 
-	pf.types[ "image/webp" ] = pf.detectImageSupport("image/webp", "UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=");
-	pf.types[ "image/vnd.ms-photo" ] = pf.detectImageSupport("image/vnd.ms-photo", "SUm8AQgAAAAFAAG8AQAQAAAASgAAAIC8BAABAAAAAQAAAIG8BAABAAAAAQAAAMC8BAABAAAAWgAAAMG8BAABAAAAHwAAAAAAAAAkw91vA07+S7GFPXd2jckNV01QSE9UTwAZAYBxAAAAABP/gAAEb/8AAQAAAQAAAA==");
-	pf.types[ "image/jp2" ] = pf.detectImageSupport("image/jp2", "/0//UQAyAAAAAAABAAAAAgAAAAAAAAAAAAAABAAAAAQAAAAAAAAAAAAEBwEBBwEBBwEBBwEB/1IADAAAAAEAAAQEAAH/XAAEQED/ZAAlAAFDcmVhdGVkIGJ5IE9wZW5KUEVHIHZlcnNpb24gMi4wLjD/kAAKAAAAAABYAAH/UwAJAQAABAQAAf9dAAUBQED/UwAJAgAABAQAAf9dAAUCQED/UwAJAwAABAQAAf9dAAUDQED/k8+kEAGvz6QQAa/PpBABr994EAk//9k=");
-	pf.types["image/x-apng"] = function() {
-		var apngTest = new Image(), ctx = document.createElement("canvas").getContext("2d");
-		apngTest.onload = function() {
-			ctx.drawImage(apngTest, 0, 0);
-			pf.types["image/x-apng"] = ctx.getImageData(0, 0, 1, 1).data[3] === 0;
-			picturefill();
-		};
-		apngTest.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACGFjVEwAAAABAAAAAcMq2TYAAAANSURBVAiZY2BgYPgPAAEEAQB9ssjfAAAAGmZjVEwAAAAAAAAAAQAAAAEAAAAAAAAAAAD6A+gBAbNU+2sAAAARZmRBVAAAAAEImWNgYGBgAAAABQAB6MzFdgAAAABJRU5ErkJggg==";
-		// frame 1 (skipped on apng-supporting browsers): [0, 0, 0, 255]
-		// frame 2: [0, 0, 0, 0];
-		return "pending";
-	}; 
-
-	/**
-	 * Takes a source element and checks if its type attribute is present and if so, supported
-	 * Note: for type tests that require a async logic,
-	 * you can define them as a function that'll run only if that type needs to be tested. Just make the test function call picturefill again when it is complete.
-	 * see the async webp test above for example
-	 */
 	pf.verifyTypeSupport = function( source ) {
 		var type = source.getAttribute( "type" );
 		// if type attribute exists, return test result, otherwise return true
 		if ( type === null || type === "" ) {
 			return true;
 		} else {
+		    var pfType = pf.types[ type ];
 			// if the type test is a function, run it and return "pending" status. The function will rerun picturefill on pending elements once finished.
-			if ( typeof( pf.types[ type ] ) === "function" ) {
-				pf.types[ type ]();
+			if ( typeof pfType === "string" && pfType !== "pending") {
+			    pf.types[ type ] = pf.detectTypeSupport( type, pfType );
+				return "pending";
+			} else if ( typeof pfType === "function" ) {
+			    pfType();
 				return "pending";
 			} else {
-				return pf.types[ type ];
+			    return pfType;
 			}
 		}
 	};
@@ -267,8 +242,8 @@ window.matchMedia || (window.matchMedia = function() {
 		 *
 		 * 1. Let input (`srcset`) be the value passed to this algorithm.
 		 * 2. Let position be a pointer into input, initially pointing at the start of the string.
-		 * 3. Let raw candidates be an initially empty ordered list of URLs with associated 
-		 *    unparsed descriptors. The order of entries in the list is the order in which entries 
+		 * 3. Let raw candidates be an initially empty ordered list of URLs with associated
+		 *    unparsed descriptors. The order of entries in the list is the order in which entries
 		 *    are added to the list.
 		 */
 		var candidates = [];
@@ -295,7 +270,7 @@ window.matchMedia || (window.matchMedia = function() {
 				}
 				srcset = srcset.slice( pos + 1 );
 
-				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and 
+				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and
 				// let that be descriptors.
 				if ( descriptor === null ) {
 					var descpos = srcset.indexOf( "," );
@@ -324,7 +299,7 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	pf.parseDescriptor = function( descriptor, sizesattr ) {
-		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list 
+		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list
 		// is the order in which entries are added to the list.
 		var sizes = sizesattr || "100vw",
 			sizeDescriptor = descriptor && descriptor.replace( /(^\s+|\s+$)/g, "" ),
@@ -405,6 +380,41 @@ window.matchMedia || (window.matchMedia = function() {
 		return candidates;
 	};
 
+	pf.backfaceVisibilityFix = function( picImg ) {
+		// See: https://github.com/scottjehl/picturefill/issues/332
+		var style = picImg.style || {},
+			WebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
+			currentZoom = style.zoom;
+
+		if (WebkitBackfaceVisibility) { 
+			style.zoom = ".999";
+
+			WebkitBackfaceVisibility = picImg.offsetWidth;
+
+			style.zoom = currentZoom;
+		}
+	};
+
+	pf.setInherentSize = function( res, picImg, readyState ) {
+		var ready = readyState !== undefined ? readyState : picImg.complete,
+			widthPreset = !ready && picImg.getAttribute && picImg.getAttribute( "width" ) !== null,
+			setWidth = function( res, picImg ) {
+				if ( picImg.setAttribute ) {
+					picImg.setAttribute( "width", picImg.naturalWidth / res );
+				}
+			},
+			widthInterval;
+
+		if ( ready && res && !widthPreset ) {
+			setWidth( res, picImg );
+		}
+		if ( !ready ) {
+			widthInterval = setTimeout(function() {
+				pf.setInherentSize( res, picImg, picImg.complete );
+			}, 250);
+		}
+	};
+
 	pf.applyBestCandidate = function( candidates, picImg ) {
 		var candidate,
 			length,
@@ -434,17 +444,8 @@ window.matchMedia || (window.matchMedia = function() {
 				// http://picture.responsiveimages.org/#the-img-element
 				picImg.currentSrc = picImg.src;
 
-				var style = picImg.style || {},
-					WebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
-					currentZoom = style.zoom;
-
-				if (WebkitBackfaceVisibility) { // See: https://github.com/scottjehl/picturefill/issues/332
-					style.zoom = ".999";
-
-					WebkitBackfaceVisibility = picImg.offsetWidth;
-
-					style.zoom = currentZoom;
-				}
+				pf.backfaceVisibilityFix( picImg );
+				pf.setInherentSize( bestCandidate.resolution, picImg );
 			}
 		}
 	};
@@ -635,6 +636,7 @@ window.matchMedia || (window.matchMedia = function() {
 			// When the document has finished loading, stop checking for new images
 			// https://github.com/ded/domready/blob/master/ready.js#L15
 			picturefill();
+
 			if ( /^loaded|^i|^c/.test( doc.readyState ) ) {
 				clearInterval( intervalId );
 				return;
@@ -678,4 +680,38 @@ window.matchMedia || (window.matchMedia = function() {
 		w.picturefill = picturefill;
 	}
 
-} )( this, this.document, new this.Image() );
+} )( window, window.document, new window.Image() );
+
+(function( w ) {
+	var pf = w.picturefill || { _: { types: {} } };
+	pf._.types[ "image/vnd.ms-photo" ] = pf._.detectTypeSupport("image/vnd.ms-photo","data:image/vnd.ms-photo;base64,SUm8AQgAAAAFAAG8AQAQAAAASgAAAIC8BAABAAAAAQAAAIG8BAABAAAAAQAAAMC8BAABAAAAWgAAAMG8BAABAAAAHwAAAAAAAAAkw91vA07+S7GFPXd2jckNV01QSE9UTwAZAYBxAAAAABP/gAAEb/8AAQAAAQAAAA==");
+
+	w.picturefill = pf;
+} )( window );
+
+(function( w ) {
+	var pf = w.picturefill || { _: { types: {} } };
+	pf._.types[ "image/jp2" ] = pf._.detectTypeSupport("image/jp2","data:image/jp2;base64,/0//UQAyAAAAAAABAAAAAgAAAAAAAAAAAAAABAAAAAQAAAAAAAAAAAAEBwEBBwEBBwEBBwEB/1IADAAAAAEAAAQEAAH/XAAEQED/ZAAlAAFDcmVhdGVkIGJ5IE9wZW5KUEVHIHZlcnNpb24gMi4wLjD/kAAKAAAAAABYAAH/UwAJAQAABAQAAf9dAAUBQED/UwAJAgAABAQAAf9dAAUCQED/UwAJAwAABAQAAf9dAAUDQED/k8+kEAGvz6QQAa/PpBABr994EAk//9k=");
+	w.picturefill = pf;
+} )( window );
+
+(function( w, doc ) {
+	var pf = w.picturefill || {};
+	pf._.types = pf._.types || {};
+
+	pf._.types[ "image/x-apng" ] = w.picturefill._.types["image/x-apng"] = function() {
+		var apngTest = new Image(), ctx = doc.createElement("canvas").getContext("2d");
+		apngTest.onload = function() {
+		    console.log("hmmm");
+			ctx.drawImage(apngTest, 0, 0);
+			pf._.types["image/x-apng"] = ctx.getImageData(0, 0, 1, 1).data[3] === 0;
+			w.picturefill();
+		};
+		apngTest.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACGFjVEwAAAABAAAAAcMq2TYAAAANSURBVAiZY2BgYPgPAAEEAQB9ssjfAAAAGmZjVEwAAAAAAAAAAQAAAAEAAAAAAAAAAAD6A+gBAbNU+2sAAAARZmRBVAAAAAEImWNgYGBgAAAABQAB6MzFdgAAAABJRU5ErkJggg==";
+		// frame 1 (skipped on apng-supporting browsers): [0, 0, 0, 255]
+		// frame 2: [0, 0, 0, 0];
+		return "pending";
+	}; 
+
+	w.picturefill = pf;
+} )( window, window.document );
