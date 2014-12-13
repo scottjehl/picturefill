@@ -1,638 +1,1264 @@
 /*! Picturefill - Responsive Images that work today.
-*  Author: Scott Jehl, Filament Group, 2012 ( new proposal implemented by Shawn Jansepar )
-*  License: MIT/GPLv2
-*  Spec: http://picture.responsiveimages.org/
-*/
-(function( w, doc, image ) {
+ *  Author: Scott Jehl, Filament Group, 2012 ( new proposal implemented by Shawn Jansepar )
+ *  License: MIT
+ *  Spec: http://picture.responsiveimages.org/
+ */
+(function( window, document, undefined ) {
 	// Enable strict mode
 	"use strict";
-
-	// If picture is supported, well, that's awesome. Let's get outta here...
-	if ( w.HTMLPictureElement ) {
-		w.picturefill = function() { };
-		return;
+	if ( typeof PFDEBUG == "undefined" ) {
+		window.PFDEBUG = true;
 	}
 
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
-	doc.createElement( "picture" );
+	document.createElement( "picture" );
 
+	var lowTreshold, partialLowTreshold, isLandscape, lazyFactor, warn, eminpx,
+		alwaysCheckWDescriptor, resizeThrottle;
 	// local object for method references and testing exposure
-	var pf = {};
+	var ri = {};
+	var noop = function() {};
+	var image = document.createElement( "img" );
+	var getImgAttr = image.getAttribute;
+	var setImgAttr = image.setAttribute;
+	var removeImgAttr = image.removeAttribute;
+	var docElem = document.documentElement;
+	var types = {};
+	var cfg = {
+		//resource selection:
+		xQuant: 1,
+		lazyFactor: 0.4,
+		maxX: 2
+	};
+	var srcAttr = "data-pfsrc";
+	var srcsetAttr = srcAttr + "set";
+	var ua = navigator.userAgent;
+	var supportAbort = (/rident/).test(ua) || ((/ecko/).test(ua) && ua.match(/rv\:(\d+)/) && RegExp.$1 > 35 );
+	var curSrcProp = "currentSrc";
+	var regWDesc = /\s+\+?\d+(e\d+)?w/;
+	var regSize = /(\([^)]+\))?\s*(.+)/;
+	var regDescriptor =  /^([\+eE\d\.]+)(w|x)$/; // currently no h
+	var regHDesc = /\s*\d+h\s*/;
+	var setOptions = window.picturefillCFG;
+	/**
+	 * Shortcut property for https://w3c.github.io/webappsec/specs/mixedcontent/#restricts-mixed-content ( for easy overriding in tests )
+	 */
+	var isSSL = location.protocol == "https:";
+	// baseStyle also used by getEmValue (i.e.: width: 1em is important)
+	var baseStyle = "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;overflow:hidden;clip:rect(0px, 0px, 0px, 0px)";
+	var fsCss = "font-size:100%!important;";
+	var isVwDirty = true;
 
-	// namespace
-	pf.ns = "picturefill";
+	var memSize = {};
+	var memDescriptor = {};
+	var cssCache = {};
+	var sizeLengthCache = {};
+	var DPR = window.devicePixelRatio;
+	var units = {
+		px: 1,
+		'in': 96
+	};
+	var anchor = document.createElement( "a" );
+	/**
+	 * alreadyRun flag used for setOptions. is it true setOptions will reevaluate
+	 * @type {boolean}
+	 */
+	var alreadyRun = false;
 
-	// srcset support test
-	(function() {
-		pf.srcsetSupported = "srcset" in image;
-		pf.sizesSupported = "sizes" in image;
+	var on = function(obj, evt, fn, capture) {
+		if ( obj.addEventListener ) {
+			obj.addEventListener(evt, fn, capture || false);
+		} else if ( obj.attachEvent ) {
+			obj.attachEvent( "on"+ evt, fn);
+		}
+	};
+
+	var off = function(obj, evt, fn, capture) {
+		if ( obj.removeEventListener ) {
+			obj.removeEventListener(evt, fn, capture || false);
+		} else if ( obj.detachEvent ) {
+			obj.detachEvent( "on"+ evt, fn);
+		}
+	};
+
+	/**
+	 * gets a mediaquery and returns a boolean or gets a css length and returns a number
+	 * @param css mediaqueries or css length
+	 * @returns {boolean|number}
+	 *
+	 * based on: https://gist.github.com/jonathantneal/db4f77009b155f083738
+	 */
+	var evalCSS = (function(){
+
+		var cache = {};
+		var regLength = /^([\d\.]+)(em|vw|px)$/;
+		var replace = function() {
+			var args = arguments, index = 0, string = args[0];
+			while (++index in args) {
+				string = string.replace(args[index], args[++index]);
+			}
+			return string;
+		};
+
+		var buidlStr = function(css) {
+			if (!cache[css]) {
+				cache[css] = "return " + replace((css || "").toLowerCase(),
+					// interpret `and`
+					/\band\b/g, "&&",
+
+					// interpret `,`
+					/,/g, "||",
+
+					// interpret `min-` as >=
+					/min-([a-z-\s]+):/g, "e.$1>=",
+
+					// interpret `min-` as <=
+					/max-([a-z-\s]+):/g, "e.$1<=",
+
+					//calc value
+					/calc([^)]+)/g, "($1)",
+
+					// interpret css values
+					/(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)",
+					//make eval less evil
+					/^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/ig, ""
+				) + ";";
+			}
+
+			return cache[css];
+		};
+
+
+		return function(css, length) {
+			var parsedLength;
+			if (!(css in cssCache)) {
+				cssCache[css] = false;
+				if(length && (parsedLength = css.match( regLength ))){
+					cssCache[css] = parsedLength[ 1 ] * units[parsedLength[ 2 ]];
+				} else {
+					/*jshint evil:true */
+					try{
+						cssCache[css] = new Function("e", buidlStr(css))(units);
+					} catch(e){}
+					/*jshint evil:false */
+				}
+			}
+			return cssCache[css];
+		};
 	})();
 
-	// just a string trim workaround
-	pf.trim = function( str ) {
-		return str.trim ? str.trim() : str.replace( /^\s+|\s+$/g, "" );
-	};
-
-	// just a string endsWith workaround
-	pf.endsWith = function( str, suffix ) {
-		return str.endsWith ? str.endsWith( suffix ) : str.indexOf( suffix, str.length - suffix.length ) !== -1;
-	};
-
-	/**
-	 * Shortcut method for https://w3c.github.io/webappsec/specs/mixedcontent/#restricts-mixed-content ( for easy overriding in tests )
-	 */
-	pf.restrictsMixedContent = function() {
-		return w.location.protocol === "https:";
-	};
-	/**
-	 * Shortcut method for matchMedia ( for easy overriding in tests )
-	 */
-
-	pf.matchesMedia = function( media ) {
-		return w.matchMedia && w.matchMedia( media ).matches;
-	};
-
-	// Shortcut method for `devicePixelRatio` ( for easy overriding in tests )
-	pf.getDpr = function() {
-		return ( w.devicePixelRatio || 1 );
+	var setResolution = function ( candidate, sizesattr ) {
+		if ( candidate.w ) { // h = means height: || descriptor.type == 'h' do not handle yet...
+			candidate.cWidth = ri.calcListLength( sizesattr || "100vw" );
+			candidate.res = candidate.w / candidate.cWidth ;
+		} else {
+			candidate.res = candidate.x;
+		}
+		return candidate;
 	};
 
 	/**
-	 * Get width in css pixel value from a "length" value
-	 * http://dev.w3.org/csswg/css-values-3/#length-value
+	 *
+	 * @param opt
 	 */
-	pf.getWidthFromLength = function( length ) {
-		// If a length is specified and doesn’t contain a percentage, and it is greater than 0 or using `calc`, use it. Else, use the `100vw` default.
-		length = length && length.indexOf( "%" ) > -1 === false && ( parseFloat( length ) > 0 || length.indexOf( "calc(" ) > -1 ) ? length : "100vw";
+	var picturefill = function( opt ) {
+		var elements, i, plen;
 
-		/**
-		 * If length is specified in  `vw` units, use `%` instead since the div we’re measuring
-		 * is injected at the top of the document.
-		 *
-		 * TODO: maybe we should put this behind a feature test for `vw`?
-		 */
-		length = length.replace( "vw", "%" );
+		var options = opt || {};
 
-		// Create a cached element for getting length value widths
-		if ( !pf.lengthEl ) {
-			pf.lengthEl = doc.createElement( "div" );
-
-			// Positioning styles help prevent padding/margin/width on `html` or `body` from throwing calculations off.
-			pf.lengthEl.style.cssText = "border:0;display:block;font-size:1em;left:0;margin:0;padding:0;position:absolute;visibility:hidden";
+		if ( options.elements && options.elements.nodeType == 1 ) {
+			if ( options.elements.nodeName.toUpperCase() == "IMG" ) {
+				options.elements =  [ options.elements ];
+			} else {
+				options.context = options.elements;
+				options.elements =  null;
+			}
 		}
 
-		pf.lengthEl.style.width = length;
+		elements = options.elements || ri.qsa( (options.context || document), ( options.reevaluate || options.reparse ) ? ri.sel : ri.selShort );
 
-		doc.body.appendChild(pf.lengthEl);
+		if ( (plen = elements.length) ) {
 
-		// Add a class, so that everyone knows where this element comes from
-		pf.lengthEl.className = "helper-from-picturefill-js";
+			ri.setupRun( options );
+			alreadyRun = true;
 
-		if ( pf.lengthEl.offsetWidth <= 0 ) {
-			// Something has gone wrong. `calc()` is in use and unsupported, most likely. Default to `100vw` (`100%`, for broader support.):
-			pf.lengthEl.style.width = doc.documentElement.offsetWidth + "px";
+			// Loop through all elements
+			for ( i = 0; i < plen; i++ ) {
+				ri.fillImg(elements[ i ], options);
+			}
+
+			ri.teardownRun( options );
 		}
-
-		var offsetWidth = pf.lengthEl.offsetWidth;
-
-		doc.body.removeChild( pf.lengthEl );
-
-		return offsetWidth;
 	};
 
-	// container of supported mime types that one might need to qualify before using
-	pf.types =  {};
+	/**
+	 * adds an onload event to an image and reevaluates it, after onload
+	 */
+	var reevaluateAfterLoad = (function(){
+		var onload = function(){
+			off( this, "load", onload );
+			off( this, "error", onload );
+			ri.fillImgs( {elements: [this]} );
+		};
+		return function( img ){
+			off( img, "load", onload );
+			off( img, "error", onload );
+			on( img, "error", onload );
+			on( img, "load", onload );
+		};
+	})();
 
-	// Add support for standard mime types
-	pf.types[ "image/jpeg" ] = true;
-	pf.types[ "image/gif" ] = true;
-	pf.types[ "image/png" ] = true;
+	/**
+	 * outputs a warning for the developer
+	 * @param {message}
+	 * @type {Function}
+	 */
+	if(PFDEBUG){
+		warn = ( window.console && console.warn ) ?
+			function( message ) {
+				console.warn( message );
+			} :
+			noop
+		;
+	}
+
+	if( !(curSrcProp in image) ){
+		curSrcProp = "src";
+	}
+
+	// Add support for standard mime types.
+	types["image/jpeg"] = true;
+	types["image/gif"] = true;
+	types["image/png"] = true;
 
 	// test svg support
-	pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Image", "1.1");
+	types[ "image/svg+xml" ] = document.implementation.hasFeature( "http://wwwindow.w3.org/TR/SVG11/feature#Image", "1.1" );
 
-	// test webp support, only when the markup calls for it
-	pf.types[ "image/webp" ] = function() {
-		// based on Modernizr's lossless img-webp test
-		// note: asynchronous
-		var type = "image/webp";
+	/**
+	 * a trim workaroung mainly for IE8
+	 * @param str
+	 * @returns {string}
+	 */
+	function trim( str ) {
+		return str.trim ? str.trim() : str.replace( /^\s+|\s+$/g, "" );
+	}
 
-		image.onerror = function() {
-			pf.types[ type ] = false;
-			picturefill();
-		};
-		image.onload = function() {
-			pf.types[ type ] = image.width === 1;
-			picturefill();
-		};
-		image.src = "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=";
+	/**
+	 * updates the internal vW property with the current viewport width in px
+	 */
+	function updateMetrics() {
+		var dprM;
+
+		isVwDirty = false;
+		DPR = window.devicePixelRatio;
+		cssCache = {};
+		sizeLengthCache = {};
+
+		dprM = (DPR || 1) * cfg.xQuant;
+
+		if(!cfg.uT){
+			cfg.maxX = Math.max(1.3, cfg.maxX);
+			dprM = Math.min( dprM, cfg.maxX );
+
+			ri.DPR = dprM;
+		}
+
+		units.width = Math.max(window.innerWidth || 0, docElem.clientWidth);
+		units.height = Math.max(window.innerHeight || 0, docElem.clientHeight);
+
+		units.vw = units.width / 100;
+		units.vh = units.height / 100;
+
+		units.em = ri.getEmValue();
+		units.rem = units.em;
+
+		lazyFactor = cfg.lazyFactor / 2;
+
+		lazyFactor = (lazyFactor * dprM) + lazyFactor;
+
+		lowTreshold = 0.5 + (0.2 * dprM);
+
+		partialLowTreshold = 0.5 + (0.25 * dprM);
+
+		if(!(isLandscape = units.width > units.height)){
+			lazyFactor *= 0.9;
+		}
+		if(supportAbort){
+			lazyFactor *= 0.9;
+		}
+
+	}
+
+	function parseDescriptor( descriptor ) {
+
+		if ( !(descriptor in memDescriptor) ) {
+			var descriptorObj = [1, 'x'];
+			var parsedDescriptor = trim( descriptor || "" );
+
+			if ( parsedDescriptor ) {
+				parsedDescriptor = parsedDescriptor.replace(regHDesc, "");
+				if ( ( parsedDescriptor ).match( regDescriptor ) ) {
+
+					descriptorObj = [RegExp.$1 * 1, RegExp.$2];
+
+					if ( PFDEBUG && (
+						descriptorObj[0] < 0 ||
+						isNaN( descriptorObj[0] ) ||
+						(descriptorObj[1] == "w" && /\./.test(''+descriptorObj[0]))
+						) ) {
+						warn( "bad descriptor: " + descriptor );
+					}
+				} else {
+					descriptorObj = false;
+
+					if ( PFDEBUG ) {
+						warn( "unknown descriptor: " + descriptor );
+					}
+				}
+			}
+
+			memDescriptor[ descriptor ] = descriptorObj;
+		}
+
+		return memDescriptor[ descriptor ];
+	}
+
+	function chooseLowRes( lowRes, diff, dpr ) {
+		var add = diff * Math.pow(lowRes, 2);
+		if(!isLandscape){
+			add /= 1.6;
+		}
+
+		lowRes += add;
+		return lowRes > dpr;
+	}
+
+	function inView(el) {
+		if(!el.getBoundingClientRect){return true;}
+		var rect = el.getBoundingClientRect();
+		var bottom, right, left, top;
+
+		return !!(
+		(bottom = rect.bottom) >= -9 &&
+		(top = rect.top) <= units.height + 9 &&
+		(right = rect.right) >= -9 &&
+		(left = rect.left) <= units.height + 9 &&
+		(bottom || right || left || top)
+		);
+	}
+
+
+	function applyBestCandidate( img ) {
+		var srcSetCandidates;
+		var matchingSet = ri.getSet( img );
+		var evaluated = false;
+		if ( matchingSet != "pending" ) {
+			evaluated = true;
+			if ( matchingSet ) {
+				srcSetCandidates = ri.setRes( matchingSet );
+				evaluated = ri.applySetCandidate( srcSetCandidates, img );
+			}
+
+		}
+		img[ ri.ns ].evaled = evaluated;
+	}
+
+	function ascendingSort( a, b ) {
+		return a.res - b.res;
+	}
+
+	function setSrcToCur( img, src, set ) {
+		var candidate;
+		if ( !set && src ) {
+			set = img[ ri.ns ].sets;
+			set = set && set[set.length - 1];
+		}
+
+		candidate = getCandidateForSrc(src, set);
+
+		if ( candidate ) {
+			src = ri.makeUrl(src);
+			img[ ri.ns ].curSrc = src;
+			img[ ri.ns ].curCan = candidate;
+
+			if ( !candidate.res ) {
+				setResolution( candidate, candidate.set.sizes );
+			}
+		}
+		return candidate;
+	}
+
+	function getCandidateForSrc( src, set ) {
+		var i, candidate, candidates;
+		if ( src && set ) {
+			candidates = ri.parseSet( set );
+			src = ri.makeUrl(src);
+			for ( i = 0; i < candidates.length; i++ ) {
+				if ( src == ri.makeUrl(candidates[ i ].url) ) {
+					candidate = candidates[ i ];
+					break;
+				}
+			}
+		}
+		return candidate;
+	}
+
+
+	function getAllSourceElements( picture, candidates ) {
+		var i, len, source, srcset;
+
+		// SPEC mismatch intended for size and perf:
+		// actually only source elements preceding the img should be used
+		// also note: don't use qsa here, because IE8 sometimes doesn't like source as the key part in a selector
+		var sources = picture.getElementsByTagName( "source" );
+
+		for ( i = 0, len = sources.length; i < len; i++ ) {
+			source = sources[ i ];
+			source[ ri.ns ] = true;
+			srcset = source.getAttribute( "srcset" );
+
+			if ( PFDEBUG && document.documentMode != 9 && source.parentNode != picture ) {
+				warn( "all source elements have to be a child of the picture element. For IE9 support wrap them in an audio/video element, BUT with conditional comments" );
+			}
+			// if source does not have a srcset attribute, skip
+			if ( srcset ) {
+				candidates.push( {
+					srcset: srcset,
+					media: source.getAttribute( "media" ),
+					type: source.getAttribute( "type" ),
+					sizes: source.getAttribute( "sizes" )
+				} );
+			}
+			if ( PFDEBUG && source.getAttribute( "src" ) ) {
+				warn( "`src` on `source` invalid, use `srcset`." );
+			}
+		}
+
+		if ( PFDEBUG ) {
+			var srcTest = ri.qsa( picture, "source, img");
+			if ( srcTest[ srcTest.length - 1].nodeName.toUpperCase() == "SOURCE" ) {
+				warn( "all sources inside picture have to precede the img element" );
+			}
+		}
+	}
+
+	function hasOneX(set){
+		var i, ret, candidates;
+		if( set ) {
+			candidates = ri.parseSet(set);
+			for ( i = 0; i < candidates.length; i++ ) {
+				if ( candidates[i].x == 1 ) {
+					ret = true;
+					break;
+				}
+			}
+		}
+		return ret;
+	}
+
+	// namespace
+	ri.ns = ("ri" + new Date().getTime()).substr(0, 9);
+
+	// srcset support test
+	ri.supSrcset = "srcset" in image;
+	ri.supSizes = "sizes" in image;
+
+	// using ri.qsa instead of dom traversing does scale much better,
+	// especially on sites mixing responsive and non-responsive images
+	ri.selShort = "picture>img,img[srcset]";
+	ri.sel = ri.selShort;
+	ri.cfg = cfg;
+
+	if ( ri.supSrcset ) {
+		ri.sel += ",img[" + srcsetAttr + "]";
+	}
+
+	/**
+	 * Shortcut property for `devicePixelRatio` ( for easy overriding in tests )
+	 */
+	ri.DPR = (DPR  || 1 );
+	ri.u = units;
+
+	// container of supported mime types that one might need to qualify before using
+	ri.types =  types;
+
+	alwaysCheckWDescriptor = ri.supSrcset && !ri.supSizes;
+
+	ri.setSize = noop;
+
+	/**
+	 * Gets a string and returns the absolute URL
+	 * @param src
+	 * @returns {String} absolute URL
+	 */
+	ri.makeUrl = function(src) {
+		anchor.href = src;
+		return anchor.href;
 	};
 
 	/**
-	 * Takes a source element and checks if its type attribute is present and if so, supported
-	 * Note: for type tests that require a async logic,
-	 * you can define them as a function that'll run only if that type needs to be tested. Just make the test function call picturefill again when it is complete.
-	 * see the async webp test above for example
+	 * Gets a DOM element or document and a selctor and returns the found matches
+	 * Can be extended with jQuery/Sizzle for IE7 support
+	 * @param context
+	 * @param sel
+	 * @returns {NodeList}
 	 */
-	pf.verifyTypeSupport = function( source ) {
-		var type = source.getAttribute( "type" );
-		// if type attribute exists, return test result, otherwise return true
-		if ( type === null || type === "" ) {
-			return true;
+	ri.qsa = function(context, sel) {
+		return context.querySelectorAll(sel);
+	};
+
+	/**
+	 * Shortcut method for matchMedia ( for easy overriding in tests )
+	 * wether native or ri.mMQ is used will be decided lazy on first call
+	 * @returns {boolean}
+	 */
+	ri.matchesMedia = function() {
+		if ( window.matchMedia && (matchMedia( "(min-width: 0.1em)" ) || {}).matches ) {
+			ri.matchesMedia = function( media ) {
+				return !media || ( matchMedia( media ).matches );
+			};
 		} else {
-			// if the type test is a function, run it and return "pending" status. The function will rerun picturefill on pending elements once finished.
-			if ( typeof( pf.types[ type ] ) === "function" ) {
-				pf.types[ type ]();
-				return "pending";
-			} else {
-				return pf.types[ type ];
-			}
-		}
-	};
-
-	// Parses an individual `size` and returns the length, and optional media query
-	pf.parseSize = function( sourceSizeStr ) {
-		var match = /(\([^)]+\))?\s*(.+)/g.exec( sourceSizeStr );
-		return {
-			media: match && match[1],
-			length: match && match[2]
-		};
-	};
-
-	// Takes a string of sizes and returns the width in pixels as a number
-	pf.findWidthFromSourceSize = function( sourceSizeListStr ) {
-		// Split up source size list, ie ( max-width: 30em ) 100%, ( max-width: 50em ) 50%, 33%
-		//                            or (min-width:30em) calc(30% - 15px)
-		var sourceSizeList = pf.trim( sourceSizeListStr ).split( /\s*,\s*/ ),
-			winningLength;
-
-		for ( var i = 0, len = sourceSizeList.length; i < len; i++ ) {
-			// Match <media-condition>? length, ie ( min-width: 50em ) 100%
-			var sourceSize = sourceSizeList[ i ],
-				// Split "( min-width: 50em ) 100%" into separate strings
-				parsedSize = pf.parseSize( sourceSize ),
-				length = parsedSize.length,
-				media = parsedSize.media;
-
-			if ( !length ) {
-				continue;
-			}
-			if ( !media || pf.matchesMedia( media ) ) {
-				// if there is no media query or it matches, choose this as our winning length
-				// and end algorithm
-				winningLength = length;
-				break;
-			}
+			ri.matchesMedia = ri.mMQ;
 		}
 
-		// pass the length to a method that can properly determine length
-		// in pixels based on these formats: http://dev.w3.org/csswg/css-values-3/#length-value
-		return pf.getWidthFromLength( winningLength );
+		return ri.matchesMedia.apply( this, arguments );
 	};
 
-	pf.parseSrcset = function( srcset ) {
-		/**
+	/**
+	 * A simplified matchMedia implementation for IE8 and IE9
+	 * handles only min-width/max-width with px or em values
+	 * @param media
+	 * @returns {boolean}
+	 */
+	ri.mMQ = function( media ) {
+		return media ? evalCSS(media) : true;
+	};
+
+
+	/**
+	 * Returns the calculated length in css pixel from the given sourceSizeValue
+	 * http://dev.w3.org/csswg/css-values-3/#length-value
+	 * intended Spec mismatches:
+	 * * Does not check for invalid use of CSS functions
+	 * * Does handle a computed length of 0 the same as a negative and therefore invalid value
+	 * @param sourceSizeValue
+	 * @returns {Number}
+	 */
+	ri.calcLength = function( sourceSizeValue ) {
+
+		var value = evalCSS(sourceSizeValue, true) || false;
+		if(value < 0){
+			value = false;
+		}
+
+		if ( PFDEBUG && (value === false || value < 0) ) {
+			warn( "invalid source size: " + sourceSizeValue );
+		}
+		return value;
+	};
+
+	/**
+	 * Takes a type string and checks if its supported
+	 */
+
+	ri.supportsType = function( type ) {
+		return ( type ) ? types[ type ] : true;
+	};
+
+	/**
+	 * Parses a sourceSize into mediaCondition (media) and sourceSizeValue (length)
+	 * @param sourceSizeStr
+	 * @returns {*}
+	 */
+	ri.parseSize = function( sourceSizeStr ) {
+		var match;
+
+		if ( !memSize[ sourceSizeStr ] ) {
+			match = ( sourceSizeStr || "" ).match(regSize);
+			memSize[ sourceSizeStr ] = {
+				media: match && match[1],
+				length: match && match[2]
+			};
+		}
+
+		return memSize[ sourceSizeStr ];
+	};
+
+	ri.parseSet = function( set ) {
+		/*
 		 * A lot of this was pulled from Boris Smus’ parser for the now-defunct WHATWG `srcset`
 		 * https://github.com/borismus/srcset-polyfill/blob/master/js/srcset-info.js
 		 *
 		 * 1. Let input (`srcset`) be the value passed to this algorithm.
 		 * 2. Let position be a pointer into input, initially pointing at the start of the string.
 		 * 3. Let raw candidates be an initially empty ordered list of URLs with associated
-		 *    unparsed descriptors. The order of entries in the list is the order in which entries
-		 *    are added to the list.
+		 * unparsed descriptors. The order of entries in the list is the order in which entries
+		 * are added to the list.
 		 */
-		var candidates = [];
 
-		while ( srcset !== "" ) {
-			srcset = srcset.replace( /^\s+/g, "" );
+		if ( !set.cands ) {
 
-			// 5. Collect a sequence of characters that are not space characters, and let that be url.
-			var pos = srcset.search(/\s/g),
-				url, descriptor = null;
+			var pos, url, descriptor, last, descpos, can, firstDescriptorType;
+			var srcset = set.srcset;
 
-			if ( pos !== -1 ) {
-				url = srcset.slice( 0, pos );
+			set.cands = [];
 
-				var last = url.slice(-1);
-
-				// 6. If url ends with a U+002C COMMA character (,), remove that character from url
-				// and let descriptors be the empty string. Otherwise, follow these substeps
-				// 6.1. If url is empty, then jump to the step labeled descriptor parser.
-
-				if ( last === "," || url === "" ) {
-					url = url.replace( /,+$/, "" );
-					descriptor = "";
-				}
-				srcset = srcset.slice( pos + 1 );
-
-				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and
-				// let that be descriptors.
-				if ( descriptor === null ) {
-					var descpos = srcset.indexOf( "," );
-					if ( descpos !== -1 ) {
-						descriptor = srcset.slice( 0, descpos );
-						srcset = srcset.slice( descpos + 1 );
-					} else {
-						descriptor = srcset;
-						srcset = "";
+			while ( srcset ) {
+				srcset = srcset.replace(/^\s+/g,"");
+				// 5. Collect a sequence of characters that are not space characters, and let that be url.
+				pos = srcset.search(/\s/g);
+				descriptor = null;
+				if ( pos != -1 ) {
+					url = srcset.slice( 0, pos );
+					last = url.charAt( url.length - 1 );
+					// 6. If url ends with a U+002C COMMA character (,), remove that character from url
+					// and let descriptors be the empty string. Otherwise, follow these substeps
+					// 6.1. If url is empty, then jump to the step labeled descriptor parser.
+					if ( last == "," || !url ) {
+						url = url.replace(/,+$/, "");
+						descriptor = "";
 					}
+					srcset = srcset.slice( pos + 1 );
+					// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and
+					// let that be descriptors.
+					if ( descriptor == null ) {
+						descpos = srcset.indexOf( "," );
+						if ( descpos != -1 ) {
+							descriptor = srcset.slice( 0, descpos );
+							srcset = srcset.slice( descpos + 1 );
+						} else {
+							descriptor = srcset;
+							srcset = "";
+						}
+					}
+				} else {
+					url = srcset;
+					srcset = "";
 				}
-			} else {
-				url = srcset;
-				srcset = "";
-			}
 
-			// 7. Add url to raw candidates, associated with descriptors.
-			if ( url || descriptor ) {
-				candidates.push({
-					url: url,
-					descriptor: descriptor
-				});
+				// 7. Add url to raw candidates, associated with descriptors.
+				if ( url && (descriptor = parseDescriptor( descriptor )) ) {
+
+					if ( PFDEBUG ) {
+						if ( !firstDescriptorType ) {
+							firstDescriptorType = set.sizes ? "w" : descriptor[1];
+						}
+						if ( firstDescriptorType != descriptor[1] ) {
+							warn("mixing x with a w descriptor/sizes attribute in one srcset doesn't make sense in most cases and is invalid.");
+						}
+					}
+					can = {
+						url: url.replace(/^,+/, ""),
+						set: set
+					};
+					can[descriptor[1]] = descriptor[0];
+
+					set.cands.push(can);
+				}
 			}
 		}
-		return candidates;
-	};
 
-	pf.parseDescriptor = function( descriptor, sizesattr ) {
-		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list
-		// is the order in which entries are added to the list.
-		var sizes = sizesattr || "100vw",
-			sizeDescriptor = descriptor && descriptor.replace( /(^\s+|\s+$)/g, "" ),
-			widthInCssPixels = pf.findWidthFromSourceSize( sizes ),
-			resCandidate;
-
-			if ( sizeDescriptor ) {
-				var splitDescriptor = sizeDescriptor.split(" ");
-
-				for (var i = splitDescriptor.length - 1; i >= 0; i--) {
-					var curr = splitDescriptor[ i ],
-						lastchar = curr && curr.slice( curr.length - 1 );
-
-					if ( ( lastchar === "h" || lastchar === "w" ) && !pf.sizesSupported ) {
-						resCandidate = parseFloat( ( parseInt( curr, 10 ) / widthInCssPixels ) );
-					} else if ( lastchar === "x" ) {
-						var res = curr && parseFloat( curr, 10 );
-						resCandidate = res && !isNaN( res ) ? res : 1;
-					}
-				}
-			}
-		return resCandidate || 1;
+		return set.cands;
 	};
 
 	/**
-	 * Takes a srcset in the form of url/
+	 * returns 1em in css px for html/body default size
+	 * function taken from respondjs
+	 * @returns {*|number}
+	 */
+	ri.getEmValue = function() {
+		var body;
+		if ( !eminpx && (body = document.body) ) {
+			var div = document.createElement( "div" ),
+				originalHTMLCSS = docElem.style.cssText,
+				originalBodyCSS = body.style.cssText;
+
+			div.style.cssText = baseStyle;
+
+			// 1em in a media query is the value of the default font size of the browser
+			// reset docElem and body to ensure the correct value is returned
+			docElem.style.cssText = fsCss;
+			body.style.cssText = fsCss;
+
+			body.appendChild( div );
+			eminpx = div.offsetWidth;
+			body.removeChild( div );
+
+			//also update eminpx before returning
+			eminpx = parseFloat( eminpx, 10 );
+
+			// restore the original values
+			docElem.style.cssText = originalHTMLCSS;
+			body.style.cssText = originalBodyCSS;
+
+		}
+		return eminpx || 16;
+	};
+
+
+	/**
+	 * Takes a string of sizes and returns the width in pixels as a number
+	 */
+	ri.calcListLength = function( sourceSizeListStr ) {
+		// Split up source size list, ie ( max-width: 30em ) 100%, ( max-width: 50em ) 50%, 33%
+		//
+		//                           or (min-width:30em) calc(30% - 15px)
+		if ( !(sourceSizeListStr in sizeLengthCache) || cfg.uT ) {
+			var sourceSize, parsedSize, length, media, i, len;
+			var sourceSizeList = trim( sourceSizeListStr ).split( /\s*,\s*/ );
+			var winningLength = false;
+			for ( i = 0, len = sourceSizeList.length; i < len; i++ ) {
+				// Match <media-condition>? length, ie ( min-width: 50em ) 100%
+				sourceSize = sourceSizeList[ i ];
+				// Split "( min-width: 50em ) 100%" into separate strings
+				parsedSize = ri.parseSize( sourceSize );
+				length = parsedSize.length;
+				media = parsedSize.media;
+
+				if ( !length ) {
+					continue;
+				}
+				// if there is no media query or it matches, choose this as our winning length
+				// and end algorithm
+				if ( ri.matchesMedia( media ) && (winningLength = ri.calcLength( length )) !== false ) {
+					break;
+				}
+			}
+			// pass the length to a method that can properly determine length
+			// in pixels based on these formats: http://dev.w3.org/csswg/css-values-3/#length-value
+			sizeLengthCache[ sourceSizeListStr ] = !winningLength ? units.width : winningLength;
+		}
+
+		return sizeLengthCache[ sourceSizeListStr ];
+	};
+
+	/**
+	 * Takes a candidate object with a srcset property in the form of url/
 	 * ex. "images/pic-medium.png 1x, images/pic-medium-2x.png 2x" or
 	 *     "images/pic-medium.png 400w, images/pic-medium-2x.png 800w" or
 	 *     "images/pic-small.png"
 	 * Get an array of image candidates in the form of
 	 *      {url: "/foo/bar.png", resolution: 1}
 	 * where resolution is http://dev.w3.org/csswg/css-values-3/#resolution-value
-	 * If sizes is specified, resolution is calculated
+	 * If sizes is specified, res is calculated
 	 */
-	pf.getCandidatesFromSourceSet = function( srcset, sizes ) {
-		var candidates = pf.parseSrcset( srcset ),
-			formattedCandidates = [];
+	ri.setRes = function( set ) {
+		var candidates;
+		if ( set ) {
 
-		for ( var i = 0, len = candidates.length; i < len; i++ ) {
-			var candidate = candidates[ i ];
+			candidates = ri.parseSet( set );
 
-			formattedCandidates.push({
-				url: candidate.url,
-				resolution: pf.parseDescriptor( candidate.descriptor, sizes )
-			});
-		}
-		return formattedCandidates;
-	};
-
-	/**
-	 * if it's an img element and it has a srcset property,
-	 * we need to remove the attribute so we can manipulate src
-	 * (the property's existence infers native srcset support, and a srcset-supporting browser will prioritize srcset's value over our winning picture candidate)
-	 * this moves srcset's value to memory for later use and removes the attr
-	 */
-	pf.dodgeSrcset = function( img ) {
-		if ( img.srcset ) {
-			img[ pf.ns ].srcset = img.srcset;
-			img.srcset = "";
-			img.setAttribute( "data-pfsrcset", img[ pf.ns ].srcset );
-		}
-	};
-
-	// Accept a source or img element and process its srcset and sizes attrs
-	pf.processSourceSet = function( el ) {
-		var srcset = el.getAttribute( "srcset" ),
-			sizes = el.getAttribute( "sizes" ),
-			candidates = [];
-
-		// if it's an img element, use the cached srcset property (defined or not)
-		if ( el.nodeName.toUpperCase() === "IMG" && el[ pf.ns ] && el[ pf.ns ].srcset ) {
-			srcset = el[ pf.ns ].srcset;
-		}
-
-		if ( srcset ) {
-			candidates = pf.getCandidatesFromSourceSet( srcset, sizes );
+			for ( var i = 0, len = candidates.length; i < len; i++ ) {
+				setResolution( candidates[ i ], set.sizes );
+			}
 		}
 		return candidates;
 	};
 
-	pf.backfaceVisibilityFix = function( picImg ) {
-		// See: https://github.com/scottjehl/picturefill/issues/332
-		var style = picImg.style || {},
-			WebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
-			currentZoom = style.zoom;
+	ri.setRes.res = setResolution;
 
-		if (WebkitBackfaceVisibility) { 
-			style.zoom = ".999";
-
-			WebkitBackfaceVisibility = picImg.offsetWidth;
-
-			style.zoom = currentZoom;
-		}
-	};
-
-	pf.setInherentSize = function( res, picImg, readyState ) {
-		var ready = readyState !== undefined ? readyState : picImg.complete,
-			widthPreset = !ready && picImg.getAttribute && picImg.getAttribute( "width" ) !== null,
-			setWidth = function( res, picImg ) {
-				if ( picImg.setAttribute ) {
-					picImg.setAttribute( "width", picImg.naturalWidth / res );
-				}
-			},
-			widthInterval;
-
-		if ( ready && res && !widthPreset ) {
-			setWidth( res, picImg );
-		}
-		if ( !ready ) {
-			widthInterval = setTimeout(function() {
-				pf.setInherentSize( res, picImg, picImg.complete );
-			}, 250);
-		}
-	};
-
-	pf.applyBestCandidate = function( candidates, picImg ) {
+	ri.applySetCandidate = function( candidates, img ) {
+		if ( !candidates.length ) {return;}
 		var candidate,
+			dpr,
+			i,
+			j,
+			diff,
 			length,
-			bestCandidate;
+			bestCandidate,
+			curSrc,
+			curCan,
+			isSameSet,
+			candidateSrc,
+			oldRes;
 
-		candidates.sort( pf.ascendingSort );
+		var imageData = img[ ri.ns ];
+		var evaled = true;
+		var lazyF = lazyFactor;
+		var sub = 0;
 
-		length = candidates.length;
-		bestCandidate = candidates[ length - 1 ];
+		curSrc = imageData.curSrc || img[curSrcProp];
 
-		for ( var i = 0; i < length; i++ ) {
-			candidate = candidates[ i ];
-			if ( candidate.resolution >= pf.getDpr() ) {
-				bestCandidate = candidate;
-				break;
-			}
-		}
+		curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set);
 
-		if ( bestCandidate && !pf.endsWith( picImg.src, bestCandidate.url ) ) {
-			if ( pf.restrictsMixedContent() && bestCandidate.url.substr(0, "http:".length).toLowerCase() === "http:" ) {
-				if ( window.console !== undefined ) {
-					console.warn( "Blocked mixed content image " + bestCandidate.url );
+		dpr = ri.DPR;
+
+		//if we have a current source, we might either become lazy or give this source some advantage
+		if ( curSrc ) {
+
+			if( !supportAbort || img.complete || !curCan || curCan.res < dpr ){
+
+				//add some lazy padding to the src
+				if ( curCan && curCan.res < dpr && curCan.res > lowTreshold ) {
+					oldRes = curCan.res;
+
+					if(curCan.res < partialLowTreshold){
+						lazyF *= 0.8;
+						sub += (0.1 * dpr);
+					}
+
+					curCan.res += lazyF * (curCan.res - sub);
 				}
-			} else {
-				picImg.src = bestCandidate.url;
-				// currentSrc attribute and property to match
-				// http://picture.responsiveimages.org/#the-img-element
-				picImg.currentSrc = picImg.src;
 
-				pf.backfaceVisibilityFix( picImg );
-				pf.setInherentSize( bestCandidate.resolution, picImg );
+				isSameSet = !imageData.pic || (curCan && curCan.set == candidates[ 0 ].set);
+
+				if ( curCan && isSameSet && curCan.res >= dpr ) {
+					bestCandidate = curCan;
+
+					// if image isn't loaded (!complete + src), test for LQIP or abort technique
+				} else if ( !supportAbort && !img.complete && getImgAttr.call( img, "src" ) && !img.lazyload ) {
+
+					//if there is no art direction or if the img isn't visible, we can use LQIP pattern
+					if ( isSameSet || !inView( img ) ) {
+
+						bestCandidate = curCan;
+						candidateSrc = curSrc;
+						evaled = "L";
+						reevaluateAfterLoad( img );
+					}
+				}
 			}
 		}
-	};
 
-	pf.ascendingSort = function( a, b ) {
-		return a.resolution - b.resolution;
-	};
-
-	/**
-	 * In IE9, <source> elements get removed if they aren't children of
-	 * video elements. Thus, we conditionally wrap source elements
-	 * using <!--[if IE 9]><video style="display: none;"><![endif]-->
-	 * and must account for that here by moving those source elements
-	 * back into the picture element.
-	 */
-	pf.removeVideoShim = function( picture ) {
-		var videos = picture.getElementsByTagName( "video" );
-		if ( videos.length ) {
-			var video = videos[ 0 ],
-				vsources = video.getElementsByTagName( "source" );
-			while ( vsources.length ) {
-				picture.insertBefore( vsources[ 0 ], video );
-			}
-			// Remove the video element once we're finished removing its children
-			video.parentNode.removeChild( video );
-		}
-	};
-
-	/**
-	 * Find all `img` elements, and add them to the candidate list if they have
-	 * a `picture` parent, a `sizes` attribute in basic `srcset` supporting browsers,
-	 * a `srcset` attribute at all, and they haven’t been evaluated already.
-	 */
-	pf.getAllElements = function() {
-		var elems = [],
-			imgs = doc.getElementsByTagName( "img" );
-
-		for ( var h = 0, len = imgs.length; h < len; h++ ) {
-			var currImg = imgs[ h ];
-
-			if ( currImg.parentNode.nodeName.toUpperCase() === "PICTURE" ||
-			( currImg.getAttribute( "srcset" ) !== null ) || currImg[ pf.ns ] && currImg[ pf.ns ].srcset !== null ) {
-				elems.push( currImg );
-			}
-		}
-		return elems;
-	};
-
-	pf.getMatch = function( img, picture ) {
-		var sources = picture.childNodes,
-			match;
-
-		// Go through each child, and if they have media queries, evaluate them
-		for ( var j = 0, slen = sources.length; j < slen; j++ ) {
-			var source = sources[ j ];
-
-			// ignore non-element nodes
-			if ( source.nodeType !== 1 ) {
-				continue;
+		if ( !bestCandidate ) {
+			if ( oldRes ) {
+				curCan.res = curCan.res - ((curCan.res - oldRes) / 2);
 			}
 
-			// Hitting the `img` element that started everything stops the search for `sources`.
-			// If no previous `source` matches, the `img` itself is evaluated later.
-			if ( source === img ) {
-				return match;
-			}
+			candidates.sort( ascendingSort );
 
-			// ignore non-`source` nodes
-			if ( source.nodeName.toUpperCase() !== "SOURCE" ) {
-				continue;
-			}
-			// if it's a source element that has the `src` property set, throw a warning in the console
-			if ( source.getAttribute( "src" ) !== null && typeof console !== undefined ) {
-				console.warn("The `src` attribute is invalid on `picture` `source` element; instead, use `srcset`.");
-			}
+			length = candidates.length;
+			bestCandidate = candidates[ length - 1 ];
 
-			var media = source.getAttribute( "media" );
+			for ( i = 0; i < length; i++ ) {
+				candidate = candidates[ i ];
+				if ( candidate.res >= dpr ) {
+					j = i - 1;
 
-			// if source does not have a srcset attribute, skip
-			if ( !source.getAttribute( "srcset" ) ) {
-				continue;
-			}
+					// we have found the perfect candidate,
+					// but let's improve this a little bit with some assumptions ;-)
+					if (candidates[ j ] &&
+						(diff = (candidate.res - dpr)) &&
+						curSrc != ri.makeUrl( candidate.url ) &&
+						chooseLowRes(candidates[ j ].res, diff, dpr)) {
+						bestCandidate = candidates[ j ];
 
-			// if there's no media specified, OR w.matchMedia is supported
-			if ( ( !media || pf.matchesMedia( media ) ) ) {
-				var typeSupported = pf.verifyTypeSupport( source );
-
-				if ( typeSupported === true ) {
-					match = source;
+					} else {
+						bestCandidate = candidate;
+					}
 					break;
-				} else if ( typeSupported === "pending" ) {
-					return false;
 				}
 			}
+		}
+
+		if ( oldRes ) {
+			curCan.res = oldRes;
+		}
+
+		if ( bestCandidate ) {
+
+			candidateSrc = ri.makeUrl( bestCandidate.url );
+
+
+			imageData.curSrc = candidateSrc;
+			imageData.curCan = bestCandidate;
+
+			if ( candidateSrc != curSrc ) {
+				ri.setSrc( img, bestCandidate );
+				if ( PFDEBUG ) {
+					testImgDimensions(img, bestCandidate);
+					if(isSSL && !bestCandidate.url.indexOf( "http:" )){
+						warn( "insecure: " + candidateSrc );
+					}
+				}
+			}
+			ri.setSize( img );
+		}
+
+		return evaled;
+	};
+
+	ri.setSrc = function( img, bestCandidate ) {
+		var origWidth;
+		img.src = bestCandidate.url;
+
+		// although this is a specific Safari issue, we don't want to take too much different code paths
+		if ( bestCandidate.set.type == "image/svg+xml" ) {
+			origWidth = img.style.width;
+			img.style.width = (img.offsetWidth + 1) + "px";
+
+			// next line only should trigger a repaint
+			// if... is only done to trick dead code removal
+			if ( img.offsetWidth + 1 ) {
+				img.style.width = origWidth;
+			}
+		}
+	};
+
+	ri.getSet = function( img ) {
+		var i, set, supportsType;
+		var match = false;
+		var sets = img [ ri.ns ].sets;
+
+		for ( i = 0; i < sets.length && !match; i++ ) {
+			set = sets[i];
+
+			if ( !set.srcset || !ri.matchesMedia( set.media ) || !(supportsType = ri.supportsType( set.type )) ) {
+				continue;
+			}
+
+			if ( supportsType == "pending" ) {
+				set = supportsType;
+			}
+
+			match = set;
+			break;
 		}
 
 		return match;
 	};
 
-	function picturefill( opt ) {
-		var elements,
-			element,
-			parent,
-			firstMatch,
-			candidates,
-			options = opt || {};
+	ri.parseSets = function( element, parent ) {
+		var srcsetAttribute, fallbackCandidate, isWDescripor, srcsetParsed;
 
-		elements = options.elements || pf.getAllElements();
+		var hasPicture = parent.nodeName.toUpperCase() == "PICTURE";
+		var imageData = element[ ri.ns ];
 
-		// Loop through all elements
-		for ( var i = 0, plen = elements.length; i < plen; i++ ) {
-			element = elements[ i ];
-			parent = element.parentNode;
-			firstMatch = undefined;
-			candidates = undefined;
-
-			// immediately skip non-`img` nodes
-			if ( element.nodeName.toUpperCase() !== "IMG" ) {
-				continue;
-			}
-
-			// expando for caching data on the img
-			if ( !element[ pf.ns ] ) {
-				element[ pf.ns ] = {};
-			}
-
-			// if the element has already been evaluated, skip it unless
-			// `options.reevaluate` is set to true ( this, for example,
-			// is set to true when running `picturefill` on `resize` ).
-			if ( !options.reevaluate && element[ pf.ns ].evaluated ) {
-				continue;
-			}
-
-			// if `img` is in a `picture` element
-			if ( parent.nodeName.toUpperCase() === "PICTURE" ) {
-
-				// IE9 video workaround
-				pf.removeVideoShim( parent );
-
-				// return the first match which might undefined
-				// returns false if there is a pending source
-				// TODO the return type here is brutal, cleanup
-				firstMatch = pf.getMatch( element, parent );
-
-				// if any sources are pending in this picture due to async type test(s)
-				// remove the evaluated attr and skip for now ( the pending test will
-				// rerun picturefill on this element when complete)
-				if ( firstMatch === false ) {
-					continue;
-				}
+		if ( imageData.src === undefined ) {
+			imageData.src = getImgAttr.call( element, "src" );
+			if ( imageData.src ) {
+				setImgAttr.call( element, srcAttr, imageData.src );
 			} else {
-				firstMatch = undefined;
+				removeImgAttr.call( element, srcAttr );
 			}
-
-			// Cache and remove `srcset` if present and we’re going to be doing `picture`/`srcset`/`sizes` polyfilling to it.
-			if ( parent.nodeName.toUpperCase() === "PICTURE" ||
-			( element.srcset && !pf.srcsetSupported ) ||
-			( !pf.sizesSupported && ( element.srcset && element.srcset.indexOf("w") > -1 ) ) ) {
-				pf.dodgeSrcset( element );
-			}
-
-			if ( firstMatch ) {
-				candidates = pf.processSourceSet( firstMatch );
-				pf.applyBestCandidate( candidates, element );
-			} else {
-				// No sources matched, so we’re down to processing the inner `img` as a source.
-				candidates = pf.processSourceSet( element );
-
-				if ( element.srcset === undefined || element[ pf.ns ].srcset ) {
-					// Either `srcset` is completely unsupported, or we need to polyfill `sizes` functionality.
-					pf.applyBestCandidate( candidates, element );
-				} // Else, resolution-only `srcset` is supported natively.
-			}
-
-			// set evaluated to true to avoid unnecessary reparsing
-			element[ pf.ns ].evaluated = true;
 		}
-	}
 
-	/**
-	 * Sets up picture polyfill by polling the document and running
-	 * the polyfill every 250ms until the document is ready.
-	 * Also attaches picturefill on resize
-	 */
-	function runPicturefill() {
-		picturefill();
-		var intervalId = setInterval( function() {
-			// When the document has finished loading, stop checking for new images
-			// https://github.com/ded/domready/blob/master/ready.js#L15
-			picturefill();
+		if ( imageData.srcset === undefined ) {
+			srcsetAttribute = getImgAttr.call( element, "srcset" );
+			imageData.srcset = srcsetAttribute;
+			srcsetParsed = true;
+		}
 
-			if ( /^loaded|^i|^c/.test( doc.readyState ) ) {
-				clearInterval( intervalId );
+		imageData.sets = [];
+
+		if ( hasPicture ) {
+			imageData.pic = true;
+			getAllSourceElements( parent, imageData.sets );
+		}
+
+		if ( imageData.srcset ) {
+			fallbackCandidate = {
+				srcset: imageData.srcset,
+				sizes: getImgAttr.call( element, "sizes" )
+			};
+
+			imageData.sets.push( fallbackCandidate );
+
+			isWDescripor = (alwaysCheckWDescriptor || imageData.src) && regWDesc.test(imageData.srcset || '');
+
+			// add normal src as candidate, if source has no w descriptor
+			if ( !isWDescripor && imageData.src && !getCandidateForSrc(imageData.src, fallbackCandidate) && !hasOneX(fallbackCandidate) ) {
+				fallbackCandidate.srcset += ", " + imageData.src;
+				fallbackCandidate.cands.push({
+					url: imageData.src,
+					x: 1,
+					set: fallbackCandidate
+				});
+			}
+
+			if ( PFDEBUG && !hasPicture && isWDescripor && imageData.src && fallbackCandidate.srcset.indexOf(element[ ri.ns ].src) == -1 ) {
+				warn("The fallback candidate (`src`) isn't described inside the srcset attribute. Normally you want to describe all available candidates.");
+			}
+
+		} else if ( imageData.src ) {
+			imageData.sets.push( {
+				srcset: imageData.src,
+				sizes: null
+			} );
+		}
+
+		imageData.curCan = null;
+
+		// if img has picture or the srcset was removed or has a srcset and does not support srcset at all
+		// or has a w descriptor (and does not support sizes) set support to false to evaluate
+		imageData.supported = !( hasPicture || ( fallbackCandidate && !ri.supSrcset ) || isWDescripor );
+
+		if ( srcsetParsed && ri.supSrcset && !imageData.supported ) {
+			if ( srcsetAttribute ) {
+				setImgAttr.call( element, srcsetAttr, srcsetAttribute );
+				element.srcset = "";
+			} else {
+				removeImgAttr.call( element, srcsetAttr );
+			}
+		}
+
+		if(imageData.supported && !imageData.srcset && ((!imageData.src && element.src) ||  element.src != ri.makeUrl(imageData.src))){
+			if(imageData.src == null){
+				element.removeAttribute('src');
+			} else {
+				element.src = imageData.src;
+			}
+		}
+
+		if ( PFDEBUG ) {
+			testMediaOrder(imageData.sets, 'source');
+		}
+		imageData.parsed = true;
+	};
+
+
+	ri.fillImg = function(element, options) {
+		var parent, imageData;
+		var extreme = options.reparse || options.reevaluate;
+
+		// expando for caching data on the img
+		if ( !element[ ri.ns ] ) {
+			element[ ri.ns ] = {};
+		}
+
+		imageData = element[ ri.ns ];
+
+		if ( imageData.evaled == "L" && element.complete ) {
+			imageData.evaled = false;
+		}
+
+		// if the element has already been evaluated, skip it
+		// unless `options.reevaluate` is set to true ( this, for example,
+		// is set to true when running `picturefill` on `resize` ).
+		if ( !extreme && imageData.evaled ) {
+			return;
+		}
+
+		if ( !imageData.parsed || options.reparse ) {
+			parent = element.parentNode;
+			if ( !parent ) {
 				return;
 			}
-		}, 250 );
+			ri.parseSets( element, parent, options );
+		}
 
-		function checkResize() {
-			var resizeThrottle;
+		if ( !imageData.supported ) {
+			applyBestCandidate( element );
+		} else {
+			imageData.evaled = true;
+		}
+	};
 
-			if ( !w._picturefillWorking ) {
-				w._picturefillWorking = true;
-				w.clearTimeout( resizeThrottle );
-				resizeThrottle = w.setTimeout( function() {
-					picturefill({ reevaluate: true });
-					w._picturefillWorking = false;
-				}, 60 );
+	ri.setupRun = function( options ) {
+		if ( !alreadyRun || options.reevaluate || isVwDirty ) {
+			updateMetrics();
+
+			// if all images are reevaluated clear the resizetimer
+			if ( !options.elements && !options.context ) {
+				clearTimeout( resizeThrottle );
 			}
 		}
+	};
 
-		if ( w.addEventListener ) {
-			w.addEventListener( "resize", checkResize, false );
-		} else if ( w.attachEvent ) {
-			w.attachEvent( "onresize", checkResize );
-		}
+	// If picture is supported, well, that's awesome.
+	if ( window.HTMLPictureElement ) {
+		picturefill = noop;
+		ri.fillImg = noop;
+	} else {
+		/**
+		 * Sets up picture polyfill by polling the document
+		 * Also attaches picturefill on resize and readystatechange
+		 */
+		(function() {
+			var ready = window.attachEvent ? /d$|^c/ : /d$|^c|^i/;
+			var run = function() {
+				var readyState = document.readyState || "";
+
+				timerId = setTimeout(run, readyState == "loading" ? 200 :  999);
+				if ( document.body ) {
+					if ( ready.test( readyState ) ) {
+						clearTimeout( timerId );
+					}
+					ri.fillImgs();
+				}
+			};
+
+			var resizeEval = function() {
+				ri.fillImgs({ reevaluate: true });
+			};
+
+			var onResize = function() {
+				clearTimeout( resizeThrottle );
+				isVwDirty = true;
+				resizeThrottle = setTimeout( resizeEval, 99 );
+			};
+
+			var timerId = setTimeout(run, document.body ? 9 : 99);
+
+			on( window, "resize", onResize );
+			on( document, "readystatechange", run );
+		})();
 	}
 
-	runPicturefill();
+	ri.picturefill = picturefill;
+	//use this internally for easy monkey patching/performance testing
+	ri.fillImgs = picturefill;
+	ri.teardownRun = noop;
 
 	/* expose methods for testing */
-	picturefill._ = pf;
+	picturefill._ = ri;
 
 	/* expose picturefill */
-	if ( typeof module === "object" && typeof module.exports === "object" ) {
-		// CommonJS, just export
-		module.exports = picturefill;
-	} else if ( typeof define === "function" && define.amd ) {
-		// AMD support
-		define( function() { return picturefill; } );
-	} else if ( typeof w === "object" ) {
-		// If no AMD and we are in the browser, attach to window
-		w.picturefill = picturefill;
+	window.picturefill = picturefill;
+
+	window.picturefillCFG = {
+		ri: ri,
+		push: function(args){
+			var name = args.shift();
+			if(typeof ri[name] == "function"){
+				ri[name].apply(ri, args);
+			} else {
+				cfg[name] = args[0];
+				if(alreadyRun){
+					ri.fillImgs( { reevaluate: true } );
+				}
+			}
+		}
+	};
+
+	while(setOptions && setOptions.length){
+		window.picturefillCFG.push(setOptions.shift());
 	}
 
-} )( window, window.document, new window.Image() );
+	if ( PFDEBUG ) {
+		warn( "Responsive image debugger active. Do not use in production, because it slows things down! extremly" );
+
+		if(!document.querySelector || (document.documentMode || 9) < 8){
+			warn("querySelector is needed. IE8 needs to be in strict, standard or edge mode: http://bit.ly/1yGgYU0 or try the ri.oldie.js plugin.");
+		}
+		if( (document.getElementsByTagName("picture")[0] ||{} ).outerHTML == "<PICTURE>" ){
+			warn("IE8 needs to picture shived. Either include picturefill.js in <head> or use html5shiv.");
+		}
+
+		if(document.compatMode == "BackCompat"){
+			warn("Browser is in quirksmode. Please make sure to be in strict mode.");
+		}
+
+		var testImgDimensions = function (img, candidate) {
+			var onload = function () {
+				var dif, xtreshold;
+				var imgWidth = img.offsetWidth;
+				var naturalWidth = img.naturalWidth;
+				var canWidth = candidate.cWidth;
+				var res = ri.DPR * cfg.xQuant;
+				var hTresh =  0.84;
+				var lTresh = res > 1 ? 0.5 : 0.75;
+
+
+				if(!canWidth && naturalWidth && candidate.x){
+					canWidth = naturalWidth / res;
+				}
+
+				if (imgWidth && canWidth) {
+					if (imgWidth > canWidth) {
+						dif = canWidth / imgWidth;
+						xtreshold = lTresh;
+					} else {
+						dif = imgWidth / canWidth;
+						xtreshold = hTresh;
+					}
+
+					if(Math.abs(imgWidth - canWidth) > 50){
+						if (candidate.w && dif < 0.86) {
+							warn("Check your sizes attribute: " + candidate.set.sizes + " was calculated to: " + canWidth + "px. But your image is shown with a size of " + imgWidth + "px. img: "+ candidate.url);
+						} else if(candidate.x && dif < xtreshold){
+							//warn("Image too much resized. Image was shown with "+ imgWidth +" but has a normalized width of "+ canWidth +". Maybe you should use a w descriptor instead of an x descriptor. img: "+ candidate.url);
+						}
+					}
+				}
+
+				off(img, "load", onload);
+			};
+
+			on(img, "load", onload);
+		};
+		var testMediaOrder = (function(){
+			var regex = {
+				minw: /^\s*\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)\s*$/,
+				maxw: /^\s*\(\s*max\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)\s*$/
+			};
+
+			var checkSetOrder = function(set, sets, index, type){
+				var i, curSet;
+				for(i = 0; i < index && i < sets.length; i++){
+					curSet = sets[i];
+					if((set._min && curSet._min && set._min >= curSet._min) || (set._max && curSet._max && set._max <= curSet._max)){
+						if(type == 'source'){
+							warn("Order of your source elements matters. Defining "+ set.media + " after "+ curSet.media +" doesn't make sense.");
+						} else {
+							warn("Order inside your sizes attribute does matter. Defining "+ set.media + " after "+ curSet.media +" doesn't make sense.");
+						}
+					}
+				}
+			};
+			var mediaTest = function(sets, type){
+				var i, len, set, lastSet;
+
+				lastSet = sets[sets.length - 1];
+				if(lastSet && (lastSet.media || lastSet.type)){
+					if(type == 'source'){
+						warn("The last src/srcset shouldn't have any type or media conditions. Use img[src] or img[srcset].");
+					} else {
+						warn("Last sizes attribute shouldn't have any condition otherwise 100vw is used.");
+					}
+				}
+				for(i = 0, len = sets.length; i < len; i++){
+					set = sets[i];
+					if(!set.media || set.type){
+						if(!set.type && i != len - 1){
+							if(type == 'source'){
+								warn("A source element without [media] and [type] doesn't make any sense. Last srcset can be used at the img element. Order is important!");
+							} else {
+								warn("The order of your sizes attribute does matter! The sizes length without a media condition has to be defined as last entry.");
+							}
+						}
+						continue;
+					}
+					set._min = set.media.match( regex.minw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" );
+					set._max = set.media.match( regex.maxw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" );
+
+
+					if ( set._min ) {
+						set._min = parseFloat( set._min, 10 ) * (set._min.indexOf( "em" ) > 0 ? ri.getEmValue() : 1);
+					}
+
+					if ( set._max ) {
+						set._max = parseFloat( set._max, 10 ) * (set._max.indexOf( "em" ) > 0 ? ri.getEmValue() : 1);
+					}
+					if(set._min || set._max){
+						checkSetOrder(set, sets, i, type);
+					}
+				}
+			};
+
+			return function(sets){
+				var i, len, sizes, j, sizesSet;
+
+				mediaTest(sets, 'source');
+
+				for(i = 0, len = sets.length; i < len; i++){
+					sizes = trim(sets[i].sizes || '');
+					if(sizes){
+						sizesSet = [];
+						sizes = sizes.split( /\s*,\s*/ );
+						for(j = 0; j < sizes.length; j++){
+							if(sizes[j]){
+								sizesSet.push(ri.parseSize( sizes[j] ));
+							}
+						}
+
+						if(sizesSet.length){
+							mediaTest(sizesSet, 'sizes');
+						}
+					}
+				}
+			};
+		})();
+	}
+
+} )( window, document );
