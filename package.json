@@ -13,14 +13,6 @@
 		"responsive",
 		"responsive images"
 	],
-	"contributors": [
-		{
-			"name": "Scott Jehl"
-		},
-		{
-			"name": "Mat Marquis"
-		}
-	],
 	"engines": {
 		"node": ">= 0.8.0"
 	},
