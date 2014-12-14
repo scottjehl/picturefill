@@ -55,7 +55,7 @@
 	var DPR = window.devicePixelRatio;
 	var units = {
 		px: 1,
-		'in': 96
+		"in": 96
 	};
 	var anchor = document.createElement( "a" );
 	/**
@@ -68,7 +68,7 @@
 		if ( obj.addEventListener ) {
 			obj.addEventListener(evt, fn, capture || false);
 		} else if ( obj.attachEvent ) {
-			obj.attachEvent( "on"+ evt, fn);
+			obj.attachEvent( "on" + evt, fn);
 		}
 	};
 
@@ -76,7 +76,7 @@
 		if ( obj.removeEventListener ) {
 			obj.removeEventListener(evt, fn, capture || false);
 		} else if ( obj.detachEvent ) {
-			obj.detachEvent( "on"+ evt, fn);
+			obj.detachEvent( "on" + evt, fn);
 		}
 	};
 
@@ -84,10 +84,10 @@
 	 * simple memoize function:
 	 */
 
-	var memoize = function(fn){
+	var memoize = function(fn) {
 		var cache = {};
-		return function(input){
-			if ( !(input in cache) ){
+		return function(input) {
+			if ( !(input in cache) ) {
 				cache[ input ] = fn(input);
 			}
 			return cache[ input ];
@@ -101,7 +101,7 @@
 	 *
 	 * based on: https://gist.github.com/jonathantneal/db4f77009b155f083738
 	 */
-	var evalCSS = (function(){
+	var evalCSS = (function() {
 
 		var regLength = /^([\d\.]+)(em|vw|px)$/;
 		var replace = function() {
@@ -137,18 +137,17 @@
 			) + ";";
 		});
 
-
 		return function(css, length) {
 			var parsedLength;
 			if (!(css in cssCache)) {
 				cssCache[css] = false;
-				if(length && (parsedLength = css.match( regLength ))){
+				if (length && (parsedLength = css.match( regLength ))) {
 					cssCache[css] = parsedLength[ 1 ] * units[parsedLength[ 2 ]];
 				} else {
 					/*jshint evil:true */
 					try{
 						cssCache[css] = new Function("e", buidlStr(css))(units);
-					} catch(e){}
+					} catch(e) {}
 					/*jshint evil:false */
 				}
 			}
@@ -156,7 +155,7 @@
 		};
 	})();
 
-	var setResolution = function ( candidate, sizesattr ) {
+	var setResolution = function( candidate, sizesattr ) {
 		if ( candidate.w ) { // h = means height: || descriptor.type === 'h' do not handle yet...
 			candidate.cWidth = ri.calcListLength( sizesattr || "100vw" );
 			candidate.res = candidate.w / candidate.cWidth ;
@@ -166,20 +165,20 @@
 		return candidate;
 	};
 
-	var parseDescriptor = memoize(function ( descriptor ) {
-		var descriptorObj = [1, 'x'];
+	var parseDescriptor = memoize(function( descriptor ) {
+		var descriptorObj = [ 1, "x" ];
 		var parsedDescriptor = trim( descriptor || "" );
 
 		if ( parsedDescriptor ) {
 			parsedDescriptor = parsedDescriptor.replace(regHDesc, "");
 			if ( ( parsedDescriptor ).match( regDescriptor ) ) {
 
-				descriptorObj = [RegExp.$1 * 1, RegExp.$2];
+				descriptorObj = [ RegExp.$1 * 1, RegExp.$2 ];
 
 				if ( PFDEBUG && (
 					descriptorObj[0] < 0 ||
 					isNaN( descriptorObj[0] ) ||
-					(descriptorObj[1] === "w" && /\./.test(''+descriptorObj[0]))
+					(descriptorObj[1] === "w" && /\./.test("" + descriptorObj[0]))
 					) ) {
 					warn( "bad descriptor: " + descriptor );
 				}
@@ -232,13 +231,13 @@
 	/**
 	 * adds an onload event to an image and reevaluates it, after onload
 	 */
-	var reevaluateAfterLoad = (function(){
-		var onload = function(){
+	var reevaluateAfterLoad = (function() {
+		var onload = function() {
 			off( this, "load", onload );
 			off( this, "error", onload );
-			ri.fillImgs( {elements: [this]} );
+			ri.fillImgs( { elements: [ this ] } );
 		};
-		return function( img ){
+		return function( img ) {
 			off( img, "load", onload );
 			off( img, "error", onload );
 			on( img, "error", onload );
@@ -251,7 +250,7 @@
 	 * @param {message}
 	 * @type {Function}
 	 */
-	if(PFDEBUG){
+	if (PFDEBUG) {
 		warn = ( window.console && console.warn ) ?
 			function( message ) {
 				console.warn( message );
@@ -260,7 +259,7 @@
 		;
 	}
 
-	if( !(curSrcProp in image) ){
+	if ( !(curSrcProp in image) ) {
 		curSrcProp = "src";
 	}
 
@@ -294,7 +293,7 @@
 
 		dprM = (DPR || 1) * cfg.xQuant;
 
-		if(!cfg.uT){
+		if (!cfg.uT) {
 			cfg.maxX = Math.max(1.3, cfg.maxX);
 			dprM = Math.min( dprM, cfg.maxX );
 
@@ -318,10 +317,10 @@
 
 		partialLowTreshold = 0.5 + (0.25 * dprM);
 
-		if(!(isLandscape = units.width > units.height)){
+		if (!(isLandscape = units.width > units.height)) {
 			lazyFactor *= 0.9;
 		}
-		if(supportAbort){
+		if (supportAbort) {
 			lazyFactor *= 0.9;
 		}
 
@@ -329,7 +328,7 @@
 
 	function chooseLowRes( lowRes, diff, dpr ) {
 		var add = diff * lowRes;
-		if(!isLandscape){
+		if (!isLandscape) {
 			add /= 1.3;
 		}
 
@@ -338,7 +337,7 @@
 	}
 
 	function inView(el) {
-		if(!el.getBoundingClientRect){return true;}
+		if (!el.getBoundingClientRect) {return true;}
 		var rect = el.getBoundingClientRect();
 		var bottom, right, left, top;
 
@@ -350,7 +349,6 @@
 		(bottom || right || left || top)
 		);
 	}
-
 
 	function applyBestCandidate( img ) {
 		var srcSetCandidates;
@@ -407,7 +405,6 @@
 		return candidate;
 	}
 
-
 	function getAllSourceElements( picture, candidates ) {
 		var i, len, source, srcset;
 
@@ -446,9 +443,9 @@
 		}
 	}
 
-	function hasOneX(set){
+	function hasOneX(set) {
 		var i, ret, candidates;
-		if( set ) {
+		if ( set ) {
 			candidates = ri.parseSet(set);
 			for ( i = 0; i < candidates.length; i++ ) {
 				if ( candidates[i].x === 1 ) {
@@ -539,7 +536,6 @@
 		return media ? evalCSS(media) : true;
 	};
 
-
 	/**
 	 * Returns the calculated length in css pixel from the given sourceSizeValue
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
@@ -552,7 +548,7 @@
 	ri.calcLength = function( sourceSizeValue ) {
 
 		var value = evalCSS(sourceSizeValue, true) || false;
-		if(value < 0){
+		if (value < 0) {
 			value = false;
 		}
 
@@ -694,7 +690,6 @@
 		return eminpx || 16;
 	};
 
-
 	/**
 	 * Takes a string of sizes and returns the width in pixels as a number
 	 */
@@ -793,7 +788,7 @@
 				// we don't want look for a better candidate
 				if ( curCan && curRes < dpr && curRes > lowTreshold ) {
 
-					if(curRes < partialLowTreshold){
+					if (curRes < partialLowTreshold) {
 						sub += (0.1 * dpr);
 					}
 
@@ -867,7 +862,7 @@
 				ri.setSrc( img, bestCandidate );
 				if ( PFDEBUG ) {
 					testImgDimensions(img, bestCandidate);
-					if(isSSL && !bestCandidate.url.indexOf( "http:" )){
+					if (isSSL && !bestCandidate.url.indexOf( "http:" )) {
 						warn( "insecure: " + candidateSrc );
 					}
 				}
@@ -954,7 +949,7 @@
 
 			imageData.sets.push( fallbackCandidate );
 
-			isWDescripor = (alwaysCheckWDescriptor || imageData.src) && regWDesc.test(imageData.srcset || '');
+			isWDescripor = (alwaysCheckWDescriptor || imageData.src) && regWDesc.test(imageData.srcset || "");
 
 			// add normal src as candidate, if source has no w descriptor
 			if ( !isWDescripor && imageData.src && !getCandidateForSrc(imageData.src, fallbackCandidate) && !hasOneX(fallbackCandidate) ) {
@@ -992,20 +987,19 @@
 			}
 		}
 
-		if(imageData.supported && !imageData.srcset && ((!imageData.src && element.src) ||  element.src !== ri.makeUrl(imageData.src))){
-			if(imageData.src === null){
-				element.removeAttribute('src');
+		if (imageData.supported && !imageData.srcset && ((!imageData.src && element.src) ||  element.src !== ri.makeUrl(imageData.src))) {
+			if (imageData.src === null) {
+				element.removeAttribute("src");
 			} else {
 				element.src = imageData.src;
 			}
 		}
 
 		if ( PFDEBUG ) {
-			testMediaOrder(imageData.sets, 'source');
+			testMediaOrder(imageData.sets, "source");
 		}
 		imageData.parsed = true;
 	};
-
 
 	ri.fillImg = function(element, options) {
 		var parent, imageData;
@@ -1110,47 +1104,46 @@
 
 	window.picturefillCFG = {
 		ri: ri,
-		push: function(args){
+		push: function(args) {
 			var name = args.shift();
-			if(typeof ri[name] === "function"){
+			if (typeof ri[name] === "function") {
 				ri[name].apply(ri, args);
 			} else {
 				cfg[name] = args[0];
-				if(alreadyRun){
+				if (alreadyRun) {
 					ri.fillImgs( { reevaluate: true } );
 				}
 			}
 		}
 	};
 
-	while(setOptions && setOptions.length){
+	while (setOptions && setOptions.length) {
 		window.picturefillCFG.push(setOptions.shift());
 	}
 
 	if ( PFDEBUG ) {
 		warn( "Responsive image debugger active. Do not use in production, because it slows things down! extremly" );
 
-		if(!document.querySelector || (document.documentMode || 9) < 8){
+		if (!document.querySelector || (document.documentMode || 9) < 8) {
 			warn("querySelector is needed. IE8 needs to be in strict, standard or edge mode: http://bit.ly/1yGgYU0 or try the ri.oldie.js plugin.");
 		}
-		if( (document.getElementsByTagName("picture")[0] ||{} ).outerHTML === "<PICTURE>" ){
+		if ( (document.getElementsByTagName("picture")[0] ||{} ).outerHTML === "<PICTURE>" ) {
 			warn("IE8 needs to picture shived. Either include picturefill.js in <head> or use html5shiv.");
 		}
 
-		if(document.compatMode === "BackCompat"){
+		if (document.compatMode === "BackCompat") {
 			warn("Browser is in quirksmode. Please make sure to be in strict mode.");
 		}
 
-		var testImgDimensions = function (img, candidate) {
-			var onload = function () {
+		var testImgDimensions = function(img, candidate) {
+			var onload = function() {
 				var dif;
 				var imgWidth = img.offsetWidth;
 				var naturalWidth = img.naturalWidth;
 				var canWidth = candidate.cWidth;
 				var res = ri.DPR * cfg.xQuant;
 
-
-				if(!canWidth && naturalWidth && candidate.x){
+				if (!canWidth && naturalWidth && candidate.x) {
 					canWidth = naturalWidth / res;
 				}
 
@@ -1161,8 +1154,8 @@
 						dif = imgWidth / canWidth;
 					}
 
-					if(candidate.w && Math.abs(imgWidth - canWidth) > 50 && dif < 0.86){
-						warn("Check your sizes attribute: " + candidate.set.sizes + " was calculated to: " + canWidth + "px. But your image is shown with a size of " + imgWidth + "px. img: "+ candidate.url);
+					if (candidate.w && Math.abs(imgWidth - canWidth) > 50 && dif < 0.86) {
+						warn("Check your sizes attribute: " + candidate.set.sizes + " was calculated to: " + canWidth + "px. But your image is shown with a size of " + imgWidth + "px. img: " + candidate.url);
 					}
 				}
 
@@ -1171,41 +1164,41 @@
 
 			on(img, "load", onload);
 		};
-		var testMediaOrder = (function(){
+		var testMediaOrder = (function() {
 			var regex = {
 				minw: /^\s*\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)\s*$/,
 				maxw: /^\s*\(\s*max\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)\s*$/
 			};
 
-			var checkSetOrder = function(set, sets, index, type){
+			var checkSetOrder = function(set, sets, index, type) {
 				var i, curSet;
-				for(i = 0; i < index && i < sets.length; i++){
+				for (i = 0; i < index && i < sets.length; i++) {
 					curSet = sets[i];
-					if((set._min && curSet._min && set._min >= curSet._min) || (set._max && curSet._max && set._max <= curSet._max)){
-						if(type === 'source'){
-							warn("Order of your source elements matters. Defining "+ set.media + " after "+ curSet.media +" doesn't make sense.");
+					if ((set._min && curSet._min && set._min >= curSet._min) || (set._max && curSet._max && set._max <= curSet._max)) {
+						if (type === "source") {
+							warn("Order of your source elements matters. Defining " + set.media + " after " + curSet.media + " doesn't make sense.");
 						} else {
-							warn("Order inside your sizes attribute does matter. Defining "+ set.media + " after "+ curSet.media +" doesn't make sense.");
+							warn("Order inside your sizes attribute does matter. Defining " + set.media + " after " + curSet.media + " doesn't make sense.");
 						}
 					}
 				}
 			};
-			var mediaTest = function(sets, type){
+			var mediaTest = function(sets, type) {
 				var i, len, set, lastSet;
 
 				lastSet = sets[sets.length - 1];
-				if(lastSet && (lastSet.media || lastSet.type)){
-					if(type === 'source'){
+				if (lastSet && (lastSet.media || lastSet.type)) {
+					if (type === "source") {
 						warn("The last src/srcset shouldn't have any type or media conditions. Use img[src] or img[srcset].");
 					} else {
 						warn("Last sizes attribute shouldn't have any condition otherwise 100vw is used.");
 					}
 				}
-				for(i = 0, len = sets.length; i < len; i++){
+				for (i = 0, len = sets.length; i < len; i++) {
 					set = sets[i];
-					if(!set.media || set.type){
-						if(!set.type && i !== len - 1){
-							if(type === 'source'){
+					if (!set.media || set.type) {
+						if (!set.type && i !== len - 1) {
+							if (type === "source") {
 								warn("A source element without [media] and [type] doesn't make any sense. Last srcset can be used at the img element. Order is important!");
 							} else {
 								warn("The order of your sizes attribute does matter! The sizes length without a media condition has to be defined as last entry.");
@@ -1216,7 +1209,6 @@
 					set._min = set.media.match( regex.minw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" );
 					set._max = set.media.match( regex.maxw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" );
 
-
 					if ( set._min ) {
 						set._min = parseFloat( set._min, 10 ) * (set._min.indexOf( "em" ) > 0 ? ri.getEmValue() : 1);
 					}
@@ -1224,30 +1216,30 @@
 					if ( set._max ) {
 						set._max = parseFloat( set._max, 10 ) * (set._max.indexOf( "em" ) > 0 ? ri.getEmValue() : 1);
 					}
-					if(set._min || set._max){
+					if (set._min || set._max) {
 						checkSetOrder(set, sets, i, type);
 					}
 				}
 			};
 
-			return function(sets){
+			return function(sets) {
 				var i, len, sizes, j, sizesSet;
 
-				mediaTest(sets, 'source');
+				mediaTest(sets, "source");
 
-				for(i = 0, len = sets.length; i < len; i++){
-					sizes = trim(sets[i].sizes || '');
-					if(sizes){
+				for (i = 0, len = sets.length; i < len; i++) {
+					sizes = trim(sets[i].sizes || "");
+					if (sizes) {
 						sizesSet = [];
 						sizes = sizes.split( /\s*,\s*/ );
-						for(j = 0; j < sizes.length; j++){
-							if(sizes[j]){
+						for (j = 0; j < sizes.length; j++) {
+							if (sizes[j]) {
 								sizesSet.push(ri.parseSize( sizes[j] ));
 							}
 						}
 
-						if(sizesSet.length){
-							mediaTest(sizesSet, 'sizes');
+						if (sizesSet.length) {
+							mediaTest(sizesSet, "sizes");
 						}
 					}
 				}
