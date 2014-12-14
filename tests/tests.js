@@ -569,6 +569,7 @@
 				return 100;
 			};
 
+			/*
 			srcset = "foo.png 2e2w, bar.jpg 1e2w";
 			expected = [
 				{
@@ -581,6 +582,7 @@
 				}
 			];
 			deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
+			*/
 		});
 
 		test( "op.mMQ", function() {

@@ -31,6 +31,19 @@
 					]
 				}
 			},
+			concat: {
+				options: {
+					separator: ';'
+				},
+				strictparser: {
+					src: ['src/external/parse-srcset.js', 'src/picturefill.js'],
+					dest: 'dist/picturefill.js'
+				},
+				quirksparser: {
+					src: ['src/external/old-parse-srcset.js', 'src/picturefill.js'],
+					dest: 'dist/picturefill.js'
+				}
+			},
 			uglify: {
 				options: {
 					banner: "<%= banner %>",
@@ -46,11 +59,11 @@
 						beautify: true,
 						mangle: false
 					},
-					src: [ "src/picturefill.js" ],
+					src: [ "dist/picturefill.js" ],
 					dest: "dist/picturefill.js"
 				},
 				distmin: {
-					src: [ "src/picturefill.js" ],
+					src: [ "dist/picturefill.js" ],
 					dest: "dist/picturefill.min.js"
 				},
 				plugins: {
@@ -124,9 +137,10 @@
 		grunt.loadNpmTasks("grunt-jscs-checker");
 		grunt.loadNpmTasks("grunt-bytesize");
 		grunt.loadNpmTasks("grunt-max-filesize");
+		grunt.loadNpmTasks("grunt-contrib-concat");
 
 		// Default task.
-		grunt.registerTask("default", [ "test", "clean", "copy", "uglify", "bytesize", "maxFilesize" ]);
+		grunt.registerTask("default", [ "clean", "copy", "concat:strictparser", "uglify", "bytesize", "maxFilesize" ]);
 		grunt.registerTask("test", [ "jscs", "jshint", "qunit" ]);
 	};
 })();

@@ -6,7 +6,7 @@
 (function( window, document, undefined ) {
 	// Enable strict mode
 	"use strict";
-	/* global PFDEBUG */
+	/* global PFDEBUG, parseSrcset */
 	if ( typeof PFDEBUG === "undefined" ) {
 		window.PFDEBUG = true;
 	}
@@ -38,8 +38,6 @@
 	var curSrcProp = "currentSrc";
 	var regWDesc = /\s+\+?\d+(e\d+)?w/;
 	var regSize = /(\([^)]+\))?\s*(.+)/;
-	var regDescriptor =  /^([\+eE\d\.]+)(w|x)$/; // currently no h
-	var regHDesc = /\s*\d+h\s*/;
 	var setOptions = window.picturefillCFG;
 	/**
 	 * Shortcut property for https://w3c.github.io/webappsec/specs/mixedcontent/#restricts-mixed-content ( for easy overriding in tests )
@@ -164,35 +162,6 @@
 		}
 		return candidate;
 	};
-
-	var parseDescriptor = memoize(function( descriptor ) {
-		var descriptorObj = [ 1, "x" ];
-		var parsedDescriptor = trim( descriptor || "" );
-
-		if ( parsedDescriptor ) {
-			parsedDescriptor = parsedDescriptor.replace(regHDesc, "");
-			if ( ( parsedDescriptor ).match( regDescriptor ) ) {
-
-				descriptorObj = [ RegExp.$1 * 1, RegExp.$2 ];
-
-				if ( PFDEBUG && (
-					descriptorObj[0] < 0 ||
-					isNaN( descriptorObj[0] ) ||
-					(descriptorObj[1] === "w" && /\./.test("" + descriptorObj[0]))
-					) ) {
-					warn( "bad descriptor: " + descriptor );
-				}
-			} else {
-				descriptorObj = false;
-
-				if ( PFDEBUG ) {
-					warn( "unknown descriptor: " + descriptor );
-				}
-			}
-		}
-
-		return descriptorObj;
-	});
 
 	/**
 	 *
@@ -580,75 +549,13 @@
 	});
 
 	ri.parseSet = function( set ) {
-		/*
-		 * A lot of this was pulled from Boris Smus’ parser for the now-defunct WHATWG `srcset`
-		 * https://github.com/borismus/srcset-polyfill/blob/master/js/srcset-info.js
-		 *
-		 * 1. Let input (`srcset`) be the value passed to this algorithm.
-		 * 2. Let position be a pointer into input, initially pointing at the start of the string.
-		 * 3. Let raw candidates be an initially empty ordered list of URLs with associated
-		 * unparsed descriptors. The order of entries in the list is the order in which entries
-		 * are added to the list.
-		 */
-
+		var i;
 		if ( !set.cands ) {
-
-			var pos, url, descriptor, last, descpos, can, firstDescriptorType;
-			var srcset = set.srcset;
-
-			set.cands = [];
-
-			while ( srcset ) {
-				srcset = srcset.replace(/^\s+/g,"");
-				// 5. Collect a sequence of characters that are not space characters, and let that be url.
-				pos = srcset.search(/\s/g);
-				descriptor = null;
-				if ( pos !== -1 ) {
-					url = srcset.slice( 0, pos );
-					last = url.charAt( url.length - 1 );
-					// 6. If url ends with a U+002C COMMA character (,), remove that character from url
-					// and let descriptors be the empty string. Otherwise, follow these substeps
-					// 6.1. If url is empty, then jump to the step labeled descriptor parser.
-					if ( last === "," || !url ) {
-						url = url.replace(/,+$/, "");
-						descriptor = "";
-					}
-					srcset = srcset.slice( pos + 1 );
-					// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and
-					// let that be descriptors.
-					if ( descriptor === null ) {
-						descpos = srcset.indexOf( "," );
-						if ( descpos !== -1 ) {
-							descriptor = srcset.slice( 0, descpos );
-							srcset = srcset.slice( descpos + 1 );
-						} else {
-							descriptor = srcset;
-							srcset = "";
-						}
-					}
-				} else {
-					url = srcset;
-					srcset = "";
-				}
-
-				// 7. Add url to raw candidates, associated with descriptors.
-				if ( url && (descriptor = parseDescriptor( descriptor )) ) {
-
-					if ( PFDEBUG ) {
-						if ( !firstDescriptorType ) {
-							firstDescriptorType = set.sizes ? "w" : descriptor[1];
-						}
-						if ( firstDescriptorType !== descriptor[1] ) {
-							warn("mixing x with a w descriptor/sizes attribute in one srcset doesn't make sense in most cases and is invalid.");
-						}
-					}
-					can = {
-						url: url.replace(/^,+/, ""),
-						set: set
-					};
-					can[descriptor[1]] = descriptor[0];
-
-					set.cands.push(can);
+			set.cands = parseSrcset(set.srcset);
+			for ( i = 0; i < set.cands.length; i++) {
+				set.cands[ i ].set = set;
+				if ( !set.cands[ i ].w && !set.cands[ i ].x && !set.cands[ i ].h ) {
+					set.cands[ i ].x = 1;
 				}
 			}
 		}
