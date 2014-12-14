@@ -6,6 +6,11 @@
 	"homepage": "https://scottjehl.github.io/picturefill/",
 	"bugs": "https://github.com/scottjehl/picturefill/issues",
 	"license": "MIT",
+	"author": "Scott Jehl <scottjehl@gmail.com>",
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:scottjehl/picturefill.git"
+	},
 	"keywords": [
 		"picturefill",
 		"srcset",
