@@ -19,6 +19,18 @@
 			clean: {
 				files: ["dist"]
 			},
+			copy: {
+				plugins: {
+					files: [
+						{
+							expand: true,
+							cwd: 'src/plugins/',
+							src: ['**/*.js'],
+							dest: 'dist/plugins/'
+						}
+					]
+				}
+			},
 			uglify: {
 				options: {
 					banner: "<%= banner %>",
@@ -46,7 +58,7 @@
 						expand: true,
 						cwd: 'src/plugins/',
 						src: ['**/*.js', '!*.min.js', '!**/*.min.js'],
-						dest: 'src/plugins/',
+						dest: 'dist/plugins/',
 						ext: '.min.js',
 						extDot: 'last'
 					}]
@@ -60,7 +72,7 @@
 					options: {
 						jshintrc: true
 					},
-					src: ["Gruntfile.js", "src/*.js", "tests/*.js"]
+					src: ["Gruntfile.js", "src/*.js"]
 				}
 			},
 			jscs: {
@@ -76,7 +88,7 @@
 			},
 			bytesize: {
 				all: {
-					src: [ "src/picturefill.min.js" ]
+					src: [ "dist/picturefill.min.js" ]
 				}
 			},
 			maxFilesize: {
@@ -85,7 +97,7 @@
 				},
 				minified: {
 					options: {
-						maxBytes: 8900
+						maxBytes: 10000
 					},
 					src: ["src/picturefill.min.js"]
 				}
@@ -104,6 +116,7 @@
 
 		// These plugins provide necessary tasks.
 		grunt.loadNpmTasks("grunt-contrib-clean");
+		grunt.loadNpmTasks('grunt-contrib-copy');
 		grunt.loadNpmTasks("grunt-contrib-jshint");
 		grunt.loadNpmTasks("grunt-contrib-qunit");
 		grunt.loadNpmTasks("grunt-contrib-uglify");
@@ -113,7 +126,7 @@
 		grunt.loadNpmTasks('grunt-max-filesize');
 
 		// Default task.
-		grunt.registerTask("default", ["test", "clean", "uglify"]);
+		grunt.registerTask("default", ["test", "clean", "copy", "uglify", "bytesize", "maxFilesize"]);
 		grunt.registerTask("test", ["jshint", "qunit"]);//"jscs",
 	};
 })();

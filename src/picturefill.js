@@ -6,7 +6,8 @@
 (function( window, document, undefined ) {
 	// Enable strict mode
 	"use strict";
-	if ( typeof PFDEBUG == "undefined" ) {
+	/* global PFDEBUG */
+	if ( typeof PFDEBUG === "undefined" ) {
 		window.PFDEBUG = true;
 	}
 
@@ -14,7 +15,7 @@
 	document.createElement( "picture" );
 
 	var lowTreshold, partialLowTreshold, isLandscape, lazyFactor, warn, eminpx,
-		alwaysCheckWDescriptor, resizeThrottle;
+		alwaysCheckWDescriptor, resizeThrottle, isDomReady;
 	// local object for method references and testing exposure
 	var ri = {};
 	var noop = function() {};
@@ -27,7 +28,7 @@
 	var cfg = {
 		//resource selection:
 		xQuant: 1,
-		lazyFactor: 0.4,
+		lazyFactor: 0.3,
 		maxX: 2
 	};
 	var srcAttr = "data-pfsrc";
@@ -43,14 +44,12 @@
 	/**
 	 * Shortcut property for https://w3c.github.io/webappsec/specs/mixedcontent/#restricts-mixed-content ( for easy overriding in tests )
 	 */
-	var isSSL = location.protocol == "https:";
+	var isSSL = location.protocol === "https:";
 	// baseStyle also used by getEmValue (i.e.: width: 1em is important)
 	var baseStyle = "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;overflow:hidden;clip:rect(0px, 0px, 0px, 0px)";
 	var fsCss = "font-size:100%!important;";
 	var isVwDirty = true;
 
-	var memSize = {};
-	var memDescriptor = {};
 	var cssCache = {};
 	var sizeLengthCache = {};
 	var DPR = window.devicePixelRatio;
@@ -82,6 +81,20 @@
 	};
 
 	/**
+	 * simple memoize function:
+	 */
+
+	var memoize = function(fn){
+		var cache = {};
+		return function(input){
+			if ( !(input in cache) ){
+				cache[ input ] = fn(input);
+			}
+			return cache[ input ];
+		};
+	};
+
+	/**
 	 * gets a mediaquery and returns a boolean or gets a css length and returns a number
 	 * @param css mediaqueries or css length
 	 * @returns {boolean|number}
@@ -90,7 +103,6 @@
 	 */
 	var evalCSS = (function(){
 
-		var cache = {};
 		var regLength = /^([\d\.]+)(em|vw|px)$/;
 		var replace = function() {
 			var args = arguments, index = 0, string = args[0];
@@ -100,33 +112,30 @@
 			return string;
 		};
 
-		var buidlStr = function(css) {
-			if (!cache[css]) {
-				cache[css] = "return " + replace((css || "").toLowerCase(),
-					// interpret `and`
-					/\band\b/g, "&&",
+		var buidlStr = memoize(function(css) {
 
-					// interpret `,`
-					/,/g, "||",
+			return "return " + replace((css || "").toLowerCase(),
+				// interpret `and`
+				/\band\b/g, "&&",
 
-					// interpret `min-` as >=
-					/min-([a-z-\s]+):/g, "e.$1>=",
+				// interpret `,`
+				/,/g, "||",
 
-					// interpret `min-` as <=
-					/max-([a-z-\s]+):/g, "e.$1<=",
+				// interpret `min-` as >=
+				/min-([a-z-\s]+):/g, "e.$1>=",
 
-					//calc value
-					/calc([^)]+)/g, "($1)",
+				// interpret `min-` as <=
+				/max-([a-z-\s]+):/g, "e.$1<=",
 
-					// interpret css values
-					/(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)",
-					//make eval less evil
-					/^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/ig, ""
-				) + ";";
-			}
+				//calc value
+				/calc([^)]+)/g, "($1)",
 
-			return cache[css];
-		};
+				// interpret css values
+				/(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)",
+				//make eval less evil
+				/^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/ig, ""
+			) + ";";
+		});
 
 
 		return function(css, length) {
@@ -148,7 +157,7 @@
 	})();
 
 	var setResolution = function ( candidate, sizesattr ) {
-		if ( candidate.w ) { // h = means height: || descriptor.type == 'h' do not handle yet...
+		if ( candidate.w ) { // h = means height: || descriptor.type === 'h' do not handle yet...
 			candidate.cWidth = ri.calcListLength( sizesattr || "100vw" );
 			candidate.res = candidate.w / candidate.cWidth ;
 		} else {
@@ -156,6 +165,35 @@
 		}
 		return candidate;
 	};
+
+	var parseDescriptor = memoize(function ( descriptor ) {
+		var descriptorObj = [1, 'x'];
+		var parsedDescriptor = trim( descriptor || "" );
+
+		if ( parsedDescriptor ) {
+			parsedDescriptor = parsedDescriptor.replace(regHDesc, "");
+			if ( ( parsedDescriptor ).match( regDescriptor ) ) {
+
+				descriptorObj = [RegExp.$1 * 1, RegExp.$2];
+
+				if ( PFDEBUG && (
+					descriptorObj[0] < 0 ||
+					isNaN( descriptorObj[0] ) ||
+					(descriptorObj[1] === "w" && /\./.test(''+descriptorObj[0]))
+					) ) {
+					warn( "bad descriptor: " + descriptor );
+				}
+			} else {
+				descriptorObj = false;
+
+				if ( PFDEBUG ) {
+					warn( "unknown descriptor: " + descriptor );
+				}
+			}
+		}
+
+		return descriptorObj;
+	});
 
 	/**
 	 *
@@ -166,8 +204,8 @@
 
 		var options = opt || {};
 
-		if ( options.elements && options.elements.nodeType == 1 ) {
-			if ( options.elements.nodeName.toUpperCase() == "IMG" ) {
+		if ( options.elements && options.elements.nodeType === 1 ) {
+			if ( options.elements.nodeName.toUpperCase() === "IMG" ) {
 				options.elements =  [ options.elements ];
 			} else {
 				options.context = options.elements;
@@ -289,44 +327,10 @@
 
 	}
 
-	function parseDescriptor( descriptor ) {
-
-		if ( !(descriptor in memDescriptor) ) {
-			var descriptorObj = [1, 'x'];
-			var parsedDescriptor = trim( descriptor || "" );
-
-			if ( parsedDescriptor ) {
-				parsedDescriptor = parsedDescriptor.replace(regHDesc, "");
-				if ( ( parsedDescriptor ).match( regDescriptor ) ) {
-
-					descriptorObj = [RegExp.$1 * 1, RegExp.$2];
-
-					if ( PFDEBUG && (
-						descriptorObj[0] < 0 ||
-						isNaN( descriptorObj[0] ) ||
-						(descriptorObj[1] == "w" && /\./.test(''+descriptorObj[0]))
-						) ) {
-						warn( "bad descriptor: " + descriptor );
-					}
-				} else {
-					descriptorObj = false;
-
-					if ( PFDEBUG ) {
-						warn( "unknown descriptor: " + descriptor );
-					}
-				}
-			}
-
-			memDescriptor[ descriptor ] = descriptorObj;
-		}
-
-		return memDescriptor[ descriptor ];
-	}
-
 	function chooseLowRes( lowRes, diff, dpr ) {
-		var add = diff * Math.pow(lowRes, 2);
+		var add = diff * lowRes;
 		if(!isLandscape){
-			add /= 1.6;
+			add /= 1.3;
 		}
 
 		lowRes += add;
@@ -352,7 +356,7 @@
 		var srcSetCandidates;
 		var matchingSet = ri.getSet( img );
 		var evaluated = false;
-		if ( matchingSet != "pending" ) {
+		if ( matchingSet !== "pending" ) {
 			evaluated = true;
 			if ( matchingSet ) {
 				srcSetCandidates = ri.setRes( matchingSet );
@@ -394,7 +398,7 @@
 			candidates = ri.parseSet( set );
 			src = ri.makeUrl(src);
 			for ( i = 0; i < candidates.length; i++ ) {
-				if ( src == ri.makeUrl(candidates[ i ].url) ) {
+				if ( src === ri.makeUrl(candidates[ i ].url) ) {
 					candidate = candidates[ i ];
 					break;
 				}
@@ -417,7 +421,7 @@
 			source[ ri.ns ] = true;
 			srcset = source.getAttribute( "srcset" );
 
-			if ( PFDEBUG && document.documentMode != 9 && source.parentNode != picture ) {
+			if ( PFDEBUG && document.documentMode !== 9 && source.parentNode !== picture ) {
 				warn( "all source elements have to be a child of the picture element. For IE9 support wrap them in an audio/video element, BUT with conditional comments" );
 			}
 			// if source does not have a srcset attribute, skip
@@ -436,7 +440,7 @@
 
 		if ( PFDEBUG ) {
 			var srcTest = ri.qsa( picture, "source, img");
-			if ( srcTest[ srcTest.length - 1].nodeName.toUpperCase() == "SOURCE" ) {
+			if ( srcTest[ srcTest.length - 1].nodeName.toUpperCase() === "SOURCE" ) {
 				warn( "all sources inside picture have to precede the img element" );
 			}
 		}
@@ -447,7 +451,7 @@
 		if( set ) {
 			candidates = ri.parseSet(set);
 			for ( i = 0; i < candidates.length; i++ ) {
-				if ( candidates[i].x == 1 ) {
+				if ( candidates[i].x === 1 ) {
 					ret = true;
 					break;
 				}
@@ -491,10 +495,11 @@
 	 * @param src
 	 * @returns {String} absolute URL
 	 */
-	ri.makeUrl = function(src) {
+
+	ri.makeUrl = memoize(function(src) {
 		anchor.href = src;
 		return anchor.href;
-	};
+	});
 
 	/**
 	 * Gets a DOM element or document and a selctor and returns the found matches
@@ -570,19 +575,13 @@
 	 * @param sourceSizeStr
 	 * @returns {*}
 	 */
-	ri.parseSize = function( sourceSizeStr ) {
-		var match;
-
-		if ( !memSize[ sourceSizeStr ] ) {
-			match = ( sourceSizeStr || "" ).match(regSize);
-			memSize[ sourceSizeStr ] = {
-				media: match && match[1],
-				length: match && match[2]
-			};
-		}
-
-		return memSize[ sourceSizeStr ];
-	};
+	ri.parseSize = memoize(function( sourceSizeStr ) {
+		var match = ( sourceSizeStr || "" ).match(regSize);
+		return {
+			media: match && match[1],
+			length: match && match[2]
+		};
+	});
 
 	ri.parseSet = function( set ) {
 		/*
@@ -608,22 +607,22 @@
 				// 5. Collect a sequence of characters that are not space characters, and let that be url.
 				pos = srcset.search(/\s/g);
 				descriptor = null;
-				if ( pos != -1 ) {
+				if ( pos !== -1 ) {
 					url = srcset.slice( 0, pos );
 					last = url.charAt( url.length - 1 );
 					// 6. If url ends with a U+002C COMMA character (,), remove that character from url
 					// and let descriptors be the empty string. Otherwise, follow these substeps
 					// 6.1. If url is empty, then jump to the step labeled descriptor parser.
-					if ( last == "," || !url ) {
+					if ( last === "," || !url ) {
 						url = url.replace(/,+$/, "");
 						descriptor = "";
 					}
 					srcset = srcset.slice( pos + 1 );
 					// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and
 					// let that be descriptors.
-					if ( descriptor == null ) {
+					if ( descriptor === null ) {
 						descpos = srcset.indexOf( "," );
-						if ( descpos != -1 ) {
+						if ( descpos !== -1 ) {
 							descriptor = srcset.slice( 0, descpos );
 							srcset = srcset.slice( descpos + 1 );
 						} else {
@@ -643,7 +642,7 @@
 						if ( !firstDescriptorType ) {
 							firstDescriptorType = set.sizes ? "w" : descriptor[1];
 						}
-						if ( firstDescriptorType != descriptor[1] ) {
+						if ( firstDescriptorType !== descriptor[1] ) {
 							warn("mixing x with a w descriptor/sizes attribute in one srcset doesn't make sense in most cases and is invalid.");
 						}
 					}
@@ -760,7 +759,7 @@
 	ri.applySetCandidate = function( candidates, img ) {
 		if ( !candidates.length ) {return;}
 		var candidate,
-			dpr,
+
 			i,
 			j,
 			diff,
@@ -770,47 +769,49 @@
 			curCan,
 			isSameSet,
 			candidateSrc,
-			oldRes;
+			curRes;
 
 		var imageData = img[ ri.ns ];
 		var evaled = true;
-		var lazyF = lazyFactor;
-		var sub = 0;
+		var dpr = ri.DPR;
+		var sub = 0.1 * dpr;
 
 		curSrc = imageData.curSrc || img[curSrcProp];
 
 		curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set);
 
-		dpr = ri.DPR;
+		curRes = curCan && curCan.res;
 
-		//if we have a current source, we might either become lazy or give this source some advantage
+		// if we have a current source, we might either become lazy or give this source some advantage
 		if ( curSrc ) {
 
-			if( !supportAbort || img.complete || !curCan || curCan.res < dpr ){
+			// if browser can abort image request and the image has a higher pixel density than needed
+			// and this image isn't downloaded yet, we skip next part and try to save bandwidth
+			if ( !supportAbort || img.complete || !curCan || curRes < dpr ) {
 
-				//add some lazy padding to the src
-				if ( curCan && curCan.res < dpr && curCan.res > lowTreshold ) {
-					oldRes = curCan.res;
+				// if there is already an image and it's quality is "okay"
+				// we don't want look for a better candidate
+				if ( curCan && curRes < dpr && curRes > lowTreshold ) {
 
-					if(curCan.res < partialLowTreshold){
-						lazyF *= 0.8;
+					if(curRes < partialLowTreshold){
 						sub += (0.1 * dpr);
 					}
 
-					curCan.res += lazyF * (curCan.res - sub);
+					curCan.res += lazyFactor * (curRes - sub);
 				}
 
-				isSameSet = !imageData.pic || (curCan && curCan.set == candidates[ 0 ].set);
+				isSameSet = !imageData.pic || (curCan && curCan.set === candidates[ 0 ].set);
 
+				// if current candidate is "best", "better" or "okay",
+				// set it to bestCandidate
 				if ( curCan && isSameSet && curCan.res >= dpr ) {
 					bestCandidate = curCan;
-
-					// if image isn't loaded (!complete + src), test for LQIP or abort technique
-				} else if ( !supportAbort && !img.complete && getImgAttr.call( img, "src" ) && !img.lazyload ) {
+				// if image isn't loaded, test for LQIP or abort technique
+				// (abort is only used, if img wasn't likely part of the preload parser optimisation)
+				} else if ( !img.complete && (!isDomReady || !supportAbort) &&  !img.lazyload ) {
 
 					//if there is no art direction or if the img isn't visible, we can use LQIP pattern
-					if ( isSameSet || !inView( img ) ) {
-
+					if ( isSameSet || (!supportAbort && !inView( img )) ) {
 						bestCandidate = curCan;
 						candidateSrc = curSrc;
 						evaled = "L";
@@ -821,8 +822,8 @@
 		}
 
 		if ( !bestCandidate ) {
-			if ( oldRes ) {
-				curCan.res = curCan.res - ((curCan.res - oldRes) / 2);
+			if ( curRes ) {
+				curCan.res = curCan.res - ((curCan.res - curRes) / 2);
 			}
 
 			candidates.sort( ascendingSort );
@@ -839,7 +840,7 @@
 					// but let's improve this a little bit with some assumptions ;-)
 					if (candidates[ j ] &&
 						(diff = (candidate.res - dpr)) &&
-						curSrc != ri.makeUrl( candidate.url ) &&
+						curSrc !== ri.makeUrl( candidate.url ) &&
 						chooseLowRes(candidates[ j ].res, diff, dpr)) {
 						bestCandidate = candidates[ j ];
 
@@ -851,19 +852,18 @@
 			}
 		}
 
-		if ( oldRes ) {
-			curCan.res = oldRes;
+		if ( curRes ) {
+			curCan.res = curRes;
 		}
 
 		if ( bestCandidate ) {
 
 			candidateSrc = ri.makeUrl( bestCandidate.url );
 
-
 			imageData.curSrc = candidateSrc;
 			imageData.curCan = bestCandidate;
 
-			if ( candidateSrc != curSrc ) {
+			if ( candidateSrc !== curSrc ) {
 				ri.setSrc( img, bestCandidate );
 				if ( PFDEBUG ) {
 					testImgDimensions(img, bestCandidate);
@@ -883,7 +883,7 @@
 		img.src = bestCandidate.url;
 
 		// although this is a specific Safari issue, we don't want to take too much different code paths
-		if ( bestCandidate.set.type == "image/svg+xml" ) {
+		if ( bestCandidate.set.type === "image/svg+xml" ) {
 			origWidth = img.style.width;
 			img.style.width = (img.offsetWidth + 1) + "px";
 
@@ -907,7 +907,7 @@
 				continue;
 			}
 
-			if ( supportsType == "pending" ) {
+			if ( supportsType === "pending" ) {
 				set = supportsType;
 			}
 
@@ -921,7 +921,7 @@
 	ri.parseSets = function( element, parent ) {
 		var srcsetAttribute, fallbackCandidate, isWDescripor, srcsetParsed;
 
-		var hasPicture = parent.nodeName.toUpperCase() == "PICTURE";
+		var hasPicture = parent.nodeName.toUpperCase() === "PICTURE";
 		var imageData = element[ ri.ns ];
 
 		if ( imageData.src === undefined ) {
@@ -966,7 +966,7 @@
 				});
 			}
 
-			if ( PFDEBUG && !hasPicture && isWDescripor && imageData.src && fallbackCandidate.srcset.indexOf(element[ ri.ns ].src) == -1 ) {
+			if ( PFDEBUG && !hasPicture && isWDescripor && imageData.src && fallbackCandidate.srcset.indexOf(element[ ri.ns ].src) === -1 ) {
 				warn("The fallback candidate (`src`) isn't described inside the srcset attribute. Normally you want to describe all available candidates.");
 			}
 
@@ -992,8 +992,8 @@
 			}
 		}
 
-		if(imageData.supported && !imageData.srcset && ((!imageData.src && element.src) ||  element.src != ri.makeUrl(imageData.src))){
-			if(imageData.src == null){
+		if(imageData.supported && !imageData.srcset && ((!imageData.src && element.src) ||  element.src !== ri.makeUrl(imageData.src))){
+			if(imageData.src === null){
 				element.removeAttribute('src');
 			} else {
 				element.src = imageData.src;
@@ -1018,7 +1018,7 @@
 
 		imageData = element[ ri.ns ];
 
-		if ( imageData.evaled == "L" && element.complete ) {
+		if ( imageData.evaled === "L" && element.complete ) {
 			imageData.evaled = false;
 		}
 
@@ -1065,16 +1065,18 @@
 		 * Also attaches picturefill on resize and readystatechange
 		 */
 		(function() {
-			var ready = window.attachEvent ? /d$|^c/ : /d$|^c|^i/;
+			var regReady = window.attachEvent ? /d$|^c/ : /d$|^c|^i/;
 			var run = function() {
 				var readyState = document.readyState || "";
 
-				timerId = setTimeout(run, readyState == "loading" ? 200 :  999);
+				timerId = setTimeout(run, readyState === "loading" ? 200 :  999);
 				if ( document.body ) {
-					if ( ready.test( readyState ) ) {
+					ri.fillImgs();
+					isDomReady = isDomReady || regReady.test(readyState);
+					if ( isDomReady ) {
 						clearTimeout( timerId );
 					}
-					ri.fillImgs();
+
 				}
 			};
 
@@ -1110,7 +1112,7 @@
 		ri: ri,
 		push: function(args){
 			var name = args.shift();
-			if(typeof ri[name] == "function"){
+			if(typeof ri[name] === "function"){
 				ri[name].apply(ri, args);
 			} else {
 				cfg[name] = args[0];
@@ -1131,23 +1133,21 @@
 		if(!document.querySelector || (document.documentMode || 9) < 8){
 			warn("querySelector is needed. IE8 needs to be in strict, standard or edge mode: http://bit.ly/1yGgYU0 or try the ri.oldie.js plugin.");
 		}
-		if( (document.getElementsByTagName("picture")[0] ||{} ).outerHTML == "<PICTURE>" ){
+		if( (document.getElementsByTagName("picture")[0] ||{} ).outerHTML === "<PICTURE>" ){
 			warn("IE8 needs to picture shived. Either include picturefill.js in <head> or use html5shiv.");
 		}
 
-		if(document.compatMode == "BackCompat"){
+		if(document.compatMode === "BackCompat"){
 			warn("Browser is in quirksmode. Please make sure to be in strict mode.");
 		}
 
 		var testImgDimensions = function (img, candidate) {
 			var onload = function () {
-				var dif, xtreshold;
+				var dif;
 				var imgWidth = img.offsetWidth;
 				var naturalWidth = img.naturalWidth;
 				var canWidth = candidate.cWidth;
 				var res = ri.DPR * cfg.xQuant;
-				var hTresh =  0.84;
-				var lTresh = res > 1 ? 0.5 : 0.75;
 
 
 				if(!canWidth && naturalWidth && candidate.x){
@@ -1157,18 +1157,12 @@
 				if (imgWidth && canWidth) {
 					if (imgWidth > canWidth) {
 						dif = canWidth / imgWidth;
-						xtreshold = lTresh;
 					} else {
 						dif = imgWidth / canWidth;
-						xtreshold = hTresh;
 					}
 
-					if(Math.abs(imgWidth - canWidth) > 50){
-						if (candidate.w && dif < 0.86) {
-							warn("Check your sizes attribute: " + candidate.set.sizes + " was calculated to: " + canWidth + "px. But your image is shown with a size of " + imgWidth + "px. img: "+ candidate.url);
-						} else if(candidate.x && dif < xtreshold){
-							//warn("Image too much resized. Image was shown with "+ imgWidth +" but has a normalized width of "+ canWidth +". Maybe you should use a w descriptor instead of an x descriptor. img: "+ candidate.url);
-						}
+					if(candidate.w && Math.abs(imgWidth - canWidth) > 50 && dif < 0.86){
+						warn("Check your sizes attribute: " + candidate.set.sizes + " was calculated to: " + canWidth + "px. But your image is shown with a size of " + imgWidth + "px. img: "+ candidate.url);
 					}
 				}
 
@@ -1188,7 +1182,7 @@
 				for(i = 0; i < index && i < sets.length; i++){
 					curSet = sets[i];
 					if((set._min && curSet._min && set._min >= curSet._min) || (set._max && curSet._max && set._max <= curSet._max)){
-						if(type == 'source'){
+						if(type === 'source'){
 							warn("Order of your source elements matters. Defining "+ set.media + " after "+ curSet.media +" doesn't make sense.");
 						} else {
 							warn("Order inside your sizes attribute does matter. Defining "+ set.media + " after "+ curSet.media +" doesn't make sense.");
@@ -1201,7 +1195,7 @@
 
 				lastSet = sets[sets.length - 1];
 				if(lastSet && (lastSet.media || lastSet.type)){
-					if(type == 'source'){
+					if(type === 'source'){
 						warn("The last src/srcset shouldn't have any type or media conditions. Use img[src] or img[srcset].");
 					} else {
 						warn("Last sizes attribute shouldn't have any condition otherwise 100vw is used.");
@@ -1210,8 +1204,8 @@
 				for(i = 0, len = sets.length; i < len; i++){
 					set = sets[i];
 					if(!set.media || set.type){
-						if(!set.type && i != len - 1){
-							if(type == 'source'){
+						if(!set.type && i !== len - 1){
+							if(type === 'source'){
 								warn("A source element without [media] and [type] doesn't make any sense. Last srcset can be used at the img element. Order is important!");
 							} else {
 								warn("The order of your sizes attribute does matter! The sizes length without a media condition has to be defined as last entry.");
