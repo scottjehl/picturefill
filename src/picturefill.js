@@ -837,6 +837,7 @@
 						(diff = (candidate.res - dpr)) &&
 						curSrc !== ri.makeUrl( candidate.url ) &&
 						chooseLowRes(candidates[ j ].res, diff, dpr)) {
+
 						bestCandidate = candidates[ j ];
 
 					} else {
