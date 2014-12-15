@@ -3,9 +3,6 @@
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
-    function trim(str) {
-        return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, "");
-    }
     function updateMetrics() {
         var dprM;
         isVwDirty = !1, DPR = window.devicePixelRatio, cssCache = {}, sizeLengthCache = {}, 
@@ -59,10 +56,10 @@
             sizes: source.getAttribute("sizes")
         });
     }
+    function isSpace(c) {
+        return " " === c || "	" === c || "\n" === c || "\f" === c || "\r" === c;
+    }
     function parseSrcset(input, set) {
-        function isSpace(c) {
-            return " " === c || "	" === c || "\n" === c || "\f" === c || "\r" === c;
-        }
         function collectCharacters(regEx) {
             var chars, match = regEx.exec(input.substring(pos));
             return match ? (chars = match[0], pos += chars.length, chars) : void 0;
@@ -104,6 +101,61 @@
             url = collectCharacters(regexLeadingNotSpaces), descriptors = [], "," === url.slice(-1) ? (url = url.replace(regexTrailingCommas, ""), 
             parseDescriptors()) : tokenize();
         }
+    }
+    function parseSizes(strValue) {
+        function parseComponentValues(str) {
+            function pushComponent() {
+                component && (componentArray.push(component), component = "");
+            }
+            function pushComponentArray() {
+                componentArray[0] && (listArray.push(componentArray), componentArray = []);
+            }
+            for (var chrctr, component = "", componentArray = [], listArray = [], parenDepth = 0, pos = 0, inComment = !1; ;) {
+                if (chrctr = str[pos], chrctr === undefined) return pushComponent(), pushComponentArray(), 
+                listArray;
+                if (inComment) {
+                    if ("*" === chrctr && "/" === str[pos + 1]) {
+                        inComment = !1, pos += 2, pushComponent();
+                        continue;
+                    }
+                    pos += 1;
+                } else {
+                    if (isSpace(chrctr)) {
+                        if (str[pos - 1] && isSpace(str[pos - 1]) || !component) {
+                            pos += 1;
+                            continue;
+                        }
+                        if (0 === parenDepth) {
+                            pushComponent(), pos += 1;
+                            continue;
+                        }
+                        chrctr = " ";
+                    } else if ("(" === chrctr) parenDepth += 1; else if (")" === chrctr) parenDepth -= 1; else {
+                        if ("," === chrctr) {
+                            pushComponent(), pushComponentArray(), pos += 1;
+                            continue;
+                        }
+                        if ("/" === chrctr && "*" === str[pos + 1]) {
+                            inComment = !0, pos += 2;
+                            continue;
+                        }
+                    }
+                    component += chrctr, pos += 1;
+                }
+            }
+        }
+        function isValidNonNegativeSourceSizeValue(s) {
+            return regexCssLengthWithUnits.test(s) && parseFloat(s) >= 0 ? !0 : regexCssCalc.test(s) ? !0 : "0" === s || "-0" === s || "+0" === s ? !0 : !1;
+        }
+        var i, unparsedSizesList, unparsedSizesListLength, unparsedSize, lastComponentValue, size, regexCssLengthWithUnits = /^(?:[+-]?[0-9]+|[0-9]*\.[0-9]+)(?:[eE][+-]?[0-9]+)?(?:ch|cm|em|ex|in|mm|pc|pt|px|rem|vh|vmin|vmax|vw)$/i, regexCssCalc = /^calc\((?:[0-9a-z \.\+\-\*\/\(\)]+)\)$/i;
+        for (unparsedSizesList = parseComponentValues(strValue), unparsedSizesListLength = unparsedSizesList.length, 
+        i = 0; unparsedSizesListLength > i; i++) {
+            if (unparsedSize = unparsedSizesList[i], lastComponentValue = unparsedSize[unparsedSize.length - 1], 
+            isValidNonNegativeSourceSizeValue(lastComponentValue) && (size = lastComponentValue, 
+            unparsedSize.pop()), 0 === unparsedSize.length) return size;
+            if (unparsedSize = unparsedSize.join(" "), ri.matchesMedia(unparsedSize)) return size;
+        }
+        return "100vw";
     }
     document.createElement("picture");
     var lowTreshold, partialLowTreshold, isLandscape, lazyFactor, eminpx, alwaysCheckWDescriptor, resizeThrottle, isDomReady, ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
@@ -198,10 +250,7 @@
         return eminpx || 16;
     }, ri.calcListLength = function(sourceSizeListStr) {
         if (!(sourceSizeListStr in sizeLengthCache) || cfg.uT) {
-            var sourceSize, parsedSize, length, media, i, len, sourceSizeList = trim(sourceSizeListStr).split(/\s*,\s*/), winningLength = !1;
-            for (i = 0, len = sourceSizeList.length; len > i && (sourceSize = sourceSizeList[i], 
-            parsedSize = ri.parseSize(sourceSize), length = parsedSize.length, media = parsedSize.media, 
-            !length || !ri.matchesMedia(media) || (winningLength = ri.calcLength(length)) === !1); i++) ;
+            var winningLength = ri.calcLength(parseSizes(sourceSizeListStr));
             sizeLengthCache[sourceSizeListStr] = winningLength ? winningLength : units.width;
         }
         return sizeLengthCache[sourceSizeListStr];
