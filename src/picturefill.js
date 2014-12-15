@@ -1163,7 +1163,8 @@
 			curCan,
 			isSameSet,
 			candidateSrc,
-			curRes;
+			curRes,
+			abortCurSrc;
 
 		var imageData = img[ ri.ns ];
 		var evaled = true;
@@ -1181,7 +1182,8 @@
 
 			// if browser can abort image request and the image has a higher pixel density than needed
 			// and this image isn't downloaded yet, we skip next part and try to save bandwidth
-			if ( !supportAbort || img.complete || !curCan || curRes < dpr ) {
+			abortCurSrc = (supportAbort && img.complete && !curCan && curRes < dpr);
+			if ( !abortCurSrc ) {
 
 				// if there is already an image and it's quality is "okay"
 				// we don't want look for a better candidate
@@ -1234,7 +1236,7 @@
 					// but let's improve this a little bit with some assumptions ;-)
 					if (candidates[ j ] &&
 						(diff = (candidate.res - dpr)) &&
-						curSrc !== ri.makeUrl( candidate.url ) &&
+						(abortCurSrc || curSrc !== ri.makeUrl( candidate.url )) &&
 						chooseLowRes(candidates[ j ].res, diff, dpr)) {
 
 						bestCandidate = candidates[ j ];
