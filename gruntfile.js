@@ -3,7 +3,6 @@
   "use strict";
 
   var pkg;
-
   module.exports = function(grunt) {
 
     // Project configuration.
@@ -20,11 +19,12 @@
         files: [ "dist" ]
       },
       concat: {
-        options: {
-          banner: "<%= banner %>",
-          stripBanners: true
-        },
+        
         dist: {
+          options: {
+            banner: "<%= banner %>",
+            stripBanners: true
+          },
           src: [ "src/external/matchmedia.js", "src/picturefill.js" ],
           dest: "dist/picturefill.js"
         }
@@ -37,6 +37,16 @@
           src: [ "<%= concat.dist.src %>" ],
           dest: "dist/picturefill.min.js"
         }
+      },
+      insert: {
+        options: {
+        	backup: true
+        },
+        main: {
+          src: "dist/_includes.js",
+          dest: "dist/picturefill.js",
+          match: "//>> insert picture types"
+        },
       },
       qunit: {
         files: [ "tests/**/*.html" ]
@@ -80,9 +90,10 @@
     grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-jscs-checker");
+    grunt.loadNpmTasks("grunt-insert");
 
-    // Default task.
-    grunt.registerTask("default", [ "test", "clean", "concat", "uglify" ]);
+	// Default task.
+    grunt.registerTask("default", [ "test", "clean", "concat",  "insert", "uglify" ]);
     grunt.registerTask("test", [ "jscs", "jshint", "qunit" ]);
   };
 })();
