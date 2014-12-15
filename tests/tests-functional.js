@@ -282,28 +282,6 @@
 			});
 		});
 
-		if(!ri.supSrcset){
-			asyncTest( "simple x image with 2.05x in src", function() {
-				var $ximage = f$('<img />').attr({
-					src: relurls['1400x600'],
-					srcset: relurls['1400x600'] + ' 2.05x, ' +relurls['350x150'] +' 1x, '+ relurls['700x300'] +' 2x'
-				});
-				$ximage.appendTo($content);
-				if(!ri.mutationSupport){
-					setTimeout(picturefill);
-				}
-
-				afterImgLoad(function(){
-
-					equal(getCurrentSrc($ximage[0]), absurls['1400x600']);
-					if(ri.mutationSupport) {
-						equal($ximage.attr('src'), relurls['1400x600']);
-					}
-					start();
-				});
-			});
-		}
-
 		if(!window.HTMLPictureElement){
 			(function(){
 				var test = function(attrType) {

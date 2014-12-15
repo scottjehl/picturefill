@@ -28,6 +28,7 @@
 		"bower_components",
 		"test",
 		"tests",
-		"examples"
+		"examples",
+		"perf-test"
 	]
 }

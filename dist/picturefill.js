@@ -1,53 +1,6 @@
-/*! Picturefill - v2.2.0 - 2014-12-14
+/*! Picturefill - v2.2.0 - 2014-12-15
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
-function parseSrcset(input) {
-    function isSpace(c) {
-        return " " === c || "	" === c || "\n" === c || "\f" === c || "\r" === c;
-    }
-    function collectCharacters(regEx) {
-        var chars, match = regEx.exec(input.substring(pos));
-        return match ? (chars = match[0], pos += chars.length, chars) : void 0;
-    }
-    function tokenize() {
-        for (collectCharacters(regexLeadingSpaces), currentDescriptor = "", state = "in descriptor"; ;) {
-            if (c = input.charAt(pos), "in descriptor" === state) if (isSpace(c)) currentDescriptor && (descriptors.push(currentDescriptor), 
-            currentDescriptor = "", state = "after descriptor"); else {
-                if ("," === c) return pos += 1, currentDescriptor && descriptors.push(currentDescriptor), 
-                void parseDescriptors();
-                if ("(" === c) currentDescriptor += c, state = "in parens"; else {
-                    if ("" === c) return currentDescriptor && descriptors.push(currentDescriptor), void parseDescriptors();
-                    currentDescriptor += c;
-                }
-            } else if ("in parens" === state) if (")" === c) currentDescriptor += c, state = "in descriptor"; else {
-                if ("" === c) return descriptors.push(currentDescriptor), void parseDescriptors();
-                currentDescriptor += c;
-            } else if ("after descriptor" === state) if (isSpace(c)) ; else {
-                if ("" === c) return void parseDescriptors();
-                state = "in descriptor", pos -= 1;
-            }
-            pos += 1;
-        }
-    }
-    function parseDescriptors() {
-        var w, d, h, i, desc, lastChar, value, intVal, floatVal, pError = !1, candidate = {};
-        for (i = 0; i < descriptors.length; i++) desc = descriptors[i], lastChar = desc[desc.length - 1], 
-        value = desc.substring(0, desc.length - 1), intVal = parseInt(value, 10), floatVal = parseFloat(value), 
-        regexNonNegativeInteger.test(value) && "w" === lastChar ? ((w || d) && (pError = !0), 
-        0 === intVal ? pError = !0 : w = intVal) : regexFloatingPoint.test(value) && "x" === lastChar ? ((w || d || h) && (pError = !0), 
-        0 > floatVal ? pError = !0 : d = floatVal) : regexNonNegativeInteger.test(value) && "h" === lastChar ? ((h || d) && (pError = !0), 
-        0 === intVal ? pError = !0 : h = intVal) : pError = !0;
-        pError ? window.console && console.log && console.log('Invalid srcset descriptor found in "' + input + '" at "' + desc + '".') : (candidate.url = url, 
-        w && (candidate.w = w), d && (candidate.d = d, candidate.x = d), h && (candidate.h = h), 
-        candidates.push(candidate));
-    }
-    for (var url, descriptors, currentDescriptor, state, c, inputLength = input.length, regexLeadingSpaces = /^[ \t\n\r\u000c]+/, regexLeadingCommasOrSpaces = /^[, \t\n\r\u000c]+/, regexLeadingNotSpaces = /^[^ \t\n\r\u000c]+/, regexTrailingCommas = /[,]+$/, regexNonNegativeInteger = /^\d+$/, regexFloatingPoint = /^-?(?:[0-9]+|[0-9]*\.[0-9]+)(?:[eE][+-]?[0-9]+)?$/, pos = 0, candidates = []; ;) {
-        if (collectCharacters(regexLeadingCommasOrSpaces), pos >= inputLength) return candidates;
-        url = collectCharacters(regexLeadingNotSpaces), descriptors = [], "," === url.slice(-1) ? (url = url.replace(regexTrailingCommas, ""), 
-        parseDescriptors()) : tokenize();
-    }
-}
-
 !function(window, document, undefined) {
     "use strict";
     function trim(str) {
@@ -106,13 +59,51 @@ function parseSrcset(input) {
             sizes: source.getAttribute("sizes")
         });
     }
-    function hasOneX(set) {
-        var i, ret, candidates;
-        if (set) for (candidates = ri.parseSet(set), i = 0; i < candidates.length; i++) if (1 === candidates[i].x) {
-            ret = !0;
-            break;
+    function parseSrcset(input, set) {
+        function isSpace(c) {
+            return " " === c || "	" === c || "\n" === c || "\f" === c || "\r" === c;
         }
-        return ret;
+        function collectCharacters(regEx) {
+            var chars, match = regEx.exec(input.substring(pos));
+            return match ? (chars = match[0], pos += chars.length, chars) : void 0;
+        }
+        function tokenize() {
+            for (collectCharacters(regexLeadingSpaces), currentDescriptor = "", state = "in descriptor"; ;) {
+                if (c = input.charAt(pos), "in descriptor" === state) if (isSpace(c)) currentDescriptor && (descriptors.push(currentDescriptor), 
+                currentDescriptor = "", state = "after descriptor"); else {
+                    if ("," === c) return pos += 1, currentDescriptor && descriptors.push(currentDescriptor), 
+                    void parseDescriptors();
+                    if ("(" === c) currentDescriptor += c, state = "in parens"; else {
+                        if ("" === c) return currentDescriptor && descriptors.push(currentDescriptor), void parseDescriptors();
+                        currentDescriptor += c;
+                    }
+                } else if ("in parens" === state) if (")" === c) currentDescriptor += c, state = "in descriptor"; else {
+                    if ("" === c) return descriptors.push(currentDescriptor), void parseDescriptors();
+                    currentDescriptor += c;
+                } else if ("after descriptor" === state) if (isSpace(c)) ; else {
+                    if ("" === c) return void parseDescriptors();
+                    state = "in descriptor", pos -= 1;
+                }
+                pos += 1;
+            }
+        }
+        function parseDescriptors() {
+            var w, d, h, i, desc, lastChar, value, intVal, floatVal, pError = !1, candidate = {};
+            for (i = 0; i < descriptors.length; i++) desc = descriptors[i], lastChar = desc[desc.length - 1], 
+            value = desc.substring(0, desc.length - 1), intVal = parseInt(value, 10), floatVal = parseFloat(value), 
+            regexNonNegativeInteger.test(value) && "w" === lastChar ? ((w || d) && (pError = !0), 
+            0 === intVal ? pError = !0 : w = intVal) : regexFloatingPoint.test(value) && "x" === lastChar ? ((w || d || h) && (pError = !0), 
+            0 > floatVal ? pError = !0 : d = floatVal) : regexNonNegativeInteger.test(value) && "h" === lastChar ? ((h || d) && (pError = !0), 
+            0 === intVal ? pError = !0 : h = intVal) : pError = !0;
+            pError || (candidate.url = url, candidate.set = set, d && (candidate.d = d), h && (candidate.h = h), 
+            w && (candidate.w = w), h || d || w || (candidate.d = 1), 1 == candidate.d && (set.has1x = !0), 
+            candidates.push(candidate));
+        }
+        for (var url, descriptors, currentDescriptor, state, c, inputLength = input.length, regexLeadingSpaces = /^[ \t\n\r\u000c]+/, regexLeadingCommasOrSpaces = /^[, \t\n\r\u000c]+/, regexLeadingNotSpaces = /^[^ \t\n\r\u000c]+/, regexTrailingCommas = /[,]+$/, regexNonNegativeInteger = /^\d+$/, regexFloatingPoint = /^-?(?:[0-9]+|[0-9]*\.[0-9]+)(?:[eE][+-]?[0-9]+)?$/, pos = 0, candidates = []; ;) {
+            if (collectCharacters(regexLeadingCommasOrSpaces), pos >= inputLength) return candidates;
+            url = collectCharacters(regexLeadingNotSpaces), descriptors = [], "," === url.slice(-1) ? (url = url.replace(regexTrailingCommas, ""), 
+            parseDescriptors()) : tokenize();
+        }
     }
     document.createElement("picture");
     var lowTreshold, partialLowTreshold, isLandscape, lazyFactor, eminpx, alwaysCheckWDescriptor, resizeThrottle, isDomReady, ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
@@ -148,7 +139,7 @@ function parseSrcset(input) {
         };
     }(), setResolution = function(candidate, sizesattr) {
         return candidate.w ? (candidate.cWidth = ri.calcListLength(sizesattr || "100vw"), 
-        candidate.res = candidate.w / candidate.cWidth) : candidate.res = candidate.x, candidate;
+        candidate.res = candidate.w / candidate.cWidth) : candidate.res = candidate.d, candidate;
     }, picturefill = function(opt) {
         var elements, i, plen, options = opt || {};
         if (options.elements && 1 === options.elements.nodeType && ("IMG" === options.elements.nodeName.toUpperCase() ? options.elements = [ options.elements ] : (options.context = options.elements, 
@@ -169,7 +160,7 @@ function parseSrcset(input) {
     }();
     curSrcProp in image || (curSrcProp = "src"), types["image/jpeg"] = !0, types["image/gif"] = !0, 
     types["image/png"] = !0, types["image/svg+xml"] = document.implementation.hasFeature("http://wwwindow.w3.org/TR/SVG11/feature#Image", "1.1"), 
-    ri.ns = ("ri" + new Date().getTime()).substr(0, 9), ri.supSrcset = "srcset" in image, 
+    ri.ns = ("pf" + new Date().getTime()).substr(0, 9), ri.supSrcset = "srcset" in image, 
     ri.supSizes = "sizes" in image, ri.selShort = "picture>img,img[srcset]", ri.sel = ri.selShort, 
     ri.cfg = cfg, ri.supSrcset && (ri.sel += ",img[" + srcsetAttr + "]"), ri.DPR = DPR || 1, 
     ri.u = units, ri.types = types, alwaysCheckWDescriptor = ri.supSrcset && !ri.supSizes, 
@@ -195,10 +186,7 @@ function parseSrcset(input) {
             length: match && match[2]
         };
     }), ri.parseSet = function(set) {
-        var i;
-        if (!set.cands) for (set.cands = parseSrcset(set.srcset), i = 0; i < set.cands.length; i++) set.cands[i].set = set, 
-        set.cands[i].w || set.cands[i].x || set.cands[i].h || (set.cands[i].x = 1);
-        return set.cands;
+        return set.cands || (set.cands = parseSrcset(set.srcset, set)), set.cands;
     }, ri.getEmValue = function() {
         var body;
         if (!eminpx && (body = document.body)) {
@@ -253,24 +241,24 @@ function parseSrcset(input) {
         }
         return match;
     }, ri.parseSets = function(element, parent) {
-        var srcsetAttribute, fallbackCandidate, isWDescripor, srcsetParsed, hasPicture = "PICTURE" === parent.nodeName.toUpperCase(), imageData = element[ri.ns];
+        var srcsetAttribute, imageSet, isWDescripor, srcsetParsed, hasPicture = "PICTURE" === parent.nodeName.toUpperCase(), imageData = element[ri.ns];
         imageData.src === undefined && (imageData.src = getImgAttr.call(element, "src"), 
         imageData.src ? setImgAttr.call(element, srcAttr, imageData.src) : removeImgAttr.call(element, srcAttr)), 
         imageData.srcset === undefined && (srcsetAttribute = getImgAttr.call(element, "srcset"), 
         imageData.srcset = srcsetAttribute, srcsetParsed = !0), imageData.sets = [], hasPicture && (imageData.pic = !0, 
-        getAllSourceElements(parent, imageData.sets)), imageData.srcset ? (fallbackCandidate = {
+        getAllSourceElements(parent, imageData.sets)), imageData.srcset ? (imageSet = {
             srcset: imageData.srcset,
             sizes: getImgAttr.call(element, "sizes")
-        }, imageData.sets.push(fallbackCandidate), isWDescripor = (alwaysCheckWDescriptor || imageData.src) && regWDesc.test(imageData.srcset || ""), 
-        isWDescripor || !imageData.src || getCandidateForSrc(imageData.src, fallbackCandidate) || hasOneX(fallbackCandidate) || (fallbackCandidate.srcset += ", " + imageData.src, 
-        fallbackCandidate.cands.push({
+        }, imageData.sets.push(imageSet), isWDescripor = (alwaysCheckWDescriptor || imageData.src) && regWDesc.test(imageData.srcset || ""), 
+        isWDescripor || !imageData.src || getCandidateForSrc(imageData.src, imageSet) || imageSet.has1x || (imageSet.srcset += ", " + imageData.src, 
+        imageSet.cands.push({
             url: imageData.src,
-            x: 1,
-            set: fallbackCandidate
+            d: 1,
+            set: imageSet
         }))) : imageData.src && imageData.sets.push({
             srcset: imageData.src,
             sizes: null
-        }), imageData.curCan = null, imageData.supported = !(hasPicture || fallbackCandidate && !ri.supSrcset || isWDescripor), 
+        }), imageData.curCan = null, imageData.supported = !(hasPicture || imageSet && !ri.supSrcset || isWDescripor), 
         srcsetParsed && ri.supSrcset && !imageData.supported && (srcsetAttribute ? (setImgAttr.call(element, srcsetAttr, srcsetAttribute), 
         element.srcset = "") : removeImgAttr.call(element, srcsetAttr)), imageData.supported && !imageData.srcset && (!imageData.src && element.src || element.src !== ri.makeUrl(imageData.src)) && (null === imageData.src ? element.removeAttribute("src") : element.src = imageData.src), 
         imageData.parsed = !0;
