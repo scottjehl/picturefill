@@ -1,4 +1,4 @@
-/*! Picturefill - v2.2.0 - 2014-12-15
+/*! Picturefill - v2.2.0 - 2014-12-16
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 !function(window, document, undefined) {
@@ -268,7 +268,7 @@
             curRes = curCan && curCan.res, curSrc && (abortCurSrc = supportAbort && img.complete && !curCan && dpr > curRes, 
             abortCurSrc || (curCan && dpr > curRes && curRes > lowTreshold && (partialLowTreshold > curRes && (sub += .1 * dpr), 
             curCan.res += lazyFactor * (curRes - sub)), isSameSet = !imageData.pic || curCan && curCan.set === candidates[0].set, 
-            curCan && isSameSet && curCan.res >= dpr ? bestCandidate = curCan : supportAbort || img.complete || img.lazyload || !isSameSet && (supportNativeLQIP && supportAbort || inView(img)) || (bestCandidate = curCan, 
+            curCan && isSameSet && curCan.res >= dpr ? bestCandidate = curCan : supportAbort || img.complete || img.lazyload || supportNativeLQIP && supportAbort || !isSameSet && inView(img) || (bestCandidate = curCan, 
             candidateSrc = curSrc, evaled = "L", reevaluateAfterLoad(img)))), !bestCandidate) for (curRes && (curCan.res = curCan.res - (curCan.res - curRes) / 2), 
             candidates.sort(ascendingSort), length = candidates.length, bestCandidate = candidates[length - 1], 
             i = 0; length > i; i++) if (candidate = candidates[i], candidate.res >= dpr) {

@@ -1210,7 +1210,7 @@
 				} else if ( !supportAbort && !img.complete &&  !img.lazyload ) {
 
 					//if there is no art direction or if the img isn't visible, we can use LQIP pattern
-					if ( isSameSet || ( (!supportNativeLQIP || !supportAbort) && !inView( img ) ) ) {
+					if ( (!supportNativeLQIP || !supportAbort) && ( isSameSet || !inView( img ) ) ) {
 						bestCandidate = curCan;
 						candidateSrc = curSrc;
 						evaled = "L";
