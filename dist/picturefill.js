@@ -158,11 +158,11 @@
         return "100vw";
     }
     document.createElement("picture");
-    var lowTreshold, partialLowTreshold, isLandscape, lazyFactor, eminpx, alwaysCheckWDescriptor, resizeThrottle, isDomReady, ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
+    var lowTreshold, partialLowTreshold, isLandscape, lazyFactor, eminpx, alwaysCheckWDescriptor, resizeThrottle, ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
         xQuant: 1,
         lazyFactor: .3,
         maxX: 2
-    }, srcAttr = "data-pfsrc", srcsetAttr = srcAttr + "set", ua = navigator.userAgent, supportAbort = /rident/.test(ua) || /ecko/.test(ua) && ua.match(/rv\:(\d+)/) && RegExp.$1 > 35, curSrcProp = "currentSrc", regWDesc = /\s+\+?\d+(e\d+)?w/, regSize = /(\([^)]+\))?\s*(.+)/, setOptions = window.picturefillCFG, baseStyle = ("https:" === location.protocol, 
+    }, srcAttr = "data-pfsrc", srcsetAttr = srcAttr + "set", ua = navigator.userAgent, supportNativeLQIP = /AppleWebKit/i.test(ua), supportAbort = /rident/.test(ua) || /ecko/.test(ua) && ua.match(/rv\:(\d+)/) && RegExp.$1 > 35, curSrcProp = "currentSrc", regWDesc = /\s+\+?\d+(e\d+)?w/, regSize = /(\([^)]+\))?\s*(.+)/, setOptions = window.picturefillCFG, baseStyle = ("https:" === location.protocol, 
     "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;overflow:hidden;clip:rect(0px, 0px, 0px, 0px)"), fsCss = "font-size:100%!important;", isVwDirty = !0, cssCache = {}, sizeLengthCache = {}, DPR = window.devicePixelRatio, units = {
         px: 1,
         "in": 96
@@ -263,15 +263,16 @@
         return candidates;
     }, ri.setRes.res = setResolution, ri.applySetCandidate = function(candidates, img) {
         if (candidates.length) {
-            var candidate, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, curRes, imageData = img[ri.ns], evaled = !0, dpr = ri.DPR, sub = .1 * dpr;
+            var candidate, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, curRes, abortCurSrc, imageData = img[ri.ns], evaled = !0, dpr = ri.DPR, sub = .1 * dpr;
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
-            curRes = curCan && curCan.res, curSrc && (!supportAbort || img.complete || !curCan || dpr > curRes) && (curCan && dpr > curRes && curRes > lowTreshold && (partialLowTreshold > curRes && (sub += .1 * dpr), 
+            curRes = curCan && curCan.res, curSrc && (abortCurSrc = supportAbort && img.complete && !curCan && dpr > curRes, 
+            abortCurSrc || (curCan && dpr > curRes && curRes > lowTreshold && (partialLowTreshold > curRes && (sub += .1 * dpr), 
             curCan.res += lazyFactor * (curRes - sub)), isSameSet = !imageData.pic || curCan && curCan.set === candidates[0].set, 
-            curCan && isSameSet && curCan.res >= dpr ? bestCandidate = curCan : img.complete || isDomReady && supportAbort || img.lazyload || (isSameSet || !supportAbort && !inView(img)) && (bestCandidate = curCan, 
-            candidateSrc = curSrc, evaled = "L", reevaluateAfterLoad(img))), !bestCandidate) for (curRes && (curCan.res = curCan.res - (curCan.res - curRes) / 2), 
+            curCan && isSameSet && curCan.res >= dpr ? bestCandidate = curCan : supportAbort || img.complete || img.lazyload || !isSameSet && (supportNativeLQIP && supportAbort || inView(img)) || (bestCandidate = curCan, 
+            candidateSrc = curSrc, evaled = "L", reevaluateAfterLoad(img)))), !bestCandidate) for (curRes && (curCan.res = curCan.res - (curCan.res - curRes) / 2), 
             candidates.sort(ascendingSort), length = candidates.length, bestCandidate = candidates[length - 1], 
             i = 0; length > i; i++) if (candidate = candidates[i], candidate.res >= dpr) {
-                j = i - 1, bestCandidate = candidates[j] && (diff = candidate.res - dpr) && curSrc !== ri.makeUrl(candidate.url) && chooseLowRes(candidates[j].res, diff, dpr) ? candidates[j] : candidate;
+                j = i - 1, bestCandidate = candidates[j] && (diff = candidate.res - dpr) && (abortCurSrc || curSrc !== ri.makeUrl(candidate.url)) && chooseLowRes(candidates[j].res, diff, dpr) ? candidates[j] : candidate;
                 break;
             }
             return curRes && (curCan.res = curRes), bestCandidate && (candidateSrc = ri.makeUrl(bestCandidate.url), 
@@ -324,7 +325,7 @@
     }, ri.setupRun = function(options) {
         (!alreadyRun || options.reevaluate || isVwDirty) && (updateMetrics(), options.elements || options.context || clearTimeout(resizeThrottle));
     }, window.HTMLPictureElement ? (picturefill = noop, ri.fillImg = noop) : !function() {
-        var regReady = window.attachEvent ? /d$|^c/ : /d$|^c|^i/, run = function() {
+        var isDomReady, regReady = window.attachEvent ? /d$|^c/ : /d$|^c|^i/, run = function() {
             var readyState = document.readyState || "";
             timerId = setTimeout(run, "loading" === readyState ? 200 : 999), document.body && (ri.fillImgs(), 
             isDomReady = isDomReady || regReady.test(readyState), isDomReady && clearTimeout(timerId));

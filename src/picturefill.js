@@ -15,7 +15,7 @@
 	document.createElement( "picture" );
 
 	var lowTreshold, partialLowTreshold, isLandscape, lazyFactor, warn, eminpx,
-		alwaysCheckWDescriptor, resizeThrottle, isDomReady;
+		alwaysCheckWDescriptor, resizeThrottle;
 	// local object for method references and testing exposure
 	var ri = {};
 	var noop = function() {};
@@ -33,7 +33,10 @@
 	};
 	var srcAttr = "data-pfsrc";
 	var srcsetAttr = srcAttr + "set";
+	// ua sniffing is done for undetectable img loading features,
+	// to do some non crucial perf optimizations
 	var ua = navigator.userAgent;
+	var supportNativeLQIP = (/AppleWebKit/i).test(ua);
 	var supportAbort = (/rident/).test(ua) || ((/ecko/).test(ua) && ua.match(/rv\:(\d+)/) && RegExp.$1 > 35 );
 	var curSrcProp = "currentSrc";
 	var regWDesc = /\s+\+?\d+(e\d+)?w/;
@@ -1204,10 +1207,10 @@
 					bestCandidate = curCan;
 				// if image isn't loaded, test for LQIP or abort technique
 				// (abort is only used, if img wasn't likely part of the preload parser optimisation)
-				} else if ( !img.complete && (!isDomReady || !supportAbort) &&  !img.lazyload ) {
+				} else if ( !supportAbort && !img.complete &&  !img.lazyload ) {
 
 					//if there is no art direction or if the img isn't visible, we can use LQIP pattern
-					if ( isSameSet || (!supportAbort && !inView( img )) ) {
+					if ( isSameSet || ( (!supportNativeLQIP || !supportAbort) && !inView( img ) ) ) {
 						bestCandidate = curCan;
 						candidateSrc = curSrc;
 						evaled = "L";
@@ -1461,6 +1464,7 @@
 		 * Also attaches picturefill on resize and readystatechange
 		 */
 		(function() {
+			var isDomReady;
 			var regReady = window.attachEvent ? /d$|^c/ : /d$|^c|^i/;
 			var run = function() {
 				var readyState = document.readyState || "";
