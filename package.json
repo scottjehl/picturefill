@@ -3,6 +3,21 @@
 	"description": "A responsive image polyfill.",
 	"version": "2.2.0",
 	"repo": "https://github.com/scottjehl/picturefill.git",
+	"homepage": "https://scottjehl.github.io/picturefill/",
+	"bugs": "https://github.com/scottjehl/picturefill/issues",
+	"license": "MIT",
+	"author": "Scott Jehl <scottjehl@gmail.com>",
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:scottjehl/picturefill.git"
+	},
+	"keywords": [
+		"picturefill",
+		"srcset",
+		"picture",
+		"responsive",
+		"responsive images"
+	],
 	"engines": {
 		"node": ">= 0.8.0"
 	},
