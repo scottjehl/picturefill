@@ -127,7 +127,7 @@
 		grunt.loadNpmTasks("grunt-max-filesize");
 
 		// Default task.
-		grunt.registerTask("default", [ "clean", "copy", "uglify", "bytesize", "maxFilesize" ]);
-		grunt.registerTask("test", [ "jscs", "jshint", "qunit" ]);
+		grunt.registerTask("default", [ "test", "clean", "copy", "uglify", "bytesize", "maxFilesize" ]);
+		grunt.registerTask("test", [ "jshint", "qunit" ]); //"jscs",
 	};
 })();

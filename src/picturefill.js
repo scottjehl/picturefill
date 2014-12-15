@@ -6,7 +6,7 @@
 (function( window, document, undefined ) {
 	// Enable strict mode
 	"use strict";
-	/* global PFDEBUG, parseSrcset */
+	/* global PFDEBUG, parseSrcset, parseSizes */
 	if ( typeof PFDEBUG === "undefined" ) {
 		window.PFDEBUG = true;
 	}
@@ -239,15 +239,6 @@
 
 	// test svg support
 	types[ "image/svg+xml" ] = document.implementation.hasFeature( "http://wwwindow.w3.org/TR/SVG11/feature#Image", "1.1" );
-
-	/**
-	 * a trim workaroung mainly for IE8
-	 * @param str
-	 * @returns {string}
-	 */
-	function trim( str ) {
-		return str.trim ? str.trim() : str.replace( /^\s+|\s+$/g, "" );
-	}
 
 	/**
 	 * updates the internal vW property with the current viewport width in px
@@ -1078,11 +1069,9 @@
 	});
 
 	ri.parseSet = function( set ) {
-		var i;
 		if ( !set.cands ) {
 			set.cands = parseSrcset(set.srcset, set);
 		}
-
 		return set.cands;
 	};
 
@@ -1545,6 +1534,15 @@
 		if (document.compatMode === "BackCompat") {
 			warn("Browser is in quirksmode. Please make sure to be in strict mode.");
 		}
+
+		/**
+		 * a trim workaroung mainly for IE8
+		 * @param str
+		 * @returns {string}
+		 */
+		var trim = function ( str ) {
+			return str.trim ? str.trim() : str.replace( /^\s+|\s+$/g, "" );
+		};
 
 		var testImgDimensions = function(img, candidate) {
 			var onload = function() {
