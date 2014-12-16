@@ -159,8 +159,12 @@ srcset=&quot;examples/images/medium.jpg 375w, examples/images/medium.jpg 480w, e
 		  Note: Picturefill can support SVG, WebP, JPEG-XR, JPEG-2000 and APNG types on any source element, and will disregard a <code>source</code> if its type is not supported in a particular environment.  
 		  <strong>This option will only work if picturefill is built by setting the <code>support-types</code> grunt task correctly when building picturefill.</strong>
 		    For example, to support all these formats, build picturefill with this grunt task:</strong></p>
-<pre><code>grunt support-types:svg:webp:jxr:jp2:apng</code></pre>
+<pre><code>grunt support-types:jxr:jp2:apng</code></pre>
 
+    <p>
+      (<strong>Note:</strong> There is no need to add <code>webp</code> or <code>svg</code> to the <code>support-types</code> list
+      because they are supported by picturefill automatically)
+    </p>
     <p>
       If you wish to remove support for any of these formats, take them out of <code>support-types</code> task.  If you wish picturefill to support
       none of these alternative formats, you can leave out the <code>support-types</code> task out of the grunt build altogether.  Remember that

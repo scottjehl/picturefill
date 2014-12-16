@@ -1,6 +1,5 @@
 (function( w, doc ) {
-	var pf = w.picturefill || {};
-	pf._.types = pf._.types || {};
+	var pf = w.picturefill;
 
 	pf._.types[ "image/x-apng" ] = w.picturefill._.types["image/x-apng"] = function() {
 		var apngTest = new Image(), ctx = doc.createElement("canvas").getContext("2d");
@@ -14,7 +13,5 @@
 		// frame 1 (skipped on apng-supporting browsers): [0, 0, 0, 255]
 		// frame 2: [0, 0, 0, 0];
 		return "pending";
-	}; 
-
-	w.picturefill = pf;
+	};
 } )( window, window.document );

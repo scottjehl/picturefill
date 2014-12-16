@@ -1,4 +1,4 @@
-/*! Picturefill - v2.2.0 - 2014-12-06
+/*! Picturefill - v2.2.0 - 2014-12-16
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -675,7 +675,9 @@ window.matchMedia || (window.matchMedia = function() {
 	} else if ( typeof define === "function" && define.amd ) {
 		// AMD support
 		define( function() { return picturefill; } );
-	} else if ( typeof w === "object" ) {
+	}
+	
+	if ( typeof w === "object" ) {
 		// If no AMD and we are in the browser, attach to window
 		w.picturefill = picturefill;
 	}
@@ -683,21 +685,17 @@ window.matchMedia || (window.matchMedia = function() {
 } )( window, window.document, new window.Image() );
 
 (function( w ) {
-	var pf = w.picturefill || { _: { types: {} } };
+	var pf = w.picturefill;
 	pf._.types[ "image/vnd.ms-photo" ] = pf._.detectTypeSupport("image/vnd.ms-photo","data:image/vnd.ms-photo;base64,SUm8AQgAAAAFAAG8AQAQAAAASgAAAIC8BAABAAAAAQAAAIG8BAABAAAAAQAAAMC8BAABAAAAWgAAAMG8BAABAAAAHwAAAAAAAAAkw91vA07+S7GFPXd2jckNV01QSE9UTwAZAYBxAAAAABP/gAAEb/8AAQAAAQAAAA==");
-
-	w.picturefill = pf;
 } )( window );
 
 (function( w ) {
-	var pf = w.picturefill || { _: { types: {} } };
+	var pf = w.picturefill;
 	pf._.types[ "image/jp2" ] = pf._.detectTypeSupport("image/jp2","data:image/jp2;base64,/0//UQAyAAAAAAABAAAAAgAAAAAAAAAAAAAABAAAAAQAAAAAAAAAAAAEBwEBBwEBBwEBBwEB/1IADAAAAAEAAAQEAAH/XAAEQED/ZAAlAAFDcmVhdGVkIGJ5IE9wZW5KUEVHIHZlcnNpb24gMi4wLjD/kAAKAAAAAABYAAH/UwAJAQAABAQAAf9dAAUBQED/UwAJAgAABAQAAf9dAAUCQED/UwAJAwAABAQAAf9dAAUDQED/k8+kEAGvz6QQAa/PpBABr994EAk//9k=");
-	w.picturefill = pf;
 } )( window );
 
 (function( w, doc ) {
-	var pf = w.picturefill || {};
-	pf._.types = pf._.types || {};
+	var pf = w.picturefill;
 
 	pf._.types[ "image/x-apng" ] = w.picturefill._.types["image/x-apng"] = function() {
 		var apngTest = new Image(), ctx = doc.createElement("canvas").getContext("2d");
@@ -711,7 +709,5 @@ window.matchMedia || (window.matchMedia = function() {
 		// frame 1 (skipped on apng-supporting browsers): [0, 0, 0, 255]
 		// frame 2: [0, 0, 0, 0];
 		return "pending";
-	}; 
-
-	w.picturefill = pf;
+	};
 } )( window, window.document );
