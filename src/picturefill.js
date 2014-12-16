@@ -36,8 +36,8 @@
 	// ua sniffing is done for undetectable img loading features,
 	// to do some non crucial perf optimizations
 	var ua = navigator.userAgent;
-	var supportNativeLQIP = (/AppleWebKit/i).test(ua);
 	var supportAbort = (/rident/).test(ua) || ((/ecko/).test(ua) && ua.match(/rv\:(\d+)/) && RegExp.$1 > 35 );
+	var useLQIP = !(supportAbort || (/AppleWebKit/i).test(ua));
 	var curSrcProp = "currentSrc";
 	var regWDesc = /\s+\+?\d+(e\d+)?w/;
 	var regSize = /(\([^)]+\))?\s*(.+)/;
@@ -1185,7 +1185,8 @@
 
 			// if browser can abort image request and the image has a higher pixel density than needed
 			// and this image isn't downloaded yet, we skip next part and try to save bandwidth
-			abortCurSrc = (supportAbort && img.complete && !curCan && curRes < dpr);
+			abortCurSrc = (supportAbort && !img.complete && curCan && curRes > dpr);
+
 			if ( !abortCurSrc ) {
 
 				// if there is already an image and it's quality is "okay"
@@ -1206,16 +1207,12 @@
 				if ( curCan && isSameSet && curCan.res >= dpr ) {
 					bestCandidate = curCan;
 				// if image isn't loaded, test for LQIP or abort technique
-				// (abort is only used, if img wasn't likely part of the preload parser optimisation)
-				} else if ( !supportAbort && !img.complete &&  !img.lazyload ) {
-
-					//if there is no art direction or if the img isn't visible, we can use LQIP pattern
-					if ( (!supportNativeLQIP || !supportAbort) && ( isSameSet || !inView( img ) ) ) {
-						bestCandidate = curCan;
-						candidateSrc = curSrc;
-						evaled = "L";
-						reevaluateAfterLoad( img );
-					}
+				//if there is no art direction or if the img isn't visible, we can use LQIP pattern
+				} else if ( useLQIP && !img.complete && !img.lazyload && ( isSameSet || !inView( img ) ) ) {
+					bestCandidate = curCan;
+					candidateSrc = curSrc;
+					evaled = "L";
+					reevaluateAfterLoad( img );
 				}
 			}
 		}

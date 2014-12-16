@@ -162,7 +162,7 @@
         xQuant: 1,
         lazyFactor: .3,
         maxX: 2
-    }, srcAttr = "data-pfsrc", srcsetAttr = srcAttr + "set", ua = navigator.userAgent, supportNativeLQIP = /AppleWebKit/i.test(ua), supportAbort = /rident/.test(ua) || /ecko/.test(ua) && ua.match(/rv\:(\d+)/) && RegExp.$1 > 35, curSrcProp = "currentSrc", regWDesc = /\s+\+?\d+(e\d+)?w/, regSize = /(\([^)]+\))?\s*(.+)/, setOptions = window.picturefillCFG, baseStyle = ("https:" === location.protocol, 
+    }, srcAttr = "data-pfsrc", srcsetAttr = srcAttr + "set", ua = navigator.userAgent, supportAbort = /rident/.test(ua) || /ecko/.test(ua) && ua.match(/rv\:(\d+)/) && RegExp.$1 > 35, useLQIP = !(supportAbort || /AppleWebKit/i.test(ua)), curSrcProp = "currentSrc", regWDesc = /\s+\+?\d+(e\d+)?w/, regSize = /(\([^)]+\))?\s*(.+)/, setOptions = window.picturefillCFG, baseStyle = ("https:" === location.protocol, 
     "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;overflow:hidden;clip:rect(0px, 0px, 0px, 0px)"), fsCss = "font-size:100%!important;", isVwDirty = !0, cssCache = {}, sizeLengthCache = {}, DPR = window.devicePixelRatio, units = {
         px: 1,
         "in": 96
@@ -265,10 +265,10 @@
         if (candidates.length) {
             var candidate, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, curRes, abortCurSrc, imageData = img[ri.ns], evaled = !0, dpr = ri.DPR, sub = .1 * dpr;
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
-            curRes = curCan && curCan.res, curSrc && (abortCurSrc = supportAbort && img.complete && !curCan && dpr > curRes, 
+            curRes = curCan && curCan.res, curSrc && (abortCurSrc = supportAbort && !img.complete && curCan && curRes > dpr, 
             abortCurSrc || (curCan && dpr > curRes && curRes > lowTreshold && (partialLowTreshold > curRes && (sub += .1 * dpr), 
             curCan.res += lazyFactor * (curRes - sub)), isSameSet = !imageData.pic || curCan && curCan.set === candidates[0].set, 
-            curCan && isSameSet && curCan.res >= dpr ? bestCandidate = curCan : supportAbort || img.complete || img.lazyload || supportNativeLQIP && supportAbort || !isSameSet && inView(img) || (bestCandidate = curCan, 
+            curCan && isSameSet && curCan.res >= dpr ? bestCandidate = curCan : !useLQIP || img.complete || img.lazyload || !isSameSet && inView(img) || (bestCandidate = curCan, 
             candidateSrc = curSrc, evaled = "L", reevaluateAfterLoad(img)))), !bestCandidate) for (curRes && (curCan.res = curCan.res - (curCan.res - curRes) / 2), 
             candidates.sort(ascendingSort), length = candidates.length, bestCandidate = candidates[length - 1], 
             i = 0; length > i; i++) if (candidate = candidates[i], candidate.res >= dpr) {
