@@ -37,7 +37,6 @@
 	// to do some non crucial perf optimizations
 	var ua = navigator.userAgent;
 	var supportAbort = (/rident/).test(ua) || ((/ecko/).test(ua) && ua.match(/rv\:(\d+)/) && RegExp.$1 > 35 );
-	var useLQIP = !(supportAbort || (/AppleWebKit/i).test(ua));
 	var curSrcProp = "currentSrc";
 	var regWDesc = /\s+\+?\d+(e\d+)?w/;
 	var regSize = /(\([^)]+\))?\s*(.+)/;
@@ -201,23 +200,6 @@
 	};
 
 	/**
-	 * adds an onload event to an image and reevaluates it, after onload
-	 */
-	var reevaluateAfterLoad = (function() {
-		var onload = function() {
-			off( this, "load", onload );
-			off( this, "error", onload );
-			ri.fillImgs( { elements: [ this ] } );
-		};
-		return function( img ) {
-			off( img, "load", onload );
-			off( img, "error", onload );
-			on( img, "error", onload );
-			on( img, "load", onload );
-		};
-	})();
-
-	/**
 	 * outputs a warning for the developer
 	 * @param {message}
 	 * @type {Function}
@@ -299,20 +281,6 @@
 		return lowRes > dpr;
 	}
 
-	function inView(el) {
-		if (!el.getBoundingClientRect) {return true;}
-		var rect = el.getBoundingClientRect();
-		var bottom, right, left, top;
-
-		return !!(
-		(bottom = rect.bottom) >= -9 &&
-		(top = rect.top) <= units.height + 9 &&
-		(right = rect.right) >= -9 &&
-		(left = rect.left) <= units.height + 9 &&
-		(bottom || right || left || top)
-		);
-	}
-
 	function applyBestCandidate( img ) {
 		var srcSetCandidates;
 		var matchingSet = ri.getSet( img );
@@ -321,9 +289,8 @@
 			evaluated = true;
 			if ( matchingSet ) {
 				srcSetCandidates = ri.setRes( matchingSet );
-				evaluated = ri.applySetCandidate( srcSetCandidates, img );
+				ri.applySetCandidate( srcSetCandidates, img );
 			}
-
 		}
 		img[ ri.ns ].evaled = evaluated;
 	}
@@ -1170,7 +1137,6 @@
 			abortCurSrc;
 
 		var imageData = img[ ri.ns ];
-		var evaled = true;
 		var dpr = ri.DPR;
 		var sub = 0.1 * dpr;
 
@@ -1206,13 +1172,6 @@
 				// set it to bestCandidate
 				if ( curCan && isSameSet && curCan.res >= dpr ) {
 					bestCandidate = curCan;
-				// if image isn't loaded, test for LQIP or abort technique
-				//if there is no art direction or if the img isn't visible, we can use LQIP pattern
-				} else if ( useLQIP && !img.complete && !img.lazyload && ( isSameSet || !inView( img ) ) ) {
-					bestCandidate = curCan;
-					candidateSrc = curSrc;
-					evaled = "L";
-					reevaluateAfterLoad( img );
 				}
 			}
 		}
@@ -1271,8 +1230,6 @@
 			}
 			ri.setSize( img );
 		}
-
-		return evaled;
 	};
 
 	ri.setSrc = function( img, bestCandidate ) {
@@ -1413,10 +1370,6 @@
 		}
 
 		imageData = element[ ri.ns ];
-
-		if ( imageData.evaled === "L" && element.complete ) {
-			imageData.evaled = false;
-		}
 
 		// if the element has already been evaluated, skip it
 		// unless `options.reevaluate` is set to true ( this, for example,

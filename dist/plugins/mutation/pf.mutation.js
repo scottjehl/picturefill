@@ -336,10 +336,6 @@
 					(function(){
 						var ascendingSort;
 						var getCurSrc = function() {
-							var imageData = this[ ri.ns ];
-							if ( imageData && imageData.evaled == "L" && this.complete ) {
-								ri.fillImgs({elements: this});
-							}
 							return this.src || '';
 						};
 						var baseGetCurSrc = getCurSrc;

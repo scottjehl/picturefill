@@ -18,15 +18,10 @@
         var add = diff * lowRes;
         return isLandscape || (add /= 1.3), lowRes += add, lowRes > dpr;
     }
-    function inView(el) {
-        if (!el.getBoundingClientRect) return !0;
-        var bottom, right, left, top, rect = el.getBoundingClientRect();
-        return !!((bottom = rect.bottom) >= -9 && (top = rect.top) <= units.height + 9 && (right = rect.right) >= -9 && (left = rect.left) <= units.height + 9 && (bottom || right || left || top));
-    }
     function applyBestCandidate(img) {
         var srcSetCandidates, matchingSet = ri.getSet(img), evaluated = !1;
         "pending" !== matchingSet && (evaluated = !0, matchingSet && (srcSetCandidates = ri.setRes(matchingSet), 
-        evaluated = ri.applySetCandidate(srcSetCandidates, img))), img[ri.ns].evaled = evaluated;
+        ri.applySetCandidate(srcSetCandidates, img))), img[ri.ns].evaled = evaluated;
     }
     function ascendingSort(a, b) {
         return a.res - b.res;
@@ -162,14 +157,12 @@
         xQuant: 1,
         lazyFactor: .3,
         maxX: 2
-    }, srcAttr = "data-pfsrc", srcsetAttr = srcAttr + "set", ua = navigator.userAgent, supportAbort = /rident/.test(ua) || /ecko/.test(ua) && ua.match(/rv\:(\d+)/) && RegExp.$1 > 35, useLQIP = !(supportAbort || /AppleWebKit/i.test(ua)), curSrcProp = "currentSrc", regWDesc = /\s+\+?\d+(e\d+)?w/, regSize = /(\([^)]+\))?\s*(.+)/, setOptions = window.picturefillCFG, baseStyle = ("https:" === location.protocol, 
+    }, srcAttr = "data-pfsrc", srcsetAttr = srcAttr + "set", ua = navigator.userAgent, supportAbort = /rident/.test(ua) || /ecko/.test(ua) && ua.match(/rv\:(\d+)/) && RegExp.$1 > 35, curSrcProp = "currentSrc", regWDesc = /\s+\+?\d+(e\d+)?w/, regSize = /(\([^)]+\))?\s*(.+)/, setOptions = window.picturefillCFG, baseStyle = ("https:" === location.protocol, 
     "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;overflow:hidden;clip:rect(0px, 0px, 0px, 0px)"), fsCss = "font-size:100%!important;", isVwDirty = !0, cssCache = {}, sizeLengthCache = {}, DPR = window.devicePixelRatio, units = {
         px: 1,
         "in": 96
     }, anchor = document.createElement("a"), alreadyRun = !1, on = function(obj, evt, fn, capture) {
         obj.addEventListener ? obj.addEventListener(evt, fn, capture || !1) : obj.attachEvent && obj.attachEvent("on" + evt, fn);
-    }, off = function(obj, evt, fn, capture) {
-        obj.removeEventListener ? obj.removeEventListener(evt, fn, capture || !1) : obj.detachEvent && obj.detachEvent("on" + evt, fn);
     }, memoize = function(fn) {
         var cache = {};
         return function(input) {
@@ -200,16 +193,7 @@
             for (ri.setupRun(options), alreadyRun = !0, i = 0; plen > i; i++) ri.fillImg(elements[i], options);
             ri.teardownRun(options);
         }
-    }, reevaluateAfterLoad = function() {
-        var onload = function() {
-            off(this, "load", onload), off(this, "error", onload), ri.fillImgs({
-                elements: [ this ]
-            });
-        };
-        return function(img) {
-            off(img, "load", onload), off(img, "error", onload), on(img, "error", onload), on(img, "load", onload);
-        };
-    }();
+    };
     curSrcProp in image || (curSrcProp = "src"), types["image/jpeg"] = !0, types["image/gif"] = !0, 
     types["image/png"] = !0, types["image/svg+xml"] = document.implementation.hasFeature("http://wwwindow.w3.org/TR/SVG11/feature#Image", "1.1"), 
     ri.ns = ("pf" + new Date().getTime()).substr(0, 9), ri.supSrcset = "srcset" in image, 
@@ -263,21 +247,20 @@
         return candidates;
     }, ri.setRes.res = setResolution, ri.applySetCandidate = function(candidates, img) {
         if (candidates.length) {
-            var candidate, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, curRes, abortCurSrc, imageData = img[ri.ns], evaled = !0, dpr = ri.DPR, sub = .1 * dpr;
+            var candidate, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, curRes, abortCurSrc, imageData = img[ri.ns], dpr = ri.DPR, sub = .1 * dpr;
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
             curRes = curCan && curCan.res, curSrc && (abortCurSrc = supportAbort && !img.complete && curCan && curRes > dpr, 
             abortCurSrc || (curCan && dpr > curRes && curRes > lowTreshold && (partialLowTreshold > curRes && (sub += .1 * dpr), 
             curCan.res += lazyFactor * (curRes - sub)), isSameSet = !imageData.pic || curCan && curCan.set === candidates[0].set, 
-            curCan && isSameSet && curCan.res >= dpr ? bestCandidate = curCan : !useLQIP || img.complete || img.lazyload || !isSameSet && inView(img) || (bestCandidate = curCan, 
-            candidateSrc = curSrc, evaled = "L", reevaluateAfterLoad(img)))), !bestCandidate) for (curRes && (curCan.res = curCan.res - (curCan.res - curRes) / 2), 
+            curCan && isSameSet && curCan.res >= dpr && (bestCandidate = curCan))), !bestCandidate) for (curRes && (curCan.res = curCan.res - (curCan.res - curRes) / 2), 
             candidates.sort(ascendingSort), length = candidates.length, bestCandidate = candidates[length - 1], 
             i = 0; length > i; i++) if (candidate = candidates[i], candidate.res >= dpr) {
                 j = i - 1, bestCandidate = candidates[j] && (diff = candidate.res - dpr) && (abortCurSrc || curSrc !== ri.makeUrl(candidate.url)) && chooseLowRes(candidates[j].res, diff, dpr) ? candidates[j] : candidate;
                 break;
             }
-            return curRes && (curCan.res = curRes), bestCandidate && (candidateSrc = ri.makeUrl(bestCandidate.url), 
+            curRes && (curCan.res = curRes), bestCandidate && (candidateSrc = ri.makeUrl(bestCandidate.url), 
             imageData.curSrc = candidateSrc, imageData.curCan = bestCandidate, candidateSrc !== curSrc && ri.setSrc(img, bestCandidate), 
-            ri.setSize(img)), evaled;
+            ri.setSize(img));
         }
     }, ri.setSrc = function(img, bestCandidate) {
         var origWidth;
@@ -314,8 +297,7 @@
         imageData.parsed = !0;
     }, ri.fillImg = function(element, options) {
         var parent, imageData, extreme = options.reparse || options.reevaluate;
-        if (element[ri.ns] || (element[ri.ns] = {}), imageData = element[ri.ns], "L" === imageData.evaled && element.complete && (imageData.evaled = !1), 
-        extreme || !imageData.evaled) {
+        if (element[ri.ns] || (element[ri.ns] = {}), imageData = element[ri.ns], extreme || !imageData.evaled) {
             if (!imageData.parsed || options.reparse) {
                 if (parent = element.parentNode, !parent) return;
                 ri.parseSets(element, parent, options);
