@@ -2,8 +2,7 @@
 (function() {
   "use strict";
 
-  var pkg;
-
+  var pkg, toConcat = [ "src/external/matchmedia.js", "src/picturefill.js" ], supportTypes = "";
   module.exports = function(grunt) {
 
     // Project configuration.
@@ -20,12 +19,13 @@
         files: [ "dist" ]
       },
       concat: {
-        options: {
-          banner: "<%= banner %>",
-          stripBanners: true
-        },
+        
         dist: {
-          src: [ "src/external/matchmedia.js", "src/picturefill.js" ],
+          options: {
+            banner: "<%= banner %>",
+            stripBanners: true
+          },
+          src: toConcat,
           dest: "dist/picturefill.js"
         }
       },
@@ -38,6 +38,7 @@
           dest: "dist/picturefill.min.js"
         }
       },
+      
       qunit: {
         files: [ "tests/**/*.html" ]
       },
@@ -46,7 +47,7 @@
           options: {
             jshintrc: true
           },
-          src: [ "Gruntfile.js", "src/*.js", "tests/*.js" ]
+          src: [ "Gruntfile.js", "src/*.js", "src/includes/*.js", "tests/*.js" ]
         }
       },
       jscs: {
@@ -56,8 +57,11 @@
       },
       watch: {
         gruntfile: {
-          files: [ "Gruntfile.js", "src/*.js", "tests/*.js" ],
-          tasks: [ "default" ]
+          files: [ "Gruntfile.js", "src/*.js", "src/includes/*.js", "tests/*.js" ],
+          tasks: [ "support-types" +  supportTypes, "default" ],
+          options: {
+            spawn: false
+          }
         }
       }
     });
@@ -80,9 +84,35 @@
     grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-jscs-checker");
+    
+    grunt.task.registerTask("support-types", "insert support for image types dev wants to include", function() {
+      var supportTypes = "";
+      for (var i = 0; i < arguments.length; i++) {
+        var arg = arguments[i];
+        
+        switch ( arg ) {
+          case "webp": 
+          case "svg":
+          case "jxr":
+          case "jp2":
+          case "apng":
+          
+            toConcat.push("src/includes/" + arg + ".js");
+        }
+        
+        supportTypes += ":" + arg;
+        
+      }
+      
+      if (!supportTypes) {
+        supportTypes = supportTypes;
+      }
+      grunt.task.run("default");
+      console.log("files to concatenate", toConcat);
+    } );
 
-    // Default task.
-    grunt.registerTask("default", [ "test", "clean", "concat", "uglify" ]);
+	// Default task.
+    grunt.registerTask("default", [ "jscs", "test", "clean", "concat", "uglify" ]);
     grunt.registerTask("test", [ "jscs", "jshint", "qunit" ]);
   };
 })();

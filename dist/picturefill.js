@@ -1,4 +1,4 @@
-/*! Picturefill - v2.2.0 - 2014-12-05
+/*! Picturefill - v2.2.0 - 2014-12-19
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -49,7 +49,7 @@ window.matchMedia || (window.matchMedia = function() {
 }());
 /*! Picturefill - Responsive Images that work today.
 *  Author: Scott Jehl, Filament Group, 2012 ( new proposal implemented by Shawn Jansepar )
-*  License: MIT/GPLv2
+*  License: MIT/GPLv2 
 *  Spec: http://picture.responsiveimages.org/
 */
 (function( w, doc, image ) {
@@ -66,7 +66,7 @@ window.matchMedia || (window.matchMedia = function() {
 	doc.createElement( "picture" );
 
 	// local object for method references and testing exposure
-	var pf = {};
+	var pf = w.picturefill || {};
 
 	// namespace
 	pf.ns = "picturefill";
@@ -118,7 +118,7 @@ window.matchMedia || (window.matchMedia = function() {
 		 * If length is specified in  `vw` units, use `%` instead since the div we’re measuring
 		 * is injected at the top of the document.
 		 *
-		 * TODO: maybe we should put this behind a feature test for `vw`?
+		 * TODO: maybe we should put this behind a feature test for `vw`? The risk of doing this is possible browser inconsistancies with vw vs % 
 		 */
 		length = length.replace( "vw", "%" );
 
@@ -149,52 +149,48 @@ window.matchMedia || (window.matchMedia = function() {
 		return offsetWidth;
 	};
 
+    pf.detectTypeSupport = function( type, typeUri ) {
+        // based on Modernizr's lossless img-webp test
+        // note: asynchronous
+        var image = new w.Image();
+        image.onerror = function() {
+            pf.types[ type ] = false;
+            picturefill();
+        };
+        image.onload = function() {
+            pf.types[ type ] = image.width === 1;
+            picturefill();
+        };
+        image.src = typeUri;
+        
+        return "pending";
+    }; 
 	// container of supported mime types that one might need to qualify before using
-	pf.types =  {};
+	pf.types = pf.types || {};
 
 	// Add support for standard mime types
 	pf.types[ "image/jpeg" ] = true;
 	pf.types[ "image/gif" ] = true;
 	pf.types[ "image/png" ] = true;
-
-	// test svg support
 	pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Image", "1.1");
+	pf.types[ "image/webp" ] = pf.detectTypeSupport("image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=");
 
-	// test webp support, only when the markup calls for it
-	pf.types[ "image/webp" ] = function() {
-		// based on Modernizr's lossless img-webp test
-		// note: asynchronous
-		var type = "image/webp";
-
-		image.onerror = function() {
-			pf.types[ type ] = false;
-			picturefill();
-		};
-		image.onload = function() {
-			pf.types[ type ] = image.width === 1;
-			picturefill();
-		};
-		image.src = "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=";
-	};
-
-	/**
-	 * Takes a source element and checks if its type attribute is present and if so, supported
-	 * Note: for type tests that require a async logic,
-	 * you can define them as a function that'll run only if that type needs to be tested. Just make the test function call picturefill again when it is complete.
-	 * see the async webp test above for example
-	 */
 	pf.verifyTypeSupport = function( source ) {
 		var type = source.getAttribute( "type" );
 		// if type attribute exists, return test result, otherwise return true
 		if ( type === null || type === "" ) {
 			return true;
 		} else {
+				var pfType = pf.types[ type ];
 			// if the type test is a function, run it and return "pending" status. The function will rerun picturefill on pending elements once finished.
-			if ( typeof( pf.types[ type ] ) === "function" ) {
-				pf.types[ type ]();
+			if ( typeof pfType === "string" && pfType !== "pending") {
+				pf.types[ type ] = pf.detectTypeSupport( type, pfType );
+				return "pending";
+			} else if ( typeof pfType === "function" ) {
+				pfType();
 				return "pending";
 			} else {
-				return pf.types[ type ];
+				return pfType;
 			}
 		}
 	};
@@ -679,7 +675,9 @@ window.matchMedia || (window.matchMedia = function() {
 	} else if ( typeof define === "function" && define.amd ) {
 		// AMD support
 		define( function() { return picturefill; } );
-	} else if ( typeof w === "object" ) {
+	}
+	
+	if ( typeof w === "object" ) {
 		// If no AMD and we are in the browser, attach to window
 		w.picturefill = picturefill;
 	}
