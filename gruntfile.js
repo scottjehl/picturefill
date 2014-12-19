@@ -112,7 +112,7 @@
     } );
 
 	// Default task.
-    grunt.registerTask("default", [ "test", "clean", "concat", "uglify" ]);
+    grunt.registerTask("default", [ "jscs", "test", "clean", "concat", "uglify" ]);
     grunt.registerTask("test", [ "jscs", "jshint", "qunit" ]);
   };
 })();

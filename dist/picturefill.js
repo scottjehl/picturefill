@@ -181,16 +181,16 @@ window.matchMedia || (window.matchMedia = function() {
 		if ( type === null || type === "" ) {
 			return true;
 		} else {
-		    var pfType = pf.types[ type ];
+				var pfType = pf.types[ type ];
 			// if the type test is a function, run it and return "pending" status. The function will rerun picturefill on pending elements once finished.
 			if ( typeof pfType === "string" && pfType !== "pending") {
-			    pf.types[ type ] = pf.detectTypeSupport( type, pfType );
+				pf.types[ type ] = pf.detectTypeSupport( type, pfType );
 				return "pending";
 			} else if ( typeof pfType === "function" ) {
-			    pfType();
+				pfType();
 				return "pending";
 			} else {
-			    return pfType;
+				return pfType;
 			}
 		}
 	};
