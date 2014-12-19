@@ -3,6 +3,10 @@
 ## Project Scope
 Picturefill aims to polyfill the standard features of the `picture` element and related `srcset`, `sizes`, `type`, and `media` attributes (some of which work on `img` elements without a `picture` parent as well). Issues and contributions that fall outside of this scope are not likely to be accepted by the project. Some exceptions include workarounds that improve browser support for standard features.
 
+## Code License
+
+Picturefill is an open source project falling under the MIT License. By using, distributing, or contributing to this project, you accept and agree that all code within the Picturefill project are licensed under MIT license.
+
 ## Working on Picturefill
 
 ### Issue Discussion
