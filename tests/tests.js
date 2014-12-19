@@ -368,7 +368,7 @@
 	});
 
 	test("verifyTypeSupport", function() {
-		expect( 7 );
+		expect( 6 );
 
 		// Test widely supported mime types.
 		ok(pf.verifyTypeSupport({
@@ -403,10 +403,6 @@
 			}
 		}));
 
-		pf.types[ "foo" ] = function() {
-			ok( true, "foo type function executed" );
-		};
-
 		pf.verifyTypeSupport({
 			getAttribute: function() {
 				return "foo";
@@ -415,7 +411,7 @@
 
 		pf.types[ "bar" ] = "baz";
 
-		equal( "baz", pf.verifyTypeSupport({
+		equal( "pending", pf.verifyTypeSupport({
 			getAttribute: function() {
 				return "bar";
 			}
