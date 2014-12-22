@@ -1394,7 +1394,7 @@
 	};
 
 	ri.setupRun = function( options ) {
-		if ( !alreadyRun || options.reevaluate || isVwDirty ) {
+		if ( !alreadyRun || options.reevaluate || isVwDirty || (DPR !== window.devicePixelRatio) ) {
 			updateMetrics();
 
 			// if all images are reevaluated clear the resizetimer
