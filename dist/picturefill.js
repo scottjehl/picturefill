@@ -1,4 +1,4 @@
-/*! Picturefill - v2.2.0 - 2014-12-16
+/*! Picturefill - v2.2.0 - 2014-12-23
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 !function(window, document, undefined) {
@@ -305,7 +305,8 @@
             imageData.supported ? imageData.evaled = !0 : applyBestCandidate(element);
         }
     }, ri.setupRun = function(options) {
-        (!alreadyRun || options.reevaluate || isVwDirty) && (updateMetrics(), options.elements || options.context || clearTimeout(resizeThrottle));
+        (!alreadyRun || options.reevaluate || isVwDirty || DPR !== window.devicePixelRatio) && (updateMetrics(), 
+        options.elements || options.context || clearTimeout(resizeThrottle));
     }, window.HTMLPictureElement ? (picturefill = noop, ri.fillImg = noop) : !function() {
         var isDomReady, regReady = window.attachEvent ? /d$|^c/ : /d$|^c|^i/, run = function() {
             var readyState = document.readyState || "";
