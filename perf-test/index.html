@@ -93,10 +93,14 @@
 			alt="image with artdirection" />
 </picture>
 <script src="../dist/picturefill.min.js"></script>
+<!--
+<script src="https://cdnjs.cloudflare.com/ajax/libs/picturefill/2.2.0/picturefill.js"></script>
+-->
+<!--
 <script src="../dist/plugins/intrinsic-dimension/pf.intrinsic.min.js"></script>
 <script src="../dist/plugins/mutation/pf.mutation.min.js"></script>
 <script src="../dist/plugins/typesupport/pf.type.min.js"></script>
-
+-->
 <script>
 	picturefill();
 </script>
@@ -134,7 +138,7 @@
 		i = 0;
 		while(i < 200){
 			triggerEvent(window, 'resize');
-			picturefill({reparse: true});
+			picturefill({reevaluate: true, reparse: true});
 			i++;
 		}
 		console.timeEnd('run picturefill reparse');
