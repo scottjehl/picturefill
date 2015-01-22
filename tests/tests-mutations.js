@@ -19,7 +19,7 @@
 		// reset stubbing
 
 		module( "method", {
-			setup: function() {
+			beforeEach: function() {
 				var prop;
 
 				for ( prop in op ) {
@@ -33,7 +33,7 @@
 				}
 			},
 
-			teardown: function() {
+			afterEach: function() {
 				var prop;
 				for ( prop in saveCache ) {
 					if ( op.hasOwnProperty(prop) && (prop in saveCache) && saveCache[prop] != op[ prop ] ) {
