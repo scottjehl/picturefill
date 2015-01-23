@@ -1,6 +1,6 @@
 /*! Picturefill - Responsive Images that work today.
 *  Author: Scott Jehl, Filament Group, 2012 ( new proposal implemented by Shawn Jansepar )
-*  License: MIT/GPLv2 
+*  License: MIT/GPLv2
 *  Spec: http://picture.responsiveimages.org/
 */
 (function( w, doc, image ) {
@@ -18,6 +18,8 @@
 
 	// local object for method references and testing exposure
 	var pf = w.picturefill || {};
+
+	var regWDesc = /\s+\+?\d+(e\d+)?w/;
 
 	// namespace
 	pf.ns = "picturefill";
@@ -69,7 +71,7 @@
 		 * If length is specified in  `vw` units, use `%` instead since the div we’re measuring
 		 * is injected at the top of the document.
 		 *
-		 * TODO: maybe we should put this behind a feature test for `vw`? The risk of doing this is possible browser inconsistancies with vw vs % 
+		 * TODO: maybe we should put this behind a feature test for `vw`? The risk of doing this is possible browser inconsistancies with vw vs %
 		 */
 		length = length.replace( "vw", "%" );
 
@@ -113,9 +115,9 @@
             picturefill();
         };
         image.src = typeUri;
-        
+
         return "pending";
-    }; 
+    };
 	// container of supported mime types that one might need to qualify before using
 	pf.types = pf.types || {};
 
@@ -337,7 +339,7 @@
 			WebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
 			currentZoom = style.zoom;
 
-		if (WebkitBackfaceVisibility) { 
+		if (WebkitBackfaceVisibility) {
 			style.zoom = ".999";
 
 			WebkitBackfaceVisibility = picImg.offsetWidth;
@@ -554,7 +556,7 @@
 			// Cache and remove `srcset` if present and we’re going to be doing `picture`/`srcset`/`sizes` polyfilling to it.
 			if ( parent.nodeName.toUpperCase() === "PICTURE" ||
 			( element.srcset && !pf.srcsetSupported ) ||
-			( !pf.sizesSupported && ( element.srcset && element.srcset.indexOf("w") > -1 ) ) ) {
+			( !pf.sizesSupported && ( element.srcset && regWDesc.test( element.srcset ) ) ) ) {
 				pf.dodgeSrcset( element );
 			}
 
@@ -627,7 +629,7 @@
 		// AMD support
 		define( function() { return picturefill; } );
 	}
-	
+
 	if ( typeof w === "object" ) {
 		// If no AMD and we are in the browser, attach to window
 		w.picturefill = picturefill;
