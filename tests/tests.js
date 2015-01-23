@@ -25,6 +25,7 @@
 		module( "method", {
 			beforeEach: function() {
 				var prop;
+				op.setupRun({reevaluate: true});
 				for ( prop in op ) {
 					if ( op.hasOwnProperty( prop ) ) {
 						if($.isPlainObject(op[ prop ])){
