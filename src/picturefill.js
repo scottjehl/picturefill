@@ -1,6 +1,6 @@
 /*! Picturefill - Responsive Images that work today.
 *  Author: Scott Jehl, Filament Group, 2012 ( new proposal implemented by Shawn Jansepar )
-*  License: MIT/GPLv2 
+*  License: MIT/GPLv2
 *  Spec: http://picture.responsiveimages.org/
 */
 (function( w, doc, image ) {
@@ -54,7 +54,7 @@
 
 	// Shortcut method for `devicePixelRatio` ( for easy overriding in tests )
 	pf.getDpr = function() {
-		return ( w.devicePixelRatio || 1 );
+		return Math.max( w.devicePixelRatio || 1, 2 );
 	};
 
 	/**
@@ -69,7 +69,7 @@
 		 * If length is specified in  `vw` units, use `%` instead since the div we’re measuring
 		 * is injected at the top of the document.
 		 *
-		 * TODO: maybe we should put this behind a feature test for `vw`? The risk of doing this is possible browser inconsistancies with vw vs % 
+		 * TODO: maybe we should put this behind a feature test for `vw`? The risk of doing this is possible browser inconsistancies with vw vs %
 		 */
 		length = length.replace( "vw", "%" );
 
@@ -113,9 +113,9 @@
             picturefill();
         };
         image.src = typeUri;
-        
+
         return "pending";
-    }; 
+    };
 	// container of supported mime types that one might need to qualify before using
 	pf.types = pf.types || {};
 
@@ -337,7 +337,7 @@
 			WebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
 			currentZoom = style.zoom;
 
-		if (WebkitBackfaceVisibility) { 
+		if (WebkitBackfaceVisibility) {
 			style.zoom = ".999";
 
 			WebkitBackfaceVisibility = picImg.offsetWidth;
@@ -627,7 +627,7 @@
 		// AMD support
 		define( function() { return picturefill; } );
 	}
-	
+
 	if ( typeof w === "object" ) {
 		// If no AMD and we are in the browser, attach to window
 		w.picturefill = picturefill;
