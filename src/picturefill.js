@@ -366,10 +366,24 @@
 		}
 	};
 
+	pf.getSmartCandidate = function(bestCandidate, secondBestCandidate, dpr) {
+		var res;
+
+		if ( secondBestCandidate && secondBestCandidate.resolution ) {
+			res = secondBestCandidate.resolution + ( (bestCandidate.resolution - dpr) * secondBestCandidate.resolution);
+			if ( res > dpr ) {
+				bestCandidate = secondBestCandidate;
+			}
+		}
+
+		return bestCandidate;
+	};
+
 	pf.applyBestCandidate = function( candidates, picImg ) {
 		var candidate,
 			length,
-			bestCandidate;
+			bestCandidate,
+			dpr = pf.getDpr();
 
 		candidates.sort( pf.ascendingSort );
 
@@ -378,8 +392,9 @@
 
 		for ( var i = 0; i < length; i++ ) {
 			candidate = candidates[ i ];
-			if ( candidate.resolution >= pf.getDpr() ) {
-				bestCandidate = candidate;
+
+			if ( candidate.resolution >= dpr ) {
+				bestCandidate = pf.getSmartCandidate( candidate, candidates[ (i - 1) ], dpr );
 				break;
 			}
 		}
