@@ -390,7 +390,6 @@
 	 * (except for comments in parens).
 	 */
 
-	// 1. Let input be the value passed to this algorithm.
 	/* jshint ignore:start */
 	// jscs:disable
 	// UTILITY FUNCTIONS
@@ -405,6 +404,7 @@
 		c === '\u000D');  // carriage return
 	}
 
+	// 1. Let input be the value passed to this algorithm.
 	function parseSrcset(input, set) {
 		var inputLength = input.length;
 
