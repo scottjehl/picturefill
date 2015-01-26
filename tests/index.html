@@ -12,16 +12,7 @@
 	<script src="resources/modernizr.js"></script>
 </head>
 <body>
-<script>
-	//make sure QUnit gets a clean fixture
-	(function(){
-		var fixtureHTML = jQuery( "#qunit-fixture").html();
-		QUnit.reset = function(){
-			$("#qunit-fixture").html( fixtureHTML );
-		};
-	})();
 
-</script>
 <script>
 	(function(){
 		var image = document.createElement( "img" );

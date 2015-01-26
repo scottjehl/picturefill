@@ -45,16 +45,7 @@
 	<div id="picturefill-fixture"></div>
 </div>
 <p><a href="index.html">Back to unit tests</a></p>
-<script>
-	//make sure QUnit gets a clean fixture
-	(function(){
-		var fixtureHTML = jQuery( "#qunit-fixture").html();
-		QUnit.reset = function(){
-			$("#qunit-fixture").html( fixtureHTML );
-		};
-	})();
 
-</script>
 <script>
 	(function(){
 		var image = document.createElement( "img" );

@@ -390,7 +390,6 @@
 	 * (except for comments in parens).
 	 */
 
-	// 1. Let input be the value passed to this algorithm.
 	/* jshint ignore:start */
 	// jscs:disable
 	// UTILITY FUNCTIONS
@@ -405,6 +404,7 @@
 		c === '\u000D');  // carriage return
 	}
 
+	// 1. Let input be the value passed to this algorithm.
 	function parseSrcset(input, set) {
 		var inputLength = input.length;
 
@@ -723,7 +723,7 @@
 	 * http://www.w3.org/html/wg/drafts/html/master/embedded-content.html#attr-img-sizes
 	 *
 	 * E.g. "(max-width: 30em) 100vw, (max-width: 50em) 70vw, 100vw"
-	 * or "(min-width: 30em), calc(30% - 15px)" or just "30vw"
+	 * or "(min-width: 30em), calc(30vw - 15px)" or just "30vw"
 	 *
 	 * Returns the first valid <css-length> with a media condition that evaluates to true,
 	 * or "100vw" if all valid media conditions evaluate to false.

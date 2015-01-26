@@ -122,7 +122,7 @@
 		grunt.loadNpmTasks("grunt-contrib-qunit");
 		grunt.loadNpmTasks("grunt-contrib-uglify");
 		grunt.loadNpmTasks("grunt-contrib-watch");
-		grunt.loadNpmTasks("grunt-jscs-checker");
+		grunt.loadNpmTasks("grunt-jscs");
 		grunt.loadNpmTasks("grunt-bytesize");
 		grunt.loadNpmTasks("grunt-max-filesize");
 
