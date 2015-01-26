@@ -54,7 +54,7 @@
 
 	// Shortcut method for `devicePixelRatio` ( for easy overriding in tests )
 	pf.getDpr = function() {
-		return Math.max( w.devicePixelRatio || 1, 2 );
+		return w.devicePixelRatio || 1;
 	};
 
 	/**
