@@ -211,19 +211,16 @@
 
 		if ( !riData &&
 			mutation.attributeName === "srcset" &&
-			mutation.target.nodeName.toUpperCase() === "IMG" ) {
+			(nodeName = mutation.target.nodeName.toUpperCase()) === "IMG" ) {
 			ri.addToElements( mutation.target, modifiedImgs );
 		} else if ( riData ) {
-			nodeName = mutation.target.nodeName.toUpperCase();
+			if(!nodeName){
+				nodeName = mutation.target.nodeName.toUpperCase();
+			}
 
 			if ( nodeName === "IMG" ) {
 				if ( mutation.attributeName in riData ) {
 					riData[ mutation.attributeName ] = undefined;
-
-					if ( mutation.attributeName === "src" || ( ri.supSrcset && mutation.attributeName === "srcset" ) ) {
-						riData.curCan = null;
-						riData.curSrc = undefined;
-					}
 				}
 				ri.addToElements( mutation.target, modifiedImgs );
 			} else if ( nodeName === "SOURCE" ) {
