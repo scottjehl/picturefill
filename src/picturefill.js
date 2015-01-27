@@ -555,7 +555,6 @@
 
 			// Cache and remove `srcset` if present and we’re going to be doing `picture`/`srcset`/`sizes` polyfilling to it.
 			if ( parent.nodeName.toUpperCase() === "PICTURE" ||
-			( element.srcset && !pf.srcsetSupported ) ||
 			( !pf.sizesSupported && ( element.srcset && regWDesc.test( element.srcset ) ) ) ) {
 				pf.dodgeSrcset( element );
 			}
