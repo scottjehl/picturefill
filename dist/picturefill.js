@@ -1,6 +1,6 @@
-/*! Picturefill - v2.2.0 - 2014-10-30
+/*! Picturefill - v2.2.0 - 2015-01-23
 * http://scottjehl.github.io/picturefill
-* Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
+* Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
 
 window.matchMedia || (window.matchMedia = function() {
@@ -246,8 +246,8 @@ window.matchMedia || (window.matchMedia = function() {
 		 *
 		 * 1. Let input (`srcset`) be the value passed to this algorithm.
 		 * 2. Let position be a pointer into input, initially pointing at the start of the string.
-		 * 3. Let raw candidates be an initially empty ordered list of URLs with associated 
-		 *    unparsed descriptors. The order of entries in the list is the order in which entries 
+		 * 3. Let raw candidates be an initially empty ordered list of URLs with associated
+		 *    unparsed descriptors. The order of entries in the list is the order in which entries
 		 *    are added to the list.
 		 */
 		var candidates = [];
@@ -274,7 +274,7 @@ window.matchMedia || (window.matchMedia = function() {
 				}
 				srcset = srcset.slice( pos + 1 );
 
-				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and 
+				// 6.2. Collect a sequence of characters that are not U+002C COMMA characters (,), and
 				// let that be descriptors.
 				if ( descriptor === null ) {
 					var descpos = srcset.indexOf( "," );
@@ -303,7 +303,7 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 
 	pf.parseDescriptor = function( descriptor, sizesattr ) {
-		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list 
+		// 11. Descriptor parser: Let candidates be an initially empty source set. The order of entries in the list
 		// is the order in which entries are added to the list.
 		var sizes = sizesattr || "100vw",
 			sizeDescriptor = descriptor && descriptor.replace( /(^\s+|\s+$)/g, "" ),
@@ -656,4 +656,4 @@ window.matchMedia || (window.matchMedia = function() {
 		w.picturefill = picturefill;
 	}
 
-} )( this, this.document, new this.Image() );
+} )( window, window.document, new window.Image() );
