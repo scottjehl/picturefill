@@ -383,6 +383,7 @@
 				picImg[ pf.ns].dims = picImg.getAttribute("width") || picImg.getAttribute("height");
 			}
 			if ( picImg[ pf.ns].dims ) { return; }
+
 			if ( urlCache[bestCandidate.url] ) {
 				setSize( picImg, urlCache[bestCandidate.url], bestCandidate.resolution );
 			} else {
@@ -421,7 +422,7 @@
 
 		if ( bestCandidate ) {
 
-			bestCandidate.url = pf.makeUrl(bestCandidate.url);
+			bestCandidate.url = pf.makeUrl( bestCandidate.url );
 
 			if ( picImg.src !== bestCandidate.url ) {
 				if ( pf.restrictsMixedContent() && bestCandidate.url.substr(0, "http:".length).toLowerCase() === "http:" ) {
@@ -438,7 +439,7 @@
 				}
 			}
 
-			pf.setIntrinsicSize(picImg, bestCandidate.resolution);
+			pf.setIntrinsicSize(picImg, bestCandidate);
 		}
 	};
 
