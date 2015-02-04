@@ -48,10 +48,18 @@
 		return str.trim ? str.trim() : str.replace( /^\s+|\s+$/g, "" );
 	};
 
-	// just a string endsWith workaround
-	pf.endsWith = function( str, suffix ) {
-		return str.endsWith ? str.endsWith( suffix ) : str.indexOf( suffix, str.length - suffix.length ) !== -1;
-	};
+	/**
+	 * Gets a string and returns the absolute URL
+	 * @param src
+	 * @returns {String} absolute URL
+	 */
+	pf.makeUrl = (function() {
+		var anchor = doc.createElement( "a" );
+		return function(src) {
+			anchor.href = src;
+			return anchor.href;
+		};
+	})();
 
 	/**
 	 * Shortcut method for https://w3c.github.io/webappsec/specs/mixedcontent/#restricts-mixed-content ( for easy overriding in tests )
@@ -361,25 +369,37 @@
 		}
 	};
 
-	pf.setInherentSize = function( res, picImg, readyState ) {
-		var ready = readyState !== undefined ? readyState : picImg.complete,
-			widthPreset = !ready && picImg.getAttribute && picImg.getAttribute( "width" ) !== null,
-			setWidth = function( res, picImg ) {
-				if ( picImg.setAttribute ) {
-					picImg.setAttribute( "width", picImg.naturalWidth / res );
-				}
-			},
-			widthInterval;
-
-		if ( ready && res && !widthPreset ) {
-			setWidth( res, picImg );
-		}
-		if ( !ready ) {
-			widthInterval = setTimeout(function() {
-				pf.setInherentSize( res, picImg, picImg.complete );
-			}, 250);
-		}
-	};
+	pf.setIntrinsicSize = (function() {
+		var urlCache = {};
+		var setSize = function( picImg, width, res ) {
+			picImg.setAttribute( "width", parseInt(width / res, 10) );
+		};
+		return function( picImg, bestCandidate ) {
+			var img;
+			if ( !picImg[ pf.ns ] ) {
+				return;
+			}
+			if ( picImg[ pf.ns ].dims === undefined ) {
+				picImg[ pf.ns].dims = picImg.getAttribute("width") || picImg.getAttribute("height");
+			}
+			if ( picImg[ pf.ns].dims ) { return; }
+			if ( urlCache[bestCandidate.url] ) {
+				setSize( picImg, urlCache[bestCandidate.url], bestCandidate.resolution );
+			} else {
+				img = doc.createElement( "img" );
+				img.onload = function() {
+					urlCache[bestCandidate.url] = img.width;
+					if ( picImg.src === bestCandidate.url ) {
+						setSize( picImg, urlCache[bestCandidate.url], bestCandidate.resolution );
+					}
+					picImg = null;
+					img.onload = null;
+					img = null;
+				};
+				img.src = bestCandidate.url;
+			}
+		};
+	})();
 
 	pf.applyBestCandidate = function( candidates, picImg ) {
 		var candidate,
@@ -399,20 +419,26 @@
 			}
 		}
 
-		if ( bestCandidate && !pf.endsWith( picImg.src, bestCandidate.url ) ) {
-			if ( pf.restrictsMixedContent() && bestCandidate.url.substr(0, "http:".length).toLowerCase() === "http:" ) {
-				if ( window.console !== undefined ) {
-					console.warn( "Blocked mixed content image " + bestCandidate.url );
-				}
-			} else {
-				picImg.src = bestCandidate.url;
-				// currentSrc attribute and property to match
-				// http://picture.responsiveimages.org/#the-img-element
-				picImg.currentSrc = picImg.src;
+		if ( bestCandidate ) {
 
-				pf.backfaceVisibilityFix( picImg );
-				pf.setInherentSize( bestCandidate.resolution, picImg );
+			bestCandidate.url = pf.makeUrl(bestCandidate.url);
+
+			if ( picImg.src !== bestCandidate.url ) {
+				if ( pf.restrictsMixedContent() && bestCandidate.url.substr(0, "http:".length).toLowerCase() === "http:" ) {
+					if ( window.console !== undefined ) {
+						console.warn( "Blocked mixed content image " + bestCandidate.url );
+					}
+				} else {
+					picImg.src = bestCandidate.url;
+					// currentSrc attribute and property to match
+					// http://picture.responsiveimages.org/#the-img-element
+					picImg.currentSrc = picImg.src;
+
+					pf.backfaceVisibilityFix( picImg );
+				}
 			}
+
+			pf.setIntrinsicSize(picImg, bestCandidate.resolution);
 		}
 	};
 
