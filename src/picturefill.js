@@ -9,8 +9,7 @@
 
 	// If picture is supported, well, that's awesome. Let's get outta here...
 	if ( w.HTMLPictureElement ) {
-		w.picturefill = function() { };
-		return;
+		return expose(function() {});
 	}
 
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
@@ -620,17 +619,21 @@
 	picturefill._ = pf;
 
 	/* expose picturefill */
-	if ( typeof module === "object" && typeof module.exports === "object" ) {
-		// CommonJS, just export
-		module.exports = picturefill;
-	} else if ( typeof define === "function" && define.amd ) {
-		// AMD support
-		define( function() { return picturefill; } );
+	function expose (picturefill) {
+		if ( typeof module === "object" && typeof module.exports === "object" ) {
+			// CommonJS, just export
+			module.exports = picturefill;
+		} else if ( typeof define === "function" && define.amd ) {
+			// AMD support
+			define( function() { return picturefill; } );
+		}
+
+		if ( typeof w === "object" ) {
+			// If no AMD and we are in the browser, attach to window
+			w.picturefill = picturefill;
+		}
 	}
-	
-	if ( typeof w === "object" ) {
-		// If no AMD and we are in the browser, attach to window
-		w.picturefill = picturefill;
-	}
+
+	expose(picturefill);
 
 } )( window, window.document, new window.Image() );
