@@ -582,4 +582,14 @@
 
 	});
 
+	test( "`img` can be added outside the DOM without errors", function() {
+		var img = document.createElement( "img" );
+
+		img.setAttribute( "srcset", "data:img 500w" );
+
+		picturefill( { elements: [ img ] } );
+
+		assert.equal( img.currentSrc || img.src, "data:img" );
+	});
+	
 })( window, jQuery );

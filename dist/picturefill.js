@@ -1,6 +1,6 @@
-/*! Picturefill - v2.2.0 - 2014-12-19
+/*! Picturefill - v2.2.0 - 2015-02-03
 * http://scottjehl.github.io/picturefill
-* Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
+* Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
 
 window.matchMedia || (window.matchMedia = function() {
@@ -580,7 +580,7 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 
 			// if `img` is in a `picture` element
-			if ( parent.nodeName.toUpperCase() === "PICTURE" ) {
+			if ( parent && parent.nodeName.toUpperCase() === "PICTURE" ) {
 
 				// IE9 video workaround
 				pf.removeVideoShim( parent );
@@ -601,7 +601,7 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 
 			// Cache and remove `srcset` if present and we’re going to be doing `picture`/`srcset`/`sizes` polyfilling to it.
-			if ( parent.nodeName.toUpperCase() === "PICTURE" ||
+			if ( ( parent && parent.nodeName.toUpperCase() === "PICTURE" ) ||
 			( element.srcset && !pf.srcsetSupported ) ||
 			( !pf.sizesSupported && ( element.srcset && element.srcset.indexOf("w") > -1 ) ) ) {
 				pf.dodgeSrcset( element );
