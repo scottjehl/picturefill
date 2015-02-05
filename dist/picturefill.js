@@ -1,6 +1,6 @@
-/*! Picturefill - v2.2.0 - 2014-12-19
+/*! Picturefill - v2.2.0 - 2015-02-05
 * http://scottjehl.github.io/picturefill
-* Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
+* Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
 
 window.matchMedia || (window.matchMedia = function() {
@@ -49,17 +49,32 @@ window.matchMedia || (window.matchMedia = function() {
 }());
 /*! Picturefill - Responsive Images that work today.
 *  Author: Scott Jehl, Filament Group, 2012 ( new proposal implemented by Shawn Jansepar )
-*  License: MIT/GPLv2 
+*  License: MIT/GPLv2
 *  Spec: http://picture.responsiveimages.org/
 */
 (function( w, doc, image ) {
 	// Enable strict mode
 	"use strict";
 
+	/* expose picturefill */
+	function expose(picturefill) {
+		if ( typeof module === "object" && typeof module.exports === "object" ) {
+			// CommonJS, just export
+			module.exports = picturefill;
+		} else if ( typeof define === "function" && define.amd ) {
+			// AMD support
+			define( function() { return picturefill; } );
+		}
+
+		if ( typeof w === "object" ) {
+			// If no AMD and we are in the browser, attach to window
+			w.picturefill = picturefill;
+		}
+	}
+
 	// If picture is supported, well, that's awesome. Let's get outta here...
 	if ( w.HTMLPictureElement ) {
-		w.picturefill = function() { };
-		return;
+		return expose(function() {});
 	}
 
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
@@ -118,7 +133,7 @@ window.matchMedia || (window.matchMedia = function() {
 		 * If length is specified in  `vw` units, use `%` instead since the div we’re measuring
 		 * is injected at the top of the document.
 		 *
-		 * TODO: maybe we should put this behind a feature test for `vw`? The risk of doing this is possible browser inconsistancies with vw vs % 
+		 * TODO: maybe we should put this behind a feature test for `vw`? The risk of doing this is possible browser inconsistancies with vw vs %
 		 */
 		length = length.replace( "vw", "%" );
 
@@ -162,9 +177,9 @@ window.matchMedia || (window.matchMedia = function() {
             picturefill();
         };
         image.src = typeUri;
-        
+
         return "pending";
-    }; 
+    };
 	// container of supported mime types that one might need to qualify before using
 	pf.types = pf.types || {};
 
@@ -386,7 +401,7 @@ window.matchMedia || (window.matchMedia = function() {
 			WebkitBackfaceVisibility = "webkitBackfaceVisibility" in style,
 			currentZoom = style.zoom;
 
-		if (WebkitBackfaceVisibility) { 
+		if (WebkitBackfaceVisibility) {
 			style.zoom = ".999";
 
 			WebkitBackfaceVisibility = picImg.offsetWidth;
@@ -668,18 +683,6 @@ window.matchMedia || (window.matchMedia = function() {
 	/* expose methods for testing */
 	picturefill._ = pf;
 
-	/* expose picturefill */
-	if ( typeof module === "object" && typeof module.exports === "object" ) {
-		// CommonJS, just export
-		module.exports = picturefill;
-	} else if ( typeof define === "function" && define.amd ) {
-		// AMD support
-		define( function() { return picturefill; } );
-	}
-	
-	if ( typeof w === "object" ) {
-		// If no AMD and we are in the browser, attach to window
-		w.picturefill = picturefill;
-	}
+	expose(picturefill);
 
 } )( window, window.document, new window.Image() );
