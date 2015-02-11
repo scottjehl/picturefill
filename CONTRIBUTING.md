@@ -28,15 +28,18 @@ Assuming that you don't see any red, you're ready to go. Just be sure to run `gr
 
 ### Development Workflow
 
+**Note**: The `master` branch now represents the publishing branch. Anything on master should be publishable to npm and bower. When something goes into master, it gets published. Minor version branches (`2.2`, `2.3`, etc) also exist now to capture in-progress work on a particular version of picturefill. Once work on a version branch is complete, it gets merged into master to be published.
+
 1. If no issue already exists for the work you’ll be doing, create one to document the problem(s) being solved and self-assign.
-1. Create a new branch—please don't work in your `master` branch directly. We recommend naming the branch to match the issue being addressed (`issue-777`).
+1. Create a new branch based off of the minor version branch you're fixing (`2.3`, `2.2`, etc) — please don't work in the `master` branch directly. We recommend naming the branch to match the issue being addressed (`issue-777`).
 1. Add failing tests for the change you want to make. Run `grunt` to see the tests fail.
 1. Fix stuff.
 1. Run `grunt` to see if the tests pass. Repeat steps 2-4 until done.
 1. Open `test/*.html` unit test file(s) in actual browsers to ensure tests pass everywhere.
 1. Update the documentation to reflect any changes.
-1. Push to your fork or push your issue-specific branch to the main repo, then submit a pull request against `master`.
-1. Once tested and +1’d by another team member (with no outstanding objections), self-merge into `master`.
+1. Push to your fork or push your issue-specific branch to the main repo, then submit a pull request against the minor version branch you're fixing. `2.2`, `2.3`, etc.
+1. Once tested and +1’d by another team member (with no outstanding objections), self-merge into the branch specified in the pull request.
+1. Once ready to release to the public, merge the minor version branch into master and publish to npm/bower.
 
 ### Versioning
 
