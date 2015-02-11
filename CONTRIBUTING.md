@@ -11,7 +11,7 @@ Picturefill is an open source project falling under the MIT License. By using, d
 
 ### Issue Discussion
 
-General Picturefill discussion takes place in Slack, at [http://picturefill.slack.com](http://picturefill.slack.com). To join, send an email to `picturefill` at `ricg.io`. Discussion of issues pretaining to the responsive images specifications takes place in the [RICG IRC channel](irc://irc.w3.org:6665/#respimg) and [issue tracker](https://github.com/responsiveimagescg/picture-element/issues/).
+General Picturefill discussion takes place in Slack, at [http://picturefill.slack.com](http://picturefill.slack.com). To join, send an email to `picturefill` at `ricg.io`. Discussion of issues pertaining to the responsive images specifications takes place in the [RICG IRC channel](irc://irc.w3.org:6665/#respimg) and [issue tracker](https://github.com/responsiveimagescg/picture-element/issues/).
 
 You can connect to the Picturefill Slack channel [via IRC](https://slack.zendesk.com/hc/en-us/articles/201727913-Connecting-to-Slack-over-IRC-and-XMPP) (SSL enabled).
 
