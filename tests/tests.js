@@ -39,19 +39,14 @@
 
 	test("getWidthFromLength", function() {
 		var calcTest = (function() {
-			var fullWidthEl = document.createElement( "div" );
-			(document.body || document.documentElement).appendChild( fullWidthEl );
-
-			var gotWidth = pf.getWidthFromLength("calc(766px - 1em)");
-			var returnValue = ( gotWidth === 750 || gotWidth === document.documentElement.offsetWidth );
-
-			fullWidthEl.parentNode.removeChild( fullWidthEl );
-
+			var gotWidth = pf.getWidthFromLength("calc(766px - 16px)");
+			var returnValue = ( gotWidth === 750 || gotWidth === false );
 			return returnValue;
 		}());
 
 		equal( pf.getWidthFromLength("750px"), 750, "returns int value of width string" );
-		ok( calcTest, "If `calc` is supported, `calc(766px - 1em)` returned `750px`. If `calc` is unsupported, the value was discarded and defaulted to `100vw`.");
+		ok( calcTest, "If `calc` is supported, `calc(766px - 16px)` returned `750px`. If `calc` is unsupported, the value is `false`.");
+		equal( pf.getWidthFromLength("calc(160px + 1de)"), false, "calc(160px + 1de)");
 	});
 
 	test("findWidthFromSourceSize", function() {
@@ -69,6 +64,10 @@
 		};
 		width = pf.findWidthFromSourceSize(sizes);
 		equal(width, 500, "returns 500 when match media returns false");
+
+		sizes = "100foo, 200px";
+		width = pf.findWidthFromSourceSize(sizes);
+		equal(width, 200, "returns 200 when there was an unknown css length");
 	});
 
 	asyncTest("setIntrinsicSize", function() {
