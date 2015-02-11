@@ -71,20 +71,39 @@
 		equal(width, 500, "returns 500 when match media returns false");
 	});
 
-	test("setInherentSize", function() {
-		var fakeImg = document.createElement( "img" );
+	asyncTest("setIntrinsicSize", function() {
+		var imgInitialHeight = document.createElement( "img" );
+		var imgInitialWidth = document.createElement( "img" );
+		var imgWithoutDimensions = document.createElement( "img" );
+		var candidate = {
+			url: pf.makeUrl( "../examples/images/small.jpg" ),
+			resolution: 2
+		};
 
-		fakeImg.src = "../examples/images/small.jpg";
+		imgWithoutDimensions.onload = function() {
+			ok( !imgInitialHeight.getAttribute("width"), "No natural width calculation is performed if a `height` attribute already exists." );
 
-		fakeImg.setAttribute( "width", 10 );
+			equal( imgInitialWidth.width, 10, "No natural width calculation is performed if a `width` attribute already exists." );
 
-		pf.setInherentSize( 2, fakeImg, false );
-		deepEqual( fakeImg.width, 10, "No natural width calculation is performed if a `width` attribute already exists." );
+			equal( imgWithoutDimensions.width, 90, "width attribute is set to `naturalWidth / resolution`" );
+			start();
+		};
 
-		fakeImg.removeAttribute( "width" );
+		imgInitialHeight.src = candidate.url;
+		imgInitialWidth.src = candidate.url;
+		imgWithoutDimensions.src = candidate.url;
 
-		pf.setInherentSize( 2, fakeImg, true );
-		deepEqual( fakeImg.width, 90, "width attribute is set to `naturalWidth / resolution`" );
+		imgInitialHeight[ pf.ns ] = {};
+		imgInitialWidth[ pf.ns ] = {};
+		imgWithoutDimensions[ pf.ns ] = {};
+
+		imgInitialHeight.setAttribute( "height", 10 );
+		imgInitialWidth.setAttribute( "width", 10 );
+
+		pf.setIntrinsicSize(imgInitialHeight, candidate );
+		pf.setIntrinsicSize(imgInitialWidth, candidate );
+		pf.setIntrinsicSize(imgWithoutDimensions, candidate );
+
 	});
 
 	test("parseSize", function() {
@@ -422,9 +441,9 @@
 		var image, candidates;
 
 		candidates = [
-			{ resolution: 100, url: "100" },
-			{ resolution: 200, url: "200" },
-			{ resolution: 300, url: "300" }
+			{ resolution: 100, url: "data:100" },
+			{ resolution: 200, url: "data:200" },
+			{ resolution: 300, url: "data:300" }
 		];
 
 		image = {
@@ -440,13 +459,13 @@
 		deepEqual(image.src, candidates[2].url, "uses the url from the best px fit" );
 		deepEqual(image.currentSrc, candidates[2].url, "uses the url from the best px fit" );
 
-		image.src = "foo300";
-		image.currentSrc = "foo300";
+		image.src = "data:300";
+		image.currentSrc = "data:300";
 
 		pf.applyBestCandidate( candidates, image );
 
-		deepEqual(image.src, "foo300", "src left alone when matched" );
-		deepEqual(image.currentSrc, "foo300", "currentSrc left alone when matched" );
+		deepEqual(image.src, "data:300", "src left alone when matched" );
+		deepEqual(image.currentSrc, "data:300", "currentSrc left alone when matched" );
 	});
 
 	test( "removeVideoShim", function() {
@@ -580,6 +599,16 @@
 
 		equal( image.src, "foo" );
 
+	});
+
+	test( "`img` can be added outside the DOM without errors", function() {
+		var img = document.createElement( "img" );
+
+		img.setAttribute( "srcset", "data:img 500w" );
+
+		picturefill( { elements: [ img ] } );
+
+		assert.equal( img.currentSrc || img.src, "data:img" );
 	});
 
 })( window, jQuery );

@@ -15,7 +15,7 @@
 		<script async="true" src="dist/picturefill.js"></script>
 	</head>
 	<body>
-		<a href="http://responsiveimages.org/" class="ricg"><img src="https://raw.github.com/ResponsiveImagesCG/meta/master/logo/Web/RICG_logo_small.png"></a>
+		<a href="http://responsiveimages.org/" class="ricg"><img src="https://raw.githubusercontent.com/ResponsiveImagesCG/RICG.io/master/_dist/_img/ricg-logo.png"></a>
 		<h1>Picturefill <em>A responsive image polyfill</em></h1>
 
 		<nav>
@@ -44,11 +44,32 @@
 			<li><a href="https://github.com/scottjehl/picturefill/blob/2.2.0/dist/picturefill.js">picturefill.js</a> (development version, unminified code)</li>
 			<li><a href="https://github.com/scottjehl/picturefill/blob/2.2.0/dist/picturefill.min.js">picturefill.min.js</a> (production version, minified code)</li>
 		</ul>
+		<p>
+			Picturefill 2.2.0 is available on the following <abbr title="Content Delivery Network">CDN</abbr>s:
+		</p>
+		<h4><a href="https://cdnjs.com/libraries/picturefill">cdnjs:</a></h4>
+		<ul>
+			<li><a href="https://cdnjs.cloudflare.com/ajax/libs/picturefill/2.2.0/picturefill.js">picturefill.js</a> (development version, unminified code)</li>
+			<li><a href="https://cdnjs.cloudflare.com/ajax/libs/picturefill/2.2.0/picturefill.min.js">picturefill.min.js</a> (production version, minified code)</li>
+		</ul>
+		<h4><a href="http://www.jsdelivr.com/#!picturefill">jsDelivr:</a></h4>
+		<ul>
+			<li><a href="https://cdn.jsdelivr.net/picturefill/2.2.0/picturefill.min.js">picturefill.min.js</a> (production version, minified code)</li>
+		</ul>
+
 		<h3>Version 1.2.1</h3>
 		<p>Version 1.2.1 of Picturefill is available if you are interested in the older markup pattern that uses <code>span</code> elements. This version is a lot lighter in weight than version 2 and allows for a fallback image in browsers that have JavaScript disabled (whereas Picturefill version 2 only offers <code>alt</code> text as a fallback for  non-JS browsers without <code>picture</code> support). Unless you need either of those features, we recommend you use Picturefill version 2.</p>
 		<ul>
 			<li><a href="https://github.com/scottjehl/picturefill/blob/1.2.1/picturefill.js">Picturefill version 1.2.1</a></li>
 			<li><a href="https://github.com/scottjehl/picturefill/blob/1.2.1/README.md">Version 1.2.1 readme</a></li>
+		</ul>
+
+		<p>
+			Picturefill 1.2.1 is available on the following <abbr title="Content Delivery Network">CDN</abbr>s:
+		</p>
+		<h4><a href="http://www.jsdelivr.com/#!picturefill">jsDelivr:</a></h4>
+		<ul>
+			<li><a href="https://cdn.jsdelivr.net/picturefill/1.2.1/picturefill.min.js">picturefill.min.js</a> (production version, minified code)</li>
 		</ul>
 
 
@@ -70,7 +91,7 @@ document.createElement( &quot;picture&quot; );
 &lt;script src=&quot;picturefill.js&quot; async&gt;&lt;/script&gt;
 </code></pre>
 
-		<p class="note">Note that if you are already including a recent version of the HTML5 Shiv (sometimes packaged with Modernizr), you may not need this line as it is included there as well. Also, more advanced users may not need this may choose to load Picturefill dynamically using a script loader like Require.js, (AMD and CommonJS support is included in the script).</p>
+		<p class="note">Note that if you are already including a recent version of the HTML5 Shiv (sometimes packaged with Modernizr), you may not need this line as it is included there as well. Also, more advanced users may not need this if they choose to load Picturefill dynamically using a script loader like Require.js (AMD and CommonJS support is included in the script).</p>
 
 
 		<h2 id="examples">Basic markup patterns</h2>
@@ -156,7 +177,7 @@ srcset=&quot;examples/images/medium.jpg 375w, examples/images/medium.jpg 480w, e
 
 	<h3 id="types"><code>media</code> example with one webp source qualified with a <code>type</code> attribute.</h3>
 		<p>
-		  Note: Picturefill can support SVG, WebP, JPEG-XR, JPEG-2000 and APNG types on any source element, and will disregard a <code>source</code> if its type is not supported in a particular environment.  
+		  Note: Picturefill can support SVG, WebP, JPEG-XR, JPEG-2000 and APNG types on any source element, and will disregard a <code>source</code> if its type is not supported in a particular environment.
 		  <strong>This option will only work if picturefill is built by setting the <code>support-types</code> grunt task correctly when building picturefill.</strong>
 		    For example, to support all these formats, build picturefill with this grunt task:</strong></p>
 <pre><code>grunt support-types:jxr:jp2:apng</code></pre>
@@ -168,11 +189,11 @@ srcset=&quot;examples/images/medium.jpg 375w, examples/images/medium.jpg 480w, e
     <p>
       If you wish to remove support for any of these formats, take them out of <code>support-types</code> task.  If you wish picturefill to support
       none of these alternative formats, you can leave out the <code>support-types</code> task out of the grunt build altogether.  Remember that
-      to ensure these images are loaded correctly by picturefill, you will need to 
-      <a href="https://developer.mozilla.org/en-US/docs/Web/Security/Securing_your_site/Configuring_server_MIME_types">properly configure your 
+      to ensure these images are loaded correctly by picturefill, you will need to
+      <a href="https://developer.mozilla.org/en-US/docs/Web/Security/Securing_your_site/Configuring_server_MIME_types">properly configure your
         web server's MIME types</a> to support these formats.
     </p>
-      
+
 <pre><code>&lt;picture&gt;
      &lt;!--[if IE 9]&gt;&lt;video style="display: none;"&gt;&lt;![endif]--&gt;
      &lt;source srcset="../examples/images/large.webp" media="(min-width: 800px)" type="image/webp"&gt;
