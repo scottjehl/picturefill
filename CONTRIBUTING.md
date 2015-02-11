@@ -16,7 +16,7 @@ General Picturefill discussion takes place in Slack, at [http://picturefill.slac
 You can connect to the Picturefill Slack channel [via IRC](https://slack.zendesk.com/hc/en-us/articles/201727913-Connecting-to-Slack-over-IRC-and-XMPP) (SSL enabled).
 
 ### Modifying the code
-First, ensure that you have the latest [Node.js](http://nodejs.org/) and [npm](http://npmjs.org/) installed.
+First, ensure that you have the latest [Node.js](http://nodejs.org/) or [io.js](http://iojs.org) and [npm](http://npmjs.org/) installed.
 
 Test that Grunt's CLI is installed by running `grunt --version`.  If the command isn't found, run `npm install -g grunt-cli`.  For more information about installing Grunt, see the [getting started guide](http://gruntjs.com/getting-started).
 
