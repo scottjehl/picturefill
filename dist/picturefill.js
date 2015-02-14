@@ -431,7 +431,7 @@ window.matchMedia || (window.matchMedia = function() {
 		};
 		return function( picImg, bestCandidate ) {
 			var img;
-			if ( !picImg[ pf.ns ] ) {
+			if ( !picImg[ pf.ns ] || w.pfStopIntrinsicSize ) {
 				return;
 			}
 			if ( picImg[ pf.ns ].dims === undefined ) {
