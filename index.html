@@ -104,13 +104,13 @@ document.createElement( &quot;picture&quot; );
 
 		<h3>An img with "srcset" and sizes" attributes:</h3>
 <pre><code>&lt;img sizes=&quot;(min-width: 40em) 80vw, 100vw&quot;
-srcset=&quot;examples/images/medium.jpg 375w, examples/images/medium.jpg 480w, examples/images/large.jpg 768w&quot; alt=&quot;A giant stone face at The Bayon temple in Angkor Thom, Cambodia&quot;&gt;
+srcset=&quot;examples/images/medium.jpg 375w, examples/images/large.jpg 480w, examples/images/extralarge.jpg 768w&quot; alt=&quot;A giant stone face at The Bayon temple in Angkor Thom, Cambodia&quot;&gt;
 </code></pre>
 
 		<p>Here's how that renders in the browser. Feel free to resize to see it change.</p>
 
 		<img sizes="(min-width: 40em) 80vw, 100vw"
-				srcset="examples/images/medium.jpg 375w, examples/images/medium.jpg 480w, examples/images/large.jpg 768w" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+				srcset="examples/images/medium.jpg 375w, examples/images/large.jpg 480w, examples/images/extralarge.jpg 768w" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 
 		<p><a href="examples/demo-01.html">View standalone demo</a></p>
 
@@ -179,7 +179,8 @@ srcset=&quot;examples/images/medium.jpg 375w, examples/images/medium.jpg 480w, e
 		<p>
 		  Note: Picturefill can support SVG, WebP, JPEG-XR, JPEG-2000 and APNG types on any source element, and will disregard a <code>source</code> if its type is not supported in a particular environment.
 		  <strong>This option will only work if picturefill is built by setting the <code>support-types</code> grunt task correctly when building picturefill.</strong>
-		    For example, to support all these formats, build picturefill with this grunt task:</strong></p>
+		    For example, to support all these formats, build picturefill with this grunt task:
+		</p>
 <pre><code>grunt support-types:jxr:jp2:apng</code></pre>
 
     <p>
@@ -196,26 +197,26 @@ srcset=&quot;examples/images/medium.jpg 375w, examples/images/medium.jpg 480w, e
 
 <pre><code>&lt;picture&gt;
      &lt;!--[if IE 9]&gt;&lt;video style="display: none;"&gt;&lt;![endif]--&gt;
-     &lt;source srcset="../examples/images/large.webp" media="(min-width: 800px)" type="image/webp"&gt;
-     &lt;source srcset="../examples/images/large.jxr" media="(min-width: 800px)" type="image/vnd.ms-photo"&gt;
-     &lt;source srcset="../examples/images/large.jp2" media="(min-width: 800px)" type="image/jp2"&gt;
-     &lt;source srcset="../examples/images/large.jpg" media="(min-width: 800px)"&gt;
-     &lt;source srcset="../examples/images/medium.jpg" media="(min-width: 400px)"&gt;
+     &lt;source srcset="examples/images/large.webp" media="(min-width: 800px)" type="image/webp"&gt;
+     &lt;source srcset="examples/images/large.jxr" media="(min-width: 800px)" type="image/vnd.ms-photo"&gt;
+     &lt;source srcset="examples/images/large.jp2" media="(min-width: 800px)" type="image/jp2"&gt;
+     &lt;source srcset="examples/images/large.jpg" media="(min-width: 800px)"&gt;
+     &lt;source srcset="examples/images/medium.jpg" media="(min-width: 400px)"&gt;
      &lt;!--[if IE 9]&gt;&lt;/video&gt;&lt;![endif]--&gt;
-     &lt;img srcset="../examples/images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"&gt;
+     &lt;img srcset="examples/images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"&gt;
 &lt;/picture&gt;
 
 </code></pre>
 
     <picture>
         <!--[if IE 9]><video style="display: none;"><![endif]-->
-        <source srcset="../examples/images/large.webp" media="(min-width: 800px)" type="image/webp">
-        <source srcset="../examples/images/large.jxr" media="(min-width: 800px)" type="image/vnd.ms-photo">
-        <source srcset="../examples/images/large.jp2" media="(min-width: 800px)" type="image/jp2">
-        <source srcset="../examples/images/large.jpg" media="(min-width: 800px)">
-        <source srcset="../examples/images/medium.jpg" media="(min-width: 400px)">
+        <source srcset="examples/images/large.webp" media="(min-width: 800px)" type="image/webp">
+        <source srcset="examples/images/large.jxr" media="(min-width: 800px)" type="image/vnd.ms-photo">
+        <source srcset="examples/images/large.jp2" media="(min-width: 800px)" type="image/jp2">
+        <source srcset="examples/images/large.jpg" media="(min-width: 800px)">
+        <source srcset="examples/images/medium.jpg" media="(min-width: 400px)">
         <!--[if IE 9]></video><![endif]-->
-        <img srcset="../examples/images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+        <img srcset="examples/images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
     </picture>
 
 		<p><a href="examples/demo-04.html">View standalone demo</a></p>
