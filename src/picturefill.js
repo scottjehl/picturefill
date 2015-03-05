@@ -664,18 +664,6 @@
 	/* expose methods for testing */
 	picturefill._ = pf;
 
-	/* expose picturefill */
-	if ( typeof module === "object" && typeof module.exports === "object" ) {
-		// CommonJS, just export
-		module.exports = picturefill;
-	} else if ( typeof define === "function" && define.amd ) {
-		// AMD support
-		define( function() { return picturefill; } );
-	}
-
-	if ( typeof w === "object" ) {
-		// If no AMD and we are in the browser, attach to window
-		w.picturefill = picturefill;
-	}
+	expose( picturefill );
 
 } )( window, window.document, new window.Image() );
