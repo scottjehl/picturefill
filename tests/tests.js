@@ -69,10 +69,10 @@
 		width = pf.findWidthFromSourceSize(sizes);
 		equal(width, 200, "returns 200 when there was an unknown css length");
 
-        sizes = "100foo, sd2300bar";
-        width = pf.findWidthFromSourceSize(sizes);
+		sizes = "100foo, sd2300bar";
+		width = pf.findWidthFromSourceSize(sizes);
 
-        equal(width, Math.max(window.innerWidth || 0, document.documentElement.clientWidth), "returns 100vw when all sizes are an unknown css length");
+		equal(width, Math.max(window.innerWidth || 0, document.documentElement.clientWidth), "returns 100vw when all sizes are an unknown css length");
 	});
 
 	asyncTest("setIntrinsicSize", function() {
