@@ -112,7 +112,9 @@
 
 		pf.lengthEl.style.width = "0px";
 
-		pf.lengthEl.style.width = length;
+        try {
+		    pf.lengthEl.style.width = length;
+        } catch ( e ) {}
 
 		doc.body.appendChild(pf.lengthEl);
 
