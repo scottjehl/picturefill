@@ -376,11 +376,13 @@
 	pf.setIntrinsicSize = (function() {
 		var urlCache = {};
 		var setSize = function( picImg, width, res ) {
-			picImg.setAttribute( "width", parseInt(width / res, 10) );
+            if ( width ) {
+			    picImg.setAttribute( "width", parseInt(width / res, 10) );
+            }
 		};
 		return function( picImg, bestCandidate ) {
 			var img;
-			if ( !picImg[ pf.ns ] ) {
+			if ( !picImg[ pf.ns ] || w.pfStopIntrinsicSize ) {
 				return;
 			}
 			if ( picImg[ pf.ns ].dims === undefined ) {
@@ -388,12 +390,22 @@
 			}
 			if ( picImg[ pf.ns].dims ) { return; }
 
-			if ( urlCache[bestCandidate.url] ) {
+			if ( bestCandidate.url in urlCache ) {
 				setSize( picImg, urlCache[bestCandidate.url], bestCandidate.resolution );
 			} else {
 				img = doc.createElement( "img" );
 				img.onload = function() {
 					urlCache[bestCandidate.url] = img.width;
+
+                    //IE 10/11 don't calculate width for svg outside document
+                    if ( !urlCache[bestCandidate.url] ) {
+                        try {
+                            doc.body.appendChild( img );
+                            urlCache[bestCandidate.url] = img.width || img.offsetWidth;
+                            doc.body.removeChild( img );
+                        } catch(e){}
+                    }
+
 					if ( picImg.src === bestCandidate.url ) {
 						setSize( picImg, urlCache[bestCandidate.url], bestCandidate.resolution );
 					}
