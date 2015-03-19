@@ -14,7 +14,7 @@
 			module.exports = picturefill;
 		} else if ( typeof define === "function" && define.amd ) {
 			// AMD support
-			define(function() { return picturefill; } );
+			define( "picturefill", function() { return picturefill; } );
 		}
 		if ( typeof w === "object" ) {
 			// If no AMD and we are in the browser, attach to window
@@ -32,7 +32,9 @@
 	doc.createElement( "picture" );
 
 	// local object for method references and testing exposure
-	var pf = {};
+	var pf = w.picturefill || {};
+
+	var regWDesc = /\s+\+?\d+(e\d+)?w/;
 
 	// namespace
 	pf.ns = "picturefill";
@@ -85,6 +87,7 @@
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
 	 */
 	pf.getWidthFromLength = function( length ) {
+		var cssValue;
 		// If a length is specified and doesn’t contain a percentage, and it is greater than 0 or using `calc`, use it. Else, use the `100vw` default.
 		length = length && length.indexOf( "%" ) > -1 === false && ( parseFloat( length ) > 0 || length.indexOf( "calc(" ) > -1 ) ? length : "100vw";
 
@@ -102,25 +105,28 @@
 
 			// Positioning styles help prevent padding/margin/width on `html` or `body` from throwing calculations off.
 			pf.lengthEl.style.cssText = "border:0;display:block;font-size:1em;left:0;margin:0;padding:0;position:absolute;visibility:hidden";
+
+			// Add a class, so that everyone knows where this element comes from
+			pf.lengthEl.className = "helper-from-picturefill-js";
 		}
 
-		pf.lengthEl.style.width = length;
+		pf.lengthEl.style.width = "0px";
+
+        try {
+		    pf.lengthEl.style.width = length;
+        } catch ( e ) {}
 
 		doc.body.appendChild(pf.lengthEl);
 
-		// Add a class, so that everyone knows where this element comes from
-		pf.lengthEl.className = "helper-from-picturefill-js";
+		cssValue = pf.lengthEl.offsetWidth;
 
-		if ( pf.lengthEl.offsetWidth <= 0 ) {
-			// Something has gone wrong. `calc()` is in use and unsupported, most likely. Default to `100vw` (`100%`, for broader support.):
-			pf.lengthEl.style.width = doc.documentElement.offsetWidth + "px";
+		if ( cssValue <= 0 ) {
+			cssValue = false;
 		}
-
-		var offsetWidth = pf.lengthEl.offsetWidth;
 
 		doc.body.removeChild( pf.lengthEl );
 
-		return offsetWidth;
+		return cssValue;
 	};
 
     pf.detectTypeSupport = function( type, typeUri ) {
@@ -142,12 +148,14 @@
 	// container of supported mime types that one might need to qualify before using
 	pf.types = pf.types || {};
 
-	// Add support for standard mime types
-	pf.types[ "image/jpeg" ] = true;
-	pf.types[ "image/gif" ] = true;
-	pf.types[ "image/png" ] = true;
-	pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Image", "1.1");
-	pf.types[ "image/webp" ] = pf.detectTypeSupport("image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=");
+	pf.initTypeDetects = function() {
+        // Add support for standard mime types
+        pf.types[ "image/jpeg" ] = true;
+        pf.types[ "image/gif" ] = true;
+        pf.types[ "image/png" ] = true;
+        pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Image", "1.1");
+        pf.types[ "image/webp" ] = pf.detectTypeSupport("image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=");
+    };
 
 	pf.verifyTypeSupport = function( source ) {
 		var type = source.getAttribute( "type" );
@@ -196,17 +204,17 @@
 			if ( !length ) {
 				continue;
 			}
-			if ( !media || pf.matchesMedia( media ) ) {
-				// if there is no media query or it matches, choose this as our winning length
-				// and end algorithm
-				winningLength = length;
+			// if there is no media query or it matches, choose this as our winning length
+			if ( (!media || pf.matchesMedia( media )) &&
+				// pass the length to a method that can properly determine length
+				// in pixels based on these formats: http://dev.w3.org/csswg/css-values-3/#length-value
+				(winningLength = pf.getWidthFromLength( length )) ) {
 				break;
 			}
 		}
 
-		// pass the length to a method that can properly determine length
-		// in pixels based on these formats: http://dev.w3.org/csswg/css-values-3/#length-value
-		return pf.getWidthFromLength( winningLength );
+		//if we have no winningLength fallback to 100vw
+		return winningLength || Math.max(w.innerWidth || 0, doc.document.clientWidth);
 	};
 
 	pf.parseSrcset = function( srcset ) {
@@ -372,11 +380,13 @@
 	pf.setIntrinsicSize = (function() {
 		var urlCache = {};
 		var setSize = function( picImg, width, res ) {
-			picImg.setAttribute( "width", parseInt(width / res, 10) );
+            if ( width ) {
+			    picImg.setAttribute( "width", parseInt(width / res, 10) );
+            }
 		};
 		return function( picImg, bestCandidate ) {
 			var img;
-			if ( !picImg[ pf.ns ] ) {
+			if ( !picImg[ pf.ns ] || w.pfStopIntrinsicSize ) {
 				return;
 			}
 			if ( picImg[ pf.ns ].dims === undefined ) {
@@ -384,12 +394,22 @@
 			}
 			if ( picImg[ pf.ns].dims ) { return; }
 
-			if ( urlCache[bestCandidate.url] ) {
+			if ( bestCandidate.url in urlCache ) {
 				setSize( picImg, urlCache[bestCandidate.url], bestCandidate.resolution );
 			} else {
 				img = doc.createElement( "img" );
 				img.onload = function() {
 					urlCache[bestCandidate.url] = img.width;
+
+                    //IE 10/11 don't calculate width for svg outside document
+                    if ( !urlCache[bestCandidate.url] ) {
+                        try {
+                            doc.body.appendChild( img );
+                            urlCache[bestCandidate.url] = img.width || img.offsetWidth;
+                            doc.body.removeChild( img );
+                        } catch(e){}
+                    }
+
 					if ( picImg.src === bestCandidate.url ) {
 						setSize( picImg, urlCache[bestCandidate.url], bestCandidate.resolution );
 					}
@@ -595,8 +615,7 @@
 
 			// Cache and remove `srcset` if present and we’re going to be doing `picture`/`srcset`/`sizes` polyfilling to it.
 			if ( ( parent && parent.nodeName.toUpperCase() === "PICTURE" ) ||
-			( element.srcset && !pf.srcsetSupported ) ||
-			( !pf.sizesSupported && ( element.srcset && element.srcset.indexOf("w") > -1 ) ) ) {
+			( !pf.sizesSupported && ( element.srcset && regWDesc.test( element.srcset ) ) ) ) {
 				pf.dodgeSrcset( element );
 			}
 
@@ -624,6 +643,7 @@
 	 * Also attaches picturefill on resize
 	 */
 	function runPicturefill() {
+        pf.initTypeDetects();
 		picturefill();
 		var intervalId = setInterval( function() {
 			// When the document has finished loading, stop checking for new images
@@ -661,6 +681,6 @@
 	/* expose methods for testing */
 	picturefill._ = pf;
 
-	expose(picturefill);
+	expose( picturefill );
 
 } )( window, window.document, new window.Image() );
