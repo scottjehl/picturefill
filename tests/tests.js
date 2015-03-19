@@ -127,6 +127,14 @@
 			media: "(min-width:30em)"
 		};
 		deepEqual(pf.parseSize(size3), expected3, "Length and Media are properly parsed");
+
+		var size4 = "(min-width: 30em) and (max-width: 50em) 50%";
+		var expected4 = {
+			length: "50%",
+			media: "(min-width: 30em) and (max-width: 50em)"
+		};
+		deepEqual(pf.parseSize(size4), expected4, "Length and Media are properly parsed");
+
 	});
 
 	test("getCandidatesFromSourceSet", function() {
