@@ -643,7 +643,7 @@
 	 * Also attaches picturefill on resize
 	 */
 	function runPicturefill() {
-        pf.initTypeDetects();
+		pf.initTypeDetects();
 		picturefill();
 		var intervalId = setInterval( function() {
 			// When the document has finished loading, stop checking for new images
