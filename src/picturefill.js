@@ -112,7 +112,9 @@
 
 		pf.lengthEl.style.width = "0px";
 
-		pf.lengthEl.style.width = length;
+        try {
+		    pf.lengthEl.style.width = length;
+        } catch ( e ) {}
 
 		doc.body.appendChild(pf.lengthEl);
 
@@ -146,12 +148,14 @@
 	// container of supported mime types that one might need to qualify before using
 	pf.types = pf.types || {};
 
-	// Add support for standard mime types
-	pf.types[ "image/jpeg" ] = true;
-	pf.types[ "image/gif" ] = true;
-	pf.types[ "image/png" ] = true;
-	pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Image", "1.1");
-	pf.types[ "image/webp" ] = pf.detectTypeSupport("image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=");
+	pf.initTypeDetects = function() {
+        // Add support for standard mime types
+        pf.types[ "image/jpeg" ] = true;
+        pf.types[ "image/gif" ] = true;
+        pf.types[ "image/png" ] = true;
+        pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Image", "1.1");
+        pf.types[ "image/webp" ] = pf.detectTypeSupport("image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=");
+    };
 
 	pf.verifyTypeSupport = function( source ) {
 		var type = source.getAttribute( "type" );
@@ -639,6 +643,7 @@
 	 * Also attaches picturefill on resize
 	 */
 	function runPicturefill() {
+		pf.initTypeDetects();
 		picturefill();
 		var intervalId = setInterval( function() {
 			// When the document has finished loading, stop checking for new images
