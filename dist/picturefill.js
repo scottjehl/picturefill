@@ -1,4 +1,4 @@
-/*! Picturefill - v2.3.0-beta - 2015-03-05
+/*! Picturefill - v2.3.0 - 2015-03-23
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -137,8 +137,10 @@ window.matchMedia || (window.matchMedia = function() {
 	 */
 	pf.getWidthFromLength = function( length ) {
 		var cssValue;
-		// If a length is specified and doesn’t contain a percentage, and it is greater than 0 or using `calc`, use it. Else, use the `100vw` default.
-		length = length && length.indexOf( "%" ) > -1 === false && ( parseFloat( length ) > 0 || length.indexOf( "calc(" ) > -1 ) ? length : "100vw";
+		// If a length is specified and doesn’t contain a percentage, and it is greater than 0 or using `calc`, use it. Else, abort.
+        if ( !(length && length.indexOf( "%" ) > -1 === false && ( parseFloat( length ) > 0 || length.indexOf( "calc(" ) > -1 )) ) {
+            return false;
+        }
 
 		/**
 		 * If length is specified in  `vw` units, use `%` instead since the div we’re measuring
@@ -161,7 +163,9 @@ window.matchMedia || (window.matchMedia = function() {
 
 		pf.lengthEl.style.width = "0px";
 
-		pf.lengthEl.style.width = length;
+        try {
+		    pf.lengthEl.style.width = length;
+        } catch ( e ) {}
 
 		doc.body.appendChild(pf.lengthEl);
 
@@ -195,12 +199,14 @@ window.matchMedia || (window.matchMedia = function() {
 	// container of supported mime types that one might need to qualify before using
 	pf.types = pf.types || {};
 
-	// Add support for standard mime types
-	pf.types[ "image/jpeg" ] = true;
-	pf.types[ "image/gif" ] = true;
-	pf.types[ "image/png" ] = true;
-	pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Image", "1.1");
-	pf.types[ "image/webp" ] = pf.detectTypeSupport("image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=");
+	pf.initTypeDetects = function() {
+        // Add support for standard mime types
+        pf.types[ "image/jpeg" ] = true;
+        pf.types[ "image/gif" ] = true;
+        pf.types[ "image/png" ] = true;
+        pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Image", "1.1");
+        pf.types[ "image/webp" ] = pf.detectTypeSupport("image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=");
+    };
 
 	pf.verifyTypeSupport = function( source ) {
 		var type = source.getAttribute( "type" );
@@ -259,7 +265,7 @@ window.matchMedia || (window.matchMedia = function() {
 		}
 
 		//if we have no winningLength fallback to 100vw
-		return winningLength || Math.max(w.innerWidth || 0, doc.document.clientWidth);
+		return winningLength || Math.max(w.innerWidth || 0, doc.documentElement.clientWidth);
 	};
 
 	pf.parseSrcset = function( srcset ) {
@@ -425,11 +431,13 @@ window.matchMedia || (window.matchMedia = function() {
 	pf.setIntrinsicSize = (function() {
 		var urlCache = {};
 		var setSize = function( picImg, width, res ) {
-			picImg.setAttribute( "width", parseInt(width / res, 10) );
+            if ( width ) {
+			    picImg.setAttribute( "width", parseInt(width / res, 10) );
+            }
 		};
 		return function( picImg, bestCandidate ) {
 			var img;
-			if ( !picImg[ pf.ns ] ) {
+			if ( !picImg[ pf.ns ] || w.pfStopIntrinsicSize ) {
 				return;
 			}
 			if ( picImg[ pf.ns ].dims === undefined ) {
@@ -437,12 +445,22 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 			if ( picImg[ pf.ns].dims ) { return; }
 
-			if ( urlCache[bestCandidate.url] ) {
+			if ( bestCandidate.url in urlCache ) {
 				setSize( picImg, urlCache[bestCandidate.url], bestCandidate.resolution );
 			} else {
 				img = doc.createElement( "img" );
 				img.onload = function() {
 					urlCache[bestCandidate.url] = img.width;
+
+                    //IE 10/11 don't calculate width for svg outside document
+                    if ( !urlCache[bestCandidate.url] ) {
+                        try {
+                            doc.body.appendChild( img );
+                            urlCache[bestCandidate.url] = img.width || img.offsetWidth;
+                            doc.body.removeChild( img );
+                        } catch(e){}
+                    }
+
 					if ( picImg.src === bestCandidate.url ) {
 						setSize( picImg, urlCache[bestCandidate.url], bestCandidate.resolution );
 					}
@@ -676,6 +694,7 @@ window.matchMedia || (window.matchMedia = function() {
 	 * Also attaches picturefill on resize
 	 */
 	function runPicturefill() {
+		pf.initTypeDetects();
 		picturefill();
 		var intervalId = setInterval( function() {
 			// When the document has finished loading, stop checking for new images
