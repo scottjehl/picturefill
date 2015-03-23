@@ -88,8 +88,10 @@
 	 */
 	pf.getWidthFromLength = function( length ) {
 		var cssValue;
-		// If a length is specified and doesn’t contain a percentage, and it is greater than 0 or using `calc`, use it. Else, use the `100vw` default.
-		length = length && length.indexOf( "%" ) > -1 === false && ( parseFloat( length ) > 0 || length.indexOf( "calc(" ) > -1 ) ? length : "100vw";
+		// If a length is specified and doesn’t contain a percentage, and it is greater than 0 or using `calc`, use it. Else, abort.
+        if ( !(length && length.indexOf( "%" ) > -1 === false && ( parseFloat( length ) > 0 || length.indexOf( "calc(" ) > -1 )) ) {
+            return false;
+        }
 
 		/**
 		 * If length is specified in  `vw` units, use `%` instead since the div we’re measuring
@@ -214,7 +216,7 @@
 		}
 
 		//if we have no winningLength fallback to 100vw
-		return winningLength || Math.max(w.innerWidth || 0, doc.document.clientWidth);
+		return winningLength || Math.max(w.innerWidth || 0, doc.documentElement.clientWidth);
 	};
 
 	pf.parseSrcset = function( srcset ) {
