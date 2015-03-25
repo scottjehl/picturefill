@@ -131,6 +131,35 @@
 			media: "(min-width:30em)"
 		};
 		deepEqual(pf.parseSize(size3), expected3, "Length and Media are properly parsed");
+
+		var size4 = "only screen and (((min-width: 30em) and (max-width: 50em)) or (min-width: 150em)) 50%";
+		var expected4 = {
+			length: "50%",
+			media: "only screen and (((min-width: 30em) and (max-width: 50em)) or (min-width: 150em))"
+		};
+		deepEqual(pf.parseSize(size4), expected4, "Length and Media are properly parsed");
+
+		var size5 = "not print 50%";
+		var expected5 = {
+			length: "50%",
+			media: "not print"
+		};
+		deepEqual(pf.parseSize(size5), expected5, "Length and Media are properly parsed");
+		
+		var size6 = "(min-width: 50.01em) and all 50%";
+		var expected6 = {
+			length: "50%",
+			media: "(min-width: 50.01em) and all"
+		};
+		deepEqual(pf.parseSize(size6), expected6, "Length and Media are properly parsed");
+		
+		var size7 = "50%";
+		var expected7 = {
+			length: "50%",
+			media: undefined
+		};
+		deepEqual(pf.parseSize(size7), expected7, "Length and Media are properly parsed");
+
 	});
 
 	test("getCandidatesFromSourceSet", function() {

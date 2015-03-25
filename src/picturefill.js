@@ -180,8 +180,9 @@
 	};
 
 	// Parses an individual `size` and returns the length, and optional media query
+	// Logical operators for media query are supported
 	pf.parseSize = function( sourceSizeStr ) {
-		var match = /(\([^)]+\))?\s*(.+)/g.exec( sourceSizeStr );
+		var match = /((?:\s*(?:\([^)]+\)+|(?!calc)[a-zA-Z]))+)?\s*(.+)/gi.exec( sourceSizeStr );
 		return {
 			media: match && match[1],
 			length: match && match[2]
