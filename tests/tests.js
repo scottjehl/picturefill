@@ -131,6 +131,20 @@
 			media: "(min-width:30em)"
 		};
 		deepEqual(pf.parseSize(size3), expected3, "Length and Media are properly parsed");
+		
+		var size4 = "(min-width: 30em) and (max-width: 50em) or (min-width: 150em) not (min-resolution: 144dpi) 50%";
+		var expected4 = {
+			length: "50%",
+			media: "(min-width: 30em) and (max-width: 50em) or (min-width: 150em) not (min-resolution: 144dpi)"
+		};
+		deepEqual(pf.parseSize(size4), expected4, "Length and Media are properly parsed");
+
+		var size5 = "50%";
+		var expected5 = {
+			length: "50%",
+			media: undefined
+		};
+		deepEqual(pf.parseSize(size5), expected5, "Length and Media are properly parsed");
 	});
 
 	test("getCandidatesFromSourceSet", function() {
