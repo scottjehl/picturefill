@@ -658,9 +658,8 @@
 			}
 		}, 250 );
 
+		var resizeThrottle;
 		function checkResize() {
-			var resizeThrottle;
-
 			if ( !w._picturefillWorking ) {
 				w._picturefillWorking = true;
 				w.clearTimeout( resizeThrottle );
