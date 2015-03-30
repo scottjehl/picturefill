@@ -36,6 +36,17 @@
 
 	var regWDesc = /\s+\+?\d+(e\d+)?w/;
 
+	var getWindowWidth = function() {
+		var w = window,
+			d = document,
+			e = d.documentElement,
+			g = d.getElementsByTagName("body")[0];
+
+		return parseInt(w.innerWidth || e.clientWidth || g.clientWidth, 10);
+	};
+
+	var windowWidth = getWindowWidth();
+
 	// namespace
 	pf.ns = "picturefill";
 
@@ -287,24 +298,37 @@
 		// is the order in which entries are added to the list.
 		var sizes = sizesattr || "100vw",
 			sizeDescriptor = descriptor && descriptor.replace( /(^\s+|\s+$)/g, "" ),
-			widthInCssPixels = pf.findWidthFromSourceSize( sizes ),
+			widthInCssPixels,
 			resCandidate;
 
-			if ( sizeDescriptor ) {
-				var splitDescriptor = sizeDescriptor.split(" ");
+		if (!pf.getWidthFromLength() && sizes.indexOf(" ") === -1) { // if no getWidthFromLength override and single length value
+			if (sizes.indexOf("px") === sizes.length - 2) { // just a pixel width is specified, nothing fancy
+				widthInCssPixels = parseInt(sizes, 10);
+			} else if (sizes.indexOf("vw") === sizes.length - 2) { // just a viewport width is specified, nothing fancy
+				widthInCssPixels = (parseInt(sizes, 10) / 100) * windowWidth; // seems safe -> http://stackoverflow.com/questions/25225682/difference-between-width100-and-width100vw#25225716
+			}
+		}
 
-				for (var i = splitDescriptor.length - 1; i >= 0; i--) {
-					var curr = splitDescriptor[ i ],
-						lastchar = curr && curr.slice( curr.length - 1 );
+		if (!widthInCssPixels) { // something fancy
+			widthInCssPixels = pf.findWidthFromSourceSize(sizes); // this is sloooow
+		}
+		
+		if ( sizeDescriptor ) {
+			var splitDescriptor = sizeDescriptor.split(" ");
 
-					if ( ( lastchar === "h" || lastchar === "w" ) && !pf.sizesSupported ) {
-						resCandidate = parseFloat( ( parseInt( curr, 10 ) / widthInCssPixels ) );
-					} else if ( lastchar === "x" ) {
-						var res = curr && parseFloat( curr, 10 );
-						resCandidate = res && !isNaN( res ) ? res : 1;
-					}
+			for (var i = splitDescriptor.length - 1; i >= 0; i--) {
+				var curr = splitDescriptor[ i ],
+					lastchar = curr && curr.slice( curr.length - 1 );
+
+				if ( ( lastchar === "h" || lastchar === "w" ) && !pf.sizesSupported ) {
+					resCandidate = parseFloat( ( parseInt( curr, 10 ) / widthInCssPixels ) );
+				} else if ( lastchar === "x" ) {
+					var res = curr && parseFloat( curr, 10 );
+					resCandidate = res && !isNaN( res ) ? res : 1;
 				}
 			}
+		}
+
 		return resCandidate || 1;
 	};
 
@@ -662,6 +686,7 @@
 			var resizeThrottle;
 
 			if ( !w._picturefillWorking ) {
+				windowWidth = getWindowWidth();
 				w._picturefillWorking = true;
 				w.clearTimeout( resizeThrottle );
 				resizeThrottle = w.setTimeout( function() {
