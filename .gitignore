@@ -23,4 +23,5 @@ Temporary Items
 node_modules
 *.zip
 
-dist/
+dist/plugins
+dist/*.min.js
