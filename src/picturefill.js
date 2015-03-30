@@ -298,17 +298,21 @@
 		// is the order in which entries are added to the list.
 		var sizes = sizesattr || "100vw",
 			sizeDescriptor = descriptor && descriptor.replace( /(^\s+|\s+$)/g, "" ),
-			widthInCssPixels = 0,
+			widthInCssPixels,
 			resCandidate;
 
-		if (!pf.getWidthFromLength() && sizes.indexOf(" ") === -1 && (sizes.indexOf("px") === sizes.length - 2)) { // just a pixel width is specified, nothing fancy
-			widthInCssPixels = parseInt(sizes, 10);
-		} else if (!pf.getWidthFromLength() && sizes === "100vw") { // just a viewport width is specified, nothing fancy
-			widthInCssPixels = windowWidth; // seems safe -> http://stackoverflow.com/questions/25225682/difference-between-width100-and-width100vw#25225716
-		} else { // something fancy
-			widthInCssPixels = pf.findWidthFromSourceSize(sizes); // this is sloooow
+		if (!pf.getWidthFromLength() && sizes.indexOf(" ") === -1) { // if no getWidthFromLength override and single length value
+			if (sizes.indexOf("px") === sizes.length - 2) { // just a pixel width is specified, nothing fancy
+				widthInCssPixels = parseInt(sizes, 10);
+			} else if (sizes.indexOf("vw") === sizes.length - 2) { // just a viewport width is specified, nothing fancy
+				widthInCssPixels = (parseInt(sizes, 10) / 100) * windowWidth; // seems safe -> http://stackoverflow.com/questions/25225682/difference-between-width100-and-width100vw#25225716
+			}
 		}
 
+		if (!widthInCssPixels) { // something fancy
+			widthInCssPixels = pf.findWidthFromSourceSize(sizes); // this is sloooow
+		}
+		
 		if ( sizeDescriptor ) {
 			var splitDescriptor = sizeDescriptor.split(" ");
 
