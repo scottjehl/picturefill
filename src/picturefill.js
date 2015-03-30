@@ -301,9 +301,9 @@
 			widthInCssPixels = 0,
 			resCandidate;
 
-		if (sizes.indexOf(' ') === -1 && (sizes.indexOf('px') === sizes.length - 2)) { // just a pixel width is specified, nothing fancy
+		if (sizes.indexOf(" ") === -1 && (sizes.indexOf("px") === sizes.length - 2)) { // just a pixel width is specified, nothing fancy
 			widthInCssPixels = parseInt(sizes, 10);
-		} else if (sizes === '100vw') { // just a viewport width is specified, nothing fancy
+		} else if (sizes === "100vw") { // just a viewport width is specified, nothing fancy
 			widthInCssPixels = windowWidth; // seems safe -> http://stackoverflow.com/questions/25225682/difference-between-width100-and-width100vw#25225716
 		} else { // something fancy
 			widthInCssPixels = pf.findWidthFromSourceSize(sizes); // this is sloooow
