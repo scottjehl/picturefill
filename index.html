@@ -15,7 +15,7 @@
 		<script async="true" src="dist/picturefill.js"></script>
 	</head>
 	<body>
-		<a href="http://responsiveimages.org/" class="ricg"><img src="https://raw.github.com/ResponsiveImagesCG/meta/master/logo/Web/RICG_logo_small.png"></a>
+		<a href="http://responsiveimages.org/" class="ricg"><img src="https://raw.githubusercontent.com/ResponsiveImagesCG/RICG.io/master/_dist/_img/ricg-logo.png"></a>
 		<h1>Picturefill <em>A responsive image polyfill</em></h1>
 
 		<nav>
@@ -38,17 +38,38 @@
 		<p>For more information on the development of Picturefill, and how you can file bugs or contribute fixes, check out the the code project site on Github : <a href="https://github.com/scottjehl/picturefill">Picturefill on Github.</a></p>
 
 		<h2 id="download">Downloading Picturefill</h2>
-		<h3>Picturefill Version 2.2.0</h3>
+		<h3>Picturefill Version 2.2.0 (latest stable version)</h3>
 		<p>For native <code>picture</code> element support, you'll want Picturefill version 2. These downloads include the <a href="https://github.com/paulirish/matchMedia.js/">matchMedia polyfill</a> for browsers that need it (like IE9).</p>
 		<ul>
 			<li><a href="https://github.com/scottjehl/picturefill/blob/2.2.0/dist/picturefill.js">picturefill.js</a> (development version, unminified code)</li>
 			<li><a href="https://github.com/scottjehl/picturefill/blob/2.2.0/dist/picturefill.min.js">picturefill.min.js</a> (production version, minified code)</li>
 		</ul>
-		<h3>Version 1.2.1 (latest stable version)</h3>
-		<p>Version 1.2.1 of Picturefill is available if you are interested in the older markup pattern that uses <code>span</code> elements. This version is a lot lighter in weight than version 2 and allows for a fallback image in browsers that have JavaScript disabled (whereas Picturefill version 2 only offers <code>alt</code> text as a fallback for  non-JS browsers without <code>picture</code> support).</p>
+		<p>
+			Picturefill 2.2.0 is available on the following <abbr title="Content Delivery Network">CDN</abbr>s:
+		</p>
+		<h4><a href="https://cdnjs.com/libraries/picturefill">cdnjs:</a></h4>
+		<ul>
+			<li><a href="https://cdnjs.cloudflare.com/ajax/libs/picturefill/2.2.0/picturefill.js">picturefill.js</a> (development version, unminified code)</li>
+			<li><a href="https://cdnjs.cloudflare.com/ajax/libs/picturefill/2.2.0/picturefill.min.js">picturefill.min.js</a> (production version, minified code)</li>
+		</ul>
+		<h4><a href="http://www.jsdelivr.com/#!picturefill">jsDelivr:</a></h4>
+		<ul>
+			<li><a href="https://cdn.jsdelivr.net/picturefill/2.2.0/picturefill.min.js">picturefill.min.js</a> (production version, minified code)</li>
+		</ul>
+
+		<h3>Version 1.2.1</h3>
+		<p>Version 1.2.1 of Picturefill is available if you are interested in the older markup pattern that uses <code>span</code> elements. This version is a lot lighter in weight than version 2 and allows for a fallback image in browsers that have JavaScript disabled (whereas Picturefill version 2 only offers <code>alt</code> text as a fallback for  non-JS browsers without <code>picture</code> support). Unless you need either of those features, we recommend you use Picturefill version 2.</p>
 		<ul>
 			<li><a href="https://github.com/scottjehl/picturefill/blob/1.2.1/picturefill.js">Picturefill version 1.2.1</a></li>
 			<li><a href="https://github.com/scottjehl/picturefill/blob/1.2.1/README.md">Version 1.2.1 readme</a></li>
+		</ul>
+
+		<p>
+			Picturefill 1.2.1 is available on the following <abbr title="Content Delivery Network">CDN</abbr>s:
+		</p>
+		<h4><a href="http://www.jsdelivr.com/#!picturefill">jsDelivr:</a></h4>
+		<ul>
+			<li><a href="https://cdn.jsdelivr.net/picturefill/1.2.1/picturefill.min.js">picturefill.min.js</a> (production version, minified code)</li>
 		</ul>
 
 
@@ -70,7 +91,7 @@ document.createElement( &quot;picture&quot; );
 &lt;script src=&quot;picturefill.js&quot; async&gt;&lt;/script&gt;
 </code></pre>
 
-		<p class="note">Note that if you are already including a recent version of the HTML5 Shiv (sometimes packaged with Modernizr), you may not need this line as it is included there as well. Also, more advanced users may not need this may choose to load Picturefill dynamically using a script loader like Require.js, (AMD and CommonJS support is included in the script).</p>
+		<p class="note">Note that if you are already including a recent version of the HTML5 Shiv (sometimes packaged with Modernizr), you may not need this line as it is included there as well. Also, more advanced users may not need this if they choose to load Picturefill dynamically using a script loader like Require.js (AMD and CommonJS support is included in the script).</p>
 
 
 		<h2 id="examples">Basic markup patterns</h2>
@@ -83,13 +104,13 @@ document.createElement( &quot;picture&quot; );
 
 		<h3>An img with "srcset" and sizes" attributes:</h3>
 <pre><code>&lt;img sizes=&quot;(min-width: 40em) 80vw, 100vw&quot;
-srcset=&quot;examples/images/medium.jpg 375w, examples/images/medium.jpg 480w, examples/images/large.jpg 768w&quot; alt=&quot;A giant stone face at The Bayon temple in Angkor Thom, Cambodia&quot;&gt;
+srcset=&quot;examples/images/medium.jpg 375w, examples/images/large.jpg 480w, examples/images/extralarge.jpg 768w&quot; alt=&quot;A giant stone face at The Bayon temple in Angkor Thom, Cambodia&quot;&gt;
 </code></pre>
 
 		<p>Here's how that renders in the browser. Feel free to resize to see it change.</p>
 
 		<img sizes="(min-width: 40em) 80vw, 100vw"
-				srcset="examples/images/medium.jpg 375w, examples/images/medium.jpg 480w, examples/images/large.jpg 768w" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+				srcset="examples/images/medium.jpg 375w, examples/images/large.jpg 480w, examples/images/extralarge.jpg 768w" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 
 		<p><a href="examples/demo-01.html">View standalone demo</a></p>
 
@@ -155,26 +176,48 @@ srcset=&quot;examples/images/medium.jpg 375w, examples/images/medium.jpg 480w, e
 	<p><a href="examples/demo-03.html">View standalone demo</a></p>
 
 	<h3 id="types"><code>media</code> example with one webp source qualified with a <code>type</code> attribute.</h3>
-		<p>Note: Picturefill supports SVG and WebP types on any source element, and will disregard a <code>source</code> if its type is not supported in a particular environment:</p>
+		<p>
+		  Note: Picturefill can support SVG, WebP, JPEG-XR, JPEG-2000 and APNG types on any source element, and will disregard a <code>source</code> if its type is not supported in a particular environment.
+		  <strong>This option will only work if picturefill is built by setting the <code>support-types</code> grunt task correctly when building picturefill.</strong>
+		    For example, to support all these formats, build picturefill with this grunt task:
+		</p>
+<pre><code>grunt support-types:jxr:jp2:apng</code></pre>
+
+    <p>
+      (<strong>Note:</strong> There is no need to add <code>webp</code> or <code>svg</code> to the <code>support-types</code> list
+      because they are supported by picturefill automatically)
+    </p>
+    <p>
+      If you wish to remove support for any of these formats, take them out of <code>support-types</code> task.  If you wish picturefill to support
+      none of these alternative formats, you can leave out the <code>support-types</code> task out of the grunt build altogether.  Remember that
+      to ensure these images are loaded correctly by picturefill, you will need to
+      <a href="https://developer.mozilla.org/en-US/docs/Web/Security/Securing_your_site/Configuring_server_MIME_types">properly configure your
+        web server's MIME types</a> to support these formats.
+    </p>
 
 <pre><code>&lt;picture&gt;
-	&lt;!--[if IE 9]&gt;&lt;video style=&quot;display: none;&quot;&gt;&lt;![endif]--&gt;
-	&lt;source srcset=&quot;examples/images/large.webp&quot; media=&quot;(min-width: 800px)&quot; type=&quot;image/webp&quot;&gt;
-	&lt;source srcset=&quot;examples/images/large.jpg&quot; media=&quot;(min-width: 800px)&quot;&gt;
-	&lt;source srcset=&quot;examples/images/medium.jpg&quot; media=&quot;(min-width: 400px)&quot;&gt;
-	&lt;!--[if IE 9]&gt;&lt;/video&gt;&lt;![endif]--&gt;
-	&lt;img srcset=&quot;examples/images/small.jpg&quot; alt=&quot;A giant stone face at The Bayon temple in Angkor Thom, Cambodia&quot;&gt;
+     &lt;!--[if IE 9]&gt;&lt;video style="display: none;"&gt;&lt;![endif]--&gt;
+     &lt;source srcset="examples/images/large.webp" media="(min-width: 800px)" type="image/webp"&gt;
+     &lt;source srcset="examples/images/large.jxr" media="(min-width: 800px)" type="image/vnd.ms-photo"&gt;
+     &lt;source srcset="examples/images/large.jp2" media="(min-width: 800px)" type="image/jp2"&gt;
+     &lt;source srcset="examples/images/large.jpg" media="(min-width: 800px)"&gt;
+     &lt;source srcset="examples/images/medium.jpg" media="(min-width: 400px)"&gt;
+     &lt;!--[if IE 9]&gt;&lt;/video&gt;&lt;![endif]--&gt;
+     &lt;img srcset="examples/images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"&gt;
 &lt;/picture&gt;
+
 </code></pre>
 
-		<picture>
-				<!--[if IE 9]><video style="display: none;"><![endif]-->
-				<source srcset="examples/images/large.webp" media="(min-width: 800px)" type="image/webp">
-				<source srcset="examples/images/large.jpg" media="(min-width: 800px)">
-				<source srcset="examples/images/medium.jpg" media="(min-width: 400px)">
-				<!--[if IE 9]></video><![endif]-->
-				<img srcset="examples/images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-		</picture>
+    <picture>
+        <!--[if IE 9]><video style="display: none;"><![endif]-->
+        <source srcset="examples/images/large.webp" media="(min-width: 800px)" type="image/webp">
+        <source srcset="examples/images/large.jxr" media="(min-width: 800px)" type="image/vnd.ms-photo">
+        <source srcset="examples/images/large.jp2" media="(min-width: 800px)" type="image/jp2">
+        <source srcset="examples/images/large.jpg" media="(min-width: 800px)">
+        <source srcset="examples/images/medium.jpg" media="(min-width: 400px)">
+        <!--[if IE 9]></video><![endif]-->
+        <img srcset="examples/images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+    </picture>
 
 		<p><a href="examples/demo-04.html">View standalone demo</a></p>
 
@@ -217,8 +260,9 @@ picturefill();
 
 		<p>Picturefill is tested broadly and works in a large number of browsers. That said, it does have some browser support considerations to keep in mind:</p>
 		<ul>
-			<li><strong>JS-Disabled Browsers only see alt text:</strong> When using the <code>picture</code> element, non-<code>picture</code> supporting browsers will only see <code>alt</code> attribute text as a fallback when JavaScript fails or is disabled. This is because any <code>noscript</code>-based workarounds (such as the one used in Picturefill version 1) will cause future browsers that support the <code>picture</code> element to show two images instead of one when JavaScript is off. Unfortunately, choosing to add a <code>src</code> attribute to the <code>img</code> element in your <code>picture</code> element isn't a good workaround either, as any browser that exists today will fetch that <code>src</code> url even if it is not going to be used (which is wasteful). If you absolutely need an image to appear in non-JS environments, Picturefill 1.2 is a fine choice.</li>
-			<li><strong>Temporary extra HTTP Requests for Picture usage in some browsers:</strong> In browsers that natively support <code>srcset</code> but do not yet support the <code>picture</code> element, users may experience a wasted HTTP request for each <code>picture</code> element on a page. This is because the browser's preparser will fetch one of the URLs listed in the <code>picture</code> element's child <code>img</code>'s <code>srcset</code> attribute as soon as possible during page load, before the JavaScript can evaluate the potential <code>picture</code> <code>source</code> elements for a better match. This problem will only affect browsers that have implemented <code>srcset</code> but not <code>picture</code>, which will hopefully be short-lived.</li>
+			<li><strong>JS-Disabled Browsers only see alt text:</strong> When using the <code>picture</code> element, non-<code>picture</code> supporting browsers will only see <code>alt</code> attribute text as a fallback when JavaScript fails or is disabled. This is because any <code>noscript</code>-based workarounds (such as the one used in Picturefill version 1) will cause future browsers that support the <code>picture</code> element to show two images instead of one when JavaScript is off. Unfortunately, adding a <code>src</code> attribute with an external source to the <code>img</code> element in your <code>picture</code> element isn't a good workaround either, as any browser that exists today will fetch that <code>src</code> url even if it is not going to be used (which is wasteful), and an empty <code>src</code> can result in <a href="http://wilto.github.io/srcn-polyfills/">unexpected requests</a>. For valid markup, the shortest possible value for <code>src</code> (without firing an <code>onerror</code> event or a potential request) is <code>src="data:image/gif;base64,R0lGODlhAQABAAAAADs="</code>If you absolutely need an image to appear in non-JS environments, Picturefill 1.2 is a fine choice.</li>
+
+			<li><strong>Temporary extra HTTP Requests for <code>picture</code> usage in some browsers:</strong> In browsers that natively support <code>srcset</code> but do not yet support the <code>picture</code> element, users may experience a wasted HTTP request for each <code>picture</code> element on a page. This is because the browser's preparser will fetch one of the URLs listed in the <code>picture</code> element's child <code>img</code>'s <code>srcset</code> attribute as soon as possible during page load, before the JavaScript can evaluate the potential <code>picture</code> <code>source</code> elements for a better match. This problem will only affect browsers that have implemented <code>srcset</code> but not <code>picture</code>, which will hopefully be short-lived.</li>
 
 			<li><strong>Source element limitations:</strong> Browsers like Android 2.3 and Internet Explorer 9 can not see the <code>source</code> elements inside a <code>picture</code> element. For IE, the <code>video</code> tag workaround helps us avoid this problem, but Android will still have no access to <code>source</code> elements. Be sure to provide a <code>srcset</code> attribute on your enclosed <code>img</code> to ensure an image will show in this browser.</li>
 			<li><strong>Media attribute support requires native media query support</strong>The <code>picture</code> element (paired with picturefill) works best in browsers that support CSS3 media queries. Picturefill includes  the <a href="https://github.com/paulirish/matchMedia.js/">matchMedia polyfill</a> by default, which makes matchMedia work in media query-supporting browsers that don’t support <code>matchMedia</code>.</li>
