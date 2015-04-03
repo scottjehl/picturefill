@@ -18,6 +18,7 @@
 }( function( picturefill, undefined ) {
 	"use strict";
 
+	var document = window.document;
 	var ri = picturefill._;
 	var knownWidths = {};
 	var cfg = ri.cfg;
@@ -33,7 +34,7 @@
 		var bgImg, curCandidate, clear;
 
 
-		if(knownWidths[url]){
+		if(url in knownWidths){
 			setSize(knownWidths[url], img, data);
 		} else {
 			clear = function(){
@@ -55,6 +56,13 @@
 
 			bgImg.onload = function(){
 				knownWidths[url] = bgImg.naturalWidth || bgImg.width;
+				if (!knownWidths[url]) {
+					try {
+						document.body.appendChild(bgImg);
+						knownWidths[url] = bgImg.offsetWidth || bgImg.naturalWidth || bgImg.width;
+						document.body.removeChild(bgImg);
+					} catch (e) {}
+				}
 				if(url == img[curSrcProp]){
 					setSize(knownWidths[url], img, data);
 				}
