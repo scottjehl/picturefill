@@ -658,17 +658,13 @@
 			}
 		}, 250 );
 
+		var resizeTimer;
+		var handleResize = function() {
+	        picturefill({ reevaluate: true });
+	    };
 		function checkResize() {
-			var resizeThrottle;
-
-			if ( !w._picturefillWorking ) {
-				w._picturefillWorking = true;
-				w.clearTimeout( resizeThrottle );
-				resizeThrottle = w.setTimeout( function() {
-					picturefill({ reevaluate: true });
-					w._picturefillWorking = false;
-				}, 60 );
-			}
+		    clearTimeout(resizeTimer);
+		    resizeTimer = setTimeout( handleResize, 60 );
 		}
 
 		if ( w.addEventListener ) {
