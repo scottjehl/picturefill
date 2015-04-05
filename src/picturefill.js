@@ -659,13 +659,12 @@
 		}, 250 );
 
 		var resizeTimer;
-		var handleResize = function() {
-	        picturefill({ reevaluate: true });
-	    };
-		function checkResize() {
-		    clearTimeout(resizeTimer);
-		    resizeTimer = setTimeout( handleResize, 60 );
-		}
+		var checkResize = function() {
+			clearTimeout( resizeTimer );
+			resizeTimer = setTimeout( function() {
+				picturefill( { reevaluate: true } );
+			}, 60 );
+		};
 
 		if ( w.addEventListener ) {
 			w.addEventListener( "resize", checkResize, false );

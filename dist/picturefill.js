@@ -1,4 +1,4 @@
-/*! Picturefill - v2.3.0 - 2015-03-23
+/*! Picturefill - v2.3.0 - 2015-04-05
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -230,7 +230,7 @@ window.matchMedia || (window.matchMedia = function() {
 
 	// Parses an individual `size` and returns the length, and optional media query
 	pf.parseSize = function( sourceSizeStr ) {
-		var match = /(\([^)]+\))?\s*(.+)/g.exec( sourceSizeStr );
+		var match = /((?:\([^()]+\)(?:\s*(?:and|or|not)\s*)?)+)?\s*(.+)/g.exec( sourceSizeStr );
 		return {
 			media: match && match[1],
 			length: match && match[2]
@@ -707,18 +707,13 @@ window.matchMedia || (window.matchMedia = function() {
 			}
 		}, 250 );
 
-		function checkResize() {
-			var resizeThrottle;
-
-			if ( !w._picturefillWorking ) {
-				w._picturefillWorking = true;
-				w.clearTimeout( resizeThrottle );
-				resizeThrottle = w.setTimeout( function() {
-					picturefill({ reevaluate: true });
-					w._picturefillWorking = false;
-				}, 60 );
-			}
-		}
+		var resizeTimer;
+		var checkResize = function() {
+			clearTimeout(resizeTimer);
+			resizeTimer = setTimeout( function() {
+				picturefill({ reevaluate: true });
+			}, 60 );
+		};
 
 		if ( w.addEventListener ) {
 			w.addEventListener( "resize", checkResize, false );
