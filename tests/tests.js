@@ -39,19 +39,14 @@
 
 	test("getWidthFromLength", function() {
 		var calcTest = (function() {
-			var fullWidthEl = document.createElement( "div" );
-			(document.body || document.documentElement).appendChild( fullWidthEl );
-
-			var gotWidth = pf.getWidthFromLength("calc(766px - 1em)");
-			var returnValue = ( gotWidth === 750 || gotWidth === document.documentElement.offsetWidth );
-
-			fullWidthEl.parentNode.removeChild( fullWidthEl );
-
+			var gotWidth = pf.getWidthFromLength("calc(766px - 16px)");
+			var returnValue = ( gotWidth === 750 || gotWidth === false );
 			return returnValue;
 		}());
 
 		equal( pf.getWidthFromLength("750px"), 750, "returns int value of width string" );
-		ok( calcTest, "If `calc` is supported, `calc(766px - 1em)` returned `750px`. If `calc` is unsupported, the value was discarded and defaulted to `100vw`.");
+		ok( calcTest, "If `calc` is supported, `calc(766px - 16px)` returned `750px`. If `calc` is unsupported, the value is `false`.");
+		equal( pf.getWidthFromLength("calc(160px + 1de)"), false, "calc(160px + 1de)");
 	});
 
 	test("findWidthFromSourceSize", function() {
@@ -69,6 +64,50 @@
 		};
 		width = pf.findWidthFromSourceSize(sizes);
 		equal(width, 500, "returns 500 when match media returns false");
+
+		sizes = "100foo, 200px";
+		width = pf.findWidthFromSourceSize(sizes);
+		equal(width, 200, "returns 200 when there was an unknown css length");
+
+		sizes = "100foo, sd2300bar";
+		width = pf.findWidthFromSourceSize(sizes);
+
+		equal(width, Math.max(window.innerWidth || 0, document.documentElement.clientWidth), "returns 100vw when all sizes are an unknown css length");
+	});
+
+	asyncTest("setIntrinsicSize", function() {
+		var imgInitialHeight = document.createElement( "img" );
+		var imgInitialWidth = document.createElement( "img" );
+		var imgWithoutDimensions = document.createElement( "img" );
+		var candidate = {
+			url: pf.makeUrl( "../examples/images/small.jpg" ),
+			resolution: 2
+		};
+
+		imgWithoutDimensions.onload = function() {
+			ok( !imgInitialHeight.getAttribute("width"), "No natural width calculation is performed if a `height` attribute already exists." );
+
+			equal( imgInitialWidth.width, 10, "No natural width calculation is performed if a `width` attribute already exists." );
+
+			equal( imgWithoutDimensions.width, 90, "width attribute is set to `naturalWidth / resolution`" );
+			start();
+		};
+
+		imgInitialHeight.src = candidate.url;
+		imgInitialWidth.src = candidate.url;
+		imgWithoutDimensions.src = candidate.url;
+
+		imgInitialHeight[ pf.ns ] = {};
+		imgInitialWidth[ pf.ns ] = {};
+		imgWithoutDimensions[ pf.ns ] = {};
+
+		imgInitialHeight.setAttribute( "height", 10 );
+		imgInitialWidth.setAttribute( "width", 10 );
+
+		pf.setIntrinsicSize(imgInitialHeight, candidate );
+		pf.setIntrinsicSize(imgInitialWidth, candidate );
+		pf.setIntrinsicSize(imgWithoutDimensions, candidate );
+
 	});
 
 	test("parseSize", function() {
@@ -352,7 +391,7 @@
 	});
 
 	test("verifyTypeSupport", function() {
-		expect( 7 );
+		expect( 6 );
 
 		// Test widely supported mime types.
 		ok(pf.verifyTypeSupport({
@@ -387,10 +426,6 @@
 			}
 		}));
 
-		pf.types[ "foo" ] = function() {
-			ok( true, "foo type function executed" );
-		};
-
 		pf.verifyTypeSupport({
 			getAttribute: function() {
 				return "foo";
@@ -399,7 +434,7 @@
 
 		pf.types[ "bar" ] = "baz";
 
-		equal( "baz", pf.verifyTypeSupport({
+		equal( "pending", pf.verifyTypeSupport({
 			getAttribute: function() {
 				return "bar";
 			}
@@ -410,9 +445,9 @@
 		var image, candidates;
 
 		candidates = [
-			{ resolution: 100, url: "100" },
-			{ resolution: 200, url: "200" },
-			{ resolution: 300, url: "300" }
+			{ resolution: 100, url: "data:100" },
+			{ resolution: 200, url: "data:200" },
+			{ resolution: 300, url: "data:300" }
 		];
 
 		image = {
@@ -428,13 +463,13 @@
 		deepEqual(image.src, candidates[2].url, "uses the url from the best px fit" );
 		deepEqual(image.currentSrc, candidates[2].url, "uses the url from the best px fit" );
 
-		image.src = "foo300";
-		image.currentSrc = "foo300";
+		image.src = "data:300";
+		image.currentSrc = "data:300";
 
 		pf.applyBestCandidate( candidates, image );
 
-		deepEqual(image.src, "foo300", "src left alone when matched" );
-		deepEqual(image.currentSrc, "foo300", "currentSrc left alone when matched" );
+		deepEqual(image.src, "data:300", "src left alone when matched" );
+		deepEqual(image.currentSrc, "data:300", "currentSrc left alone when matched" );
 	});
 
 	test( "removeVideoShim", function() {
@@ -568,6 +603,16 @@
 
 		equal( image.src, "foo" );
 
+	});
+
+	test( "`img` can be added outside the DOM without errors", function() {
+		var img = document.createElement( "img" );
+
+		img.setAttribute( "srcset", "data:img 500w" );
+
+		picturefill( { elements: [ img ] } );
+
+		assert.equal( img.currentSrc || img.src, "data:img" );
 	});
 
 })( window, jQuery );
