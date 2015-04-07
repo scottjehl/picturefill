@@ -35,6 +35,7 @@
     "grunt-contrib-watch": "~0.6.0",
     "grunt-gh-pages": "^0.10.0",
     "grunt-insert": "~0.1.0",
-    "grunt-jscs-checker": "~0.4.3"
+    "grunt-jscs-checker": "~0.4.3",
+    "grunt-release": "^0.12.0"
   }
 }
