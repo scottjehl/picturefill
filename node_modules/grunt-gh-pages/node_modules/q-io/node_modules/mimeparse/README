@@ -1,0 +1,96 @@
+
+
+This module provides basic functions for handling mime-types. It can
+handle matching mime-types against a list of media-ranges. See section
+14.1 of the HTTP specification [RFC 2616] for a complete explanation.
+
+  <http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.1>
+
+A port to JavaScript of Joe Gregorio's MIME-Type Parser:
+
+  <http://code.google.com/p/mimeparse/>
+
+Ported by J. Chris Anderson <jchris@apache.org>, targeting the
+Spidermonkey runtime.
+
+Ported to Chiron, Narwhal, Node by Kris Kowal.
+
+  <http://github.com/kriskowal/mimeparse>
+
+
+Installation
+============
+
+    Install <http://github.com/isaacs/npm>
+
+    npm install mimeparse
+
+
+The API
+=======
+
+parseMimeType(mimeType)
+
+    Carves up a mime-type and returns an Array of the
+    [type, subtype, params] where "params" is a Hash of all
+    the parameters for the media range.
+
+    For example, the media range "application/xhtml;q=0.5" would
+    get parsed into::
+
+        ["application", "xhtml", { "q" : "0.5" }]
+
+parseMediaRange(range)
+
+    Carves up a media range and returns an Array of the
+    [type, subtype, params] where "params" is a Object with
+    all the parameters for the media range.
+    
+    For example, the media range "application/*;q=0.5" would
+    get parsed into::
+    
+        ["application", "*", { "q" : "0.5" }]
+    
+    In addition this function also guarantees that there
+    is a value for "q" in the params dictionary, filling it
+    in with a proper default if necessary.
+
+fitnessAndQualityParsed(mimeType, parsedRanges)
+
+    Find the best match for a given mime-type against
+    a list of media_ranges that have already been
+    parsed by parseMediaRange(). Returns an array of
+    the fitness value and the value of the 'q' quality
+    parameter of the best match, or (-1, 0) if no match
+    was found. Just as for qualityParsed(), 'parsed_ranges'
+    must be a list of parsed media ranges.
+
+qualityParsed(mimeType, parsedRanges)
+
+    Find the best match for a given mime-type against
+    a list of media_ranges that have already been
+    parsed by parseMediaRange(). Returns the
+    'q' quality parameter of the best match, 0 if no
+    match was found. This function bahaves the same as quality()
+    except that 'parsedRanges' must be a list of
+    parsed media ranges.
+
+quality(mimeType, ranges)
+
+    Returns the quality 'q' of a mime-type when compared
+    against the media-ranges in ranges. For example::
+
+        >>> quality('text/html','text/*;q=0.3, text/html;q=0.7, text/html;level=1, text/html;level=2;q=0.4, *\/*;q=0.5')
+        0.7
+
+bestMatch(supported, header)
+
+    Takes a list of supported mime-types and finds the best
+    match for all the media-ranges listed in header. The value of
+    header must be a string that conforms to the format of the
+    HTTP Accept: header. The value of 'supported' is a list of
+    mime-types::
+    
+        >>> bestMatch(['application/xbel+xml', 'text/xml'], 'text/*;q=0.5,*\/*; q=0.1')
+        'text/xml'
+

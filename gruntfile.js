@@ -19,7 +19,7 @@
         files: [ "dist" ]
       },
       concat: {
-        
+
         dist: {
           options: {
             banner: "<%= banner %>",
@@ -38,7 +38,7 @@
           dest: "dist/picturefill.min.js"
         }
       },
-      
+
       qunit: {
         files: [ "tests/**/*.html" ]
       },
@@ -54,6 +54,12 @@
         all: {
           src: "<%= jshint.all.src %>"
         }
+      },
+      "gh-pages": {
+        options: {
+          base: '.'
+        },
+        src: ["**"]
       },
       watch: {
         gruntfile: {
@@ -84,26 +90,27 @@
     grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-jscs-checker");
-    
+    grunt.loadNpmTasks("grunt-gh-pages");
+
     grunt.task.registerTask("support-types", "insert support for image types dev wants to include", function() {
       var supportTypes = "";
       for (var i = 0; i < arguments.length; i++) {
         var arg = arguments[i];
-        
+
         switch ( arg ) {
-          case "webp": 
+          case "webp":
           case "svg":
           case "jxr":
           case "jp2":
           case "apng":
-          
+
             toConcat.push("src/includes/" + arg + ".js");
         }
-        
+
         supportTypes += ":" + arg;
-        
+
       }
-      
+
       if (!supportTypes) {
         supportTypes = supportTypes;
       }
@@ -114,5 +121,6 @@
 	// Default task.
     grunt.registerTask("default", [ "jscs", "test", "clean", "concat", "uglify" ]);
     grunt.registerTask("test", [ "jscs", "jshint", "qunit" ]);
+    grunt.registerTask("publish", [ "gh-pages" ]);
   };
 })();
