@@ -59,7 +59,7 @@
         options: {
           base: '.'
         },
-        src: ["**"]
+        src: ["**/*", "!node_modules/**/*", "!test/**/*", "!src/**/*"]
       },
       watch: {
         gruntfile: {
