@@ -15,7 +15,7 @@
 		<script async="true" src="dist/picturefill.js"></script>
 	</head>
 	<body>
-		<a href="http://responsiveimages.org/" class="ricg"><img src="https://raw.githubusercontent.com/ResponsiveImagesCG/RICG.io/master/_dist/_img/ricg-logo.png"></a>
+		<a href="http://responsiveimages.org/" class="ricg"><img src="https://raw.githubusercontent.com/ResponsiveImagesCG/RICG.io/master/_dist/_img/ricg-logo.png" alt="Responsive Issues Community Group"></a>
 		<h1>Picturefill <em>A responsive image polyfill</em></h1>
 
 		<nav>
@@ -24,37 +24,37 @@
 				<li><a href="#getting-started">Getting Started</a></li>
 				<li><a href="#examples">Examples</a></li>
 				<li><a href="#api">API</a></li>
-				<li><a href="#support">Browser support</a></li>
+				<li><a href="#support">Browser Support</a></li>
 				<li><a href="#contributing">Contributing</a></li>
 			</ul>
 		</nav>
 
 		<p>The <a href="http://picture.responsiveimages.org/">picture element</a> and associated features are W3C standard HTML features that allow web developers to deliver an appropriate image to every user depending on a variety of conditions like screen size, viewport size, screen resolution, and more. Picturefill is a JavaScript file (or a <em>polyfill</em> to be more specific) that enables support for the <code>picture</code> element and associated features in browsers that do not yet support them, so you can start using them today!</p>
 
-		<p>Picturefill is developed and maintained by <a href="http://filamentgroup.com"><img src="http://filamentgroup.com/images/fg-logo-icon-lrg.png" class="filament-logo" alt="Filament Group"></a>, with help from the members of the <a href="http://picture.responsiveimages.org/">Responsive Images Community Group</a> and the developer community at large. For Picturefill version 2, a special thanks goes to <a href="https://github.com/jansepar">Shawn Jansepar</a> for all his work on polyfilling the new spec.</p>
+		<p>Picturefill is developed and maintained by <a href="http://filamentgroup.com"><img src="http://filamentgroup.com/images/fg-logo-icon-lrg.png" class="filament-logo" alt="Filament Group"></a>, with help from the members of the <a href="http://responsiveimages.org/">Responsive Issues Community Group</a> and the developer community at large. For Picturefill version 2, a special thanks goes to <a href="https://github.com/jansepar">Shawn Jansepar</a> for all his work on polyfilling the new spec.</p>
 
 		<h3 id="contributing">Contributing, Bug Reports, and More information</h3>
 
-		<p>For more information on the development of Picturefill, and how you can file bugs or contribute fixes, check out the the code project site on Github : <a href="https://github.com/scottjehl/picturefill">Picturefill on Github.</a></p>
+		<p>For more information on the development of Picturefill, and how you can file bugs or contribute fixes, check out the the code project site on Github: <a href="https://github.com/scottjehl/picturefill">Picturefill on Github</a>.</p>
 
 		<h2 id="download">Downloading Picturefill</h2>
-		<h3>Picturefill Version 2.2.0 (latest stable version)</h3>
+		<h3>Picturefill Version 2.3.0 (latest stable version)</h3>
 		<p>For native <code>picture</code> element support, you'll want Picturefill version 2. These downloads include the <a href="https://github.com/paulirish/matchMedia.js/">matchMedia polyfill</a> for browsers that need it (like IE9).</p>
 		<ul>
-			<li><a href="https://github.com/scottjehl/picturefill/blob/2.2.0/dist/picturefill.js">picturefill.js</a> (development version, unminified code)</li>
-			<li><a href="https://github.com/scottjehl/picturefill/blob/2.2.0/dist/picturefill.min.js">picturefill.min.js</a> (production version, minified code)</li>
+			<li><a href="https://github.com/scottjehl/picturefill/blob/2.3.0/dist/picturefill.js">picturefill.js</a> (development version, unminified code)</li>
+			<li><a href="https://github.com/scottjehl/picturefill/blob/2.3.0/dist/picturefill.min.js">picturefill.min.js</a> (production version, minified code)</li>
 		</ul>
 		<p>
-			Picturefill 2.2.0 is available on the following <abbr title="Content Delivery Network">CDN</abbr>s:
+			Picturefill 2.3.0 is available on the following <abbr title="Content Delivery Network">CDN</abbr>s:
 		</p>
 		<h4><a href="https://cdnjs.com/libraries/picturefill">cdnjs:</a></h4>
 		<ul>
-			<li><a href="https://cdnjs.cloudflare.com/ajax/libs/picturefill/2.2.0/picturefill.js">picturefill.js</a> (development version, unminified code)</li>
-			<li><a href="https://cdnjs.cloudflare.com/ajax/libs/picturefill/2.2.0/picturefill.min.js">picturefill.min.js</a> (production version, minified code)</li>
+			<li><a href="https://cdnjs.cloudflare.com/ajax/libs/picturefill/2.3.0/picturefill.js">picturefill.js</a> (development version, unminified code)</li>
+			<li><a href="https://cdnjs.cloudflare.com/ajax/libs/picturefill/2.3.0/picturefill.min.js">picturefill.min.js</a> (production version, minified code)</li>
 		</ul>
 		<h4><a href="http://www.jsdelivr.com/#!picturefill">jsDelivr:</a></h4>
 		<ul>
-			<li><a href="https://cdn.jsdelivr.net/picturefill/2.2.0/picturefill.min.js">picturefill.min.js</a> (production version, minified code)</li>
+			<li><a href="https://cdn.jsdelivr.net/picturefill/2.3.0/picturefill.min.js">picturefill.min.js</a> (production version, minified code)</li>
 		</ul>
 
 		<h3>Version 1.2.1</h3>
@@ -75,12 +75,12 @@
 
 		<h2 id="getting-started">Getting Started with Picturefill Version 2</h2>
 
-		<p>For basic usage of Picturefill: download one of the files listed above and reference it from the <code>head</code> section of your HTML document with the following code:</p>
+		<p>For basic usage of Picturefill download one of the files listed above and reference it from the <code>head</code> section of your HTML document with the following code:</p>
 
 <pre><code>&lt;script src=&quot;picturefill.js&quot;&gt;&lt;/script&gt;
 </code></pre>
 
-		<p>To allow your page to load more efficiently, we'd recommend adding an <code>async</code> attribute to that <code>script</code> tag as well. This tells the browser that it can load picturefill asynchronously, without waiting for it to finish before loading the rest of the document. If you add this attribute, you'll need to add a line of script before the <code>script</code> tag as well to allow older browsers to recognize <code>picture</code> elements if it encounters them in the page before picturefill has finished loading. </p>
+		<p>To allow your page to load more efficiently, we'd recommend adding an <code>async</code> attribute to that <code>script</code> tag as well. This tells the browser that it can load Picturefill asynchronously, without waiting for it to finish before loading the rest of the document. If you add this attribute, you'll need to add a line of script before the <code>script</code> tag as well to allow older browsers to recognize <code>picture</code> elements if it encounters them in the page before Picturefill has finished loading.</p>
 
 		<p><strong>Here's our recommended snippet:</strong></p>
 
@@ -96,7 +96,7 @@ document.createElement( &quot;picture&quot; );
 
 		<h2 id="examples">Basic markup patterns</h2>
 
-		<p>Once you've included picturefill.js, you can start adding responsive image elements to your site. Picturefill adds support for both the <code>picture</code> element and also new responsive attributes to the <code>img</code> element. You may find that the new <code>img</code> features may be all you need. Let's cover those first.</p>
+		<p>Once you've included picturefill.js, you can start adding responsive image elements to your site. Picturefill adds support for both the <code>picture</code> element and the new responsive attributes for the <code>img</code> element. You may find that the new <code>img</code> features may be all you need. Let's cover those first.</p>
 
 		<h3 id="img-sizes">Using <code>img</code> with <code>srcset</code> &amp; <code>sizes</code> attributes</h3>
 
@@ -118,7 +118,7 @@ srcset=&quot;examples/images/medium.jpg 375w, examples/images/large.jpg 480w, ex
 
 		<p>The <code>picture</code> element requires a little more markup than the example above, but it allows you to use features like CSS3 Media Queries to pair image sources with other layout conditions in your designs. </p>
 
-		<p>Your <code>picture</code> element should contain a series of <code>source</code> elements followed by an <code>img</code> element. Each <code>source</code> element must have a <code>srcset</code> attribute specifying one or more image url sources (which can use expanded srcset syntax if desired for resolution switching), and the <code>img</code> element should have a srcset attribute for fallback purposes as well (some browsers like Android 2.3's won't see the <code>source</code> elements). Additionally, you may add a  <code>media</code> attribute containing CSS3 Media Queries, and/or a <code>sizes</code> attribute to pair with <code>srcset</code>.</p>
+		<p>Your <code>picture</code> element should contain a series of <code>source</code> elements followed by an <code>img</code> element. Each <code>source</code> element must have a <code>srcset</code> attribute specifying one or more image URL sources (which can use expanded <code>srcset</code> syntax if desired for resolution switching), and the <code>img</code> element should have a <code>srcset</code> attribute for fallback purposes as well (some browsers like Android 2.3's won't see the <code>source</code> elements). Additionally, you may add a  <code>media</code> attribute containing CSS3 Media Queries, and/or a <code>sizes</code> attribute to pair with <code>srcset</code>.</p>
 
 		<p>Here's one with <code>srcset</code> and <code>media</code>. The first <code>source</code> with a <code>media</code> attribute that matches the user’s context will determine the src of the <code>img</code> element at the end, so you’ll want to present larger options first when using <code>min-width</code> media queries (like in the examples below), and larger options last when using <code>max-width</code> media queries.</p>
 
@@ -129,8 +129,8 @@ srcset=&quot;examples/images/medium.jpg 375w, examples/images/large.jpg 480w, ex
 &lt;/picture&gt;
 </code></pre>
 
-		<h3 id="ie9">Supporting Picture in Internet Explorer 9</h3>
-		<p>While most versions of IE (even older ones!) are supported well, IE9 has a little conflict to work around. To support IE9, you will need to wrap a <code>video</code> element wrapper around the source elements in your <code>picture</code> tag. You can do this using conditional comments, like so:</p>
+		<h3 id="ie9">Supporting <code>picture</code> in Internet Explorer 9</h3>
+		<p>While most versions of IE (even older ones!) are supported well, IE9 has a little conflict to work around. To support IE9, you will need to wrap a <code>video</code> element around the <code>source</code> elements in your <code>picture</code> tag. You can do this using conditional comments, like so:</p>
 
 <pre><code>&lt;picture&gt;
 	&lt;!--[if IE 9]&gt;&lt;video style=&quot;display: none;&quot;&gt;&lt;![endif]--&gt;
@@ -153,10 +153,10 @@ srcset=&quot;examples/images/medium.jpg 375w, examples/images/large.jpg 480w, ex
 
 		<p><a href="examples/demo-02.html">View standalone demo</a></p>
 
-		<h2>More Picture markup examples</h2>
+		<h2>More <code>picture</code> markup examples</h2>
 
-		<h3 id="media-and-srcset"><code>media</code> and <code>srcset</code> syntax:</h3>
-		<p>The <code>1x</code>, <code>2x</code> syntax in <code>srcset</code> acts as a shorthand for more complex resolution media queries. When natively supported, <code>srcset</code> will allow the UA to override requests for higher-resolution options based on a bandwidth limitations or a user preference (see #9 in the <a href="http://usecases.responsiveimages.org/#h2_requirements">Responsive Images Use Cases and Requirements</a>).</p>
+		<h3 id="media-and-srcset"><code>media</code> and <code>srcset</code> syntax</h3>
+		<p>The <code>1x</code>, <code>2x</code> syntax in <code>srcset</code> acts as a shorthand for more complex resolution media queries. When natively supported, <code>srcset</code> will allow the UA to override requests for higher-resolution options based on bandwidth limitations or a user preference (see #9 in the <a href="http://usecases.responsiveimages.org/#h2_requirements">Responsive Images Use Cases and Requirements</a>).</p>
 
 <pre><code>&lt;picture&gt;
 	&lt;!--[if IE 9]&gt;&lt;video style=&quot;display: none;&quot;&gt;&lt;![endif]--&gt;
@@ -175,22 +175,20 @@ srcset=&quot;examples/images/medium.jpg 375w, examples/images/large.jpg 480w, ex
 
 	<p><a href="examples/demo-03.html">View standalone demo</a></p>
 
-	<h3 id="types"><code>media</code> example with one webp source qualified with a <code>type</code> attribute.</h3>
+	<h3 id="types"><code>media</code> example with one WebP source qualified with a <code>type</code> attribute</h3>
 		<p>
-		  Note: Picturefill can support SVG, WebP, JPEG-XR, JPEG-2000 and APNG types on any source element, and will disregard a <code>source</code> if its type is not supported in a particular environment.
-		  <strong>This option will only work if picturefill is built by setting the <code>support-types</code> grunt task correctly when building picturefill.</strong>
-		    For example, to support all these formats, build picturefill with this grunt task:
+		  Note: Picturefill can support SVG, WebP, JPEG-XR, JPEG-2000 and APNG types on any <code>source</code> element, and will disregard a <code>source</code> if its type is not supported in a particular environment.
+		  <strong>This option will only work if Picturefill is built by setting the <code>support-types</code> grunt task correctly when building Picturefill.</strong>
+		    For example, to support all these formats, build Picturefill with this grunt task:
 		</p>
 <pre><code>grunt support-types:jxr:jp2:apng</code></pre>
 
     <p>
       (<strong>Note:</strong> There is no need to add <code>webp</code> or <code>svg</code> to the <code>support-types</code> list
-      because they are supported by picturefill automatically)
+      because they are supported by Picturefill automatically.)
     </p>
     <p>
-      If you wish to remove support for any of these formats, take them out of <code>support-types</code> task.  If you wish picturefill to support
-      none of these alternative formats, you can leave out the <code>support-types</code> task out of the grunt build altogether.  Remember that
-      to ensure these images are loaded correctly by picturefill, you will need to
+      If you wish to remove support for any of these formats, take them out of the <code>support-types</code> task. If you wish Picturefill to support none of these alternative formats, you can leave the <code>support-types</code> task out of the grunt build altogether. Remember that to ensure these images are loaded correctly by Picturefill, you will need to
       <a href="https://developer.mozilla.org/en-US/docs/Web/Security/Securing_your_site/Configuring_server_MIME_types">properly configure your
         web server's MIME types</a> to support these formats.
     </p>
@@ -205,7 +203,6 @@ srcset=&quot;examples/images/medium.jpg 375w, examples/images/large.jpg 480w, ex
      &lt;!--[if IE 9]&gt;&lt;/video&gt;&lt;![endif]--&gt;
      &lt;img srcset="examples/images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"&gt;
 &lt;/picture&gt;
-
 </code></pre>
 
     <picture>
@@ -223,28 +220,27 @@ srcset=&quot;examples/images/medium.jpg 375w, examples/images/large.jpg 480w, ex
 
 		<h2 id="api">Picturefill JavaScript API</h2>
 
-		<p>Under ordinary circumstances, you likely won't need to do more than include picturefill.js in your page, but in some situations you may want to run picturefill's function manually yourself, and there are a few options to keep in mind:</p>
+		<p>Under ordinary circumstances, you likely won't need to do more than include picturefill.js in your page, but in some situations you may want to run Picturefill's function manually yourself, and there are a few options to keep in mind:</p>
 
-		<h3>The picturefill function</h3>
+		<h3>The <code>picturefill()</code> function</h3>
 
-		<p>Picturefill.js exposes a single global function: the <code>picturefill()</code> function. <code>picturefill()</code> is automatically called one or more times while a page is loading, and it also is triggered when the browser window is resized (or on orientation change). You can run the <code>picturefill()</code> function at any time in JavaScript yourself as well, which may be useful after making updates to the DOM, or when conditions relevant to your application change:</p>
+		<p>picturefill.js exposes a single global function: the <code>picturefill()</code> function. <code>picturefill()</code> is automatically called one or more times while a page is loading, and it also is triggered when the browser window is resized (or on orientation change). You can run the <code>picturefill()</code> function at any time in JavaScript yourself as well, which may be useful after making updates to the DOM, or when conditions relevant to your application change:</p>
 
-<pre><code>
-picturefill();
+<pre><code>picturefill();
 </code></pre>
 
-		<h3>Picturefill function options</h3>
+		<h3><code>picturefill()</code> function options</h3>
 
 		<p>When running the <code>picturefill()</code> function, you can pass options specifying the following settings:</p>
 
 		<ul>
-			<li><strong>Elements:</strong> An array of <code>img</code> elements you'd like picturefill to evaluate. The Default value for <code>options.elements</code> is all <code>img</code> elements in the page that have a <code>srcset</code> attribute or have a <code>picture</code> element as a direct parent.
+			<li><strong>Elements:</strong> An array of <code>img</code> elements you'd like Picturefill to evaluate. The default value for <code>options.elements</code> is all <code>img</code> elements in the page that have a <code>srcset</code> attribute or have a <code>picture</code> element as a direct parent.
 <pre><code>picturefill( {
 	elements: [ document.getElementById( "myPicture" ) ]
 } );
 </code></pre>
 			</li>
-			<li><strong>Reevaluate:</strong> Force picturefill to evaluate all elements in the <code>options.elements</code> array, even if they've already been evaluated. The default is <code>false</code>, except when a resize event triggers Picturefill to run (<code>options.reevaluate</code> is <code>true</code> in that case).
+			<li><strong>Reevaluate:</strong> Force Picturefill to evaluate all elements in the <code>options.elements</code> array, even if they've already been evaluated. The default is <code>false</code>, except when a resize event triggers Picturefill to run (<code>options.reevaluate</code> is <code>true</code> in that case).
 <pre><code>picturefill( {
 	reevaluate: true
 } );
@@ -260,12 +256,13 @@ picturefill();
 
 		<p>Picturefill is tested broadly and works in a large number of browsers. That said, it does have some browser support considerations to keep in mind:</p>
 		<ul>
-			<li><strong>JS-Disabled Browsers only see alt text:</strong> When using the <code>picture</code> element, non-<code>picture</code> supporting browsers will only see <code>alt</code> attribute text as a fallback when JavaScript fails or is disabled. This is because any <code>noscript</code>-based workarounds (such as the one used in Picturefill version 1) will cause future browsers that support the <code>picture</code> element to show two images instead of one when JavaScript is off. Unfortunately, adding a <code>src</code> attribute with an external source to the <code>img</code> element in your <code>picture</code> element isn't a good workaround either, as any browser that exists today will fetch that <code>src</code> url even if it is not going to be used (which is wasteful), and an empty <code>src</code> can result in <a href="http://wilto.github.io/srcn-polyfills/">unexpected requests</a>. For valid markup, the shortest possible value for <code>src</code> (without firing an <code>onerror</code> event or a potential request) is <code>src="data:image/gif;base64,R0lGODlhAQABAAAAADs="</code>If you absolutely need an image to appear in non-JS environments, Picturefill 1.2 is a fine choice.</li>
+			<li><strong>JS-Disabled Browsers only see <code>alt</code> text:</strong> When using the <code>picture</code> element, non-<code>picture</code> supporting browsers will only see <code>alt</code> attribute text as a fallback when JavaScript fails or is disabled. This is because any <code>noscript</code>-based workarounds (such as the one used in Picturefill version 1) will cause future browsers that support the <code>picture</code> element to show two images instead of one when JavaScript is off. Unfortunately, adding a <code>src</code> attribute with an external source to the <code>img</code> element in your <code>picture</code> element isn't a good workaround either, as any browser that exists today will fetch that <code>src</code> URL even if it is not going to be used (which is wasteful), and an empty <code>src</code> can result in <a href="http://wilto.github.io/srcn-polyfills/">unexpected requests</a>. For valid markup, the shortest possible value for <code>src</code> (without firing an <code>onerror</code> event or a potential request) is <code>src="data:image/gif;base64,R0lGODlhAQABAAAAADs="</code>. If you absolutely need an image to appear in non-JS environments, Picturefill 1.2 is a fine choice.</li>
 
 			<li><strong>Temporary extra HTTP Requests for <code>picture</code> usage in some browsers:</strong> In browsers that natively support <code>srcset</code> but do not yet support the <code>picture</code> element, users may experience a wasted HTTP request for each <code>picture</code> element on a page. This is because the browser's preparser will fetch one of the URLs listed in the <code>picture</code> element's child <code>img</code>'s <code>srcset</code> attribute as soon as possible during page load, before the JavaScript can evaluate the potential <code>picture</code> <code>source</code> elements for a better match. This problem will only affect browsers that have implemented <code>srcset</code> but not <code>picture</code>, which will hopefully be short-lived.</li>
 
-			<li><strong>Source element limitations:</strong> Browsers like Android 2.3 and Internet Explorer 9 can not see the <code>source</code> elements inside a <code>picture</code> element. For IE, the <code>video</code> tag workaround helps us avoid this problem, but Android will still have no access to <code>source</code> elements. Be sure to provide a <code>srcset</code> attribute on your enclosed <code>img</code> to ensure an image will show in this browser.</li>
-			<li><strong>Media attribute support requires native media query support</strong>The <code>picture</code> element (paired with picturefill) works best in browsers that support CSS3 media queries. Picturefill includes  the <a href="https://github.com/paulirish/matchMedia.js/">matchMedia polyfill</a> by default, which makes matchMedia work in media query-supporting browsers that don’t support <code>matchMedia</code>.</li>
+			<li><strong><code>source</code> element limitations:</strong> Browsers like Android 2.3 and Internet Explorer 9 cannot see the <code>source</code> elements inside a <code>picture</code> element. For IE, the <code>video</code> tag workaround helps us avoid this problem, but Android will still have no access to <code>source</code> elements. Be sure to provide a <code>srcset</code> attribute on your enclosed <code>img</code> to ensure an image will show in this browser.</li>
+
+			<li><strong><code>media</code> attribute support requires native media query support:</strong> The <code>picture</code> element (paired with Picturefill) works best in browsers that support CSS3 media queries. Picturefill includes  the <a href="https://github.com/paulirish/matchMedia.js/">matchMedia polyfill</a> by default, which makes matchMedia work in media query-supporting browsers that don’t support <code>matchMedia</code>.</li>
 		</ul>
 
 	</body>

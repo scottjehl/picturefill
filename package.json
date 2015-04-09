@@ -1,7 +1,7 @@
 {
   "name": "picturefill",
   "description": "A responsive image polyfill.",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "homepage": "https://scottjehl.github.io/picturefill/",
   "bugs": "https://github.com/scottjehl/picturefill/issues",
   "license": "MIT",
