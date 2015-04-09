@@ -61,6 +61,14 @@
         },
         src: ["**/*", "!node_modules/**/*", "!test/**/*", "!src/**/*"]
       },
+      release: {
+        options: {
+          additionalFiles: ["bower.json"],
+          commitMessage: "Picturefill <%= version %>",
+          tagMessage: "Picturefill <%= version %>",
+          afterRelease: ["gh-pages"]
+        }
+      },
       watch: {
         gruntfile: {
           files: [ "Gruntfile.js", "src/*.js", "src/includes/*.js", "tests/*.js" ],
@@ -91,6 +99,8 @@
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-jscs-checker");
     grunt.loadNpmTasks("grunt-gh-pages");
+    grunt.loadNpmTasks("grunt-release");
+
 
     grunt.task.registerTask("support-types", "insert support for image types dev wants to include", function() {
       var supportTypes = "";
