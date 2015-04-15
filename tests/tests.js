@@ -717,20 +717,6 @@
 			equal( op.getSet( img ), false );
 		});
 
-		test( "picturefill ignores elements when they are marked with a property", function() {
-			expect( 0 );
-
-			var mockPicture = {
-				nodeName: "PICTURE"
-			};
-
-			mockPicture[ op.ns ] = {
-				evaled: true
-			};
-
-			picturefill({ reevaluate: false, elements: [ mockPicture ] });
-		});
-
 		test( "picturefill marks elements with a property", function() {
 			// NOTE requires at least one child image for the propery to be set
 			var mockPicture = $( ".prop-check" )[0];

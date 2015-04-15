@@ -15,7 +15,7 @@
 	document.createElement( "picture" );
 
 	var lowTreshold, partialLowTreshold, isLandscape, lazyFactor, warn, eminpx,
-		alwaysCheckWDescriptor, resizeThrottle;
+		alwaysCheckWDescriptor, resizeThrottle, evalId;
 	// local object for method references and testing exposure
 	var ri = {};
 	var noop = function() {};
@@ -211,7 +211,7 @@
 			}
 		}
 
-		elements = options.elements || ri.qsa( (options.context || document), ( options.reevaluate || options.reparse ) ? ri.sel : ri.selShort );
+		elements = options.elements || ri.qsa( (options.context || document), ( options.reevaluate || options.mqchange ) ? ri.sel : ri.selShort );
 
 		if ( (plen = elements.length) ) {
 
@@ -279,6 +279,8 @@
 		units.vw = units.width / 100;
 		units.vh = units.height / 100;
 
+		evalId = [units.height, units.width, dprM].join('-');
+
 		units.em = ri.getEmValue();
 		units.rem = units.em;
 
@@ -314,7 +316,7 @@
 		var matchingSet = ri.getSet( img );
 		var evaluated = false;
 		if ( matchingSet !== "pending" ) {
-			evaluated = true;
+			evaluated = evalId;
 			if ( matchingSet ) {
 				srcSetCandidates = ri.setRes( matchingSet );
 				ri.applySetCandidate( srcSetCandidates, img );
@@ -1357,7 +1359,7 @@
 
 	ri.fillImg = function(element, options) {
 		var imageData;
-		var extreme = options.reparse || options.reevaluate;
+		var extreme = options.mqchange || options.reevaluate;
 
 		// expando for caching data on the img
 		if ( !element[ ri.ns ] ) {
@@ -1369,18 +1371,18 @@
 		// if the element has already been evaluated, skip it
 		// unless `options.reevaluate` is set to true ( this, for example,
 		// is set to true when running `picturefill` on `resize` ).
-		if ( !extreme && imageData.evaled ) {
+		if ( !extreme && imageData.evaled === evalId ) {
 			return;
 		}
 
-		if ( !imageData.parsed || options.reparse ) {
+		if ( !imageData.parsed || options.reevaluate ) {
 			ri.parseSets( element, element.parentNode, options );
 		}
 
 		if ( !imageData.supported ) {
 			applyBestCandidate( element );
 		} else {
-			imageData.evaled = true;
+			imageData.evaled = evalId;
 		}
 	};
 
@@ -1422,7 +1424,7 @@
 			};
 
 			var resizeEval = function() {
-				ri.fillImgs({ reevaluate: true });
+				ri.fillImgs();
 			};
 
 			var onResize = function() {

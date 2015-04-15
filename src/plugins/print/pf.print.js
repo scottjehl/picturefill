@@ -38,7 +38,7 @@
 			ri.DPR = 1.5;
 			ri.cfg.xQuant = 1.5;
 		}
-		picturefill({reevaluate: true});
+		picturefill({mqchange: true});
 	};
 	var afterprint = function(){
 		if(oldMatches){
@@ -53,7 +53,7 @@
 			ri.DPR = oldDPR;
 			oldDPR = false;
 		}
-		picturefill({reevaluate: true});
+		picturefill({mqchange: true});
 	};
 
 

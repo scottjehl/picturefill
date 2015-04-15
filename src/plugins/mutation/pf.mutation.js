@@ -136,7 +136,6 @@
 
 			ri.fillImgs({
 				elements: modifiedImgs,
-				reparse: true,
 				reevaluate: true
 			});
 		}
