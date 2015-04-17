@@ -1359,7 +1359,7 @@
 
 	ri.fillImg = function(element, options) {
 		var imageData;
-		var extreme = options.mqchange || options.reevaluate;
+		var extreme = options.reselect || options.reevaluate;
 
 		// expando for caching data on the img
 		if ( !element[ ri.ns ] ) {
@@ -1460,7 +1460,7 @@
 			} else {
 				cfg[name] = args[0];
 				if (alreadyRun) {
-					ri.fillImgs( { reevaluate: true } );
+					ri.fillImgs( { reselect: true } );
 				}
 			}
 		}
