@@ -1,4 +1,4 @@
-/*! Picturefill - v3.0.0 - 2015-04-15
+/*! Picturefill - v3.0.0 - 2015-04-17
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 !function(window, document, undefined) {
@@ -18,7 +18,7 @@
         (isLandscape = units.width > units.height) || (lazyFactor *= .9), supportAbort && (lazyFactor *= .9);
     }
     function chooseLowRes(lowRes, diff, dpr) {
-        var add = diff * lowRes;
+        var add = diff * Math.pow(lowRes - .4, 1.2);
         return isLandscape || (add /= 1.3), lowRes += add, lowRes > dpr;
     }
     function applyBestCandidate(img) {
@@ -247,7 +247,7 @@
         return candidates;
     }, ri.setRes.res = setResolution, ri.applySetCandidate = function(candidates, img) {
         if (candidates.length) {
-            var candidate, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, curRes, abortCurSrc, imageData = img[ri.ns], dpr = ri.DPR, sub = .1 * dpr;
+            var candidate, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, curRes, abortCurSrc, imageData = img[ri.ns], dpr = ri.DPR, sub = .2 + .1 * dpr;
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
             curRes = curCan && curCan.res, curSrc && (abortCurSrc = supportAbort && !img.complete && curCan && curRes > dpr, 
             abortCurSrc || (curCan && dpr > curRes && curRes > lowTreshold && (partialLowTreshold > curRes && (sub += .1 * dpr), 
@@ -296,7 +296,7 @@
         element.srcset = "") : removeImgAttr.call(element, srcsetAttr)), imageData.supported && !imageData.srcset && (!imageData.src && element.src || element.src !== ri.makeUrl(imageData.src)) && (null === imageData.src ? element.removeAttribute("src") : element.src = imageData.src), 
         imageData.parsed = !0;
     }, ri.fillImg = function(element, options) {
-        var imageData, extreme = options.mqchange || options.reevaluate;
+        var imageData, extreme = options.reselect || options.reevaluate;
         element[ri.ns] || (element[ri.ns] = {}), imageData = element[ri.ns], (extreme || imageData.evaled !== evalId) && ((!imageData.parsed || options.reevaluate) && ri.parseSets(element, element.parentNode, options), 
         imageData.supported ? imageData.evaled = evalId : applyBestCandidate(element));
     }, ri.setupRun = function(options) {
@@ -320,7 +320,7 @@
             var name = args.shift();
             "function" == typeof ri[name] ? ri[name].apply(ri, args) : (cfg[name] = args[0], 
             alreadyRun && ri.fillImgs({
-                reevaluate: !0
+                reselect: !0
             }));
         }
     };

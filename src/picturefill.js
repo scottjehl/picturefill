@@ -302,7 +302,7 @@
 	}
 
 	function chooseLowRes( lowRes, diff, dpr ) {
-		var add = diff * lowRes;
+		var add = diff * Math.pow(lowRes - 0.4, 1.2);
 		if (!isLandscape) {
 			add /= 1.3;
 		}
@@ -1135,7 +1135,7 @@
 
 		var imageData = img[ ri.ns ];
 		var dpr = ri.DPR;
-		var sub = 0.1 * dpr;
+		var sub = 0.2 + (0.1 * dpr);
 
 		curSrc = imageData.curSrc || img[curSrcProp];
 

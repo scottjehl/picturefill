@@ -53,7 +53,7 @@
 			ri.DPR = oldDPR;
 			oldDPR = false;
 		}
-		picturefill({mqchange: true});
+		picturefill({reselect: true});
 	};
 
 
