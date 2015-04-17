@@ -135,7 +135,7 @@
 	};
 
 
-	if(window.addEventListener){
+	if(window.addEventListener && !window.HTMLPictureElement){
 		addEventListener('resize', reeval, false);
 	}
 
