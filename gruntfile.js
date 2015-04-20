@@ -101,7 +101,6 @@
     grunt.loadNpmTasks("grunt-gh-pages");
     grunt.loadNpmTasks("grunt-release");
 
-
     grunt.task.registerTask("support-types", "insert support for image types dev wants to include", function() {
       var supportTypes = "";
       for (var i = 0; i < arguments.length; i++) {
