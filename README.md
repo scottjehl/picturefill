@@ -5,6 +5,8 @@ A [responsive image](http://www.whatwg.org/specs/web-apps/current-work/multipage
 
 [![build-status](https://api.travis-ci.org/scottjehl/picturefill.svg)](https://travis-ci.org/scottjehl/picturefill)
 
+![](https://pf-slackin.herokuapp.com/badge.svg)
+
 Picturefill has two versions:
 * Version 2 is a strict polyfill of the [Picture element draft specification](http://www.whatwg.org/specs/web-apps/current-work/multipage/embedded-content.html#embedded-content) and is the main version in development.
 * Version 1 mimics the Picture element pattern with `span` elements. It is maintained in the 1.2 branch.
@@ -20,6 +22,8 @@ For information on how to contribute code to Picturefill, check out `CONTRIBUTIN
 ## Issues
 If you find a bug in Picturefill, please add it to [the issue tracker](https://github.com/scottjehl/picturefill/issues)
 
+## Discussion
+Picturefill discussion takes place via Slack. For an invitation, visit [https://pf-slackin.herokuapp.com/](https://pf-slackin.herokuapp.com/)
 
 ## Support
 
