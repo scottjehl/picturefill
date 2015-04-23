@@ -5,7 +5,7 @@ A [responsive image](http://www.whatwg.org/specs/web-apps/current-work/multipage
 
 [![build-status](https://api.travis-ci.org/scottjehl/picturefill.svg)](https://travis-ci.org/scottjehl/picturefill)
 
-![](https://pf-slackin.herokuapp.com/badge.svg)
+[<img src="https://pf-slackin.herokuapp.com/badge.svg" alt="Join Slack channel">](https://pf-slackin.herokuapp.com/)
 
 Picturefill has two versions:
 * Version 2 is a strict polyfill of the [Picture element draft specification](http://www.whatwg.org/specs/web-apps/current-work/multipage/embedded-content.html#embedded-content) and is the main version in development.
