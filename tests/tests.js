@@ -120,11 +120,11 @@
 
 			} else {
 				ok( $srcsetImageX.prop( op.ns ), "picturefill modifies images in non-supporting browsers." );
-				equal( $srcsetImageX.prop( "src" ), op.makeUrl( "resources/oneX.jpg" ), "picturefill changes source of image" );
+				equal( $srcsetImageX.prop( "src" ), op.makeUrl( "resources/oneX.jpg" ), "picturefill changes source of image1" );
 			}
 
 			if ( window.HTMLPictureElement || (op.supSrcset && op.supSizes) ) {
-				equal( $srcsetImageW.prop( op.ns ), undefined, "picturefill doesn't touch images in supporting browsers." );
+				equal( ($srcsetImageX.prop( op.ns ) || { supported: true }).supported, true, "picturefill doesn't touch images in supporting browsers." );
 				equal( $srcsetImageW.prop( "src" ), "", "picturefill doesn't touch image sources in supporting browsers." );
 			} else {
 				ok( $srcsetImageW.prop( op.ns ), "picturefill modifies images in non-supporting browsers." );
