@@ -445,14 +445,20 @@
 							equal($('source', picture).prop('sizes'), data[0].sizes);
 							strictEqual($('source', picture).prop('type'), '');
 
-							if(!ri.supSrcset || ri.supSizes){
+							if(!ri.supSrcset || (ri.supSizes && window.HTMLPictureElement)){
 								equal($('img', picture).prop('srcset'), data[1].srcset);
+							} else {
+								equal($('img', picture).prop('srcset'), '');
 							}
 							equal($('img', picture).prop('media'), data[1].media);
 							strictEqual($('img', picture).prop('sizes'), '');
 						}
 
-						equal($('img', picture).attr('srcset'), data[1].srcset);
+						if(!ri.supSrcset || (ri.supSizes && window.HTMLPictureElement)) {
+							equal($('img', picture).attr('srcset'), data[1].srcset);
+						} else {
+							equal($('img', picture).prop('srcset'), '');
+						}
 
 					});
 				};
