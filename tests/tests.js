@@ -746,11 +746,23 @@
 			try { picturefill({ reevaluate: false, elements: jQuery( ".no-src" ) }); } catch (e) { console.log( e ); ok( false ); }
 		});
 
-		test( "`img` can be added outside the DOM without errors", function() {
+		asyncTest( "`img` can be added outside the DOM without errors", function() {
+			var runTest, timer;
 			var img = document.createElement( "img" );
+			var runTest = function(){
+				equal( img.currentSrc || img.src, "data:img" );
+				start();
+				img.onload = null;
+				img.onerror = null;
+				clearTimeout(timer);
+			};
+
+			timer = setTimeout(runTest, 99);
+			img.onload = runTest;
+			img.onerror = runTest;
 			img.setAttribute( "srcset", "data:img 500w" );
 			picturefill( { elements: [ img ] } );
-			equal( img.currentSrc || img.src, "data:img" );
+
 		});
 	};
 
