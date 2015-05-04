@@ -1,4 +1,4 @@
-/*! Picturefill - v3.0.0 - 2015-04-17
+/*! Picturefill - v3.0.0 - 2015-05-04
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 !function(window, document, undefined) {
@@ -314,7 +314,7 @@
         }, timerId = setTimeout(run, document.body ? 9 : 99);
         on(window, "resize", onResize), on(document, "readystatechange", run);
     }(), ri.picturefill = picturefill, ri.fillImgs = picturefill, ri.teardownRun = noop, 
-    picturefill._ = ri, window.picturefill = picturefill, window.picturefillCFG = {
+    picturefill._ = ri, window.picturefillCFG = {
         ri: ri,
         push: function(args) {
             var name = args.shift();
@@ -325,4 +325,7 @@
         }
     };
     for (;setOptions && setOptions.length; ) window.picturefillCFG.push(setOptions.shift());
+    window.picturefill = picturefill, "object" == typeof module && "object" == typeof module.exports ? module.exports = picturefill : "function" == typeof define && define.amd && define("picturefill", function() {
+        return picturefill;
+    });
 }(window, document);
