@@ -1448,9 +1448,6 @@
 	/* expose methods for testing */
 	picturefill._ = ri;
 
-	/* expose picturefill */
-	window.picturefill = picturefill;
-
 	window.picturefillCFG = {
 		ri: ri,
 		push: function(args) {
@@ -1468,6 +1465,18 @@
 
 	while (setOptions && setOptions.length) {
 		window.picturefillCFG.push(setOptions.shift());
+	}
+
+	/* expose picturefill */
+	window.picturefill = picturefill;
+
+	/* expose picturefill */
+	if ( typeof module === "object" && typeof module.exports === "object" ) {
+		// CommonJS, just export
+		module.exports = picturefill;
+	} else if ( typeof define === "function" && define.amd ) {
+		// AMD support
+		define( "picturefill", function() { return picturefill; } );
 	}
 
 	if ( PFDEBUG ) {
