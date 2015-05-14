@@ -1,133 +1,135 @@
 /*global module:true*/
 (function() {
-	"use strict";
+  "use strict";
 
-	var pkg;
+  var pkg, toConcat = [ "src/external/matchmedia.js", "src/picturefill.js" ], supportTypes = "";
+  module.exports = function(grunt) {
 
-	module.exports = function(grunt) {
+    // Project configuration.
+    grunt.initConfig({
+      // Metadata.
+      pkg: pkg = grunt.file.readJSON("picturefill.json"),
+      banner: "/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - " +
+        "<%= grunt.template.today('yyyy-mm-dd') %>\n" +
+        "<%= pkg.homepage ? '* ' + pkg.homepage + '\\n' : '' %>" +
+        "* Copyright (c) <%= grunt.template.today('yyyy') %> <%= pkg.author.name %>;" +
+        " Licensed <%= _.pluck(pkg.licenses, 'type').join(', ') %> */\n",
+      // Task configuration.
+      clean: {
+        files: [ "dist" ]
+      },
+      concat: {
 
-		// Project configuration.
-		grunt.initConfig({
-			// Metadata.
-			pkg: pkg = grunt.file.readJSON("picturefill.json"),
-			banner: "/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - " +
-			"<%= grunt.template.today('yyyy-mm-dd') %>\n" +
-			"<%= pkg.homepage ? '* ' + pkg.homepage + '\\n' : '' %>" +
-			"* Copyright (c) <%= grunt.template.today('yyyy') %> <%= pkg.author.name %>;" +
-			" Licensed <%= _.pluck(pkg.licenses, 'type').join(', ') %> */\n",
-			// Task configuration.
-			clean: {
-				files: [ "dist" ]
-			},
-			copy: {
-				plugins: {
-					files: [
-						{
-							expand: true,
-							cwd: "src/plugins/",
-							src: [ "**/*.js" ],
-							dest: "dist/plugins/"
-						}
-					]
-				}
-			},
+        dist: {
+          options: {
+            banner: "<%= banner %>",
+            stripBanners: true
+          },
+          src: toConcat,
+          dest: "dist/picturefill.js"
+        }
+      },
+      uglify: {
+        options: {
+          banner: "<%= banner %>"
+        },
+        dist: {
+          src: [ "<%= concat.dist.src %>" ],
+          dest: "dist/picturefill.min.js"
+        }
+      },
 
-			uglify: {
-				options: {
-					banner: "<%= banner %>",
-					compress: {
-						global_defs: {
-							"PFDEBUG": false
-						},
-						dead_code: true
-					}
-				},
-				distfull: {
-					options: {
-						beautify: true,
-						mangle: false
-					},
-					src: [ "src/picturefill.js" ],
-					dest: "dist/picturefill.js"
-				},
-				distmin: {
-					src: [ "src/picturefill.js" ],
-					dest: "dist/picturefill.min.js"
-				},
-				plugins: {
-					files: [ {
-						expand: true,
-						cwd: "src/plugins/",
-						src: [ "**/*.js", "!*.min.js", "!**/*.min.js" ],
-						dest: "dist/plugins/",
-						ext: ".min.js",
-						extDot: "last"
-					} ]
-				}
-			},
-			qunit: {
-				files: [ "tests/*.html", "!tests/index-functional.html" ]
-			},
-			jshint: {
-				all: {
-					options: {
-						jshintrc: true
-					},
-					src: [ "Gruntfile.js", "src/*.js" ]
-				}
-			},
-			jscs: {
-				all: {
-					src: "<%= jshint.all.src %>"
-				}
-			},
-			watch: {
-				gruntfile: {
-					files: [ "Gruntfile.js", "src/*.js", "tests/*.js" ],
-					tasks: [ "default" ]
-				}
-			},
-			bytesize: {
-				all: {
-					src: [ "dist/picturefill.min.js" ]
-				}
-			},
-			maxFilesize: {
-				options: {
-					// Task-specific options go here.
-				},
-				minified: {
-					options: {
-						maxBytes: 10000
-					},
-					src: [ "src/picturefill.min.js" ]
-				}
-			}
-		});
+      qunit: {
+        files: [ "tests/**/*.html" ]
+      },
+      jshint: {
+        all: {
+          options: {
+            jshintrc: true
+          },
+          src: [ "Gruntfile.js", "src/*.js", "src/includes/*.js", "tests/*.js" ]
+        }
+      },
+      jscs: {
+        all: {
+          src: "<%= jshint.all.src %>"
+        }
+      },
+      "gh-pages": {
+        options: {
+          base: '.'
+        },
+        src: ["**/*", "!node_modules/**/*", "!test/**/*", "!src/**/*"]
+      },
+      release: {
+        options: {
+          additionalFiles: ["bower.json"],
+          commitMessage: "Picturefill <%= version %>",
+          tagMessage: "Picturefill <%= version %>",
+          afterRelease: ["gh-pages"]
+        }
+      },
+      watch: {
+        gruntfile: {
+          files: [ "Gruntfile.js", "src/*.js", "src/includes/*.js", "tests/*.js" ],
+          tasks: [ "support-types" +  supportTypes, "default" ],
+          options: {
+            spawn: false
+          }
+        }
+      }
+    });
 
-		// because the compress plugin is insane
-		grunt.task.registerTask("compress", "compress the dist folder", function() {
-			var childProc = require("child_process");
-			var done = this.async();
+    // because the compress plugin is insane
+    grunt.task.registerTask( "compress", "compress the dist folder", function() {
+      var childProc = require("child_process");
+      var done = this.async();
 
-			childProc.exec("zip -r dist-" + pkg.version + ".zip dist", function() {
-				done();
-			});
-		});
+      childProc.exec( "zip -r dist-" + pkg.version + ".zip dist", function() {
+        done();
+      });
+    });
 
-		// These plugins provide necessary tasks.
-		grunt.loadNpmTasks("grunt-contrib-clean");
-		grunt.loadNpmTasks("grunt-contrib-copy");
-		grunt.loadNpmTasks("grunt-contrib-jshint");
-		grunt.loadNpmTasks("grunt-contrib-qunit");
-		grunt.loadNpmTasks("grunt-contrib-uglify");
-		grunt.loadNpmTasks("grunt-contrib-watch");
-		grunt.loadNpmTasks("grunt-jscs");
-		grunt.loadNpmTasks("grunt-bytesize");
-		grunt.loadNpmTasks("grunt-max-filesize");
+    // These plugins provide necessary tasks.
+    grunt.loadNpmTasks("grunt-contrib-clean");
+    grunt.loadNpmTasks("grunt-contrib-concat");
+    grunt.loadNpmTasks("grunt-contrib-jshint");
+    grunt.loadNpmTasks("grunt-contrib-qunit");
+    grunt.loadNpmTasks("grunt-contrib-uglify");
+    grunt.loadNpmTasks("grunt-contrib-watch");
+    grunt.loadNpmTasks("grunt-jscs-checker");
+    grunt.loadNpmTasks("grunt-gh-pages");
+    grunt.loadNpmTasks("grunt-release");
 
-		// Default task.
-		grunt.registerTask("default", [ "test", "clean", "copy", "uglify", "bytesize", "maxFilesize" ]);
-		grunt.registerTask("test", [ "jshint", "qunit" ]); //"jscs",
-	};
+    grunt.task.registerTask("support-types", "insert support for image types dev wants to include", function() {
+      var supportTypes = "";
+      for (var i = 0; i < arguments.length; i++) {
+        var arg = arguments[i];
+
+        switch ( arg ) {
+          case "webp":
+          case "svg":
+          case "jxr":
+          case "jp2":
+          case "apng":
+
+            toConcat.push("src/includes/" + arg + ".js");
+        }
+
+        supportTypes += ":" + arg;
+
+      }
+
+      if (!supportTypes) {
+        supportTypes = supportTypes;
+      }
+      grunt.task.run("default");
+      console.log("files to concatenate", toConcat);
+    } );
+
+	// Default task.
+    grunt.registerTask("default", [ "jscs", "test", "clean", "concat", "uglify" ]);
+    grunt.registerTask("test", [ "jscs", "jshint", "qunit" ]);
+    grunt.registerTask("publish", [ "gh-pages" ]);
+  };
 })();
