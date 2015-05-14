@@ -1,4 +1,4 @@
-/*! Picturefill - v3.0.0 - 2015-05-13
+/*! Picturefill - v3.0.0 - 2015-05-14
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 !function(window, document, undefined) {
@@ -144,10 +144,9 @@
         }
         var i, unparsedSizesList, unparsedSizesListLength, unparsedSize, lastComponentValue, size, regexCssLengthWithUnits = /^(?:[+-]?[0-9]+|[0-9]*\.[0-9]+)(?:[eE][+-]?[0-9]+)?(?:ch|cm|em|ex|in|mm|pc|pt|px|rem|vh|vmin|vmax|vw)$/i, regexCssCalc = /^calc\((?:[0-9a-z \.\+\-\*\/\(\)]+)\)$/i;
         for (unparsedSizesList = parseComponentValues(strValue), unparsedSizesListLength = unparsedSizesList.length, 
-        i = 0; unparsedSizesListLength > i; i++) {
-            if (unparsedSize = unparsedSizesList[i], lastComponentValue = unparsedSize[unparsedSize.length - 1], 
-            isValidNonNegativeSourceSizeValue(lastComponentValue) && (size = lastComponentValue, 
-            unparsedSize.pop()), 0 === unparsedSize.length) return size;
+        i = 0; unparsedSizesListLength > i; i++) if (unparsedSize = unparsedSizesList[i], 
+        lastComponentValue = unparsedSize[unparsedSize.length - 1], isValidNonNegativeSourceSizeValue(lastComponentValue)) {
+            if (size = lastComponentValue, unparsedSize.pop(), 0 === unparsedSize.length) return size;
             if (unparsedSize = unparsedSize.join(" "), ri.matchesMedia(unparsedSize)) return size;
         }
         return "100vw";
@@ -156,7 +155,7 @@
     var lowTreshold, partialLowTreshold, isLandscape, lazyFactor, eminpx, alwaysCheckWDescriptor, resizeThrottle, evalId, ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
         xQuant: 1,
         lazyFactor: .3,
-        maxX: 2
+        maxX: 4
     }, srcAttr = "data-pfsrc", srcsetAttr = srcAttr + "set", ua = navigator.userAgent, supportAbort = /rident/.test(ua) || /ecko/.test(ua) && ua.match(/rv\:(\d+)/) && RegExp.$1 > 35, curSrcProp = "currentSrc", regWDesc = /\s+\+?\d+(e\d+)?w/, regSize = /(\([^)]+\))?\s*(.+)/, setOptions = window.picturefillCFG, baseStyle = ("https:" === location.protocol, 
     "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;overflow:hidden;clip:rect(0px, 0px, 0px, 0px)"), fsCss = "font-size:100%!important;", isVwDirty = !0, cssCache = {}, sizeLengthCache = {}, DPR = window.devicePixelRatio, units = {
         px: 1,
