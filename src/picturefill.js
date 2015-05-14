@@ -29,7 +29,7 @@
 		//resource selection:
 		xQuant: 1,
 		lazyFactor: 0.3,
-		maxX: 2
+		maxX: 4
 	};
 	var srcAttr = "data-pfsrc";
 	var srcsetAttr = srcAttr + "set";
