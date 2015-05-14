@@ -874,8 +874,10 @@
 			if (isValidNonNegativeSourceSizeValue(lastComponentValue)) {
 				size = lastComponentValue;
 				unparsedSize.pop();
-			} else if (PFDEBUG) {
-				warn("Parse error: " + strValue);
+			} else {
+				if (PFDEBUG) {
+					warn("Parse error: " + strValue);
+				}
 				continue;
 			}
 
