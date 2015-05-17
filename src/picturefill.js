@@ -6,10 +6,6 @@
 (function( window, document, undefined ) {
 	// Enable strict mode
 	"use strict";
-	/* global PFDEBUG, parseSizes */
-	if ( typeof PFDEBUG === "undefined" ) {
-		window.PFDEBUG = true;
-	}
 
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
 	document.createElement( "picture" );
@@ -232,14 +228,12 @@
 	 * @param {message}
 	 * @type {Function}
 	 */
-	if (PFDEBUG) {
-		warn = ( window.console && console.warn ) ?
-			function( message ) {
-				console.warn( message );
-			} :
-			noop
-		;
-	}
+	warn = ( window.console && console.warn ) ?
+		function( message ) {
+			console.warn( message );
+		} :
+		noop
+	;
 
 	if ( !(curSrcProp in image) ) {
 		curSrcProp = "src";
@@ -378,9 +372,6 @@
 			source[ ri.ns ] = true;
 			srcset = source.getAttribute( "srcset" );
 
-			if ( PFDEBUG && document.documentMode !== 9 && source.parentNode !== picture ) {
-				warn( "all source elements have to be a child of the picture element. For IE9 support wrap them in an audio/video element, BUT with conditional comments" );
-			}
 			// if source does not have a srcset attribute, skip
 			if ( srcset ) {
 				candidates.push( {
@@ -389,16 +380,6 @@
 					type: source.getAttribute( "type" ),
 					sizes: source.getAttribute( "sizes" )
 				} );
-			}
-			if ( PFDEBUG && source.getAttribute( "src" ) ) {
-				warn( "`src` on `source` invalid, use `srcset`." );
-			}
-		}
-
-		if ( PFDEBUG ) {
-			var srcTest = ri.qsa( picture, "source, img");
-			if ( srcTest[ srcTest.length - 1].nodeName.toUpperCase() === "SOURCE" ) {
-				warn( "all sources inside picture have to precede the img element" );
 			}
 		}
 	}
@@ -529,8 +510,6 @@
 				candidate.set = set;
 
 				candidates.push(candidate);
-			} else if (PFDEBUG) {
-				warn("Invalid srcset descriptor found in '" + input + "' at '" + desc + "'.");
 			}
 		} // (close parseDescriptors fn)
 
@@ -875,9 +854,6 @@
 				size = lastComponentValue;
 				unparsedSize.pop();
 			} else {
-				if (PFDEBUG) {
-					warn("Parse error: " + strValue);
-				}
 				continue;
 			}
 
@@ -885,9 +861,6 @@
 			// size. If unparsed size is now empty, return size and exit this algorithm.
 			// If this was not the last item in unparsed sizes list, that is a parse error.
 			if (unparsedSize.length === 0) {
-				if (PFDEBUG && (i !== unparsedSizesListLength -1)) {
-					warn("Parse error: " + strValue);
-				}
 				return size;
 			}
 
@@ -1010,9 +983,6 @@
 			value = false;
 		}
 
-		if ( PFDEBUG && (value === false || value < 0) ) {
-			warn( "invalid source size: " + sourceSizeValue );
-		}
 		return value;
 	};
 
@@ -1220,12 +1190,6 @@
 
 			if ( candidateSrc !== curSrc ) {
 				ri.setSrc( img, bestCandidate );
-				if ( PFDEBUG ) {
-					testImgDimensions(img, bestCandidate);
-					if (isSSL && !bestCandidate.url.indexOf( "http:" )) {
-						warn( "insecure: " + candidateSrc );
-					}
-				}
 			}
 			ri.setSize( img );
 		}
@@ -1319,10 +1283,6 @@
 				});
 			}
 
-			if ( PFDEBUG && !hasPicture && isWDescripor && imageData.src && imageSet.srcset.indexOf(element[ ri.ns ].src) === -1 ) {
-				warn("The fallback candidate (`src`) isn't described inside the srcset attribute. Normally you want to describe all available candidates.");
-			}
-
 		} else if ( imageData.src ) {
 			imageData.sets.push( {
 				srcset: imageData.src,
@@ -1353,9 +1313,6 @@
 			}
 		}
 
-		if ( PFDEBUG ) {
-			testMediaOrder(imageData.sets, "source");
-		}
 		imageData.parsed = true;
 	};
 
@@ -1479,141 +1436,6 @@
 	} else if ( typeof define === "function" && define.amd ) {
 		// AMD support
 		define( "picturefill", function() { return picturefill; } );
-	}
-
-	if ( PFDEBUG ) {
-		warn( "Responsive image debugger active. Do not use in production, because it slows things down! extremly" );
-
-		if (!document.querySelector || (document.documentMode || 9) < 8) {
-			warn("querySelector is needed. IE8 needs to be in strict, standard or edge mode: http://bit.ly/1yGgYU0 or try the ri.oldie.js plugin.");
-		}
-		if ( (document.getElementsByTagName("picture")[0] ||{} ).outerHTML === "<PICTURE>" ) {
-			warn("IE8 needs to picture shived. Either include picturefill.js in <head> or use html5shiv.");
-		}
-
-		if (document.compatMode === "BackCompat") {
-			warn("Browser is in quirksmode. Please make sure to be in strict mode.");
-		}
-
-		/**
-		 * a trim workaroung mainly for IE8
-		 * @param str
-		 * @returns {string}
-		 */
-		var trim = function ( str ) {
-			return str.trim ? str.trim() : str.replace( /^\s+|\s+$/g, "" );
-		};
-
-		var testImgDimensions = function(img, candidate) {
-			var onload = function() {
-				var dif;
-				var imgWidth = img.offsetWidth;
-				var naturalWidth = img.naturalWidth;
-				var canWidth = candidate.cWidth;
-				var res = ri.DPR * cfg.xQuant;
-
-				if (!canWidth && naturalWidth && candidate.d) {
-					canWidth = naturalWidth / res;
-				}
-
-				if (imgWidth && canWidth) {
-					if (imgWidth > canWidth) {
-						dif = canWidth / imgWidth;
-					} else {
-						dif = imgWidth / canWidth;
-					}
-
-					if (candidate.w && Math.abs(imgWidth - canWidth) > 50 && dif < 0.86) {
-						warn("Check your sizes attribute: " + candidate.set.sizes + " was calculated to: " + canWidth + "px. But your image is shown with a size of " + imgWidth + "px. img: " + candidate.url);
-					}
-				}
-
-				off(img, "load", onload);
-			};
-
-			on(img, "load", onload);
-		};
-		var testMediaOrder = (function() {
-			var regex = {
-				minw: /^\s*\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)\s*$/,
-				maxw: /^\s*\(\s*max\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)\s*$/
-			};
-
-			var checkSetOrder = function(set, sets, index, type) {
-				var i, curSet;
-				for (i = 0; i < index && i < sets.length; i++) {
-					curSet = sets[i];
-					if ((set._min && curSet._min && set._min >= curSet._min) || (set._max && curSet._max && set._max <= curSet._max)) {
-						if (type === "source") {
-							warn("Order of your source elements matters. Defining " + set.media + " after " + curSet.media + " doesn't make sense.");
-						} else {
-							warn("Order inside your sizes attribute does matter. Defining " + set.media + " after " + curSet.media + " doesn't make sense.");
-						}
-					}
-				}
-			};
-			var mediaTest = function(sets, type) {
-				var i, len, set, lastSet;
-
-				lastSet = sets[sets.length - 1];
-				if (lastSet && (lastSet.media || lastSet.type)) {
-					if (type === "source") {
-						warn("The last src/srcset shouldn't have any type or media conditions. Use img[src] or img[srcset].");
-					} else {
-						warn("Last sizes attribute shouldn't have any condition otherwise 100vw is used.");
-					}
-				}
-				for (i = 0, len = sets.length; i < len; i++) {
-					set = sets[i];
-					if (!set.media || set.type) {
-						if (!set.type && i !== len - 1) {
-							if (type === "source") {
-								warn("A source element without [media] and [type] doesn't make any sense. Last srcset can be used at the img element. Order is important!");
-							} else {
-								warn("The order of your sizes attribute does matter! The sizes length without a media condition has to be defined as last entry.");
-							}
-						}
-						continue;
-					}
-					set._min = set.media.match( regex.minw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" );
-					set._max = set.media.match( regex.maxw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" );
-
-					if ( set._min ) {
-						set._min = parseFloat( set._min, 10 ) * (set._min.indexOf( "em" ) > 0 ? ri.getEmValue() : 1);
-					}
-
-					if ( set._max ) {
-						set._max = parseFloat( set._max, 10 ) * (set._max.indexOf( "em" ) > 0 ? ri.getEmValue() : 1);
-					}
-					if (set._min || set._max) {
-						checkSetOrder(set, sets, i, type);
-					}
-				}
-			};
-
-			return function(sets) {
-				var i, len, sizes, j, sizesSet;
-
-				mediaTest(sets, "source");
-
-				for (i = 0, len = sets.length; i < len; i++) {
-					sizes = trim(sets[i].sizes || "");
-					if (sizes) {
-						sizesSet = [];
-						sizes = sizes.split( /\s*,\s*/ );
-						for (j = 0; j < sizes.length; j++) {
-							if (sizes[j]) {
-								sizesSet.push(ri.parseSize( sizes[j] ));
-							}
-						}
-
-						if (sizesSet.length) {
-							mediaTest(sizesSet, "sizes");
-						}
-					}
-				}
-			};
-		})();
 	}
 
 } )( window, document );
