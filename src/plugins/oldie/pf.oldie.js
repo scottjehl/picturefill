@@ -2,11 +2,11 @@
 	"use strict";
 	var interValId;
 	var intervalIndex = 0;
-	var run = function(){
+	var run = function() {
 		if ( window.picturefill ) {
 			factory( window.picturefill );
 		}
-		if(window.picturefill || intervalIndex > 9999){
+		if (window.picturefill || intervalIndex > 9999) {
 			clearInterval(interValId);
 		}
 		intervalIndex++;
@@ -19,17 +19,18 @@
 	"use strict";
 
 	var ri = picturefill._;
+	var jQuery = window.jQuery || window.$;
 
-	if(!document.querySelector){
+	if (!document.querySelector) {
 		ri.qsa = function(context, sel) {
 			return jQuery(sel, context);
 		};
 
-		var anchor = document.createElement('a');
+		var anchor = document.createElement("a");
 
 		ri.makeUrl = function(src) {
-			jQuery.attr(anchor, 'href', src+'' );
-			return jQuery.prop(anchor, 'href');
+			jQuery.attr(anchor, "href", src + "" );
+			return jQuery.prop(anchor, "href");
 		};
 	}
 

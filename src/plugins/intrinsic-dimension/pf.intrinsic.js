@@ -2,11 +2,11 @@
 	"use strict";
 	var interValId;
 	var intervalIndex = 0;
-	var run = function(){
+	var run = function() {
 		if ( window.picturefill ) {
 			factory( window.picturefill );
 		}
-		if(window.picturefill || intervalIndex > 9999){
+		if (window.picturefill || intervalIndex > 9999) {
 			clearInterval(interValId);
 		}
 		intervalIndex++;
@@ -23,21 +23,20 @@
 	var knownWidths = {};
 	var cfg = ri.cfg;
 	var curSrcProp = "currentSrc";
-	var setSize = function(width, img, data){
+	var setSize = function(width, img, data) {
 		var curCandidate = data.curCan;
 
 		if ( width ) {
 			img.setAttribute( "width", parseInt(width / curCandidate.res, 10) );
 		}
 	};
-	var loadBg = function(url, img, data){
+	var loadBg = function(url, img, data) {
 		var bgImg, curCandidate, clear;
 
-
-		if(url in knownWidths){
+		if (url in knownWidths) {
 			setSize(knownWidths[url], img, data);
 		} else {
-			clear = function(){
+			clear = function() {
 				data.pendingURLSize = null;
 				bgImg.onload = null;
 				bgImg.onerror = null;
@@ -48,13 +47,13 @@
 			data.pendingURLSize = url;
 			curCandidate = data.curCan;
 
-			if(curCandidate.w){
+			if (curCandidate.w) {
 				setSize(curCandidate.w, img, data);
 			}
 
-			bgImg = document.createElement('img');
+			bgImg = document.createElement("img");
 
-			bgImg.onload = function(){
+			bgImg.onload = function() {
 				knownWidths[url] = bgImg.naturalWidth || bgImg.width;
 				if (!knownWidths[url]) {
 					try {
@@ -63,7 +62,7 @@
 						document.body.removeChild(bgImg);
 					} catch (e) {}
 				}
-				if(url == img[curSrcProp]){
+				if (url === img[curSrcProp]) {
 					setSize(knownWidths[url], img, data);
 				}
 				clear();
@@ -72,29 +71,29 @@
 
 			bgImg.src = url;
 
-			if(bgImg && bgImg.complete){
+			if (bgImg && bgImg.complete) {
 				bgImg.onload();
 			}
 		}
 
 	};
-	var reeval = (function(){
+	var reeval = (function() {
 		var running, timer;
 
-		var run = function(){
+		var run = function() {
 			var i, len, imgData;
-			var imgs = document.getElementsByTagName('img');
-			var options = {elements: []};
+			var imgs = document.getElementsByTagName("img");
+			var options = { elements: [] };
 
 			ri.setupRun(options);
 
 			running = false;
 			clearTimeout(timer);
 
-			for(i = 0, len = imgs.length; i < len; i++){
+			for (i = 0, len = imgs.length; i < len; i++) {
 				imgData = imgs[i][ri.ns];
 
-				if(imgData && imgData.curCan){
+				if (imgData && imgData.curCan) {
 					ri.setRes.res(imgData.curCan, imgData.curCan.set.sizes);
 					ri.setSize(imgs[i]);
 				}
@@ -103,8 +102,8 @@
 			ri.teardownRun( options );
 		};
 
-		return function(){
-			if(!running && cfg.addSize){
+		return function() {
+			if (!running && cfg.addSize) {
 				running = true;
 				clearTimeout(timer);
 				timer = setTimeout(run);
@@ -113,7 +112,7 @@
 
 	})();
 
-	if( !(curSrcProp in document.createElement("img")) ){
+	if ( !(curSrcProp in document.createElement("img")) ) {
 		curSrcProp = "src";
 	}
 
@@ -129,17 +128,16 @@
 		if ( !cfg.addSize || !curCandidate || data.dims ) {return;}
 		url = ri.makeUrl(curCandidate.url);
 
-		if(url == img[curSrcProp] && url !== data.pendingURLSize){
+		if (url === img[curSrcProp] && url !== data.pendingURLSize) {
 			loadBg(url, img, data);
 		}
 	};
 
-
-	if(window.addEventListener && !window.HTMLPictureElement){
-		addEventListener('resize', reeval, false);
+	if (window.addEventListener && !window.HTMLPictureElement) {
+		addEventListener("resize", reeval, false);
 	}
 
-	if(!('addSize' in cfg)){
+	if (!("addSize" in cfg)) {
 		cfg.addSize = true;
 	} else {
 		cfg.addSize = !!cfg.addSize;

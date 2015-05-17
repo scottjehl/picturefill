@@ -2,11 +2,11 @@
 	"use strict";
 	var interValId;
 	var intervalIndex = 0;
-	var run = function(){
+	var run = function() {
 		if ( window.picturefill ) {
 			factory( window.picturefill );
 		}
-		if(window.picturefill || intervalIndex > 9999){
+		if (window.picturefill || intervalIndex > 9999) {
 			clearInterval(interValId);
 		}
 		intervalIndex++;
@@ -20,60 +20,60 @@
 
 	var ri = picturefill._;
 	var runningTests = 0;
-	var setTypeValue = function(types, value){
+	var setTypeValue = function(types, value) {
 		var i;
-		for(i = 0; i < types.length; i++){
+		for (i = 0; i < types.length; i++) {
 			ri.types[types[i]] = value;
 		}
 	};
 
-	if(window.HTMLPictureElement && !ri.cfg.uT){
-		picturefill.testTypeSupport = function(){};
+	if (window.HTMLPictureElement && !ri.cfg.uT) {
+		picturefill.testTypeSupport = function() {};
 		return;
 	}
 
 	ri.types["image/bmp"] = true;
 	ri.types["image/x-bmp"] = true;
 
-	picturefill.testTypeSupport = function(types, url, width, useCanvas){
-		if(typeof types == "string"){
+	picturefill.testTypeSupport = function(types, url, width, useCanvas) {
+		if (typeof types === "string") {
 			types = types.split(/\s*\,*\s+/g);
 		}
 		var canvas;
 		var supports = "pending";
-		var img = document.createElement('img');
-		var onComplete = function(){
+		var img = document.createElement("img");
+		var onComplete = function() {
 			runningTests--;
 			setTypeValue(types, supports);
-			if(runningTests < 1){
-				picturefill({reevaluate: true});
+			if (runningTests < 1) {
+				picturefill({ reselect: true });
 			}
 		};
 
-		if(useCanvas){
-			canvas = document.createElement('canvas');
-			if(!canvas.getContext){
+		if (useCanvas) {
+			canvas = document.createElement("canvas");
+			if (!canvas.getContext) {
 				setTypeValue(types, false);
 				return;
 			}
 		}
 
-		img.onload = function(){
+		img.onload = function() {
 			var ctx;
 			supports = true;
-			if(width){
-				supports = img.width == width;
+			if (width) {
+				supports = img.width === width;
 			}
 
-			if(useCanvas){
-				ctx = canvas.getContext('2d');
+			if (useCanvas) {
+				ctx = canvas.getContext("2d");
 				ctx.drawImage(img, 0, 0);
 				supports = ctx.getImageData(0, 0, 1, 1).data[3] === 0;
 			}
 			onComplete();
 		};
 
-		img.onerror = function(){
+		img.onerror = function() {
 			supports = false;
 			onComplete();
 		};
@@ -81,7 +81,6 @@
 		setTypeValue(types, "pending");
 		img.src = url;
 	};
-
 
 	picturefill.testTypeSupport("image/webp", "data:image/webp;base64,UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAABBxAR/Q9ERP8DAABWUDggGAAAADABAJ0BKgEAAQADADQlpAADcAD++/1QAA==", 1);
 	picturefill.testTypeSupport("image/jp2 image/jpx image/jpm", "data:image/jp2;base64,/0//UQAyAAAAAAABAAAAAgAAAAAAAAAAAAAABAAAAAQAAAAAAAAAAAAEBwEBBwEBBwEBBwEB/1IADAAAAAEAAAQEAAH/XAAEQED/ZAAlAAFDcmVhdGVkIGJ5IE9wZW5KUEVHIHZlcnNpb24gMi4wLjD/kAAKAAAAAABYAAH/UwAJAQAABAQAAf9dAAUBQED/UwAJAgAABAQAAf9dAAUCQED/UwAJAwAABAQAAf9dAAUDQED/k8+kEAGvz6QQAa/PpBABr994EAk//9k=", 1);

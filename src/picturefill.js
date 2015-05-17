@@ -4,6 +4,7 @@
  *  Spec: http://picture.responsiveimages.org/
  */
 (function( window, document, undefined ) {
+	/* global parseSizes */
 	// Enable strict mode
 	"use strict";
 
@@ -40,7 +41,6 @@
 	/**
 	 * Shortcut property for https://w3c.github.io/webappsec/specs/mixedcontent/#restricts-mixed-content ( for easy overriding in tests )
 	 */
-	var isSSL = location.protocol === "https:";
 	// baseStyle also used by getEmValue (i.e.: width: 1em is important)
 	var baseStyle = "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;overflow:hidden;clip:rect(0px, 0px, 0px, 0px)";
 	var fsCss = "font-size:100%!important;";
@@ -81,14 +81,6 @@
 			obj.addEventListener(evt, fn, capture || false);
 		} else if ( obj.attachEvent ) {
 			obj.attachEvent( "on" + evt, fn);
-		}
-	};
-
-	var off = function(obj, evt, fn, capture) {
-		if ( obj.removeEventListener ) {
-			obj.removeEventListener(evt, fn, capture || false);
-		} else if ( obj.detachEvent ) {
-			obj.detachEvent( "on" + evt, fn);
 		}
 	};
 
@@ -207,7 +199,7 @@
 			}
 		}
 
-		elements = options.elements || ri.qsa( (options.context || document), ( options.reevaluate || options.mqchange ) ? ri.sel : ri.selShort );
+		elements = options.elements || ri.qsa( (options.context || document), ( options.reevaluate || options.reselect ) ? ri.sel : ri.selShort );
 
 		if ( (plen = elements.length) ) {
 
@@ -273,7 +265,7 @@
 		units.vw = units.width / 100;
 		units.vh = units.height / 100;
 
-		evalId = [units.height, units.width, dprM].join('-');
+		evalId = [ units.height, units.width, dprM ].join("-");
 
 		units.em = ri.getEmValue();
 		units.rem = units.em;
@@ -383,7 +375,6 @@
 			}
 		}
 	}
-
 
 	/**
 	 * Srcset Parser
@@ -675,7 +666,6 @@
 		} // (Close of big while loop.)
 	}
 
-
 	/* jshint ignore:start */
 	// jscs:disable
 
@@ -883,7 +873,7 @@
 
 		// If the above algorithm exhausts unparsed sizes list without returning a
 		// size value, return 100vw.
-		return '100vw';
+		return "100vw";
 	}
 	// jscs: enable
 	/* jshint ignore:end */

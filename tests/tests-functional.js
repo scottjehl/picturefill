@@ -1,4 +1,5 @@
 (function(window, $) {
+	// jscs:disable
 	var relurls = {};
 	var absurls = {};
 

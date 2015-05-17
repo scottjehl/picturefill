@@ -1,5 +1,5 @@
 (function(window, $) {
-
+	// jscs:disable
 	if(!window.picturefillCFG){
 		window.picturefillCFG = [];
 	}

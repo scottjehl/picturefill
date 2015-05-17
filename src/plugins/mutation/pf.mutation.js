@@ -2,11 +2,11 @@
 	"use strict";
 	var interValId;
 	var intervalIndex = 0;
-	var run = function(){
+	var run = function() {
 		if ( window.picturefill ) {
 			factory( window.picturefill );
 		}
-		if(window.picturefill || intervalIndex > 9999){
+		if (window.picturefill || intervalIndex > 9999) {
 			clearInterval(interValId);
 		}
 		intervalIndex++;
@@ -181,12 +181,12 @@
 		if ( parent && ( parent.nodeName || "" ).toUpperCase() !== "PICTURE" ) {
 			parent = parent.parentNode;
 
-			if(!parent || ( parent.nodeName || "" ).toUpperCase() !== "PICTURE" ) {
+			if (!parent || ( parent.nodeName || "" ).toUpperCase() !== "PICTURE" ) {
 				parent = null;
 			}
 		}
 
-		if(parent){
+		if (parent) {
 			ri.addToElements( parent.getElementsByTagName( "img" )[0], imgs );
 		}
 	};
@@ -267,7 +267,7 @@
 
 			document.documentElement.addEventListener( "DOMNodeRemoved", function( e ) {
 
-				if ( riobserver.connected && isReady && (e.target || {}).nodeName == 'SOURCE') {
+				if ( riobserver.connected && isReady && (e.target || {}).nodeName === "SOURCE") {
 					addMutation( { type: "childList", addedNodes: [], removedNodes: [ e.target ], target: e.target.parentNode } );
 				}
 			}, true);
@@ -310,43 +310,43 @@
 					}
 				});
 
-				if(!ri.supSrcset){
-					imgIdls.push('srcset');
+				if (!ri.supSrcset) {
+					imgIdls.push("srcset");
 				}
 
-				if(!ri.supSizes){
-					imgIdls.push('sizes');
+				if (!ri.supSizes) {
+					imgIdls.push("sizes");
 				}
 
-				imgIdls.forEach(function(idl){
+				imgIdls.forEach(function(idl) {
 					Object.defineProperty(HTMLImageElement.prototype, idl, {
 						set: function( value ) {
 							setImgAttr.call( this, idl, value );
 						},
 						get: function() {
-							return getImgAttr.call( this, idl ) || '';
+							return getImgAttr.call( this, idl ) || "";
 						},
 						enumerable: true,
 						configurable: true
 					});
 				});
 
-				if(!('currentSrc' in image)){
-					(function(){
+				if (!("currentSrc" in image)) {
+					(function() {
 						var ascendingSort;
 						var updateCurSrc = function(elem, src) {
 							if (src == null) {
-								src = elem.src || '';
+								src = elem.src || "";
 							}
 
-							Object.defineProperty(elem, 'pfCurrentSrc', {
+							Object.defineProperty(elem, "pfCurrentSrc", {
 								value: src,
 								writable: true
 							});
 						};
 						var baseUpdateCurSrc = updateCurSrc;
 
-						if(ri.supSrcset && window.devicePixelRatio){
+						if (ri.supSrcset && window.devicePixelRatio) {
 							ascendingSort = function( a, b ) {
 								var aRes = a.d || a.w || a.res;
 								var bRes = b.d || b.w || b.res;
@@ -363,14 +363,14 @@
 									length = cands.length;
 									ret = cands[ length - 1 ];
 
-									for(i = 0; i < length; i++){
-										if(cands[i].d >= window.devicePixelRatio){
+									for (i = 0; i < length; i++) {
+										if (cands[i].d >= window.devicePixelRatio) {
 											ret = cands[i];
 											break;
 										}
 									}
 
-									if(ret){
+									if (ret) {
 										ret = ri.makeUrl(ret.url);
 									}
 								}
@@ -378,23 +378,23 @@
 							};
 						}
 
-						document.addEventListener('load', function(e) {
-							if (e.target.nodeName.toUpperCase() == 'IMG') {
+						document.addEventListener("load", function(e) {
+							if (e.target.nodeName.toUpperCase() === "IMG") {
 								updateCurSrc(e.target);
 							}
 						}, true);
 
-						Object.defineProperty(HTMLImageElement.prototype, 'currentSrc', {
+						Object.defineProperty(HTMLImageElement.prototype, "currentSrc", {
 							set: function() {
-								if(window.console && console.warn){
-									console.warn('currentSrc can\'t be set on img element');
+								if (window.console && console.warn) {
+									console.warn("currentSrc can't be set on img element");
 								}
 							},
 							get: function() {
 								if (this.complete) {
 									updateCurSrc(this);
 								}
-								return this.pfCurrentSrc || '';
+								return this.pfCurrentSrc || "";
 							},
 							enumerable: true,
 							configurable: true
@@ -402,15 +402,15 @@
 					})();
 				}
 
-				if(window.HTMLSourceElement && !('srcset' in document.createElement('source'))){
+				if (window.HTMLSourceElement && !("srcset" in document.createElement("source"))) {
 
-					['srcset', 'sizes'].forEach(function(idl){
-						Object.defineProperty(HTMLSourceElement.prototype, idl, {
+					[ "srcset", "sizes" ].forEach(function(idl) {
+						Object.defineProperty(window.HTMLSourceElement.prototype, idl, {
 							set: function( value ) {
 								this.setAttribute( idl, value );
 							},
 							get: function() {
-								return this.getAttribute( idl ) || '';
+								return this.getAttribute( idl ) || "";
 							},
 							enumerable: true,
 							configurable: true
@@ -424,7 +424,7 @@
 		riobserver.start();
 	}
 	if ( !isReady ) {
-		document.addEventListener("DOMContentLoaded", function(event) {
+		document.addEventListener("DOMContentLoaded", function() {
 			isReady = true;
 		});
 	}
