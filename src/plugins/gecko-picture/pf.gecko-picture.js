@@ -24,6 +24,10 @@
 				var i;
 				var imgs = document.querySelectorAll("picture > img");
 				for (i = 0; i < imgs.length; i++) {
+					if(imgs[i].currentSrc && !imgs[i].complete){
+						removeEventListener('resize', onResize);
+						break;
+					}
 					fixPicture(imgs[i]);
 				}
 			};
