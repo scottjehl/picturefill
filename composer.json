@@ -1,0 +1,18 @@
+{
+  "name": "scottjehl/picturefill",
+  "description": "A responsive image polyfill for <picture>, srcset, sizes, and more.",
+  "type": "component",
+  "homepage": "http://scottjehl.github.com/picturefill/",
+  "license": "MIT",
+  "extra": {
+    "component": {
+      "scripts": [
+        "dist/picturefill.js"
+      ],
+      "files": [
+        "dist/picturefill.min.js",
+        "extensions/ie8-mq-shim.js"
+      ]
+    }
+  }
+}
