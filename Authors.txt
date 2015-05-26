@@ -36,3 +36,4 @@ The Picturefill core team
 
 Scott Jehl, @scottjehl
 Mat Marquis, @wilto
+Mike Engel, @beardfury
