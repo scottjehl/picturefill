@@ -182,10 +182,10 @@
 
 	// Parses an individual `size` and returns the length, and optional media query
 	pf.parseSize = function( sourceSizeStr ) {
-		var match = /(\([^)]+\))?\s*(.+)/g.exec( sourceSizeStr );
+		var match = /(\([^)]+\)([^0-9]+[^)]+\))*)?\s*(.+)/g.exec( sourceSizeStr );
 		return {
 			media: match && match[1],
-			length: match && match[2]
+			length: match && match[3]
 		};
 	};
 
