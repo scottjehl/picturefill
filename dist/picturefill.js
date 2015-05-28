@@ -1,4 +1,4 @@
-/*! Picturefill - v2.3.0 - 2015-04-05
+/*! Picturefill - v2.3.1 - 2015-05-28
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
@@ -89,10 +89,9 @@ window.matchMedia || (window.matchMedia = function() {
 	pf.ns = "picturefill";
 
 	// srcset support test
-	(function() {
-		pf.srcsetSupported = "srcset" in image;
-		pf.sizesSupported = "sizes" in image;
-	})();
+	pf.srcsetSupported = "srcset" in image;
+	pf.sizesSupported = "sizes" in image;
+	pf.curSrcSupported = "currentSrc" in image;
 
 	// just a string trim workaround
 	pf.trim = function( str ) {
@@ -504,7 +503,9 @@ window.matchMedia || (window.matchMedia = function() {
 					picImg.src = bestCandidate.url;
 					// currentSrc attribute and property to match
 					// http://picture.responsiveimages.org/#the-img-element
-					picImg.currentSrc = picImg.src;
+					if ( !pf.curSrcSupported ) {
+						picImg.currentSrc = picImg.src;
+					}
 
 					pf.backfaceVisibilityFix( picImg );
 				}
@@ -708,12 +709,13 @@ window.matchMedia || (window.matchMedia = function() {
 		}, 250 );
 
 		var resizeTimer;
-		var checkResize = function() {
-			clearTimeout(resizeTimer);
-			resizeTimer = setTimeout( function() {
-				picturefill({ reevaluate: true });
-			}, 60 );
-		};
+		var handleResize = function() {
+	        picturefill({ reevaluate: true });
+	    };
+		function checkResize() {
+		    clearTimeout(resizeTimer);
+		    resizeTimer = setTimeout( handleResize, 60 );
+		}
 
 		if ( w.addEventListener ) {
 			w.addEventListener( "resize", checkResize, false );

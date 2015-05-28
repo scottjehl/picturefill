@@ -475,7 +475,9 @@
 		pf.applyBestCandidate( candidates, image );
 
 		deepEqual(image.src, candidates[2].url, "uses the url from the best px fit" );
-		deepEqual(image.currentSrc, candidates[2].url, "uses the url from the best px fit" );
+		if ( !pf.curSrcSupported ) {
+			deepEqual(image.currentSrc, candidates[2].url, "uses the url from the best px fit" );
+		}
 
 		image.src = "data:300";
 		image.currentSrc = "data:300";
@@ -483,7 +485,9 @@
 		pf.applyBestCandidate( candidates, image );
 
 		deepEqual(image.src, "data:300", "src left alone when matched" );
-		deepEqual(image.currentSrc, "data:300", "currentSrc left alone when matched" );
+		if ( !pf.curSrcSupported ) {
+			deepEqual(image.currentSrc, "data:300", "currentSrc left alone when matched" );
+		}
 	});
 
 	test( "removeVideoShim", function() {
@@ -626,7 +630,7 @@
 
 		picturefill( { elements: [ img ] } );
 
-		assert.equal( img.currentSrc || img.src, "data:img" );
+		assert.equal( img.src || img.currentSrc, "data:img" );
 	});
 
 })( window, jQuery );
