@@ -3,12 +3,11 @@ A [responsive image](http://www.whatwg.org/specs/web-apps/current-work/multipage
 * Authors: Scott Jehl, Mat Marquis, Shawn Jansepar (2.0 refactor lead), and many more: see Authors.txt
 * License: MIT
 
-[![build-status](https://api.travis-ci.org/scottjehl/picturefill.svg)](https://travis-ci.org/scottjehl/picturefill)
+[![build-status](https://api.travis-ci.org/scottjehl/picturefill.svg)](https://travis-ci.org/scottjehl/picturefill) [<img src="https://pf-slackin.herokuapp.com/badge.svg" alt="Join Slack channel">](https://pf-slackin.herokuapp.com/)
 
-[<img src="https://pf-slackin.herokuapp.com/badge.svg" alt="Join Slack channel">](https://pf-slackin.herokuapp.com/)
-
-Picturefill has two versions:
-* Version 2 is a strict polyfill of the [Picture element draft specification](http://www.whatwg.org/specs/web-apps/current-work/multipage/embedded-content.html#embedded-content) and is the main version in development.
+Picturefill has three versions:
+* Version 3 is built on version 2 but contains many performance fixes
+* Version 2 (recommended) is a strict polyfill of the [Picture element draft specification](http://www.whatwg.org/specs/web-apps/current-work/multipage/embedded-content.html#embedded-content) and is the main version in development.
 * Version 1 mimics the Picture element pattern with `span` elements. It is maintained in the 1.2 branch.
 
 ## Usage, Demos, Docs
@@ -16,8 +15,27 @@ To find out how to use Picturefill on your sites, visit the project and demo sit
 
 [Picturefill Documentation, Downloads, and Demos Site](http://scottjehl.github.com/picturefill/)
 
+## Known issues
+Be it browsers, the `picture` spec, or picturefill, there are a couple issues and workarounds you should be aware of when working with Picturefill.
+
+- Firefox 38 has some bugs [[1]](https://bugzilla.mozilla.org/show_bug.cgi?id=1139560) [[2]](https://bugzilla.mozilla.org/show_bug.cgi?id=1139554) [[3]](https://bugzilla.mozilla.org/show_bug.cgi?id=1135812) where images wont update on screen resize. If you're using srcset to specify `1x` and `2x` images, always be explicit and declare `1x` (even though you technically don't have to).
+
+- No `%` allowed in the `sizes` attribute. Using `%` will fallback to `100vw`.
+
+- Trying to use the `src` attribute in a browser that _doesn't_ support `picture` natively can result in a double download.
+
+- If you only want to have an image show up at certain sizes, and not show up at others, you will need to use a transparent placeholder gif:
+
+```html
+<picture>
+    <source srcset="../img/sample.svg" media="(min-width: 768px)" />
+    <img srcset="data:image/gifbase64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+        alt="Samplepic" />
+</picture>
+```
+
 ## Contributing
-For information on how to contribute code to Picturefill, check out `CONTRIBUTING.md`
+For information on how to contribute code to Picturefill, check out [`CONTRIBUTING.md`](CONTRIBUTING.md)
 
 ## Issues
 If you find a bug in Picturefill, please add it to [the issue tracker](https://github.com/scottjehl/picturefill/issues)
