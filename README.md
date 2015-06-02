@@ -15,14 +15,21 @@ To find out how to use Picturefill on your sites, visit the project and demo sit
 
 [Picturefill Documentation, Downloads, and Demos Site](http://scottjehl.github.com/picturefill/)
 
-## Known issues
+## The gotchas
 Be it browsers, the `picture` spec, or picturefill, there are a couple issues and workarounds you should be aware of when working with Picturefill.
 
-- Firefox 38 has some bugs [[1]](https://bugzilla.mozilla.org/show_bug.cgi?id=1139560) [[2]](https://bugzilla.mozilla.org/show_bug.cgi?id=1139554) [[3]](https://bugzilla.mozilla.org/show_bug.cgi?id=1135812) where images wont update on screen resize. If you're using srcset to specify `1x` and `2x` images, always be explicit and declare `1x` (even though you technically don't have to).
+- Firefox 38 has some bugs [[1]](https://bugzilla.mozilla.org/show_bug.cgi?id=1139560) [[2]](https://bugzilla.mozilla.org/show_bug.cgi?id=1139554) [[3]](https://bugzilla.mozilla.org/show_bug.cgi?id=1135812) where images wont update on screen resize. These should be fixed in Firefox 39.
 
-- No `%` allowed in the `sizes` attribute. Using `%` will fallback to `100vw`.
+- Per the `picture` spec, using `%` _isn't_ allowed in the `sizes` attribute. Using `%` will fallback to `100vw`.
 
-- Trying to use the `src` attribute in a browser that _doesn't_ support `picture` natively can result in a double download.
+- Trying to use the `src` attribute in a browser that _doesn't_ support `picture` natively can result in a double download. To avoid this, don't use the `src` attribute on the `img` tag:
+
+```html
+<picture>
+    <source srcset="../img/sample.svg" media="(min-width: 768px)" />
+    <img srcset="default.png" alt="Sample pic" />
+</picture>
+```
 
 - If you only want to have an image show up at certain sizes, and not show up at others, you will need to use a transparent placeholder gif:
 
@@ -30,7 +37,7 @@ Be it browsers, the `picture` spec, or picturefill, there are a couple issues an
 <picture>
     <source srcset="../img/sample.svg" media="(min-width: 768px)" />
     <img srcset="data:image/gifbase64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-        alt="Samplepic" />
+        alt="Sample pic" />
 </picture>
 ```
 
