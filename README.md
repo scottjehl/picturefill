@@ -18,7 +18,7 @@ To find out how to use Picturefill on your sites, visit the project and demo sit
 ## The gotchas
 Be it browsers, the `picture` spec, or picturefill, there are a couple issues and workarounds you should be aware of when working with Picturefill.
 
-- Firefox 38 has some bugs [[1]](https://bugzilla.mozilla.org/show_bug.cgi?id=1139560) [[2]](https://bugzilla.mozilla.org/show_bug.cgi?id=1139554) [[3]](https://bugzilla.mozilla.org/show_bug.cgi?id=1135812) where images wont update on screen resize. These should be fixed in Firefox 39.
+- Firefox 38 has some bugs [[1]](https://bugzilla.mozilla.org/show_bug.cgi?id=1139560) [[2]](https://bugzilla.mozilla.org/show_bug.cgi?id=1139554) [[3]](https://bugzilla.mozilla.org/show_bug.cgi?id=1135812) where images won't update on screen resize. These should be fixed in Firefox 39.
 
 - Per the `picture` spec, using `%` _isn't_ allowed in the `sizes` attribute. Using `%` will fallback to `100vw`.
 
