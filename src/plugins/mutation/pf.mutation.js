@@ -394,7 +394,8 @@
 								if (this.complete) {
 									updateCurSrc(this);
 								}
-								return this.pfCurrentSrc || "";
+								//IE is never complete if no src/srcset available
+								return (!this.src && !this.srcset) ? "" : this.pfCurrentSrc || "";
 							},
 							enumerable: true,
 							configurable: true
