@@ -11,24 +11,36 @@
 
 			var dummySrc = document.createElement("source");
 
-			var fixPicture = function(img) {
+			var fixRespimg = function(img) {
+				var source, sizes;
 				var picture = img.parentNode;
-				var source = dummySrc.cloneNode();
-				picture.insertBefore(source, picture.firstElementChild);
-				setTimeout(function() {
-					picture.removeChild(source);
-				});
+
+				if (picture.nodeName.toUpperCase() === "PICTURE") {
+					source = dummySrc.cloneNode();
+
+					picture.insertBefore(source, picture.firstElementChild);
+					setTimeout(function() {
+						picture.removeChild(source);
+					});
+				} else if (!img._pfLastSize || img.offsetWidth > img._pfLastSize) {
+					img._pfLastSize = img.offsetWidth;
+					sizes = img.sizes;
+					img.sizes += ",100vw";
+					setTimeout(function() {
+						img.sizes = sizes;
+					});
+				}
 			};
 
 			var findPictureImgs = function() {
 				var i;
-				var imgs = document.querySelectorAll("picture > img");
+				var imgs = document.querySelectorAll("picture > img, img[srcset][sizes]");
 				for (i = 0; i < imgs.length; i++) {
-					if(imgs[i].currentSrc && !imgs[i].complete){
-						removeEventListener('resize', onResize);
+					if (imgs[i].currentSrc && !imgs[i].complete) {
+						removeEventListener("resize", onResize);
 						break;
 					}
-					fixPicture(imgs[i]);
+					fixRespimg(imgs[i]);
 				}
 			};
 			var onResize = function() {

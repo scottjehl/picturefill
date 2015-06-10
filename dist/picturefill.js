@@ -1,4 +1,4 @@
-/*! Picturefill - v3.0.0-alpha1 - 2015-05-17
+/*! Picturefill - v3.0.0-alpha1 - 2015-06-09
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! Picturefill - Responsive Images that work today.

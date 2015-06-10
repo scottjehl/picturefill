@@ -1,11 +1,14 @@
+html,
 body {
     font-family: 'Source Sans Pro', sans-serif;
-    margin: 3em 5%;
+    margin: 0;
+    padding: 0;
     color: #333;
     line-height: 1.4;
+    text-rendering: optimizeSpeed;
 }
 a {
-    color: #e6615e;
+    color: #962c1f;
 }
 a:hover {
     text-decoration: none;
@@ -15,19 +18,76 @@ a:hover {
     margin: 0 auto 1em;
     max-width: 8em;
 }
+p {
+    line-height: 1.5;
+}
+main {
+    margin: 3em 3.5%;
+}
 @media (min-width: 60em){
-    body {
+    main {
         width: 54em;
-        margin: 3em auto;
+        margin: 3em 7.5%;
     }
 }
-h1 {
+
+.hed {
     clear: both;
     font-family: 'Raleway', sans-serif;
-    text-align: center;
-    font-size: 2.8em;
+    font-size: 3.2em;
+    line-height: 1.1;
     margin: 0;
     color: #951c19;
+    text-rendering: optimizeLegibility;
+}
+.subhed {
+    text-transform: uppercase;
+    font-weight: bold;
+    margin: 0;
+    font-size: 1.25em;
+    letter-spacing: .1em;
+    text-rendering: optimizeLegibility;
+}
+.hed-subsection {
+    text-transform: uppercase;
+    font-weight: bold;
+    margin: 0;
+    padding-top: .75em;
+    font-size: 1em;
+    letter-spacing: .125em;
+    text-rendering: optimizeLegibility;
+}
+.lede .hed-subsection {
+    font-size: .9em;
+}
+.hed-section {
+    background: #962c1f;
+    margin: 2.5em 0 1.6em -20em;
+    color: rgba(255,255,255,.9);
+    display: inline-block;
+    font-size: 1.2em;
+    font-weight: normal;
+    padding: .4em 4em .35em 20em;
+    letter-spacing: .065em;
+    text-rendering: optimizeLegibility;
+}
+@media (min-width: 40em){
+    .hed-section {
+        min-width: 18em;
+    }
+}
+.hed-pattern {
+    font-size: 1.3em;
+    line-height: 1.2;
+    color: #951c19;
+    padding: .5em 0 .1em 0;
+    border-bottom: 2px solid #951c19;
+    text-rendering: optimizeLegibility;
+}
+
+.lede {
+    font-size: 1.1em;
+    margin-top: 2.5em;
 }
 h1 em {
     display: block;
@@ -41,6 +101,22 @@ p, li {
     font-size: 1.1em;
     margin: .6em 0 .8em;
 }
+li {
+    font-size: 1.1em;
+    margin: .2em 0 .4em;
+}
+ul {
+    padding-bottom: .5em;
+}
+
+.download {
+    font-size: 1.2em;
+}
+.meta {
+    margin: 0;
+    font-size: .95em;
+    color: rgba(0,0,0,.7);
+}
 
 h1 .picture,
 p code {
@@ -49,9 +125,8 @@ p code {
     padding: 0 .2em;
     border: 1px solid rgba(0,0,0,.1);
 }
-.filament-logo {
+.inline-logo {
     display: inline;
-    background: #247201;
     padding: .1em .3em;
     margin: 0 .1em 0;
     max-width: 7em;
@@ -59,18 +134,27 @@ p code {
     position: relative;
     top: .3em;
 }
+.filament-logo {
+    background: #247201;
+}
+.bocoup-logo {
+    top: .4em;
+    max-height: 2em;
+}
 .nav {
     text-align: center;
+    border-bottom: 2px solid #952b1d;
+    border-top: 3px solid #952b1d;
     display: block;
-    padding: 0 5%;
-    border-top: 1px solid papayawhip;
-    border-bottom: 1px solid papayawhip;
     margin: 0 auto 2em;
-    background: #fafafa;
     font-size: 1em;
     color: #444;
-    width: 90%;
-
+    width: 100%;
+}
+.nav ul {
+    margin: 0 auto;
+    padding: 0;
+    max-width: 1200px;
 }
 .nav li {
     display: block;
@@ -78,30 +162,30 @@ p code {
     padding: .4em 0;
     margin: 0;
     border-top: 1px solid #fff;
-}
-.nav li:first-child {
-    border: none;
+    width: 100%;
+    border-bottom: 2px solid #952b1d;
 }
 .nav li a {
     display: inline-block;
     text-decoration: none;
-    color: #222;
-}
-.nav li a:hover {
-    background: papayawhip;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: .95em;
+    color: #952b1d;
 }
 @media (min-width: 44em){
     .nav {
         display: table;
-        border: 1px solid papayawhip;
-        width: 80%;
+        width: 100%;
         padding: 0;
+        border-bottom: 3px solid #952b1d;
     }
     .nav li {
         display: table-cell;
         padding: 0;
         border: 0;
         font-size: 1em;
+        width: 1.6%;
     }
     .nav li a {
         padding: .8em 0;
@@ -113,7 +197,7 @@ pre {
     background: #fafafa;
     font-size: 1em;
     border: 2px solid #ddd;
-    padding: .5em 1em;
+    padding: .7em 1em .85em 1em;
     width: 100%;
     box-sizing: border-box;
     font-family: "monaco", monospace;
@@ -125,14 +209,6 @@ pre code {
 img {
     max-width: 100%
 }
-h2 {
-    margin: 2em 0;
-    font-family: 'Raleway', sans-serif;
-    font-size: 1.2em;
-    border-bottom: 1px solid papayawhip;
-    text-align: center;
-    padding: .3em 0 .4em;
-}
 .note {
     font-style: italic;
     font-size: .9em;
@@ -140,4 +216,30 @@ h2 {
 h3 {
     font-size: 1.1em;
     font-weight: bold;
+}
+
+
+.foot {
+    background: #606060;
+}
+.hed-sponsors {
+    background: #484848;
+    color: rgba(255,255,255,.9);
+    display: block;
+    text-indent: 7.5%;
+    text-transform: uppercase;
+    font-weight: normal;
+    margin: 0;
+    padding: .65em 0 .55em 0;
+    font-size: 1em;
+    letter-spacing: .125em;
+}
+.sponsors {
+    margin: 0 auto;
+    padding: 3em 7.5% 2.5em 7.5%;
+}
+.sponsors img {
+    display: inline-block;
+    width: 200px;
+    margin: .5em 10% .5em 0;
 }
