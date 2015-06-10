@@ -15,18 +15,18 @@
 				var source, sizes;
 				var picture = img.parentNode;
 
-				if(picture.nodeName.toUpperCase() == 'PICTURE'){
+				if (picture.nodeName.toUpperCase() === "PICTURE") {
 					source = dummySrc.cloneNode();
 
 					picture.insertBefore(source, picture.firstElementChild);
 					setTimeout(function() {
 						picture.removeChild(source);
 					});
-				} else if(!img._pfLastSize || img.offsetWidth > img._pfLastSize) {
+				} else if (!img._pfLastSize || img.offsetWidth > img._pfLastSize) {
 					img._pfLastSize = img.offsetWidth;
 					sizes = img.sizes;
-					img.sizes += ',100vw';
-					setTimeout(function(){
+					img.sizes += ",100vw";
+					setTimeout(function() {
 						img.sizes = sizes;
 					});
 				}
