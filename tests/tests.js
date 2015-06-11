@@ -131,7 +131,7 @@
 			media: "(min-width:30em)"
 		};
 		deepEqual(pf.parseSize(size3), expected3, "Length and Media are properly parsed");
-		
+
 		var size4 = "(min-width: 30em) and (max-width: 50em) or (min-width: 150em) not (min-resolution: 144dpi) 50%";
 		var expected4 = {
 			length: "50%",
