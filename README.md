@@ -6,7 +6,6 @@ A [responsive image](http://www.whatwg.org/specs/web-apps/current-work/multipage
 [![build-status](https://api.travis-ci.org/scottjehl/picturefill.svg)](https://travis-ci.org/scottjehl/picturefill) [<img src="https://pf-slackin.herokuapp.com/badge.svg" alt="Join Slack channel">](https://pf-slackin.herokuapp.com/)
 
 Picturefill has three versions:
-* Version 3 is built on version 2 but contains many performance fixes
 * Version 2 (recommended) is a strict polyfill of the [Picture element draft specification](http://www.whatwg.org/specs/web-apps/current-work/multipage/embedded-content.html#embedded-content) and is the main version in development.
 * Version 1 mimics the Picture element pattern with `span` elements. It is maintained in the 1.2 branch.
 
@@ -16,9 +15,9 @@ To find out how to use Picturefill on your sites, visit the project and demo sit
 [Picturefill Documentation, Downloads, and Demos Site](http://scottjehl.github.com/picturefill/)
 
 ## The gotchas
-Be it browsers, the `picture` spec, or picturefill, there are a couple issues and workarounds you should be aware of when working with Picturefill.
+Be it browsers, the `picture` spec, or picturefill, there are a couple gotchas you should be aware of when working with Picturefill.
 
-- Firefox 38 has some bugs [[1]](https://bugzilla.mozilla.org/show_bug.cgi?id=1139560) [[2]](https://bugzilla.mozilla.org/show_bug.cgi?id=1139554) [[3]](https://bugzilla.mozilla.org/show_bug.cgi?id=1135812) where images won't update on screen resize. These should be fixed in Firefox 39.
+- Firefox 38 and 39 has some bugs [[1]](https://bugzilla.mozilla.org/show_bug.cgi?id=1139560) [[2]](https://bugzilla.mozilla.org/show_bug.cgi?id=1139554) [[3]](https://bugzilla.mozilla.org/show_bug.cgi?id=1135812) where images won't update on screen resize. These should be fixed in Firefox 40.
 
 - Per the `picture` spec, using `%` _isn't_ allowed in the `sizes` attribute. Using `%` will fallback to `100vw`.
 
