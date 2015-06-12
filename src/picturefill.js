@@ -34,7 +34,6 @@
 	var curSrcProp = "currentSrc";
 	var regWDesc = /\s+\+?\d+(e\d+)?w/;
 	var regSize = /(\([^)]+\))?\s*(.+)/;
-	var regEdgeAlgorithm = /^(edge|experimental)$/;
 	var setOptions = window.picturefillCFG;
 	/**
 	 * Shortcut property for https://w3c.github.io/webappsec/specs/mixedcontent/#restricts-mixed-content ( for easy overriding in tests )
@@ -265,7 +264,7 @@
 		var bonusFactor, tooMuch, bonus, meanDensity;
 
 		//experimental
-		if ( regEdgeAlgorithm.test(cfg.algorithm || "") ){
+		if (cfg.algorithm === "saveData" ){
 			if ( lowerValue > 2.7 ) {
 				meanDensity = dprValue + 1;
 			} else {
