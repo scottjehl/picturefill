@@ -213,7 +213,7 @@
 			(nodeName = mutation.target.nodeName.toUpperCase()) === "IMG" ) {
 			ri.addToElements( mutation.target, modifiedImgs );
 		} else if ( riData ) {
-			if(!nodeName){
+			if (!nodeName) {
 				nodeName = mutation.target.nodeName.toUpperCase();
 			}
 
