@@ -1191,13 +1191,13 @@
 		return match;
 	};
 
-	ri.parseSets = function( element, parent ) {
+	ri.parseSets = function( element, parent, options ) {
 		var srcsetAttribute, imageSet, isWDescripor, srcsetParsed;
 
 		var hasPicture = parent && parent.nodeName.toUpperCase() === "PICTURE";
 		var imageData = element[ ri.ns ];
 
-		if ( imageData.src === undefined ) {
+		if ( imageData.src === undefined || options.src ) {
 			imageData.src = getImgAttr.call( element, "src" );
 			if ( imageData.src ) {
 				setImgAttr.call( element, srcAttr, imageData.src );
@@ -1206,7 +1206,7 @@
 			}
 		}
 
-		if ( imageData.srcset === undefined ) {
+		if ( imageData.srcset === undefined || options.srcset || !ri.supSrcset || element.srcset ) {
 			srcsetAttribute = getImgAttr.call( element, "srcset" );
 			imageData.srcset = srcsetAttribute;
 			srcsetParsed = true;
@@ -1247,6 +1247,7 @@
 		}
 
 		imageData.curCan = null;
+		imageData.curSrc = undefined;
 
 		// if img has picture or the srcset was removed or has a srcset and does not support srcset at all
 		// or has a w descriptor (and does not support sizes) set support to false to evaluate
