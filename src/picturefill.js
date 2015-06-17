@@ -232,25 +232,25 @@
 	}
 
 	// Add support for standard mime types.
-	types["image/jpeg"] = true;
-	types["image/gif"] = true;
-	types["image/png"] = true;
+	types[ "image/jpeg" ] = true;
+	types[ "image/gif" ] = true;
+	types[ "image/png" ] = true;
 
 	function detectTypeSupport( type, typeUri ) {
 		// based on Modernizr's lossless img-webp test
 		// note: asynchronous
-		var image = new w.Image();
+		var image = new window.Image();
 		image.onerror = function() {
-			pf.types[ type ] = false;
+			types[ type ] = false;
 			picturefill();
 		};
 		image.onload = function() {
-			pf.types[ type ] = image.width === 1;
+			types[ type ] = image.width === 1;
 			picturefill();
 		};
 		image.src = typeUri;
 		return "pending";
-	};
+	}
 
 	// test svg support
 	types[ "image/svg+xml" ] = document.implementation.hasFeature( "http://wwwindow.w3.org/TR/SVG11/feature#Image", "1.1" );
