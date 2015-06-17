@@ -1,4 +1,4 @@
-/*! Picturefill - v3.0.0-alpha1 - 2015-06-10
+/*! Picturefill - v3.0.0-alpha1 - 2015-06-17
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! Picturefill - Responsive Images that work today.
@@ -14,7 +14,8 @@
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
 	document.createElement( "picture" );
 
-	var warn, eminpx, alwaysCheckWDescriptor, resizeThrottle, evalId;
+	var lowTreshold, partialLowTreshold, isLandscape, lazyFactor, warn, eminpx,
+		alwaysCheckWDescriptor, resizeThrottle, evalId;
 	// local object for method references and testing exposure
 	var ri = {};
 	var noop = function() {};
@@ -26,7 +27,9 @@
 	var types = {};
 	var cfg = {
 		//resource selection:
-		algorithm: ""
+		xQuant: 1,
+		lazyFactor: 0.3,
+		maxX: 4
 	};
 	var srcAttr = "data-pfsrc";
 	var srcsetAttr = srcAttr + "set";
@@ -37,7 +40,6 @@
 	var curSrcProp = "currentSrc";
 	var regWDesc = /\s+\+?\d+(e\d+)?w/;
 	var regSize = /(\([^)]+\))?\s*(.+)/;
-	var regEdgeAlgorithm = /^(edge|experimental)$/;
 	var setOptions = window.picturefillCFG;
 	/**
 	 * Shortcut property for https://w3c.github.io/webappsec/specs/mixedcontent/#restricts-mixed-content ( for easy overriding in tests )
@@ -233,24 +235,49 @@
 	}
 
 	// Add support for standard mime types.
-	types["image/jpeg"] = true;
-	types["image/gif"] = true;
-	types["image/png"] = true;
+	types[ "image/jpeg" ] = true;
+	types[ "image/gif" ] = true;
+	types[ "image/png" ] = true;
+
+	function detectTypeSupport( type, typeUri ) {
+		// based on Modernizr's lossless img-webp test
+		// note: asynchronous
+		var image = new window.Image();
+		image.onerror = function() {
+			types[ type ] = false;
+			picturefill();
+		};
+		image.onload = function() {
+			types[ type ] = image.width === 1;
+			picturefill();
+		};
+		image.src = typeUri;
+		return "pending";
+	}
 
 	// test svg support
 	types[ "image/svg+xml" ] = document.implementation.hasFeature( "http://wwwindow.w3.org/TR/SVG11/feature#Image", "1.1" );
+	types[ "image/webp" ] = detectTypeSupport("image/webp", "data:image/webp;base64,UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAABBxAR/Q9ERP8DAABWUDggGAAAADABAJ0BKgEAAQADADQlpAADcAD++/1QAA==" );
 
 	/**
 	 * updates the internal vW property with the current viewport width in px
 	 */
 	function updateMetrics() {
+		var dprM;
 
 		isVwDirty = false;
 		DPR = window.devicePixelRatio;
 		cssCache = {};
 		sizeLengthCache = {};
 
-		ri.DPR = DPR || 1;
+		dprM = (DPR || 1) * cfg.xQuant;
+
+		if (!cfg.uT) {
+			cfg.maxX = Math.max(1.3, cfg.maxX);
+			dprM = Math.min( dprM, cfg.maxX );
+
+			ri.DPR = dprM;
+		}
 
 		units.width = Math.max(window.innerWidth || 0, docElem.clientWidth);
 		units.height = Math.max(window.innerHeight || 0, docElem.clientHeight);
@@ -258,38 +285,36 @@
 		units.vw = units.width / 100;
 		units.vh = units.height / 100;
 
-		evalId = [ units.height, units.width, DPR ].join("-");
+		evalId = [ units.height, units.width, dprM ].join("-");
 
 		units.em = ri.getEmValue();
 		units.rem = units.em;
-	}
 
-	function chooseLowRes( lowerValue, higherValue, dprValue, isCached ) {
-		var bonusFactor, tooMuch, bonus, meanDensity;
+		lazyFactor = cfg.lazyFactor / 2;
 
-		//experimental
-		if ( regEdgeAlgorithm.test(cfg.algorithm || "") ){
-			if ( lowerValue > 2.7 ) {
-				meanDensity = dprValue + 1;
-			} else {
-				tooMuch = higherValue - dprValue;
-				bonusFactor = Math.pow(lowerValue - 0.6, 1.5);
+		lazyFactor = (lazyFactor * dprM) + lazyFactor;
 
-				bonus = tooMuch * bonusFactor;
+		lowTreshold = 0.5 + (0.2 * dprM);
 
-				if (isCached) {
-					bonus += 0.1 * bonusFactor;
-				}
+		partialLowTreshold = 0.5 + (0.25 * dprM);
 
-				meanDensity = lowerValue + bonus;
-			}
-		} else {
-			meanDensity = (dprValue > 1) ?
-				Math.sqrt(lowerValue * higherValue) :
-				lowerValue;
+		if (!(isLandscape = units.width > units.height)) {
+			lazyFactor *= 0.9;
+		}
+		if (supportAbort) {
+			lazyFactor *= 0.9;
 		}
 
-		return meanDensity > dprValue;
+	}
+
+	function chooseLowRes( lowRes, diff, dpr ) {
+		var add = diff * Math.pow(lowRes - 0.4, 1.2);
+		if (!isLandscape) {
+			add /= 1.3;
+		}
+
+		lowRes += add;
+		return lowRes > dpr;
 	}
 
 	function applyBestCandidate( img ) {
@@ -1077,32 +1102,50 @@
 	ri.applySetCandidate = function( candidates, img ) {
 		if ( !candidates.length ) {return;}
 		var candidate,
+
 			i,
 			j,
+			diff,
 			length,
 			bestCandidate,
 			curSrc,
 			curCan,
 			isSameSet,
 			candidateSrc,
+			curRes,
 			abortCurSrc;
 
 		var imageData = img[ ri.ns ];
 		var dpr = ri.DPR;
+		var sub = 0.2 + (0.1 * dpr);
 
 		curSrc = imageData.curSrc || img[curSrcProp];
 
 		curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set);
 
+		curRes = curCan && curCan.res;
+
 		// if we have a current source, we might either become lazy or give this source some advantage
-		if ( curCan && curCan.set === candidates[ 0 ].set ) {
+		if ( curSrc ) {
 
 			// if browser can abort image request and the image has a higher pixel density than needed
 			// and this image isn't downloaded yet, we skip next part and try to save bandwidth
-			abortCurSrc = (supportAbort && !img.complete && curCan.res - 0.1 > dpr);
+			abortCurSrc = (supportAbort && !img.complete && curCan && curRes > dpr);
 
 			if ( !abortCurSrc ) {
-				curCan.cached = true;
+
+				// if there is already an image and it's quality is "okay"
+				// we don't want look for a better candidate
+				if ( curCan && curRes < dpr && curRes > lowTreshold ) {
+
+					if (curRes < partialLowTreshold) {
+						sub += (0.1 * dpr);
+					}
+
+					curCan.res += lazyFactor * (curRes - sub);
+				}
+
+				isSameSet = !imageData.pic || (curCan && curCan.set === candidates[ 0 ].set);
 
 				// if current candidate is "best", "better" or "okay",
 				// set it to bestCandidate
@@ -1113,6 +1156,9 @@
 		}
 
 		if ( !bestCandidate ) {
+			if ( curRes ) {
+				curCan.res = curCan.res - ((curCan.res - curRes) / 2);
+			}
 
 			candidates.sort( ascendingSort );
 
@@ -1127,8 +1173,9 @@
 					// we have found the perfect candidate,
 					// but let's improve this a little bit with some assumptions ;-)
 					if (candidates[ j ] &&
+						(diff = (candidate.res - dpr)) &&
 						(abortCurSrc || curSrc !== ri.makeUrl( candidate.url )) &&
-						chooseLowRes(candidates[ j ].res, candidate.res, dpr, candidates[ j ].cached)) {
+						chooseLowRes(candidates[ j ].res, diff, dpr)) {
 
 						bestCandidate = candidates[ j ];
 
@@ -1138,6 +1185,10 @@
 					break;
 				}
 			}
+		}
+
+		if ( curRes ) {
+			curCan.res = curRes;
 		}
 
 		if ( bestCandidate ) {
