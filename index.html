@@ -27,18 +27,22 @@
 			</ul>
 		</nav>
 
+		<header>
+		</header>
+
 		<main>
 			<h1 class="hed">Picturefill</h1>
 			<p class="subhed">A responsive image polyfill</p>
+			<span class="ricg-seal">Officially endorsed by the <abbr title="Responsive Issues Community Group">RICG</abbr></span>
 
 			<div class="lede">
-				<p>The <a href="http://picture.responsiveimages.org/">picture element</a> and associated features are W3C standard HTML features that allow web developers to deliver an appropriate image to every user depending on a variety of conditions like screen size, viewport size, screen resolution, and more. Picturefill is a JavaScript file (or a <em>polyfill</em> to be more specific) that enables support for the <code>picture</code> element and associated features in browsers that do not yet support them, so you can start using them today!</p>
+				<p>The <a href="http://picture.responsiveimages.org/"><code>picture</code> element, <code>srcset</code> and <code>sizes</code> attributes</a>, and associated features allow web developers to deliver an appropriate image to every user depending on a variety of conditions like screen size, viewport size, screen resolution, and more. Picturefill enables support for the <code>picture</code> element and associated features in browsers that do not yet support them, so you can start using them today!</p>
 
-				<p>Picturefill development is sponsored by <a href="http://filamentgroup.com"><img src="http://filamentgroup.com/images/fg-logo-icon-lrg.png" class="filament-logo inline-logo" alt="Filament Group"></a> and <a href="http://bocoup.com"><img src="https://raw.githubusercontent.com/bocoup/brandguide/master/logo/bocoup-horizontal-100.png?token=AAa2hlqeQ2llihDiI8L2sqbj5bV-QY7oks5VgDh8wA%3D%3D" class="bocoup-logo inline-logo" alt="Bocoup"></a>. For Picturefill version 2, a special thanks goes to <a href="https://github.com/jansepar">Shawn Jansepar</a> for all his work on polyfilling the spec.</p>
+				<p>Picturefill development is sponsored by <a href="http://filamentgroup.com"><img src="http://filamentgroup.com/images/fg-logo-icon-lrg.png" class="filament-logo inline-logo" alt="Filament Group"></a> and <a href="http://bocoup.com"><img src="https://raw.githubusercontent.com/bocoup/brandguide/master/logo/bocoup-horizontal-100.png?token=AAa2hlqeQ2llihDiI8L2sqbj5bV-QY7oks5VgDh8wA%3D%3D" class="bocoup-logo inline-logo" alt="Bocoup"></a>, and maintained by The Picturefill Team.</p>
 
 				<h3 class="hed-subsection" id="contributing">Contributing, Bug Reports, and More information</h3>
 
-				<p>For more information on the development of Picturefill and how you can file bugs or contribute fixes, check out the the code project site on Github : <a href="https://github.com/scottjehl/picturefill">Picturefill on Github.</a></p>
+				<p>For more information on the development of Picturefill and how you can file bugs or contribute fixes, check out <a href="https://github.com/scottjehl/picturefill">the project on GitHub.</a></p>
 
 			</div>
 
@@ -91,31 +95,54 @@
 			<p class="note">Note that if you are already including a recent version of the HTML5 Shiv (sometimes packaged with Modernizr), you may not need this line as it is included there as well. Also, more advanced users may not need this may choose to load Picturefill dynamically using a script loader like Require.js, (AMD and CommonJS support is included in the script).</p>
 
 			<h2 class="hed-section" id="examples">Markup Patterns</h2>
-			<p>Once you've included picturefill.js, you can start adding responsive image elements to your site. Picturefill adds support for both the <code>picture</code> element and also new responsive attributes to the <code>img</code> element. You may find that the new <code>img</code> features may be all you need. Let's cover those first.</p>
+
+			<p>Once you've included picturefill.js, you can start adding responsive image elements to your site. Picturefill adds support for both the <code>picture</code> element and also new responsive attributes to the <code>img</code> element.</p>
+
+			<p>There are a number of different <a href="http://usecases.responsiveimages.org">use cases</a> addressed by some combination of features from the <a href="http://picture.responsiveimages.org">responsive images specification</a>—here are some of the most common ones:</p>
+
+			<nav class="subnav">
+				<ul>
+					<li><a href="#img-srcset">I want to serve high-res assets only to users with high pixel density viewports</a></li>
+					<li><a href="#img-sizes">I want the browser to choose the best image source for a user’s pixel density <em>and</em> the size of the image in the layout.</li>
+					<li><a href="#using-picture">I need my image sources to change only at specific breakpoints that I define.</a></li>
+					<li><a href="#using-media-and-srcset">I need specific image breakpoints, with multiple resolution options for each.</a></li>
+					<li><a href="#using-type">I want to serve newer image formats only to browsers that support them.</a></li>
+				</ul>
+			</nav>
 
 			<h3 class="hed-pattern" id="img-srcset">Using the `srcset` attribute</h3>
-<pre><code>&lt;img srcset=&quot;medium.jpg 1x, large 2x&quot; alt=&quot;…&quot;&gt;</code></pre>
+			<p class="usecase">The <code>srcset</code> attribute (without <code>sizes</code>) is used to serve larger—but otherwise identical—image sources to high resolution displays only.</p>
+
+			<pre><code>&lt;img srcset=&quot;examples/images/large.jpg 1x, examples/images/extralarge.jpg 2x&quot; alt=&quot;…&quot;&gt;</code></pre>
+
+			<p>Note that the <code>2x</code> source will be shown at the inherent width of the <code>1x</code> source. The two sources will occupy the same space in your layout, but the <code>2x</code> source will be at double the pixel density. This only applies to the <em>natural</em> size of the <code>img</code>—any sizing changes done in CSS are unchanged.</p>
+
+			<p>Here's how that renders on your display:</p>
+			<img srcset="examples/images/large.jpg 1x, examples/images/extralarge.jpg 2x" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 
 			<h3 class="hed-pattern" id="img-sizes">Using the `srcset` &amp; `sizes` attributes</h3>
-			<p>The <code>sizes</code> syntax is used to define the size of the image across a number of breakpoints. <code>srcset</code> then defines an array of images and their inherent sizes. It's beyond the scope of this guide to get into much detail about how to use the new <code>srcset</code> &amp; <code>sizes</code> attributes, so we'd recommend reading the following post by Eric Portis: <a href="http://ericportis.com/posts/2014/srcset-sizes/">Srcset and Sizes</a>. Read that first, then check out the demos below!</p>
+			<p class="usecase">The <code>srcset</code> and <code>sizes</code> syntaxes are used to provide the browser with a list of image sources that are identical apart from their size (same aspect ratio, same focal point) and how they’ll be displayed, then allow the browser to choose the source best for the user’s current viewport size, display density, and the size of that image in the page layout.</p>
+
+			<p>The <code>sizes</code> syntax is used to define the spaces your image will occupy in your layout. <code>srcset</code> then defines a list of images and their inherent widths. This allows the browser to choose the smallest appropriate source for the size <em>available in that part of the layout</em>, rather than the viewport size alone.</p>
+
+			<p>It's beyond the scope of this guide to get into much detail about how to use the new <code>srcset</code> &amp; <code>sizes</code> attributes, so we'd recommend reading the following post by Eric Portis: <a href="http://ericportis.com/posts/2014/srcset-sizes/">Srcset and Sizes</a>. Read that first, then check out the demos below!</p>
 
 	<pre><code>&lt;img 
   sizes=&quot;(min-width: 40em) 80vw, 100vw&quot;
-  srcset=&quot;examples/images/small.jpg 375w, 
-          examples/images/medium.jpg 480w,
-          examples/images/large.jpg 768w&quot; 
+  srcset=&quot;examples/images/medium.jpg 375w, 
+          examples/images/large.jpg 480w,
+          examples/images/extralarge.jpg 768w&quot; 
   alt=&quot;…&quot;&gt;</code></pre>
 
-			<p>Here's how that renders in the browser. Feel free to resize to see it change.</p>
+			<p>Here's how that renders on your display at your current viewport size:</p>
 
 			<img sizes="(min-width: 40em) 80vw, 100vw"
-					srcset="examples/images/medium.jpg 375w, examples/images/medium.jpg 480w, examples/images/large.jpg 768w" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-
-			<p><a href="examples/demo-01.html">View standalone demo</a></p>
+					srcset="examples/images/medium.jpg 375w, examples/images/large.jpg 480w, examples/images/extralarge.jpg 768w" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 
 			<h3 class="hed-pattern" id="using-picture">Using the `picture` element</h3>
+			<p class="usecase">The <code>picture</code> element is used when you need explicit control over which source is shown at set viewport sizes.</p>
 
-			<p>The <code>picture</code> element requires a little more markup than the example above, but it allows you to use features like CSS3 Media Queries to pair image sources with other layout conditions in your designs. </p>
+			<p>The <code>picture</code> element requires a little more markup than the example above, but it allows you to use features like CSS3 Media Queries to pair image source with varying sizes, zoom levels, and aspect ratios with the layout conditions in your designs. It should not, however, be used to serve radically different image sources—all sources must be described by the <code>alt</code> attribute of the inner <code>img</code>.</p>
 
 			<p>Your <code>picture</code> element should contain a series of <code>source</code> elements followed by an <code>img</code> element. Each <code>source</code> element must have a <code>srcset</code> attribute specifying one or more image url sources (which can use expanded srcset syntax if desired for resolution switching), and the <code>img</code> element should have a srcset attribute for fallback purposes as well (some browsers like Android 2.3's won't see the <code>source</code> elements). Additionally, you may add a  <code>media</code> attribute containing CSS3 Media Queries, and/or a <code>sizes</code> attribute to pair with <code>srcset</code>.</p>
 
@@ -127,16 +154,13 @@
   &lt;img srcset=&quot;examples/images/medium.jpg&quot; alt=&quot;…&quot;&gt;
 &lt;/picture&gt;</code></pre>
 
-			<p>Here's how that renders in the browser. Feel free to resize to see it change.</p>
+			<p>Here's how that renders at your current viewport size:</p>
 
 			<picture>
-				<!--[if IE 9]><video style="display: none;"><![endif]-->
 				<source srcset="examples/images/extralarge.jpg" media="(min-width: 1000px)">
 				<source srcset="examples/images/large.jpg" media="(min-width: 800px)">
-				<!--[if IE 9]></video><![endif]-->
 				<img srcset="examples/images/medium.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 			</picture>
-			<p><a href="examples/demo-02.html">View standalone demo</a></p>
 
 			<h3 class="hed-subsection" id="ie9">Supporting Picture in Internet Explorer 9</h3>
 			<p>While most versions of IE (even older ones!) are supported well, IE9 has a little conflict to work around. To support IE9, you will need to wrap a <code>video</code> element wrapper around the source elements in your <code>picture</code> tag. You can do this using conditional comments, like so:</p>
@@ -149,13 +173,12 @@
   &lt;img srcset=&quot;examples/images/medium.jpg&quot; alt=&quot;…&quot;&gt;
 &lt;/picture&gt;</code></pre>
 
-			<h3 class="hed-subsection" id="media-and-srcset">`media` and `srcset` syntax:</h3>
+			<h3 class="hed-subsection" id="using-media-and-srcset">`media` and `srcset` syntax:</h3>
+
 			<p>The <code>1x</code>, <code>2x</code> syntax in <code>srcset</code> acts as a shorthand for more complex resolution media queries. When natively supported, <code>srcset</code> will allow the UA to override requests for higher-resolution options based on a bandwidth limitations or a user preference (see #9 in the <a href="http://usecases.responsiveimages.org/#h2_requirements">Responsive Images Use Cases and Requirements</a>).</p>
 
 	<pre><code>&lt;picture&gt;
-  &lt;!--[if IE 9]&gt;&lt;video style=&quot;display: none;&quot;&gt;&lt;![endif]--&gt;
   &lt;source srcset=&quot;examples/images/large.jpg, examples/images/extralarge.jpg 2x&quot; media=&quot;(min-width: 800px)&quot;&gt;
-  &lt;!--[if IE 9]&gt;&lt;/video&gt;&lt;![endif]--&gt;
   &lt;img srcset=&quot;examples/images/small.jpg, examples/images/medium.jpg 2x&quot; alt=&quot;…&quot;&gt;
 &lt;/picture&gt;</code></pre>
 
@@ -168,25 +191,29 @@
 
 		<p><a href="examples/demo-03.html">View standalone demo</a></p>
 
-		<h3 class="hed-subsection" id="types">The `types` attribute</h3>
-			<p>Note: Picturefill supports SVG and WebP types on any source element, and will disregard a <code>source</code> if its type is not supported in a particular environment:</p>
+			<h3 class="hed-pattern" id="using-type">The `type` attribute in `picture`</h3>
+			<p class="usecase">The <code>types</code> attribute is used to send an alternate image source <em>format</em> only to browsers that support that format, and a fallback source to browsers that do not.</p>
 
-	<pre><code>&lt;picture&gt;
-  &lt;!--[if IE 9]&gt;&lt;video style=&quot;display: none;&quot;&gt;&lt;![endif]--&gt;
+			<p>Picturefill supports SVG and WebP as part of its core, but the following MIME types can be used via the “typesupport” plugin:</p>
+			<ul>
+				<li><code>image/bmp</code></li>
+				<li><code>image/xbmp</code></li>
+				<li><code>image/jp2</code></li>
+				<li><code>image/vnd.ms-photo</code></li>
+				<li><code>video/vnd.mozilla.apng</code></li>
+			</ul>
+
+				<pre><code>&lt;picture&gt;
   &lt;source srcset=&quot;examples/images/large.webp&quot; type=&quot;image/webp&quot;&gt;
-  &lt;!--[if IE 9]&gt;&lt;/video&gt;&lt;![endif]--&gt;
   &lt;img srcset=&quot;examples/images/large.jpg&quot; alt=&quot;…&quot;&gt;
 &lt;/picture&gt;</code></pre>
 
-			<picture>
-					<!--[if IE 9]><video style="display: none;"><![endif]-->
-					<source srcset="examples/images/large.webp" media="(min-width: 800px)" type="image/webp">
-					<source srcset="examples/images/large.jpg" media="(min-width: 800px)">
-					<source srcset="examples/images/medium.jpg" media="(min-width: 400px)">
-					<!--[if IE 9]></video><![endif]-->
-					<img srcset="examples/images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-			</picture>
+			<p>Here's how that renders in your browser:</p>
 
+			<picture>
+					<source srcset="examples/images/large.webp" type="image/webp">
+					<img srcset="examples/images/large.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+			</picture>
 			<p><a href="examples/demo-04.html">View standalone demo</a></p>
 
 			<h2 class="hed-section" id="api">Picturefill JavaScript API</h2>
@@ -216,7 +243,7 @@
 				</li>
 			</ul>
 
-			<h2  class="hed-section" id="support">Browser Support</h2>
+			<h2 class="hed-section" id="support">Browser Support</h2>
 			<p>Picturefill supports a broad range of browsers and devices, provided that you stick with the markup conventions documented above. </p>
 
 			<h3  class="hed-subsection" id="gotchas">Support caveats to keep in mind</h3>

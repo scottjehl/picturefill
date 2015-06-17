@@ -21,8 +21,42 @@ a:hover {
 p {
     line-height: 1.5;
 }
+header {
+    background: url(images/extralarge.jpg) center center no-repeat;
+    background-size: cover;
+    border-bottom: 4px solid #952b1d;
+    display: block;
+    padding-top: 20%;
+    max-height: 10em;
+}
+@media(min-width: 40em) {
+
+}
+
+.subnav li {
+    line-height: 1.3;
+    padding: .3em 0;
+}
+.ricg-seal {
+    background: url(images/ricg-seal.png) center center no-repeat;
+    background-size: cover;
+    height: 5.5em;
+    width: 5.5em;
+    display: block;
+    text-indent: -999px;
+    position: absolute;
+    right: -5%;
+    top: -5em;
+}
+@media(min-width: 40em) {
+    .ricg-seal {
+        height: 10em;
+        width: 10em;
+    }
+}
 main {
     margin: 3em 3.5%;
+    position: relative;
 }
 @media (min-width: 60em){
     main {
@@ -103,7 +137,7 @@ p, li {
 }
 li {
     font-size: 1.1em;
-    margin: .2em 0 .4em;
+    margin: 0;
 }
 ul {
     padding-bottom: .5em;
@@ -116,6 +150,7 @@ ul {
     margin: 0;
     font-size: .95em;
     color: rgba(0,0,0,.7);
+    padding-bottom: .75em;
 }
 
 h1 .picture,
@@ -146,7 +181,6 @@ p code {
     border-bottom: 2px solid #952b1d;
     border-top: 3px solid #952b1d;
     display: block;
-    margin: 0 auto 2em;
     font-size: 1em;
     color: #444;
     width: 100%;
@@ -218,7 +252,12 @@ h3 {
     font-weight: bold;
 }
 
-
+.usecase {
+    color: #951c19;
+    font-style: italic;
+    font-size: 1.1em;
+    padding-bottom: .75em;
+}
 .foot {
     background: #606060;
 }
