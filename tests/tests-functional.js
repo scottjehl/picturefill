@@ -303,7 +303,9 @@
 								offsetWidth: 340
 							},
 							620: {
-								currentSrc: roundedDPR < 1.2 ? absurls['700x300'] : absurls['1400x600'],
+								currentSrc: roundedDPR < 1.2 && /^(edge|experimental)$/.test(ri.cfg.algorithm) ?
+									absurls['700x300'] :
+									absurls['1400x600'],
 								offsetWidth: 710
 							},
 							800: {
@@ -315,6 +317,7 @@
 						//IE8/IE9 needs a clear remove here
 						$wimage.removeAttr('width');
 						$wimage.removeAttr('height');
+						debugger;
 
 						runViewportTests($wimage, viewports);
 					};

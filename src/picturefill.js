@@ -11,8 +11,7 @@
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
 	document.createElement( "picture" );
 
-	var lowTreshold, partialLowTreshold, isLandscape, lazyFactor, warn, eminpx,
-		alwaysCheckWDescriptor, resizeThrottle, evalId;
+	var warn, eminpx, alwaysCheckWDescriptor, resizeThrottle, evalId;
 	// local object for method references and testing exposure
 	var ri = {};
 	var noop = function() {};
@@ -24,9 +23,7 @@
 	var types = {};
 	var cfg = {
 		//resource selection:
-		xQuant: 1,
-		lazyFactor: 0.3,
-		maxX: 4
+		algorithm: ""
 	};
 	var srcAttr = "data-pfsrc";
 	var srcsetAttr = srcAttr + "set";
@@ -243,21 +240,13 @@
 	 * updates the internal vW property with the current viewport width in px
 	 */
 	function updateMetrics() {
-		var dprM;
 
 		isVwDirty = false;
 		DPR = window.devicePixelRatio;
 		cssCache = {};
 		sizeLengthCache = {};
 
-		dprM = (DPR || 1) * cfg.xQuant;
-
-		if (!cfg.uT) {
-			cfg.maxX = Math.max(1.3, cfg.maxX);
-			dprM = Math.min( dprM, cfg.maxX );
-
-			ri.DPR = dprM;
-		}
+		ri.DPR = DPR || 1;
 
 		units.width = Math.max(window.innerWidth || 0, docElem.clientWidth);
 		units.height = Math.max(window.innerHeight || 0, docElem.clientHeight);
@@ -265,36 +254,38 @@
 		units.vw = units.width / 100;
 		units.vh = units.height / 100;
 
-		evalId = [ units.height, units.width, dprM ].join("-");
+		evalId = [ units.height, units.width, DPR ].join("-");
 
 		units.em = ri.getEmValue();
 		units.rem = units.em;
-
-		lazyFactor = cfg.lazyFactor / 2;
-
-		lazyFactor = (lazyFactor * dprM) + lazyFactor;
-
-		lowTreshold = 0.5 + (0.2 * dprM);
-
-		partialLowTreshold = 0.5 + (0.25 * dprM);
-
-		if (!(isLandscape = units.width > units.height)) {
-			lazyFactor *= 0.9;
-		}
-		if (supportAbort) {
-			lazyFactor *= 0.9;
-		}
-
 	}
 
-	function chooseLowRes( lowRes, diff, dpr ) {
-		var add = diff * Math.pow(lowRes - 0.4, 1.2);
-		if (!isLandscape) {
-			add /= 1.3;
+	function chooseLowRes( lowerValue, higherValue, dprValue, isCached ) {
+		var bonusFactor, tooMuch, bonus, meanDensity;
+
+		//experimental
+		if (cfg.algorithm === "saveData" ){
+			if ( lowerValue > 2.7 ) {
+				meanDensity = dprValue + 1;
+			} else {
+				tooMuch = higherValue - dprValue;
+				bonusFactor = Math.pow(lowerValue - 0.6, 1.5);
+
+				bonus = tooMuch * bonusFactor;
+
+				if (isCached) {
+					bonus += 0.1 * bonusFactor;
+				}
+
+				meanDensity = lowerValue + bonus;
+			}
+		} else {
+			meanDensity = (dprValue > 1) ?
+				Math.sqrt(lowerValue * higherValue) :
+				lowerValue;
 		}
 
-		lowRes += add;
-		return lowRes > dpr;
+		return meanDensity > dprValue;
 	}
 
 	function applyBestCandidate( img ) {
@@ -1082,50 +1073,32 @@
 	ri.applySetCandidate = function( candidates, img ) {
 		if ( !candidates.length ) {return;}
 		var candidate,
-
 			i,
 			j,
-			diff,
 			length,
 			bestCandidate,
 			curSrc,
 			curCan,
 			isSameSet,
 			candidateSrc,
-			curRes,
 			abortCurSrc;
 
 		var imageData = img[ ri.ns ];
 		var dpr = ri.DPR;
-		var sub = 0.2 + (0.1 * dpr);
 
 		curSrc = imageData.curSrc || img[curSrcProp];
 
 		curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set);
 
-		curRes = curCan && curCan.res;
-
 		// if we have a current source, we might either become lazy or give this source some advantage
-		if ( curSrc ) {
+		if ( curCan && curCan.set === candidates[ 0 ].set ) {
 
 			// if browser can abort image request and the image has a higher pixel density than needed
 			// and this image isn't downloaded yet, we skip next part and try to save bandwidth
-			abortCurSrc = (supportAbort && !img.complete && curCan && curRes > dpr);
+			abortCurSrc = (supportAbort && !img.complete && curCan.res - 0.1 > dpr);
 
 			if ( !abortCurSrc ) {
-
-				// if there is already an image and it's quality is "okay"
-				// we don't want look for a better candidate
-				if ( curCan && curRes < dpr && curRes > lowTreshold ) {
-
-					if (curRes < partialLowTreshold) {
-						sub += (0.1 * dpr);
-					}
-
-					curCan.res += lazyFactor * (curRes - sub);
-				}
-
-				isSameSet = !imageData.pic || (curCan && curCan.set === candidates[ 0 ].set);
+				curCan.cached = true;
 
 				// if current candidate is "best", "better" or "okay",
 				// set it to bestCandidate
@@ -1136,9 +1109,6 @@
 		}
 
 		if ( !bestCandidate ) {
-			if ( curRes ) {
-				curCan.res = curCan.res - ((curCan.res - curRes) / 2);
-			}
 
 			candidates.sort( ascendingSort );
 
@@ -1153,9 +1123,8 @@
 					// we have found the perfect candidate,
 					// but let's improve this a little bit with some assumptions ;-)
 					if (candidates[ j ] &&
-						(diff = (candidate.res - dpr)) &&
 						(abortCurSrc || curSrc !== ri.makeUrl( candidate.url )) &&
-						chooseLowRes(candidates[ j ].res, diff, dpr)) {
+						chooseLowRes(candidates[ j ].res, candidate.res, dpr, candidates[ j ].cached)) {
 
 						bestCandidate = candidates[ j ];
 
@@ -1165,10 +1134,6 @@
 					break;
 				}
 			}
-		}
-
-		if ( curRes ) {
-			curCan.res = curRes;
 		}
 
 		if ( bestCandidate ) {
@@ -1225,13 +1190,13 @@
 		return match;
 	};
 
-	ri.parseSets = function( element, parent ) {
+	ri.parseSets = function( element, parent, options ) {
 		var srcsetAttribute, imageSet, isWDescripor, srcsetParsed;
 
 		var hasPicture = parent && parent.nodeName.toUpperCase() === "PICTURE";
 		var imageData = element[ ri.ns ];
 
-		if ( imageData.src === undefined ) {
+		if ( imageData.src === undefined || options.src ) {
 			imageData.src = getImgAttr.call( element, "src" );
 			if ( imageData.src ) {
 				setImgAttr.call( element, srcAttr, imageData.src );
@@ -1240,7 +1205,7 @@
 			}
 		}
 
-		if ( imageData.srcset === undefined ) {
+		if ( imageData.srcset === undefined || options.srcset || !ri.supSrcset || element.srcset ) {
 			srcsetAttribute = getImgAttr.call( element, "srcset" );
 			imageData.srcset = srcsetAttribute;
 			srcsetParsed = true;
@@ -1281,6 +1246,7 @@
 		}
 
 		imageData.curCan = null;
+		imageData.curSrc = undefined;
 
 		// if img has picture or the srcset was removed or has a srcset and does not support srcset at all
 		// or has a w descriptor (and does not support sizes) set support to false to evaluate
