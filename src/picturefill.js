@@ -90,9 +90,9 @@
 	pf.getWidthFromLength = function( length ) {
 		var cssValue;
 		// If a length is specified and doesn’t contain a percentage, and it is greater than 0 or using `calc`, use it. Else, abort.
-        if ( !(length && length.indexOf( "%" ) > -1 === false && ( parseFloat( length ) > 0 || length.indexOf( "calc(" ) > -1 )) ) {
-            return false;
-        }
+	   if ( !(length && length.indexOf( "%" ) > -1 === false && ( parseFloat( length ) > 0 || length.indexOf( "calc(" ) > -1 )) ) {
+		  return false;
+	   }
 
 		/**
 		 * If length is specified in  `vw` units, use `%` instead since the div we’re measuring
@@ -115,9 +115,9 @@
 
 		pf.lengthEl.style.width = "0px";
 
-        try {
+	   try {
 		    pf.lengthEl.style.width = length;
-        } catch ( e ) {}
+	   } catch ( e ) {}
 
 		doc.body.appendChild(pf.lengthEl);
 
@@ -133,31 +133,31 @@
 	};
 
     pf.detectTypeSupport = function( type, typeUri ) {
-        // based on Modernizr's lossless img-webp test
-        // note: asynchronous
-        var image = new w.Image();
-        image.onerror = function() {
-            pf.types[ type ] = false;
-            picturefill();
-        };
-        image.onload = function() {
-            pf.types[ type ] = image.width === 1;
-            picturefill();
-        };
-        image.src = typeUri;
+	   // based on Modernizr's lossless img-webp test
+	   // note: asynchronous
+	   var image = new w.Image();
+	   image.onerror = function() {
+		  pf.types[ type ] = false;
+		  picturefill();
+	   };
+	   image.onload = function() {
+		  pf.types[ type ] = image.width === 1;
+		  picturefill();
+	   };
+	   image.src = typeUri;
 
-        return "pending";
+	   return "pending";
     };
 	// container of supported mime types that one might need to qualify before using
 	pf.types = pf.types || {};
 
 	pf.initTypeDetects = function() {
-        // Add support for standard mime types
-        pf.types[ "image/jpeg" ] = true;
-        pf.types[ "image/gif" ] = true;
-        pf.types[ "image/png" ] = true;
-        pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Image", "1.1");
-        pf.types[ "image/webp" ] = pf.detectTypeSupport("image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=");
+	   // Add support for standard mime types
+	   pf.types[ "image/jpeg" ] = true;
+	   pf.types[ "image/gif" ] = true;
+	   pf.types[ "image/png" ] = true;
+	   pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Image", "1.1");
+	   pf.types[ "image/webp" ] = pf.detectTypeSupport("image/webp", "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=");
     };
 
 	pf.verifyTypeSupport = function( source ) {
@@ -192,7 +192,7 @@
 	// Takes a string of sizes and returns the width in pixels as a number
 	pf.findWidthFromSourceSize = function( sourceSizeListStr ) {
 		// Split up source size list, ie ( max-width: 30em ) 100%, ( max-width: 50em ) 50%, 33%
-		//                            or (min-width:30em) calc(30% - 15px)
+		//					   or (min-width:30em) calc(30% - 15px)
 		var sourceSizeList = pf.trim( sourceSizeListStr ).split( /\s*,\s*/ ),
 			winningLength;
 
@@ -312,10 +312,10 @@
 	/**
 	 * Takes a srcset in the form of url/
 	 * ex. "images/pic-medium.png 1x, images/pic-medium-2x.png 2x" or
-	 *     "images/pic-medium.png 400w, images/pic-medium-2x.png 800w" or
-	 *     "images/pic-small.png"
+	 *	"images/pic-medium.png 400w, images/pic-medium-2x.png 800w" or
+	 *	"images/pic-small.png"
 	 * Get an array of image candidates in the form of
-	 *      {url: "/foo/bar.png", resolution: 1}
+	 *	 {url: "/foo/bar.png", resolution: 1}
 	 * where resolution is http://dev.w3.org/csswg/css-values-3/#resolution-value
 	 * If sizes is specified, resolution is calculated
 	 */
@@ -383,9 +383,9 @@
 	pf.setIntrinsicSize = (function() {
 		var urlCache = {};
 		var setSize = function( picImg, width, res ) {
-            if ( width ) {
+		  if ( width ) {
 			    picImg.setAttribute( "width", parseInt(width / res, 10) );
-            }
+		  }
 		};
 		return function( picImg, bestCandidate ) {
 			var img;
@@ -404,14 +404,14 @@
 				img.onload = function() {
 					urlCache[bestCandidate.url] = img.width;
 
-                    //IE 10/11 don't calculate width for svg outside document
-                    if ( !urlCache[bestCandidate.url] ) {
-                        try {
-                            doc.body.appendChild( img );
-                            urlCache[bestCandidate.url] = img.width || img.offsetWidth;
-                            doc.body.removeChild( img );
-                        } catch(e){}
-                    }
+				 //IE 10/11 don't calculate width for svg outside document
+				 if ( !urlCache[bestCandidate.url] ) {
+					try {
+						doc.body.appendChild( img );
+						urlCache[bestCandidate.url] = img.width || img.offsetWidth;
+						doc.body.removeChild( img );
+					} catch(e){}
+				 }
 
 					if ( picImg.src === bestCandidate.url ) {
 						setSize( picImg, urlCache[bestCandidate.url], bestCandidate.resolution );
@@ -663,7 +663,7 @@
 
 		var resizeTimer;
 		var handleResize = function() {
-	        picturefill({ reevaluate: true });
+		   picturefill({ reevaluate: true });
 	    };
 		function checkResize() {
 		    clearTimeout(resizeTimer);
