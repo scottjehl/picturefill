@@ -38,15 +38,15 @@ header {
     padding: .3em 0;
 }
 .ricg-seal {
-    background: url(images/ricg-seal.png) center center no-repeat;
+    background: url(../logos/ricg-seal.png) center center no-repeat;
     background-size: cover;
     height: 5.5em;
     width: 5.5em;
     display: block;
-    text-indent: -999px;
+    text-indent: -9999px;
     position: absolute;
     right: -5%;
-    top: -5em;
+    top: -4.25em;
 }
 @media(min-width: 40em) {
     .ricg-seal {
@@ -114,6 +114,7 @@ main {
     font-size: 1.3em;
     line-height: 1.2;
     color: #951c19;
+    font-weight: bold;
     padding: .5em 0 .1em 0;
     border-bottom: 2px solid #951c19;
     text-rendering: optimizeLegibility;
@@ -146,6 +147,9 @@ ul {
 .download {
     font-size: 1.2em;
 }
+.demo {
+    display: block;
+}
 .meta {
     margin: 0;
     font-size: .95em;
@@ -173,8 +177,8 @@ p code {
     background: #247201;
 }
 .bocoup-logo {
-    top: .4em;
-    max-height: 2em;
+    top: .35em;
+    max-height: 1.8em;
 }
 .nav {
     text-align: center;
@@ -281,4 +285,8 @@ h3 {
     display: inline-block;
     width: 200px;
     margin: .5em 10% .5em 0;
+}
+
+.sponsors img.spon-bocoup {
+    width: 150px;
 }

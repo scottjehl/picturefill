@@ -27,9 +27,6 @@
 			</ul>
 		</nav>
 
-		<header>
-		</header>
-
 		<main>
 			<h1 class="hed">Picturefill</h1>
 			<p class="subhed">A responsive image polyfill</p>
@@ -38,7 +35,7 @@
 			<div class="lede">
 				<p>The <a href="http://picture.responsiveimages.org/"><code>picture</code> element, <code>srcset</code> and <code>sizes</code> attributes</a>, and associated features allow web developers to deliver an appropriate image to every user depending on a variety of conditions like screen size, viewport size, screen resolution, and more. Picturefill enables support for the <code>picture</code> element and associated features in browsers that do not yet support them, so you can start using them today!</p>
 
-				<p>Picturefill development is sponsored by <a href="http://filamentgroup.com"><img src="http://filamentgroup.com/images/fg-logo-icon-lrg.png" class="filament-logo inline-logo" alt="Filament Group"></a> and <a href="http://bocoup.com"><img src="https://raw.githubusercontent.com/bocoup/brandguide/master/logo/bocoup-horizontal-100.png?token=AAa2hlqeQ2llihDiI8L2sqbj5bV-QY7oks5VgDh8wA%3D%3D" class="bocoup-logo inline-logo" alt="Bocoup"></a>, and maintained by The Picturefill Team.</p>
+				<p>Picturefill development is sponsored by <a href="http://filamentgroup.com"><img src="logos/fg-sm.png" class="filament-logo inline-logo" alt="Filament Group"></a> and <a href="http://bocoup.com"><img src="logos/bocoup-sm.png" class="bocoup-logo inline-logo" alt="Bocoup"></a>, and maintained by the <a href="https://github.com/scottjehl/picturefill/blob/master/Authors.txt">Picturefill Team</a>.</p>
 
 				<h3 class="hed-subsection" id="contributing">Contributing, Bug Reports, and More information</h3>
 
@@ -138,6 +135,8 @@
 
 			<img sizes="(min-width: 40em) 80vw, 100vw"
 					srcset="examples/images/medium.jpg 375w, examples/images/large.jpg 480w, examples/images/extralarge.jpg 768w" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+			<a href="examples/demo-01.html" class="demo">Standalone <code>srcset</code> and <code>sizes</code> demo</a>
+
 
 			<h3 class="hed-pattern" id="using-picture">Using the `picture` element</h3>
 			<p class="usecase">The <code>picture</code> element is used when you need explicit control over which source is shown at set viewport sizes.</p>
@@ -161,6 +160,8 @@
 				<source srcset="examples/images/large.jpg" media="(min-width: 800px)">
 				<img srcset="examples/images/medium.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 			</picture>
+			<a href="examples/demo-02.html" class="demo">Standalone <code>picture</code> demo</a>
+
 
 			<h3 class="hed-subsection" id="ie9">Supporting Picture in Internet Explorer 9</h3>
 			<p>While most versions of IE (even older ones!) are supported well, IE9 has a little conflict to work around. To support IE9, you will need to wrap a <code>video</code> element wrapper around the source elements in your <code>picture</code> tag. You can do this using conditional comments, like so:</p>
@@ -188,8 +189,7 @@
 				<!--[if IE 9]></video><![endif]-->
 				<img srcset="examples/images/small.jpg, examples/images/medium.jpg 2x" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 			</picture>
-
-		<p><a href="examples/demo-03.html">View standalone demo</a></p>
+			<a href="examples/demo-03.html" class="demo">Standalone extended <code>picture</code> demo</a>
 
 			<h3 class="hed-pattern" id="using-type">The `type` attribute in `picture`</h3>
 			<p class="usecase">The <code>types</code> attribute is used to send an alternate image source <em>format</em> only to browsers that support that format, and a fallback source to browsers that do not.</p>
@@ -214,7 +214,7 @@
 					<source srcset="examples/images/large.webp" type="image/webp">
 					<img srcset="examples/images/large.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 			</picture>
-			<p><a href="examples/demo-04.html">View standalone demo</a></p>
+			<a href="examples/demo-04.html" class="demo">Standalone <code>type</code> attribute demo</a>
 
 			<h2 class="hed-section" id="api">Picturefill JavaScript API</h2>
 
@@ -263,8 +263,8 @@
 	<footer class="foot">
 		<h2 class="hed-sponsors">Sponsors</h2>
 		<div class="sponsors">
-			<a href="http://filamentgroup.com"><img src="http://www.filamentgroup.com/images/fg-logo-icon-lrg.png"></a>
-			<a href="http://bocoup.com"><img src="examples/images/bocoup-inv.png"></a>
+			<a href="http://filamentgroup.com"><img class="spon-fg" src="logos/fg-lg.png"></a>
+			<a href="http://bocoup.com"><img class="spon-bocoup" src="logos/bocoup-lg.png"></a>
 		</div>
 	</footer>
 
