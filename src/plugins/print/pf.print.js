@@ -20,7 +20,7 @@
 	if (!window.addEventListener) {return;}
 	var oldMatches, oldXQant, oldDPR;
 	var printMedia = window.matchMedia && matchMedia("print") || { matches: false };
-	var ri = picturefill._;
+	var pf = picturefill._;
 	var resetMedia = function(media) {
 		if (!media) {return true;}
 		if (media.indexOf("print") !== -1) {return true;}
@@ -28,29 +28,29 @@
 	};
 	var beforeprint = function() {
 		if (!printMedia.matches && !oldMatches) {
-			oldMatches = ri.matchesMedia;
-			ri.matchesMedia = resetMedia;
+			oldMatches = pf.matchesMedia;
+			pf.matchesMedia = resetMedia;
 		}
 
-		if (!oldXQant && !oldDPR && ri.DPR < 1.5 && ri.cfg.xQuant < 1.5) {
-			oldXQant = ri.cfg.xQuant;
-			oldDPR = ri.DPR;
-			ri.DPR = 1.5;
-			ri.cfg.xQuant = 1.5;
+		if (!oldXQant && !oldDPR && pf.DPR < 1.5 && pf.cfg.xQuant < 1.5) {
+			oldXQant = pf.cfg.xQuant;
+			oldDPR = pf.DPR;
+			pf.DPR = 1.5;
+			pf.cfg.xQuant = 1.5;
 		}
 		picturefill({ reselect: true });
 	};
 	var afterprint = function() {
 		if (oldMatches) {
-			ri.matchesMedia = oldMatches;
+			pf.matchesMedia = oldMatches;
 			oldMatches = false;
 		}
 		if (oldXQant) {
-			ri.cfg.xQuant = oldXQant;
+			pf.cfg.xQuant = oldXQant;
 			oldXQant = false;
 		}
 		if (oldDPR) {
-			ri.DPR = oldDPR;
+			pf.DPR = oldDPR;
 			oldDPR = false;
 		}
 		picturefill({ reselect: true });

@@ -19,9 +19,9 @@
 	"use strict";
 
 	var document = window.document;
-	var ri = picturefill._;
+	var pf = picturefill._;
 	var knownWidths = {};
-	var cfg = ri.cfg;
+	var cfg = pf.cfg;
 	var curSrcProp = "currentSrc";
 	var setSize = function(width, img, data) {
 		var curCandidate = data.curCan;
@@ -85,21 +85,21 @@
 			var imgs = document.getElementsByTagName("img");
 			var options = { elements: [] };
 
-			ri.setupRun(options);
+			pf.setupRun(options);
 
 			running = false;
 			clearTimeout(timer);
 
 			for (i = 0, len = imgs.length; i < len; i++) {
-				imgData = imgs[i][ri.ns];
+				imgData = imgs[i][pf.ns];
 
 				if (imgData && imgData.curCan) {
-					ri.setRes.res(imgData.curCan, imgData.curCan.set.sizes);
-					ri.setSize(imgs[i]);
+					pf.setRes.res(imgData.curCan, imgData.curCan.set.sizes);
+					pf.setSize(imgs[i]);
 				}
 			}
 
-			ri.teardownRun( options );
+			pf.teardownRun( options );
 		};
 
 		return function() {
@@ -116,9 +116,9 @@
 		curSrcProp = "src";
 	}
 
-	ri.setSize = function( img ) {
+	pf.setSize = function( img ) {
 		var url;
-		var data = img[ ri.ns ];
+		var data = img[ pf.ns ];
 		var curCandidate = data.curCan;
 
 		if ( data.dims === undefined ) {
@@ -126,7 +126,7 @@
 		}
 
 		if ( !cfg.addSize || !curCandidate || data.dims ) {return;}
-		url = ri.makeUrl(curCandidate.url);
+		url = pf.makeUrl(curCandidate.url);
 
 		if (url === img[curSrcProp] && url !== data.pendingURLSize) {
 			loadBg(url, img, data);

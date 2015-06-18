@@ -18,22 +18,22 @@
 }( function( picturefill ) {
 	"use strict";
 
-	var ri = picturefill._;
+	var pf = picturefill._;
 	var runningTests = 0;
 	var setTypeValue = function(types, value) {
 		var i;
 		for (i = 0; i < types.length; i++) {
-			ri.types[types[i]] = value;
+			pf.types[types[i]] = value;
 		}
 	};
 
-	if (window.HTMLPictureElement && !ri.cfg.uT) {
+	if (window.HTMLPictureElement && !pf.cfg.uT) {
 		picturefill.testTypeSupport = function() {};
 		return;
 	}
 
-	ri.types["image/bmp"] = true;
-	ri.types["image/x-bmp"] = true;
+	pf.types["image/bmp"] = true;
+	pf.types["image/x-bmp"] = true;
 
 	picturefill.testTypeSupport = function(types, url, width, useCanvas) {
 		if (typeof types === "string") {

@@ -18,17 +18,17 @@
 }( function( picturefill ) {
 	"use strict";
 
-	var ri = picturefill._;
+	var pf = picturefill._;
 	var jQuery = window.jQuery || window.$;
 
 	if (!document.querySelector) {
-		ri.qsa = function(context, sel) {
+		pf.qsa = function(context, sel) {
 			return jQuery(sel, context);
 		};
 
 		var anchor = document.createElement("a");
 
-		ri.makeUrl = function(src) {
+		pf.makeUrl = function(src) {
 			jQuery.attr(anchor, "href", src + "" );
 			return jQuery.prop(anchor, "href");
 		};
