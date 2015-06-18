@@ -2,7 +2,6 @@
 	"name": "picturefill",
 	"repo": "scottjehl/picturefill",
 	"description": "A Polyfill for the HTML Picture Element (http://picture.responsiveimages.org/) that you can use today.",
-	"version": "3.0.0-alpha1",
 	"main": "dist/picturefill.js",
 	"scripts": [
 		"dist/picturefill.js"

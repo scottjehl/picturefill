@@ -63,7 +63,6 @@
       },
       release: {
         options: {
-          additionalFiles: [ "bower.json" ],
           commitMessage: "Picturefill <%= version %>",
           tagMessage: "Picturefill <%= version %>",
           afterRelease: [ "gh-pages" ]
