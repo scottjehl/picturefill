@@ -2,7 +2,7 @@
 	"name": "Picturefill",
 	"title": "Picturefill",
 	"description": "A Polyfill for the HTML Picture Element (http://picture.responsiveimages.org/) that you can use today.",
-	"version": "2.2.0",
+	"version": "2.3.1",
 	"homepage": "http://scottjehl.github.io/picturefill",
 	"author": {
 		"name": "https://github.com/scottjehl/picturefill/blob/master/Authors.txt",
