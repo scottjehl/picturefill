@@ -631,7 +631,7 @@
 				// No sources matched, so we’re down to processing the inner `img` as a source.
 				candidates = pf.processSourceSet( element );
 
-				if ( element.srcset === undefined || element[ pf.ns ].srcset ) {
+				if ( !pf.srcsetSupported || element[ pf.ns ].srcset ) {
 					// Either `srcset` is completely unsupported, or we need to polyfill `sizes` functionality.
 					pf.applyBestCandidate( candidates, element );
 				} // Else, resolution-only `srcset` is supported natively.
