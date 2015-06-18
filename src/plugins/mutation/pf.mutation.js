@@ -22,7 +22,7 @@
 	var Element = window.Element;
 	var MutationObserver = window.MutationObserver;
 	var noop = function() {};
-	var riobserver = {
+	var pfObserver = {
 		disconnect: noop,
 		take: noop,
 		observe: noop,
@@ -31,9 +31,9 @@
 		connected: false
 	};
 	var isReady = /^loade|^c|^i/.test(document.readyState || "");
-	var ri = picturefill._;
-	ri.mutationSupport = false;
-	ri.observer = riobserver;
+	var pf = picturefill._;
+	pf.mutationSupport = false;
+	pf.observer = pfObserver;
 	if ( !Object.keys || !window.HTMLSourceElement || !document.addEventListener) {
 		return;
 	}
@@ -45,8 +45,8 @@
 	var elemProto = Element && Element.prototype;
 	var sup = {};
 	var monkeyPatch = function( name, fn ) {
-		sup[ name ] = ri[ name ];
-		ri[ name ] = fn;
+		sup[ name ] = pf[ name ];
+		pf[ name ] = fn;
 	};
 
 	if ( elemProto && !elemProto.matches ) {
@@ -57,96 +57,96 @@
 		matches = function( elem, sel ) {
 			return elem.matches( sel );
 		};
-		ri.mutationSupport = !!( Object.create && Object.defineProperties );
+		pf.mutationSupport = !!( Object.create && Object.defineProperties );
 	}
 
-	if ( !ri.mutationSupport ) {
+	if ( !pf.mutationSupport ) {
 		return;
 	}
 
-	riobserver.observe = function() {
+	pfObserver.observe = function() {
 		if ( allowConnect ) {
-			riobserver.connected = true;
+			pfObserver.connected = true;
 			if ( observer ) {
 				observer.observe( document.documentElement, config );
 			}
 		}
 	};
 
-	riobserver.disconnect = function() {
-		riobserver.connected = false;
+	pfObserver.disconnect = function() {
+		pfObserver.connected = false;
 		if ( observer ) {
 			observer.disconnect();
 		}
 	};
 
-	riobserver.take = function() {
+	pfObserver.take = function() {
 		if ( observer ) {
-			ri.onMutations( observer.takeRecords() );
+			pf.onMutations( observer.takeRecords() );
 		} else if ( addMutation ) {
 			addMutation.take();
 		}
 	};
 
-	riobserver.start = function() {
+	pfObserver.start = function() {
 		allowConnect = true;
-		riobserver.observe();
+		pfObserver.observe();
 	};
 
-	riobserver.stop = function() {
+	pfObserver.stop = function() {
 		allowConnect = false;
-		riobserver.disconnect();
+		pfObserver.disconnect();
 	};
 
 	monkeyPatch( "setupRun", function() {
-		riobserver.disconnect();
+		pfObserver.disconnect();
 		return sup.setupRun.apply( this, arguments );
 	});
 
 	monkeyPatch( "teardownRun", function() {
 		var ret = sup.setupRun.apply( this, arguments );
-		riobserver.observe();
+		pfObserver.observe();
 		return ret;
 	});
 
 	monkeyPatch( "setSrc", function() {
 		var ret;
-		var wasConnected = riobserver.connected;
-		riobserver.disconnect();
+		var wasConnected = pfObserver.connected;
+		pfObserver.disconnect();
 		ret = sup.setSrc.apply( this, arguments );
 		if ( wasConnected ) {
-			riobserver.observe();
+			pfObserver.observe();
 		}
 		return ret;
 	});
 
-	ri.onMutations = function( mutations ) {
+	pf.onMutations = function( mutations ) {
 		var i, len;
 		var modifiedImgs = [];
 
 		for (i = 0, len = mutations.length; i < len; i++) {
 			if ( isReady && mutations[i].type === "childList" ) {
-				ri.onSubtreeChange( mutations[i], modifiedImgs );
+				pf.onSubtreeChange( mutations[i], modifiedImgs );
 			} else if ( mutations[i].type === "attributes" ) {
-				ri.onAttrChange( mutations[i], modifiedImgs );
+				pf.onAttrChange( mutations[i], modifiedImgs );
 			}
 		}
 
 		if ( modifiedImgs.length ) {
 
-			ri.fillImgs({
+			pf.fillImgs({
 				elements: modifiedImgs,
 				reevaluate: true
 			});
 		}
 	};
 
-	ri.onSubtreeChange = function( mutations, imgs ) {
-		ri.findAddedMutations( mutations.addedNodes, imgs );
-		ri.findRemovedMutations( mutations.removedNodes, mutations.target, imgs );
+	pf.onSubtreeChange = function( mutations, imgs ) {
+		pf.findAddedMutations( mutations.addedNodes, imgs );
+		pf.findRemovedMutations( mutations.removedNodes, mutations.target, imgs );
 	};
 
-	ri.findAddedMutations = function( nodes, imgs ) {
+	pf.findAddedMutations = function( nodes, imgs ) {
 		var i, len, node, nodeName;
 		for ( i = 0, len = nodes.length; i < len; i++ ){
 			node = nodes[i];
@@ -155,29 +155,29 @@
 			nodeName = node.nodeName.toUpperCase();
 
 			if ( nodeName === "PICTURE" ) {
-				ri.addToElements( node.getElementsByTagName( "img" )[0], imgs );
-			} else if ( nodeName === "IMG" && matches( node, ri.selShort ) ){
-				ri.addToElements( node, imgs );
+				pf.addToElements( node.getElementsByTagName( "img" )[0], imgs );
+			} else if ( nodeName === "IMG" && matches( node, pf.selShort ) ){
+				pf.addToElements( node, imgs );
 			} else if ( nodeName === "SOURCE" ) {
-				ri.addImgForSource( node, node.parentNode, imgs );
+				pf.addImgForSource( node, node.parentNode, imgs );
 			} else {
-				ri.addToElements( ri.qsa( node, ri.selShort ), imgs );
+				pf.addToElements( pf.qsa( node, pf.selShort ), imgs );
 			}
 		}
 	};
 
-	ri.findRemovedMutations = function( nodes, target, imgs ) {
+	pf.findRemovedMutations = function( nodes, target, imgs ) {
 		var i, len, node;
 		for ( i = 0, len = nodes.length; i < len; i++ ) {
 			node = nodes[i];
 			if ( node.nodeType !== 1 ) {continue;}
 			if ( node.nodeName.toUpperCase() === "SOURCE" ) {
-				ri.addImgForSource( node, target, imgs );
+				pf.addImgForSource( node, target, imgs );
 			}
 		}
 	};
 
-	ri.addImgForSource = function( node, parent, imgs ) {
+	pf.addImgForSource = function( node, parent, imgs ) {
 		if ( parent && ( parent.nodeName || "" ).toUpperCase() !== "PICTURE" ) {
 			parent = parent.parentNode;
 
@@ -187,16 +187,16 @@
 		}
 
 		if (parent) {
-			ri.addToElements( parent.getElementsByTagName( "img" )[0], imgs );
+			pf.addToElements( parent.getElementsByTagName( "img" )[0], imgs );
 		}
 	};
 
-	ri.addToElements = function( img, imgs ) {
+	pf.addToElements = function( img, imgs ) {
 		var i, len;
 		if ( img ) {
 			if ( ("length" in img) && !img.nodeType ){
 				for ( i = 0, len = img.length; i < len; i++ ) {
-					ri.addToElements( img[i], imgs );
+					pf.addToElements( img[i], imgs );
 				}
 			} else if ( img.parentNode && imgs.indexOf(img) === -1 ) {
 				imgs.push( img );
@@ -204,14 +204,14 @@
 		}
 	};
 
-	ri.onAttrChange = function( mutation, modifiedImgs ) {
+	pf.onAttrChange = function( mutation, modifiedImgs ) {
 		var nodeName;
-		var riData = mutation.target[ ri.ns ];
+		var riData = mutation.target[ pf.ns ];
 
 		if ( !riData &&
 			mutation.attributeName === "srcset" &&
 			(nodeName = mutation.target.nodeName.toUpperCase()) === "IMG" ) {
-			ri.addToElements( mutation.target, modifiedImgs );
+			pf.addToElements( mutation.target, modifiedImgs );
 		} else if ( riData ) {
 			if (!nodeName) {
 				nodeName = mutation.target.nodeName.toUpperCase();
@@ -221,17 +221,17 @@
 				if ( mutation.attributeName in riData ) {
 					riData[ mutation.attributeName ] = undefined;
 				}
-				ri.addToElements( mutation.target, modifiedImgs );
+				pf.addToElements( mutation.target, modifiedImgs );
 			} else if ( nodeName === "SOURCE" ) {
-				ri.addImgForSource( mutation.target, mutation.target.parentNode, modifiedImgs );
+				pf.addImgForSource( mutation.target, mutation.target.parentNode, modifiedImgs );
 			}
 		}
 	};
 
 	if ( !window.HTMLPictureElement ) {
 
-		if ( MutationObserver && !ri.testMutationEvents ) {
-			observer = new MutationObserver( ri.onMutations );
+		if ( MutationObserver && !pf.testMutationEvents ) {
+			observer = new MutationObserver( pf.onMutations );
 		} else {
 
 			addMutation = (function() {
@@ -244,7 +244,7 @@
 						if ( !addMutation.take ) {
 							addMutation.take = function() {
 								if ( mutations.length ) {
-									ri.onMutations( mutations );
+									pf.onMutations( mutations );
 									mutations = [];
 								}
 								running = false;
@@ -257,20 +257,20 @@
 			})();
 
 			document.documentElement.addEventListener( "DOMNodeInserted", function( e ) {
-				if ( riobserver.connected && isReady ) {
+				if ( pfObserver.connected && isReady ) {
 					addMutation( { type: "childList", addedNodes: [ e.target ], removedNodes: [] } );
 				}
 			}, true);
 
 			document.documentElement.addEventListener( "DOMNodeRemoved", function( e ) {
 
-				if ( riobserver.connected && isReady && (e.target || {}).nodeName === "SOURCE") {
+				if ( pfObserver.connected && isReady && (e.target || {}).nodeName === "SOURCE") {
 					addMutation( { type: "childList", addedNodes: [], removedNodes: [ e.target ], target: e.target.parentNode } );
 				}
 			}, true);
 
 			document.documentElement.addEventListener( "DOMAttrModified", function( e ) {
-				if ( riobserver.connected && observeProps[e.attrName] ) {
+				if ( pfObserver.connected && observeProps[e.attrName] ) {
 					addMutation( { type: "attributes", target: e.target, attributeName: e.attrName } );
 				}
 			}, true);
@@ -288,7 +288,7 @@
 					src: 1
 				};
 
-				if ( ri.supSrcset && !ri.supSizes ) {
+				if ( pf.supSrcset && !pf.supSizes ) {
 					GETIMGATTRS.srcset = 1;
 				}
 
@@ -296,7 +296,7 @@
 					getAttribute: {
 						value: function( attr ) {
 							var internal;
-							if ( GETIMGATTRS[ attr ] && (internal = this[ ri.ns ]) && ( internal[attr] !== undefined ) ) {
+							if ( GETIMGATTRS[ attr ] && (internal = this[ pf.ns ]) && ( internal[attr] !== undefined ) ) {
 								return internal[ attr ];
 							}
 							return getImgAttr.apply( this, arguments );
@@ -307,11 +307,11 @@
 					}
 				});
 
-				if (!ri.supSrcset) {
+				if (!pf.supSrcset) {
 					imgIdls.push("srcset");
 				}
 
-				if (!ri.supSizes) {
+				if (!pf.supSizes) {
 					imgIdls.push("sizes");
 				}
 
@@ -343,7 +343,7 @@
 						};
 						var baseUpdateCurSrc = updateCurSrc;
 
-						if (ri.supSrcset && window.devicePixelRatio) {
+						if (pf.supSrcset && window.devicePixelRatio) {
 							ascendingSort = function( a, b ) {
 								var aRes = a.d || a.w || a.res;
 								var bRes = b.d || b.w || b.res;
@@ -352,9 +352,9 @@
 
 							updateCurSrc = function(elem) {
 								var i, cands, length, ret;
-								var imageData = elem[ ri.ns ];
+								var imageData = elem[ pf.ns ];
 
-								if ( imageData && imageData.supported && imageData.srcset && imageData.sets && (cands = ri.parseSet(imageData.sets[0])) && cands.sort) {
+								if ( imageData && imageData.supported && imageData.srcset && imageData.sets && (cands = pf.parseSet(imageData.sets[0])) && cands.sort) {
 
 									cands.sort( ascendingSort );
 									length = cands.length;
@@ -368,7 +368,7 @@
 									}
 
 									if (ret) {
-										ret = ri.makeUrl(ret.url);
+										ret = pf.makeUrl(ret.url);
 									}
 								}
 								baseUpdateCurSrc(elem, ret);
@@ -419,7 +419,7 @@
 			})();
 		}
 
-		riobserver.start();
+		pfObserver.start();
 	}
 	if ( !isReady ) {
 		document.addEventListener("DOMContentLoaded", function() {
