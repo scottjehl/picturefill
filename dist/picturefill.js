@@ -1353,32 +1353,6 @@
 
 			var timerId = setTimeout(run, document.body ? 9 : 99);
 
-//			// Also attach picturefill on resize and readystatechange
-//			// http://modernjavascript.blogspot.com/2013/08/building-better-debounce.html
-//			var debounce = function(func, wait) {
-//				var timeout, args, context, timestamp;
-//
-//				return function() {
-//					context = this;
-//					args = [].slice.call(arguments, 0);
-//					timestamp = new Date();
-//
-//					var later = function() {
-//						var last = (new Date()) - timestamp;
-//
-//						if (last < wait) {
-//							timeout = setTimeout(later, wait - last);
-//						} else {
-//							timeout = null;
-//							func.apply(context, args);
-//						}
-//					};
-//					if (!timeout) {
-//						timeout = setTimeout(later, wait);
-//					}
-//				};
-//			};
-
 			// Also attach picturefill on resize and readystatechange
 			// http://modernjavascript.blogspot.com/2013/08/building-better-debounce.html
 			var debounce = function(func, wait) {
