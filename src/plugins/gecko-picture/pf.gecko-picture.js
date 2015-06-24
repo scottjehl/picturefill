@@ -44,7 +44,7 @@
 				timer = setTimeout(findPictureImgs, 99);
 			};
 			var mq = window.matchMedia && matchMedia("(orientation: landscape)");
-			var init = function(){
+			var init = function() {
 				onResize();
 
 				if (mq && mq.addListener) {
