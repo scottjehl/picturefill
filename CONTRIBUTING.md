@@ -11,12 +11,12 @@ Picturefill is an open source project falling under the MIT License. By using, d
 
 ### Issue Discussion
 
-General Picturefill discussion takes place in Slack, at [http://picturefill.slack.com](http://picturefill.slack.com). To join, send an email to `picturefill` at `ricg.io`. Discussion of issues pretaining to the responsive images specifications takes place in the [RICG IRC channel](irc://irc.w3.org:6665/#respimg) and [issue tracker](https://github.com/responsiveimagescg/picture-element/issues/).
+General Picturefill discussion takes place in Slack, at [http://picturefill.slack.com](http://picturefill.slack.com). To join, send an email to `picturefill` at `ricg.io`. Discussion of issues pertaining to the responsive images specifications takes place in the [RICG IRC channel](irc://irc.w3.org:6665/#respimg) and [issue tracker](https://github.com/responsiveimagescg/picture-element/issues/).
 
 You can connect to the Picturefill Slack channel [via IRC](https://slack.zendesk.com/hc/en-us/articles/201727913-Connecting-to-Slack-over-IRC-and-XMPP) (SSL enabled).
 
 ### Modifying the code
-First, ensure that you have the latest [Node.js](http://nodejs.org/) and [npm](http://npmjs.org/) installed.
+First, ensure that you have the latest [Node.js](http://nodejs.org/) or [io.js](http://iojs.org) and [npm](http://npmjs.org/) installed.
 
 Test that Grunt's CLI is installed by running `grunt --version`.  If the command isn't found, run `npm install -g grunt-cli`.  For more information about installing Grunt, see the [getting started guide](http://gruntjs.com/getting-started).
 
@@ -28,15 +28,18 @@ Assuming that you don't see any red, you're ready to go. Just be sure to run `gr
 
 ### Development Workflow
 
+**Note**: The `master` branch now represents the publishing branch. Anything on master should be publishable to npm and bower. When something goes into master, it gets published. Minor version branches (`2.2`, `2.3`, etc) also exist to capture in-progress work on a particular version of picturefill. Once work on a version branch is complete, it gets merged into master to be published.
+
 1. If no issue already exists for the work you’ll be doing, create one to document the problem(s) being solved and self-assign.
-1. Create a new branch—please don't work in your `master` branch directly. We reccomend naming the branch to match the issue being addressed (`issue-777`).
+1. Create a new branch based off of the minor version branch you're fixing (`2.3`, `2.2`, etc) — please don't work in the `master` branch directly. We recommend naming the branch to match the issue being addressed (`issue-777`).
 1. Add failing tests for the change you want to make. Run `grunt` to see the tests fail.
 1. Fix stuff.
 1. Run `grunt` to see if the tests pass. Repeat steps 2-4 until done.
 1. Open `test/*.html` unit test file(s) in actual browsers to ensure tests pass everywhere.
 1. Update the documentation to reflect any changes.
-1. Push to your fork or push your issue-specific branch to the main repo, then submit a pull request against `master`.
-1. Once tested and +1’d by another team member (with no outstanding objections), self-merge into `master`.
+1. Push to your fork or push your issue-specific branch to the main repo, then submit a pull request against the minor version branch you're fixing. `2.2`, `2.3`, etc.
+1. Once tested and +1’d by another team member (with no outstanding objections), self-merge into the branch specified in the pull request.
+1. Once ready to release to the public, merge the minor version branch into master and publish to npm and create a tag for bower.
 
 ### Versioning
 
