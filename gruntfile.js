@@ -57,16 +57,16 @@
       },
       "gh-pages": {
         options: {
-          base: '.'
+          base: "."
         },
-        src: ["**/*", "!node_modules/**/*", "!test/**/*", "!src/**/*"]
+        src: [ "**/*", "!node_modules/**/*", "!test/**/*", "!src/**/*" ]
       },
       release: {
         options: {
-          additionalFiles: ["bower.json"],
+          additionalFiles: [ "bower.json" ],
           commitMessage: "Picturefill <%= version %>",
           tagMessage: "Picturefill <%= version %>",
-          afterRelease: ["gh-pages"]
+          afterRelease: [ "gh-pages" ]
         }
       },
       watch: {
