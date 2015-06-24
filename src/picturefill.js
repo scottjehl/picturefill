@@ -11,7 +11,7 @@
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
 	document.createElement( "picture" );
 
-	var warn, eminpx, alwaysCheckWDescriptor, resizeThrottle, evalId;
+	var warn, eminpx, alwaysCheckWDescriptor, evalId;
 	// local object for method references and testing exposure
 	var pf = {};
 	var noop = function() {};
@@ -1317,14 +1317,9 @@
 		}
 	};
 
-	pf.setupRun = function( options ) {
+	pf.setupRun = function() {
 		if ( !alreadyRun || isVwDirty || (DPR !== window.devicePixelRatio) ) {
 			updateMetrics();
-
-			// if all images are reevaluated clear the resizetimer
-			if ( !options.elements && !options.context ) {
-				clearTimeout( resizeThrottle );
-			}
 		}
 	};
 
@@ -1333,13 +1328,12 @@
 		picturefill = noop;
 		pf.fillImg = noop;
 	} else {
-		/**
-		 * Sets up picture polyfill by polling the document
-		 * Also attaches picturefill on resize and readystatechange
-		 */
+
+		 // Set up picture polyfill by polling the document
 		(function() {
 			var isDomReady;
 			var regReady = window.attachEvent ? /d$|^c/ : /d$|^c|^i/;
+
 			var run = function() {
 				var readyState = document.readyState || "";
 
@@ -1354,19 +1348,38 @@
 				}
 			};
 
-			var resizeEval = function() {
-				pf.fillImgs();
+			var timerId = setTimeout(run, document.body ? 9 : 99);
+
+			// Also attach picturefill on resize and readystatechange
+			// http://modernjavascript.blogspot.com/2013/08/building-better-debounce.html
+			var debounce = function(func, wait) {
+				var timeout, timestamp;
+				var later = function() {
+					var last = (new Date()) - timestamp;
+
+					if (last < wait) {
+						timeout = setTimeout(later, wait - last);
+					} else {
+						timeout = null;
+						func();
+					}
+				};
+
+				return function() {
+					timestamp = new Date();
+
+					if (!timeout) {
+						timeout = setTimeout(later, wait);
+					}
+				};
 			};
 
 			var onResize = function() {
-				clearTimeout( resizeThrottle );
 				isVwDirty = true;
-				resizeThrottle = setTimeout( resizeEval, 99 );
+				pf.fillImgs();
 			};
 
-			var timerId = setTimeout(run, document.body ? 9 : 99);
-
-			on( window, "resize", onResize );
+			on( window, "resize", debounce(onResize, 99 ) );
 			on( document, "readystatechange", run );
 
 			types[ "image/webp" ] = detectTypeSupport("image/webp", "data:image/webp;base64,UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAABBxAR/Q9ERP8DAABWUDggGAAAADABAJ0BKgEAAQADADQlpAADcAD++/1QAA==" );
