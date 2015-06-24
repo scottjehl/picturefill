@@ -137,7 +137,7 @@
 				// interpret `min-` as >=
 				/min-([a-z-\s]+):/g, "e.$1>=",
 
-				// interpret `min-` as <=
+				// interpret `max-` as <=
 				/max-([a-z-\s]+):/g, "e.$1<=",
 
 				//calc value
