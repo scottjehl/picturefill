@@ -44,13 +44,20 @@
 				timer = setTimeout(findPictureImgs, 99);
 			};
 			var mq = window.matchMedia && matchMedia("(orientation: landscape)");
+			var init = function(){
+				onResize();
+
+				if (mq && mq.addListener) {
+					mq.addListener(onResize);
+				}
+			};
 
 			dummySrc.srcset = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
 
-			onResize();
-
-			if (mq && mq.addListener) {
-				mq.addListener(onResize);
+			if (/^[c|i]|d$/.test(document.readyState || "")) {
+				init();
+			} else {
+				document.addEventListener("DOMContentLoaded", init);
 			}
 
 			return onResize;
