@@ -1,7 +1,7 @@
 /**
  * FF's first picture implementation is static and does not react to viewport changes, this tiny script fixes this.
  */
-(function() {
+(function(window) {
 	/*jshint eqnull:true */
 	var ua = navigator.userAgent;
 
@@ -36,10 +36,6 @@
 				var i;
 				var imgs = document.querySelectorAll("picture > img, img[srcset][sizes]");
 				for (i = 0; i < imgs.length; i++) {
-					if (imgs[i].currentSrc && !imgs[i].complete) {
-						removeEventListener("resize", onResize);
-						break;
-					}
 					fixRespimg(imgs[i]);
 				}
 			};
@@ -47,10 +43,17 @@
 				clearTimeout(timer);
 				timer = setTimeout(findPictureImgs, 99);
 			};
+			var mq = window.matchMedia && matchMedia("(orientation: landscape)");
 
 			dummySrc.srcset = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
+
+			onResize();
+
+			if (mq && mq.addListener) {
+				mq.addListener(onResize);
+			}
 
 			return onResize;
 		})());
 	}
-})();
+})(window);
