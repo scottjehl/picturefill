@@ -601,7 +601,9 @@
 			ok( op.mMQ( "(max-width: 481px)" ) );
 			ok( !op.mMQ( "(max-width: 479px)" ) );
 
+			op.u.orientation = 2;
 			ok( !op.mMQ( "(orientation: landscape)" ) );
+			ok( op.mMQ( "(orientation: portrait)" ) );
 
 			ok( op.mMQ( "(min-width: 240em)" ) );
 			ok( !op.mMQ( "(min-width: 241em)" ) );
