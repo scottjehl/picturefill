@@ -135,10 +135,15 @@
 				/,/g, "||",
 
 				// interpret `min-` as >=
-				/min-([a-z-\s]+):/g, "e.$1>=",
+				/min-([a-z-\s]+)\s*:/g, "e.$1>=",
 
 				// interpret `min-` as <=
-				/max-([a-z-\s]+):/g, "e.$1<=",
+				/max-([a-z-\s]+)\s*:/g, "e.$1<=",
+
+				// interpret orientation
+				/landscape/g, "1",
+				/portrait/g, "2",
+				/orientation\s*:/g, "e.orientation==",
 
 				//calc value
 				/calc([^)]+)/g, "($1)",
@@ -269,6 +274,8 @@
 
 		units.vw = units.width / 100;
 		units.vh = units.height / 100;
+
+		units.orientation = (units.vw > units.vh) ? 1 : 2;
 
 		evalId = [ units.height, units.width, DPR ].join("-");
 
