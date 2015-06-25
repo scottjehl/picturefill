@@ -243,6 +243,19 @@
 				</li>
 			</ul>
 
+			<h3 class="hed-subsection">Picturefill source selection option</h3>
+
+			<p>By default Picturefill tries to mimic the resource selection algorithm of Chrome (except that Picturefill, unlike the browser, doesn't know which image files are already cached). Picturefill 3.0 also comes with a new image custom source selection algorithm unique to Picturefill called <code>saveData</code>. The <code>saveData</code> algorithm weights the resource selection algorithm towards smaller image candidates on
+very high dppx devices (3dppx +), to conserve bandwidth.</p>
+
+			<p>To use <code>saveData</code>, create a picturefillCFG array that runs before the main plugin:
+
+			<pre><code>//generating the config array
+window.picturefillCFG = window.picturefillCFG || [];
+picturefillCFG.push([ "algorithm", "saveData" ]);</pre></code>
+
+			<p>Developer feedback on this new algorithm is welcome, especially if you've got some hard data.
+
 			<h2 class="hed-section" id="support">Browser Support</h2>
 			<p>Picturefill supports a broad range of browsers and devices, provided that you stick with the markup conventions documented above. </p>
 
