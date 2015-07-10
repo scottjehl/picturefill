@@ -2,7 +2,7 @@
 (function() {
   "use strict";
 
-  var pkg, toConcat = [ "src/external/matchmedia.js", "src/picturefill.js" ], supportTypes = "";
+  var pkg;
   module.exports = function(grunt) {
 
     // Project configuration.
@@ -18,6 +18,19 @@
       clean: {
         files: [ "dist" ]
       },
+      copy: {
+        plugins: {
+          files: [
+              {
+                expand: true,
+                cwd: "src/plugins/",
+                src: [ "**", "!gecko-picture/*" ],
+                dest: "dist/plugins/",
+                filter: "isFile"
+              }
+          ],
+        },
+      },
       concat: {
 
         dist: {
@@ -25,7 +38,7 @@
             banner: "<%= banner %>",
             stripBanners: true
           },
-          src: toConcat,
+          src: [ "src/plugins/gecko-picture/pf.gecko-picture.js", "src/picturefill.js" ],
           dest: "dist/picturefill.js"
         }
       },
@@ -34,20 +47,28 @@
           banner: "<%= banner %>"
         },
         dist: {
-          src: [ "<%= concat.dist.src %>" ],
-          dest: "dist/picturefill.min.js"
+          files: [
+              {
+              expand: true,
+              cwd: "dist/",
+              src: [ "**/*.js", "!*.min.js", "!**/*.min.js" ],
+              dest: "dist/",
+              ext: ".min.js",
+              extDot: "last"
+            }
+          ]
         }
       },
 
       qunit: {
-        files: [ "tests/**/*.html" ]
+        files: [ "tests/*.html" ]
       },
       jshint: {
         all: {
           options: {
             jshintrc: true
           },
-          src: [ "Gruntfile.js", "src/*.js", "src/includes/*.js", "tests/*.js" ]
+          src: [ "Gruntfile.js", "src/**/*.js" ]
         }
       },
       jscs: {
@@ -57,22 +78,21 @@
       },
       "gh-pages": {
         options: {
-          base: '.'
+          base: "."
         },
-        src: ["**/*", "!node_modules/**/*", "!test/**/*", "!src/**/*"]
+        src: [ "**/*", "!node_modules/**/*", "!test/**/*", "!src/**/*" ]
       },
       release: {
         options: {
-          additionalFiles: ["bower.json"],
           commitMessage: "Picturefill <%= version %>",
           tagMessage: "Picturefill <%= version %>",
-          afterRelease: ["gh-pages"]
+          afterRelease: [ "gh-pages" ]
         }
       },
       watch: {
         gruntfile: {
           files: [ "Gruntfile.js", "src/*.js", "src/includes/*.js", "tests/*.js" ],
-          tasks: [ "support-types" +  supportTypes, "default" ],
+          tasks: [ "default" ],
           options: {
             spawn: false
           }
@@ -92,6 +112,7 @@
 
     // These plugins provide necessary tasks.
     grunt.loadNpmTasks("grunt-contrib-clean");
+    grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.loadNpmTasks("grunt-contrib-concat");
     grunt.loadNpmTasks("grunt-contrib-jshint");
     grunt.loadNpmTasks("grunt-contrib-qunit");
@@ -101,34 +122,8 @@
     grunt.loadNpmTasks("grunt-gh-pages");
     grunt.loadNpmTasks("grunt-release");
 
-    grunt.task.registerTask("support-types", "insert support for image types dev wants to include", function() {
-      var supportTypes = "";
-      for (var i = 0; i < arguments.length; i++) {
-        var arg = arguments[i];
-
-        switch ( arg ) {
-          case "webp":
-          case "svg":
-          case "jxr":
-          case "jp2":
-          case "apng":
-
-            toConcat.push("src/includes/" + arg + ".js");
-        }
-
-        supportTypes += ":" + arg;
-
-      }
-
-      if (!supportTypes) {
-        supportTypes = supportTypes;
-      }
-      grunt.task.run("default");
-      console.log("files to concatenate", toConcat);
-    } );
-
 	// Default task.
-    grunt.registerTask("default", [ "jscs", "test", "clean", "concat", "uglify" ]);
+    grunt.registerTask("default", [ "jscs", "test", "clean", "concat", "copy", "uglify" ]);
     grunt.registerTask("test", [ "jscs", "jshint", "qunit" ]);
     grunt.registerTask("publish", [ "gh-pages" ]);
   };

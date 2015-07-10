@@ -1,0 +1,12 @@
+{
+	"preset": "jquery",
+	"validateLineBreaks": null,
+	"requireMultipleVarDecl": null,
+	"validateQuoteMarks": "\"",
+	"excludeFiles": [
+		"node_modules",
+		"dist",
+		"tests",
+		"examples"
+	]
+}
