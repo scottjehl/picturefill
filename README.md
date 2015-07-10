@@ -1,6 +1,6 @@
 # Picturefill
 A [responsive image](http://www.whatwg.org/specs/web-apps/current-work/multipage/embedded-content.html#embedded-content) polyfill.
-* Authors: A great many. See Authors.txt
+* Authors: See [Authors.txt](https://github.com/scottjehl/picturefill/blob/3.0/Authors.txt)
 * License: MIT
 
 [![build-status](https://api.travis-ci.org/scottjehl/picturefill.svg)](https://travis-ci.org/scottjehl/picturefill)
