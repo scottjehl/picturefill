@@ -1,4 +1,4 @@
- # Picturefill
+# Picturefill
 A [responsive image](http://www.whatwg.org/specs/web-apps/current-work/multipage/embedded-content.html#embedded-content) polyfill.
 * Authors: A great many. See Authors.txt
 * License: MIT
