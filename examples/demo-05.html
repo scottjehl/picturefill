@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset=utf-8 />
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<title>Picturefill - Demo</title>
+		<link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400' rel='stylesheet' type='text/css'>
+		<link href='../examples/styles.css' rel='stylesheet' type='text/css'>
+
+		<script>
+			// Picture element HTML shim|v it for old IE (pairs with Picturefill.js)
+			document.createElement( "picture" );
+		</script>
+		<script src="../dist/picturefill.js"></script>
+    
+
+	</head>
+	<body>
+		<a href="http://responsiveimages.org/" class="ricg"><img src="https://raw.github.com/ResponsiveImagesCG/meta/master/logo/Web/RICG_logo_small.png"></a>
+
+
+
+	<h3><code>media</code> example with one APNG source qualified with a <code>type</code> attribute.</h3>
+		<p>Note: Picturefill supports APNG types on any source element, and will disregard a <code>source</code> if its type is not supported in a particular environment.
+		  </p>
+
+<pre><code>&lt;picture&gt;
+        &lt;!--[if IE 9]&gt;&lt;video style="display: none;"&gt;&lt;![endif]--&gt;
+        &lt;source srcset="../examples/images/ballanim.png" type="image/x-apng"&gt;
+        &lt;source srcset="../examples/images/ballanim.gif" type="image/gif"&gt;
+        
+        &lt;!--[if IE 9]&gt;&lt;/video&gt;&lt;![endif]--&gt;
+        &lt;img srcset="../examples/images/ballanim.gif" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia"&gt;
+&lt;/picture&gt;
+</code></pre>
+
+    <p>Also note that the Mime Type <code>image/x-apng</code>
+    is not real &mdash; it is only used by picturefill to distinguish between PNG and APNG (this is experimental and may be changed in a later release).</p>
+
+		<picture>
+				<!--[if IE 9]><video style="display: none;"><![endif]-->
+				<source srcset="../examples/images/ballanim.png" type="image/x-apng">
+				<source srcset="../examples/images/ballanim.gif" type="image/gif">
+				
+				<!--[if IE 9]></video><![endif]-->
+				<img srcset="../examples/images/ballanim.gif" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+		</picture>
+
+
+
+	</body>
+</html>

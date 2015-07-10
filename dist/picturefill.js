@@ -1217,6 +1217,8 @@
 					break;
 				}
 			}
+
+			pf.setIntrinsicSize(picImg, bestCandidate);
 		}
 
 		if ( bestCandidate ) {
