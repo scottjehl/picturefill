@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>picturefill functional tests</title>
+	<link rel="stylesheet" href="resources/qunit-1.17.1.css" />
+	<script src="resources/qunit-1.17.1.js"></script>
+	<script src="resources/jquery-1.11.2.js"></script>
+	<style>
+		#functional-content {
+			width: 1024px;
+			height: 300px;
+			border: none;
+			padding: 0;
+			margin: 0;
+			resize: both;
+		}
+
+	</style>
+</head>
+<body>
+
+<div id="qunit"></div>
+
+<div id="qunit-fixture"></div>
+
+<p><a href="index.html">Back to unit tests</a></p>
+
+<iframe id="functional-content" src="resources/functional-frame.html" scrolling="no"></iframe>
+<script src="resources/es5-polyfill.js"></script>
+<script src="tests-functional.js"></script>
+</body>
+</html>
