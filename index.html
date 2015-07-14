@@ -124,11 +124,11 @@
 
 			<p>It's beyond the scope of this guide to get into much detail about how to use the new <code>srcset</code> &amp; <code>sizes</code> attributes, so we'd recommend reading the following post by Eric Portis: <a href="http://ericportis.com/posts/2014/srcset-sizes/">Srcset and Sizes</a>. Read that first, then check out the demos below!</p>
 
-	<pre><code>&lt;img 
+	<pre><code>&lt;img
   sizes=&quot;(min-width: 40em) 80vw, 100vw&quot;
-  srcset=&quot;examples/images/medium.jpg 375w, 
+  srcset=&quot;examples/images/medium.jpg 375w,
           examples/images/large.jpg 480w,
-          examples/images/extralarge.jpg 768w&quot; 
+          examples/images/extralarge.jpg 768w&quot;
   alt=&quot;…&quot;&gt;</code></pre>
 
 			<p>Here's how that renders on your display at your current viewport size:</p>
@@ -233,12 +233,13 @@
 			<ul>
 				<li><strong>Elements:</strong> An array of <code>img</code> elements you'd like picturefill to evaluate. The Default value for <code>options.elements</code> is all <code>img</code> elements in the page that have a <code>srcset</code> attribute or have a <code>picture</code> element as a direct parent.
 	<pre><code>picturefill({
-  elements: [ document.getElementById( "myPicture" ) ]
+  elements: [ document.getElementById( "myImg" ) ]
 });</code></pre>
 				</li>
-				<li><strong>Reevaluate:</strong> Force picturefill to evaluate all elements in the <code>options.elements</code> array, even if they've already been evaluated. The default is <code>false</code>, except when a resize event triggers Picturefill to run (<code>options.reevaluate</code> is <code>true</code> in that case).
+				<li><strong>Reevaluate:</strong> Force picturefill to evaluate all elements in the <code>options.elements</code> array, even if they've already been evaluated. The default is <code>false</code>. This option has to be used, if you dynamically change the <code>srcset</code>/<code>sizes</code> attributes or modify associated <code>source</code> elements. As an alternative the <a href="dist/plugins/mutation/pf.mutation.js">mutation plugin</a> can be used.
 	<pre><code>picturefill({
-  reevaluate: true
+  reevaluate: true,
+  elements: [ document.getElementById( "myImg" ) ]
 });</code></pre>
 				</li>
 			</ul>
