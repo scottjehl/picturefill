@@ -30,7 +30,7 @@
 		<main>
 			<h1 class="hed">Picturefill</h1>
 			<p class="subhed">A responsive image polyfill</p>
-			<span class="ricg-seal">Officially endorsed by the <abbr title="Responsive Issues Community Group">RICG</abbr></span>
+			<a href="http://ricg.io" class="ricg-seal">Officially endorsed by the <abbr title="Responsive Issues Community Group">RICG</abbr></a>
 
 			<div class="lede">
 				<p>The <a href="http://picture.responsiveimages.org/"><code>picture</code> element, <code>srcset</code> and <code>sizes</code> attributes</a>, and associated features allow web developers to deliver an appropriate image to every user depending on a variety of conditions like screen size, viewport size, screen resolution, and more. Picturefill enables support for the <code>picture</code> element and associated features in browsers that do not yet support them, so you can start using them today!</p>
@@ -45,8 +45,11 @@
 
 			<h2 class="hed-section" id="download">Downloading Picturefill</h2>
 
-			<h3 class="hed-subsection">Picturefill Version 3.0.0 (RC 1)</h3>
-			<p>Version 3 is a full rewrite of the codebase featuring optimized performance, better emulation of native behavior, and new spec-based parsers. It also handles some of the quirks, shortcomings, and edge cases related to first-generation native implementations. For IE 9 and earlier, version 3 includes a small shim that polyfills the use of common media conditions (<code>min-width</code>, <code>max-width</code>, <code>min-height</code>, <code>max-height</code>). If you need old IE support for other media conditions, such as <code>orientation</code> or <code>aspect-ratio</code>, please additionally include the <a href="https://github.com/paulirish/matchMedia.js/">matchMedia polyfill</a>. Feedback on this release candidate is highly welcomed—if you encounter any problems, please <a href="https://github.com/scottjehl/picturefill/issues">file an issue on GitHub</a>.</p>
+			<h3 class="hed-subsection">Picturefill Version 3.0.0 (Release Candidate 1)</h3>
+
+			<p>Version 3 is a <em>full rewrite</em> of the Picturefill codebase, featuring optimized performance, better emulation of native behavior, and parsers that adhere much more closely to <a href="http://picture.responsiveimages.org">the specification</a>. It also handles many of the quirks, shortcomings, and edge cases related to first-generation native implementations.</p>
+
+			<p>Feedback on this beta release is highly welcomed—if you encounter any problems, please <a href="https://github.com/scottjehl/picturefill/issues">file an issue on GitHub</a>.</p>
 			<ul>
 				<li>
 					<a href="https://cdn.rawgit.com/scottjehl/picturefill/3.0/dist/picturefill.js" class="download">picturefill.js</a>
@@ -73,7 +76,7 @@
 
 			<h2 class="hed-section" id="getting-started">Getting Started with Picturefill</h2>
 
-			<p>For basic usage of Picturefill: download one of the files listed above and reference it from the <code>head</code> section of your HTML document with the following code:</p>
+			<p>To start using Picturefill download one of the files listed above and reference it from the <code>head</code> section of your HTML document with the following code:</p>
 
 	<pre><code>&lt;script src=&quot;picturefill.js&quot;&gt;&lt;/script&gt;</code></pre>
 
@@ -93,7 +96,7 @@
 
 			<h2 class="hed-section" id="examples">Markup Patterns</h2>
 
-			<p>Once you've included picturefill.js, you can start adding responsive image elements to your site. Picturefill adds support for both the <code>picture</code> element and also new responsive attributes to the <code>img</code> element.</p>
+			<p>Once you've included picturefill.js, you can start adding responsive image elements to your site! Picturefill adds support for the the entire suite of responsive image solutions, including the <code>picture</code> element and new <code>img</code> element attributes.</p>
 
 			<p>There are a number of different <a href="http://usecases.responsiveimages.org">use cases</a> addressed by some combination of features from the <a href="http://picture.responsiveimages.org">responsive images specification</a>—here are some of the most common ones:</p>
 
@@ -112,17 +115,17 @@
 
 			<pre><code>&lt;img srcset=&quot;examples/images/large.jpg 1x, examples/images/extralarge.jpg 2x&quot; alt=&quot;…&quot;&gt;</code></pre>
 
-			<p>Note that the <code>2x</code> source will be shown at the inherent width of the <code>1x</code> source. The two sources will occupy the same space in your layout, but the <code>2x</code> source will be at double the pixel density. This only applies to the <em>natural</em> size of the <code>img</code>—any sizing changes done in CSS are unchanged.</p>
-
 			<p>Here's how that renders on your display:</p>
 			<img srcset="examples/images/large.jpg 1x, examples/images/extralarge.jpg 2x" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 
+			<p>The <code>2x</code> source will be shown at the inherent width of the <code>1x</code> source—so the two sources will occupy the same space in your layout, but the <code>2x</code> source will be displayed at double the pixel density. This only applies to the <em>natural</em> size of the <code>img</code>—resizing the image via CSS will behave as expected.</p>
+
+			<p class="note" id="caching">Modern browsers that support <code>srcset</code> natively may select a cached file that meets the minimum media condition, even if it is “overkill” for the current media condition. For example, a <code>2x</code> file may be shown on a <code>1x</code> device, if that <code>2x</code> file is already in the cache—there’d be no reason to make an additional request when the user will see no discernable difference, after all. This is typically encountered only on sites with multiple versions of the same image displayed in multiple elements at different sizes (like our demo page). The occasional selection of "oversize" resources—depending on the cache—is currently an expected behavior in native implementations and you may encounter it during testing.</p>
+
+			<p id="override">Eventually <code>srcset</code> will be extended to allow the browser to override requests for higher-resolution options based on a bandwidth limitations or a user preference (see #9 in the <a href="http://usecases.responsiveimages.org/#h2_requirements">Responsive Images Use Cases and Requirements</a>).</p>
+
 			<h3 class="hed-pattern" id="img-sizes">Using the `srcset` &amp; `sizes` attributes</h3>
 			<p class="usecase">The <code>srcset</code> and <code>sizes</code> syntaxes are used to provide the browser with a list of image sources that are identical apart from their size (same aspect ratio, same focal point) and how they’ll be displayed, then allow the browser to choose the source best for the user’s current viewport size, display density, and the size of that image in the page layout.</p>
-
-			<p>The <code>sizes</code> syntax is used to define the spaces your image will occupy in your layout. <code>srcset</code> then defines a list of images and their inherent widths. This allows the browser to choose the smallest appropriate source for the size <em>available in that part of the layout</em>, rather than the viewport size alone.</p>
-
-			<p>It's beyond the scope of this guide to get into much detail about how to use the new <code>srcset</code> &amp; <code>sizes</code> attributes, so we'd recommend reading the following post by Eric Portis: <a href="http://ericportis.com/posts/2014/srcset-sizes/">Srcset and Sizes</a>. Read that first, then check out the demos below!</p>
 
 	<pre><code>&lt;img
   sizes=&quot;(min-width: 40em) 80vw, 100vw&quot;
@@ -137,15 +140,14 @@
 					srcset="examples/images/medium.jpg 375w, examples/images/large.jpg 480w, examples/images/extralarge.jpg 768w" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 			<a href="examples/demo-01.html" class="demo">Standalone <code>srcset</code> and <code>sizes</code> demo</a>
 
+			<p>The <code>sizes</code> syntax is used to define the spaces your image will occupy in your layout. <code>srcset</code> then defines a list of images and their inherent widths. This allows the browser to choose the smallest appropriate source for the size <em>available in that part of the layout</em>, rather than the viewport size alone.</p>
+
+			<p>It's beyond the scope of this guide to get into much detail about how to use the new <code>srcset</code> &amp; <code>sizes</code> attributes so we’d highly recommend reading the following post by Eric Portis: <a href="http://ericportis.com/posts/2014/srcset-sizes/">Srcset and Sizes</a>. Keep in mind that the same <a href="#caching">caching behavior</a> is applied to this usage of <code>srcset</code>, as well.</p>
 
 			<h3 class="hed-pattern" id="using-picture">Using the `picture` element</h3>
 			<p class="usecase">The <code>picture</code> element is used when you need explicit control over which source is shown at set viewport sizes.</p>
 
 			<p>The <code>picture</code> element requires a little more markup than the example above, but it allows you to use features like CSS3 Media Queries to pair image source with varying sizes, zoom levels, and aspect ratios with the layout conditions in your designs. It should not, however, be used to serve radically different image sources—all sources must be described by the <code>alt</code> attribute of the inner <code>img</code>.</p>
-
-			<p>Your <code>picture</code> element should contain a series of <code>source</code> elements followed by an <code>img</code> element. Each <code>source</code> element must have a <code>srcset</code> attribute specifying one or more image url sources (which can use expanded srcset syntax if desired for resolution switching), and the <code>img</code> element should have a srcset attribute for fallback purposes as well (some browsers like Android 2.3's won't see the <code>source</code> elements). Additionally, you may add a  <code>media</code> attribute containing CSS3 Media Queries, and/or a <code>sizes</code> attribute to pair with <code>srcset</code>.</p>
-
-			<p>Here's one with <code>srcset</code> and <code>media</code>. The first <code>source</code> with a <code>media</code> attribute that matches the user’s context will determine the src of the <code>img</code> element at the end, so you’ll want to present larger options first when using <code>min-width</code> media queries (like in the examples below), and larger options last when using <code>max-width</code> media queries.</p>
 
 	<pre><code>&lt;picture&gt;
   &lt;source srcset=&quot;examples/images/extralarge.jpg&quot; media=&quot;(min-width: 1000px)&quot;&gt;
@@ -162,6 +164,9 @@
 		</picture>
 			<a href="examples/demo-02.html" class="demo">Standalone <code>picture</code> demo</a>
 
+			<p>Your <code>picture</code> element should contain a series of <code>source</code> elements followed by an <code>img</code> element. Each <code>source</code> element must have a <code>srcset</code> attribute specifying one or more image url sources (which can use expanded srcset syntax if desired for resolution switching), and the <code>img</code> element should have a srcset attribute for fallback purposes as well (some browsers like Android 2.3's won't see the <code>source</code> elements). Additionally, you may add a <code>media</code> attribute containing CSS3 Media Queries, and/or a <code>sizes</code> attribute to pair with <code>srcset</code>.</p>
+
+			<p>The first <code>source</code> with a <code>media</code> attribute that matches the user’s context will determine the src of the <code>img</code> element at the end, so you’ll want to present larger options first when using <code>min-width</code> media queries (like in the examples below), and larger options last when using <code>max-width</code> media queries. Since these image sources are meant to align with layout breakpoints, <code>srcset</code>’s <a href="#caching">caching behavior</a> and the potential for a <a href="#override">bandwidth or user preference override</a> do not apply here.</p>
 
 			<h3 class="hed-subsection" id="ie9">Supporting Picture in Internet Explorer 9</h3>
 			<p>While most versions of IE (even older ones!) are supported well, IE9 has a little conflict to work around. To support IE9, you will need to wrap a <code>video</code> element wrapper around the source elements in your <code>picture</code> tag. You can do this using conditional comments, like so:</p>
@@ -175,8 +180,7 @@
 &lt;/picture&gt;</code></pre>
 
 			<h3 class="hed-subsection" id="using-media-and-srcset">`media` and `srcset` syntax:</h3>
-
-			<p>The <code>1x</code>, <code>2x</code> syntax in <code>srcset</code> acts as a shorthand for more complex resolution media queries. When natively supported, <code>srcset</code> will allow the UA to override requests for higher-resolution options based on a bandwidth limitations or a user preference (see #9 in the <a href="http://usecases.responsiveimages.org/#h2_requirements">Responsive Images Use Cases and Requirements</a>).</p>
+			<p>The <code>1x</code>/<code>2x</code> syntax can be used within <code>source</code> element <code>srcset</code> attributes as a shorthand for more complex resolution media queries.</p>
 
 	<pre><code>&lt;picture&gt;
   &lt;source srcset=&quot;examples/images/large.jpg, examples/images/extralarge.jpg 2x&quot; media=&quot;(min-width: 800px)&quot;&gt;
@@ -192,7 +196,7 @@
 			<a href="examples/demo-03.html" class="demo">Standalone extended <code>picture</code> demo</a>
 
 			<h3 class="hed-pattern" id="using-type">The `type` attribute in `picture`</h3>
-			<p class="usecase">The <code>types</code> attribute is used to send an alternate image source <em>format</em> only to browsers that support that format, and a fallback source to browsers that do not.</p>
+			<p class="usecase">The <code>types</code> attribute is used to send an alternate image source <em>format</em> only to browsers that support that format, and a fallback source to browsers that do not. Unlike <a href="https://twitter.com/scottjehl/status/298884304023465984">existing solutions</a>, the <code>picture</code> element makes these negotiations using a single request.</p>
 
 			<p>Picturefill supports SVG and WebP as part of its core, but the following MIME types can be used via the “typesupport” plugin:</p>
 			<ul>
@@ -211,8 +215,8 @@
 			<p>Here's how that renders in your browser:</p>
 
 			<picture>
-					<source srcset="examples/images/large.webp" type="image/webp">
-					<img srcset="examples/images/large.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+				<source srcset="examples/images/large.webp" type="image/webp">
+				<img srcset="examples/images/large.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 			</picture>
 			<a href="examples/demo-04.html" class="demo">Standalone <code>type</code> attribute demo</a>
 
@@ -228,7 +232,7 @@
 
 			<h3 class="hed-subsection">Picturefill function options</h3>
 
-			<p>When running the <code>picturefill()</code> function, you can pass options specifying the following settings:</p>
+			<p>When running the <code>picturefill()</code> function, you can pass options specifying the following configuration options:</p>
 
 			<ul>
 				<li><strong>Elements:</strong> An array of <code>img</code> elements you'd like picturefill to evaluate. The Default value for <code>options.elements</code> is all <code>img</code> elements in the page that have a <code>srcset</code> attribute or have a <code>picture</code> element as a direct parent.
@@ -244,26 +248,33 @@
 				</li>
 			</ul>
 
-			<h3 class="hed-subsection">Picturefill source selection option</h3>
 
-			<p>By default Picturefill tries to mimic the resource selection algorithm of Chrome (except that Picturefill, unlike the browser, doesn't know which image files are already cached). Picturefill 3.0 also comes with a new image custom source selection algorithm unique to Picturefill called <code>saveData</code>. The <code>saveData</code> algorithm weights the resource selection algorithm towards smaller image candidates on
-very high dppx devices (3dppx +), to conserve bandwidth.</p>
+			<h3 class="hed-subsection">Source selection algorithm option</h3>
 
-			<p>To use <code>saveData</code>, create a picturefillCFG array that runs before the main plugin:
+			<p>By default Picturefill attempts to mimic the resource selection algorithms current native implementations, but Picturefill 3 also includes an optional and experimental custom source selection algorithm. The <code>saveData</code> algorithm skews the resource selection algorithm toward smaller image candidates(<code>2x</code> on extremely high dppx devices (<code>3x</code> and up), to conserve bandwidth in situations where there may be little or no <em>visual</em> difference between sources.</p>
+
+			<p>To use <code>saveData</code>, create a <code>picturefillCFG</code> array that runs before the main plugin:
 
 			<pre><code>//generating the config array
 window.picturefillCFG = window.picturefillCFG || [];
 picturefillCFG.push([ "algorithm", "saveData" ]);</pre></code>
 
-			<p>Developer feedback on this new algorithm is welcome, especially if you've got some hard data.
+			<p>Developer feedback on this new algorithm is <em>highly</em> welcomed. We’d love to see some data around potential bandwidth savings, and this data may go on to inform native responsive image implementations in the future.</p>
 
 			<h2 class="hed-section" id="support">Browser Support</h2>
-			<p>Picturefill supports a broad range of browsers and devices, provided that you stick with the markup conventions documented above. </p>
+			<p>Picturefill supports a broad range of browsers and devices, provided that you stick with the markup conventions documented above.</p>
 
-			<h3  class="hed-subsection" id="gotchas">Support caveats to keep in mind</h3>
+			<!--<h3 class="hed-subsection" id="markup-conventions">Markup Conventions</h3>-->
+			<!-- TODO: Detail trade-offs of various markup/fallback patterns. -->
+
+			<h3 class="hed-subsection" id="gotchas">Support caveats</h3>
 
 			<p>Picturefill is tested broadly and works in a large number of browsers. That said, it does have some browser support considerations to keep in mind:</p>
 			<ul>
+				<li>For IE 9 and earlier, version 3 includes a small shim that polyfills the use of common media conditions (<code>min-width</code>, <code>max-width</code>, <code>min-height</code>, <code>max-height</code>). If you need old IE support for other media conditions, such as <code>orientation</code> or <code>aspect-ratio</code>, please additionally include the <a href="https://github.com/paulirish/matchMedia.js/">matchMedia polyfill</a>.</li>
+
+				<li>Picturefill 3 includes a small shim that polyfills common media conditions for IE9 and earlier (<code>min-width</code>, <code>max-width</code>, <code>min-height</code>, and <code>max-height</code>). If you need old IE support for other media conditions, such as <code>orientation</code> or <code>aspect-ratio</code>, please additionally include the <a href="https://github.com/paulirish/matchMedia.js/">matchMedia polyfill</a>.</li>
+
 				<li><strong>JS-Disabled Browsers only see alt text:</strong> When using the <code>picture</code> element, non-<code>picture</code> supporting browsers will only see <code>alt</code> attribute text as a fallback when JavaScript fails or is disabled. This is because any <code>noscript</code>-based workarounds (such as the one used in Picturefill version 1) will cause future browsers that support the <code>picture</code> element to show two images instead of one when JavaScript is off. Unfortunately, adding a <code>src</code> attribute with an external source to the <code>img</code> element in your <code>picture</code> element isn't a good workaround either, as any browser that exists today will fetch that <code>src</code> url even if it is not going to be used (which is wasteful), and an empty <code>src</code> can result in <a href="http://wilto.github.io/srcn-polyfills/">unexpected requests</a>. For valid markup, the shortest possible value for <code>src</code> (without firing an <code>onerror</code> event or a potential request) is <pre><code>src="data:image/gif;base64,R0lGODlhAQABAAAAADs="</pre></code></li>
 
 				<li><strong>Temporary extra HTTP Requests for <code>picture</code> usage in some browsers:</strong> In browsers that natively support <code>srcset</code> but do not yet support the <code>picture</code> element, users may experience a wasted HTTP request for each <code>picture</code> element on a page. This is because the browser's preparser will fetch one of the URLs listed in the <code>picture</code> element's child <code>img</code>'s <code>srcset</code> attribute as soon as possible during page load, before the JavaScript can evaluate the potential <code>picture</code> <code>source</code> elements for a better match. This problem will only affect browsers that have implemented <code>srcset</code> but not <code>picture</code>, which will hopefully be short-lived.</li>
