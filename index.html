@@ -49,11 +49,11 @@
 			<p>Version 3 is a full rewrite of the codebase featuring optimized performance, better emulation of native behavior, and new spec-based parsers. It also handles some of the quirks, shortcomings, and edge cases related to first-generation native implementations. For IE 9 and earlier, version 3 includes a small shim that polyfills the use of common media conditions (<code>min-width</code>, <code>max-width</code>, <code>min-height</code>, <code>max-height</code>). If you need old IE support for other media conditions, such as <code>orientation</code> or <code>aspect-ratio</code>, please additionally include the <a href="https://github.com/paulirish/matchMedia.js/">matchMedia polyfill</a>. Feedback on this beta release is highly welcomed—if you encounter any problems, please <a href="https://github.com/scottjehl/picturefill/issues">file an issue on GitHub</a>.</p>
 			<ul>
 				<li>
-					<a href="#" class="download">picturefill.js</a>
+					<a href="https://cdn.rawgit.com/scottjehl/picturefill/3.0/dist/picturefill.js" class="download">picturefill.js</a>
 					<p class="meta">(development version, unminified code)</p>
 				</li>
 				<li>
-					<a href="#" class="download">picturefill.min.js</a>
+					<a href="https://cdn.rawgit.com/scottjehl/picturefill/3.0/dist/picturefill.min.js" class="download">picturefill.min.js</a>
 					<p class="meta">(production version, minified code)</p>
 				</li>
 			</ul>
@@ -124,11 +124,11 @@
 
 			<p>It's beyond the scope of this guide to get into much detail about how to use the new <code>srcset</code> &amp; <code>sizes</code> attributes, so we'd recommend reading the following post by Eric Portis: <a href="http://ericportis.com/posts/2014/srcset-sizes/">Srcset and Sizes</a>. Read that first, then check out the demos below!</p>
 
-	<pre><code>&lt;img 
+	<pre><code>&lt;img
   sizes=&quot;(min-width: 40em) 80vw, 100vw&quot;
-  srcset=&quot;examples/images/medium.jpg 375w, 
+  srcset=&quot;examples/images/medium.jpg 375w,
           examples/images/large.jpg 480w,
-          examples/images/extralarge.jpg 768w&quot; 
+          examples/images/extralarge.jpg 768w&quot;
   alt=&quot;…&quot;&gt;</code></pre>
 
 			<p>Here's how that renders on your display at your current viewport size:</p>
