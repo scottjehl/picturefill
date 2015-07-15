@@ -1381,8 +1381,6 @@
 
 			on( window, "resize", debounce(onResize, 99 ) );
 			on( document, "readystatechange", run );
-
-			types[ "image/webp" ] = detectTypeSupport("image/webp", "data:image/webp;base64,UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAABBxAR/Q9ERP8DAABWUDggGAAAADABAJ0BKgEAAQADADQlpAADcAD++/1QAA==" );
 		})();
 	}
 
@@ -1423,6 +1421,11 @@
 	} else if ( typeof define === "function" && define.amd ) {
 		// AMD support
 		define( "picturefill", function() { return picturefill; } );
+	}
+
+	// IE8 evals this sync, so it must be the last thing we do
+	if ( !window.HTMLPictureElement ) {
+		types[ "image/webp" ] = detectTypeSupport("image/webp", "data:image/webp;base64,UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAABBxAR/Q9ERP8DAABWUDggGAAAADABAJ0BKgEAAQADADQlpAADcAD++/1QAA==" );
 	}
 
 } )( window, document );
