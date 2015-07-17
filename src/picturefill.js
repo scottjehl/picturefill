@@ -4,7 +4,6 @@
  *  Spec: http://picture.responsiveimages.org/
  */
 (function( window, document, undefined ) {
-	/* global parseSizes */
 	// Enable strict mode
 	"use strict";
 
@@ -673,9 +672,6 @@
 		} // (Close of big while loop.)
 	}
 
-	/* jshint ignore:start */
-	// jscs:disable
-
 	/*
 	 * Sizes Parser
 	 *
@@ -794,7 +790,7 @@
 				} else if (chrctr === ")") {
 					parenDepth -= 1;
 				} else if (chrctr === ",") {
-					pushComponent()
+					pushComponent();
 					pushComponentArray();
 					pos += 1;
 					continue;
@@ -882,8 +878,6 @@
 		// size value, return 100vw.
 		return "100vw";
 	}
-	// jscs: enable
-	/* jshint ignore:end */
 
 	// namespace
 	pf.ns = ("pf" + new Date().getTime()).substr(0, 9);
