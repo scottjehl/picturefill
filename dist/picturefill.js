@@ -1,4 +1,4 @@
-/*! Picturefill - v3.0.0-alpha1 - 2015-06-24
+/*! Picturefill - v3.0.0-alpha1 - 2015-07-13
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 (function(window) {
@@ -825,9 +825,9 @@
 
 			// (Loop forwards from the beginning of the string.)
 			while (true) {
-				chrctr = str[pos];
+				chrctr = str.charAt(pos);
 
-				if (chrctr === undefined) { // ( End of string reached.)
+				if (chrctr === "") { // ( End of string reached.)
 					pushComponent();
 					pushComponentArray();
 					return listArray;
@@ -845,7 +845,7 @@
 					// (If previous character in loop was also a space, or if
 					// at the beginning of the string, do not add space char to
 					// component.)
-					if ((str[pos - 1] && isSpace(str[pos - 1])) || (!component)) {
+					if ( (str.charAt(pos - 1) && isSpace( str.charAt(pos - 1) ) ) || !component ) {
 						pos += 1;
 						continue;
 					} else if (parenDepth === 0) {
@@ -865,7 +865,7 @@
 					pushComponentArray();
 					pos += 1;
 					continue;
-				} else if ((chrctr === "/") && (str[pos + 1] === "*")) {
+				} else if ( (chrctr === "/") && (str.charAt(pos + 1) === "*") ) {
 					inComment = true;
 					pos += 2;
 					continue;
