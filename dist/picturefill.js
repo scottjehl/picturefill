@@ -1,4 +1,4 @@
-/*! Picturefill - v3.0.0-alpha1 - 2015-07-13
+/*! Picturefill - v3.0.0-beta1 - 2015-07-17
 * http://scottjehl.github.io/picturefill
 * Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 (function(window) {
@@ -71,7 +71,6 @@
  *  Spec: http://picture.responsiveimages.org/
  */
 (function( window, document, undefined ) {
-	/* global parseSizes */
 	// Enable strict mode
 	"use strict";
 
@@ -740,9 +739,6 @@
 		} // (Close of big while loop.)
 	}
 
-	/* jshint ignore:start */
-	// jscs:disable
-
 	/*
 	 * Sizes Parser
 	 *
@@ -861,7 +857,7 @@
 				} else if (chrctr === ")") {
 					parenDepth -= 1;
 				} else if (chrctr === ",") {
-					pushComponent()
+					pushComponent();
 					pushComponentArray();
 					pos += 1;
 					continue;
@@ -949,8 +945,6 @@
 		// size value, return 100vw.
 		return "100vw";
 	}
-	// jscs: enable
-	/* jshint ignore:end */
 
 	// namespace
 	pf.ns = ("pf" + new Date().getTime()).substr(0, 9);
