@@ -21,15 +21,22 @@
       copy: {
         plugins: {
           files: [
-              {
-                expand: true,
-                cwd: "src/plugins/",
-                src: [ "**", "!gecko-picture/*" ],
-                dest: "dist/plugins/",
-                filter: "isFile"
-              }
+          {
+            expand: true,
+            cwd: "src/plugins/",
+            src: [ "**", "!gecko-picture/*" ],
+            dest: "dist/plugins/",
+            filter: "isFile"
+          }
           ],
-        },
+        }
+      },
+      intern: {
+        options: {
+          runType: "runner",
+          config: "tests/intern",
+          suites: [ "tests/tests" ]
+        }
       },
       concat: {
 
@@ -59,7 +66,6 @@
           ]
         }
       },
-
       qunit: {
         files: [ "tests/*.html" ]
       },
@@ -84,6 +90,7 @@
       },
       release: {
         options: {
+          additionalFiles: [ "bower.json" ],
           commitMessage: "Picturefill <%= version %>",
           tagMessage: "Picturefill <%= version %>",
           afterRelease: [ "gh-pages" ]
@@ -121,10 +128,11 @@
     grunt.loadNpmTasks("grunt-jscs-checker");
     grunt.loadNpmTasks("grunt-gh-pages");
     grunt.loadNpmTasks("grunt-release");
+    grunt.loadNpmTasks("intern");
 
 	// Default task.
     grunt.registerTask("default", [ "jscs", "test", "clean", "concat", "copy", "uglify" ]);
-    grunt.registerTask("test", [ "jscs", "jshint", "qunit" ]);
+    grunt.registerTask("test", [ "jscs", "jshint", "intern" ]);
     grunt.registerTask("publish", [ "gh-pages" ]);
   };
 })();

@@ -1416,7 +1416,7 @@
 		module.exports = picturefill;
 	} else if ( typeof define === "function" && define.amd ) {
 		// AMD support
-		define( "picturefill", function() { return picturefill; } );
+		define( "picturefill", [], function() { return picturefill; } );
 	}
 
 } )( window, document );

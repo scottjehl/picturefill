@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+  <head>
+    <title>picturefill main tests</title>
+  </head>
+  <body>
+    <div id="fixtures">
+
+      <!-- Functional tests -->
+      <picture>
+        <!-- First `source` in source order is selected -->
+        <audio>
+          <source srcset="../examples/images/small.jpg" />
+          <source srcset="../examples/images/extralarge.jpg" />
+        </audio>
+        <img class="first-match">
+      </picture>
+
+      <!-- dummy elements used as a mock pictures -->
+      <picture class="video-shim">
+        <video style="display: none;">
+          <source class="source-one"/>
+          <source class="source-two"/>
+        </video>
+      </picture>
+
+      <picture class="audio-shim">
+        <audio>
+          <source class="source-one"/>
+          <source class="source-two"/>
+        </audio>
+      </picture>
+
+      <img src="bar" class="prop-check"/>
+
+      <picture>
+        <img srcset="imgsrcset" class="ignored-source-check">
+        <video style="display: none;">
+          <source srcset="sourcesrcset"></source>
+        </video>
+      </picture>
+
+      <picture>
+        <!-- First `source` in source order is selected -->
+        <img class="match">
+        <audio>
+          <source srcset="baz"></source>
+        </audio>
+        <img class="match-second" src="baz">
+      </picture>
+
+      <picture>
+        <!--[if IE 9]><video style="display: none;"><![endif]-->
+          <source type="foo" srcset="foo"/>
+        <!--[if IE 9]></video><![endif]-->
+
+        <img class="pending-check" src="test" />
+      </picture>
+
+      <picture>
+        <!--[if IE 9]><video style="display: none;"><![endif]-->
+          <source srcset="foo" media="bar"/>
+        <!--[if IE 9]></video><![endif]-->
+        <img class="match-check" src="test" />
+      </picture>
+
+      <picture>
+        <video style="display: none;">
+          <source srcset="foo" media="bar"/>
+        </video>
+        <img class="no-match-check" src="" />
+      </picture>
+
+      <picture>
+        <!--[if IE 9]><video style="display: none;"><![endif]-->
+          <source media="bar"/>
+        <!--[if IE 9]></video><![endif]-->
+        <img class="no-srcset-check" src="" />
+      </picture>
+
+      <div class="src-source-check">
+        <picture>
+          <!--[if IE 9]><video style="display: none;"><![endif]-->
+            <source src="" />
+          <!--[if IE 9]></video><![endif]-->
+        </picture>
+      </div>
+
+    </div>
+  </body>
+</html>

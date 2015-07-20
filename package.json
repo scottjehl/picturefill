@@ -37,6 +37,7 @@
     "grunt-gh-pages": "^0.10.0",
     "grunt-insert": "~0.1.0",
     "grunt-jscs-checker": "~0.4.3",
-    "grunt-release": "^0.12.0"
+    "grunt-release": "^0.12.0",
+    "intern": "^3.0.0-rc.3"
   }
 }
