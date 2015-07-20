@@ -124,7 +124,7 @@
 			return string;
 		};
 
-		var buidlStr = memoize(function(css) {
+		var buildStr = memoize(function(css) {
 
 			return "return " + replace((css || "").toLowerCase(),
 				// interpret `and`
@@ -158,7 +158,7 @@
 				} else {
 					/*jshint evil:true */
 					try{
-						cssCache[css] = new Function("e", buidlStr(css))(units);
+						cssCache[css] = new Function("e", buildStr(css))(units);
 					} catch(e) {}
 					/*jshint evil:false */
 				}
