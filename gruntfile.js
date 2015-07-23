@@ -18,6 +18,13 @@
       clean: {
         files: [ "dist" ]
       },
+      intern: {
+        options: {
+          runType: 'runner',
+          config: 'tests/intern',
+          suites: ['tests/tests']
+        }
+      },
       concat: {
 
         dist: {
@@ -39,15 +46,12 @@
         }
       },
 
-      qunit: {
-        files: [ "tests/**/*.html" ]
-      },
       jshint: {
         all: {
           options: {
             jshintrc: true
           },
-          src: [ "Gruntfile.js", "src/*.js", "src/includes/*.js", "tests/*.js" ]
+          src: [ "Gruntfile.js", "src/**/*.js" ]
         }
       },
       jscs: {
@@ -57,16 +61,16 @@
       },
       "gh-pages": {
         options: {
-          base: '.'
+          base: "."
         },
-        src: ["**/*", "!node_modules/**/*", "!test/**/*", "!src/**/*"]
+        src: [ "**/*", "!node_modules/**/*", "!test/**/*", "!src/**/*" ]
       },
       release: {
         options: {
-          additionalFiles: ["bower.json"],
+          additionalFiles: [ "bower.json" ],
           commitMessage: "Picturefill <%= version %>",
           tagMessage: "Picturefill <%= version %>",
-          afterRelease: ["gh-pages"]
+          afterRelease: [ "gh-pages" ]
         }
       },
       watch: {
@@ -94,12 +98,12 @@
     grunt.loadNpmTasks("grunt-contrib-clean");
     grunt.loadNpmTasks("grunt-contrib-concat");
     grunt.loadNpmTasks("grunt-contrib-jshint");
-    grunt.loadNpmTasks("grunt-contrib-qunit");
     grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-jscs-checker");
     grunt.loadNpmTasks("grunt-gh-pages");
     grunt.loadNpmTasks("grunt-release");
+    grunt.loadNpmTasks("intern");
 
     grunt.task.registerTask("support-types", "insert support for image types dev wants to include", function() {
       var supportTypes = "";
@@ -129,7 +133,7 @@
 
 	// Default task.
     grunt.registerTask("default", [ "jscs", "test", "clean", "concat", "uglify" ]);
-    grunt.registerTask("test", [ "jscs", "jshint", "qunit" ]);
+    grunt.registerTask("test", [ "jscs", "jshint", "intern" ]);
     grunt.registerTask("publish", [ "gh-pages" ]);
   };
 })();
