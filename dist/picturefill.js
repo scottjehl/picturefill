@@ -1440,9 +1440,10 @@
 					}
 				};
 			};
-
+			var lastClientWidth = docElem.clientHeight;
 			var onResize = function() {
-				isVwDirty = Math.max(window.innerWidth || 0, docElem.clientWidth) !== units.width || Math.max(window.innerHeight || 0, docElem.clientHeight) !== units.height;
+				isVwDirty = Math.max(window.innerWidth || 0, docElem.clientWidth) !== units.width || docElem.clientHeight !== lastClientWidth;
+				lastClientWidth = docElem.clientHeight;
 				if ( isVwDirty ) {
 					pf.fillImgs();
 				}
