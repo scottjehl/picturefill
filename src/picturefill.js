@@ -1375,8 +1375,10 @@
 			};
 
 			var onResize = function() {
-				isVwDirty = true;
-				pf.fillImgs();
+				isVwDirty = Math.max(window.innerWidth || 0, docElem.clientWidth) !== units.width || Math.max(window.innerHeight || 0, docElem.clientHeight) !== units.height;
+				if ( isVwDirty ) {
+					pf.fillImgs();
+				}
 			};
 
 			on( window, "resize", debounce(onResize, 99 ) );
