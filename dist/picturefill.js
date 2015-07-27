@@ -1,6 +1,12 @@
-/*! Picturefill - v3.0.0-beta1 - 2015-07-15
-* http://scottjehl.github.io/picturefill
-* Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
+/*! Picturefill - v3.0.0-beta1 - 2015-07-27
+ * http://scottjehl.github.io/picturefill
+ * Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT
+ */
+/*! Gecko-Picture - v1.0
+ * https://github.com/scottjehl/picturefill/tree/3.0/src/plugins/gecko-picture
+ * Firefox's early picture implementation (prior to FF41) is static and does
+ * not react to viewport changes. This tiny module fixes this.
+ */
 (function(window) {
 	/*jshint eqnull:true */
 	var ua = navigator.userAgent;
@@ -65,13 +71,13 @@
 	}
 })(window);
 
-/*! Picturefill - Responsive Images that work today.
- *  Author: Scott Jehl, Filament Group, 2012 ( new proposal implemented by Shawn Jansepar )
+/*! Picturefill - v3.0.0-beta
+ * http://scottjehl.github.io/picturefill
+ * Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt;
  *  License: MIT
- *  Spec: http://picture.responsiveimages.org/
  */
+
 (function( window, document, undefined ) {
-	/* global parseSizes */
 	// Enable strict mode
 	"use strict";
 
@@ -192,7 +198,7 @@
 			return string;
 		};
 
-		var buidlStr = memoize(function(css) {
+		var buildStr = memoize(function(css) {
 
 			return "return " + replace((css || "").toLowerCase(),
 				// interpret `and`
@@ -226,7 +232,7 @@
 				} else {
 					/*jshint evil:true */
 					try{
-						cssCache[css] = new Function("e", buidlStr(css))(units);
+						cssCache[css] = new Function("e", buildStr(css))(units);
 					} catch(e) {}
 					/*jshint evil:false */
 				}
@@ -740,9 +746,6 @@
 		} // (Close of big while loop.)
 	}
 
-	/* jshint ignore:start */
-	// jscs:disable
-
 	/*
 	 * Sizes Parser
 	 *
@@ -825,9 +828,9 @@
 
 			// (Loop forwards from the beginning of the string.)
 			while (true) {
-				chrctr = str[pos];
+				chrctr = str.charAt(pos);
 
-				if (chrctr === undefined) { // ( End of string reached.)
+				if (chrctr === "") { // ( End of string reached.)
 					pushComponent();
 					pushComponentArray();
 					return listArray;
@@ -845,7 +848,7 @@
 					// (If previous character in loop was also a space, or if
 					// at the beginning of the string, do not add space char to
 					// component.)
-					if ((str[pos - 1] && isSpace(str[pos - 1])) || (!component)) {
+					if ( (str.charAt(pos - 1) && isSpace( str.charAt(pos - 1) ) ) || !component ) {
 						pos += 1;
 						continue;
 					} else if (parenDepth === 0) {
@@ -861,11 +864,11 @@
 				} else if (chrctr === ")") {
 					parenDepth -= 1;
 				} else if (chrctr === ",") {
-					pushComponent()
+					pushComponent();
 					pushComponentArray();
 					pos += 1;
 					continue;
-				} else if ((chrctr === "/") && (str[pos + 1] === "*")) {
+				} else if ( (chrctr === "/") && (str.charAt(pos + 1) === "*") ) {
 					inComment = true;
 					pos += 2;
 					continue;
@@ -949,8 +952,6 @@
 		// size value, return 100vw.
 		return "100vw";
 	}
-	// jscs: enable
-	/* jshint ignore:end */
 
 	// namespace
 	pf.ns = ("pf" + new Date().getTime()).substr(0, 9);
