@@ -317,7 +317,6 @@
 						//IE8/IE9 needs a clear remove here
 						$wimage.removeAttr('width');
 						$wimage.removeAttr('height');
-						debugger;
 
 						runViewportTests($wimage, viewports);
 					};

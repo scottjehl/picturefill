@@ -1368,10 +1368,13 @@
 					}
 				};
 			};
-
+			var lastClientWidth = docElem.clientHeight;
 			var onResize = function() {
-				isVwDirty = true;
-				pf.fillImgs();
+				isVwDirty = Math.max(window.innerWidth || 0, docElem.clientWidth) !== units.width || docElem.clientHeight !== lastClientWidth;
+				lastClientWidth = docElem.clientHeight;
+				if ( isVwDirty ) {
+					pf.fillImgs();
+				}
 			};
 
 			on( window, "resize", debounce(onResize, 99 ) );
