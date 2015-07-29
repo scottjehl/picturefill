@@ -1,4 +1,4 @@
-/*! Picturefill - v3.0.0-beta1 - 2015-07-29
+/*! Picturefill - v3.0.0-rc1 - 2015-07-29
  * http://scottjehl.github.io/picturefill
  * Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT
  */
