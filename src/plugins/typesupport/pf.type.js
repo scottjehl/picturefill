@@ -27,7 +27,7 @@
 		}
 	};
 
-	if (window.HTMLPictureElement && !pf.cfg.uT) {
+	if (pf.supPicture && !pf.cfg.uT) {
 		picturefill.testTypeSupport = function() {};
 		return;
 	}
