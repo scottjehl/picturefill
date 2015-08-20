@@ -228,7 +228,7 @@
 		}
 	};
 
-	if ( !window.HTMLPictureElement ) {
+	if ( !pf.supPicture ) {
 
 		if ( MutationObserver && !pf.testMutationEvents ) {
 			observer = new MutationObserver( pf.onMutations );
