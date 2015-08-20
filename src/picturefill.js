@@ -893,7 +893,6 @@
 			image.srcset = "data:,a";
 			image2.src = "data:,a";
 			pf.supSrcset = image.complete === image2.complete;
-			pf.supSizes = pf.supSrcset && pf.supSizes;
 			pf.supPicture = pf.supSrcset && pf.supPicture;
 		})(document.createElement("img"));
 	}
