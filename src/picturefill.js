@@ -886,6 +886,16 @@
 	// srcset support test
 	pf.supSrcset = "srcset" in image;
 	pf.supSizes = "sizes" in image;
+	pf.supPicture = !!window.HTMLPictureElement;
+
+	if (pf.supSrcset && pf.supPicture && !pf.supSizes) {
+		(function(image2) {
+			image.srcset = "data:,a";
+			image2.src = "data:,a";
+			pf.supSrcset = image.complete === image2.complete;
+			pf.supPicture = pf.supSrcset && pf.supPicture;
+		})(document.createElement("img"));
+	}
 
 	// using pf.qsa instead of dom traversing does scale much better,
 	// especially on sites mixing responsive and non-responsive images
@@ -1319,7 +1329,7 @@
 	};
 
 	// If picture is supported, well, that's awesome.
-	if ( window.HTMLPictureElement ) {
+	if ( pf.supPicture ) {
 		picturefill = noop;
 		pf.fillImg = noop;
 	} else {
@@ -1422,7 +1432,7 @@
 	}
 
 	// IE8 evals this sync, so it must be the last thing we do
-	if ( !window.HTMLPictureElement ) {
+	if ( !pf.supPicture ) {
 		types[ "image/webp" ] = detectTypeSupport("image/webp", "data:image/webp;base64,UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAABBxAR/Q9ERP8DAABWUDggGAAAADABAJ0BKgEAAQADADQlpAADcAD++/1QAA==" );
 	}
 
