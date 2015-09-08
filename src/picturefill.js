@@ -1,10 +1,10 @@
-/*! Picturefill - Responsive Images that work today.
- *  Author: Scott Jehl, Filament Group, 2012 ( new proposal implemented by Shawn Jansepar )
+/*! Picturefill - v3.0.0-beta
+ * http://scottjehl.github.io/picturefill
+ * Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt;
  *  License: MIT
- *  Spec: http://picture.responsiveimages.org/
  */
+
 (function( window, document, undefined ) {
-	/* global parseSizes */
 	// Enable strict mode
 	"use strict";
 
@@ -125,7 +125,7 @@
 			return string;
 		};
 
-		var buidlStr = memoize(function(css) {
+		var buildStr = memoize(function(css) {
 
 			return "return " + replace((css || "").toLowerCase(),
 				// interpret `and`
@@ -159,7 +159,7 @@
 				} else {
 					/*jshint evil:true */
 					try{
-						cssCache[css] = new Function("e", buidlStr(css))(units);
+						cssCache[css] = new Function("e", buildStr(css))(units);
 					} catch(e) {}
 					/*jshint evil:false */
 				}
@@ -673,9 +673,6 @@
 		} // (Close of big while loop.)
 	}
 
-	/* jshint ignore:start */
-	// jscs:disable
-
 	/*
 	 * Sizes Parser
 	 *
@@ -758,9 +755,9 @@
 
 			// (Loop forwards from the beginning of the string.)
 			while (true) {
-				chrctr = str[pos];
+				chrctr = str.charAt(pos);
 
-				if (chrctr === undefined) { // ( End of string reached.)
+				if (chrctr === "") { // ( End of string reached.)
 					pushComponent();
 					pushComponentArray();
 					return listArray;
@@ -778,7 +775,7 @@
 					// (If previous character in loop was also a space, or if
 					// at the beginning of the string, do not add space char to
 					// component.)
-					if ((str[pos - 1] && isSpace(str[pos - 1])) || (!component)) {
+					if ( (str.charAt(pos - 1) && isSpace( str.charAt(pos - 1) ) ) || !component ) {
 						pos += 1;
 						continue;
 					} else if (parenDepth === 0) {
@@ -794,11 +791,11 @@
 				} else if (chrctr === ")") {
 					parenDepth -= 1;
 				} else if (chrctr === ",") {
-					pushComponent()
+					pushComponent();
 					pushComponentArray();
 					pos += 1;
 					continue;
-				} else if ((chrctr === "/") && (str[pos + 1] === "*")) {
+				} else if ( (chrctr === "/") && (str.charAt(pos + 1) === "*") ) {
 					inComment = true;
 					pos += 2;
 					continue;
@@ -882,8 +879,6 @@
 		// size value, return 100vw.
 		return "100vw";
 	}
-	// jscs: enable
-	/* jshint ignore:end */
 
 	// namespace
 	pf.ns = ("pf" + new Date().getTime()).substr(0, 9);
@@ -891,6 +886,16 @@
 	// srcset support test
 	pf.supSrcset = "srcset" in image;
 	pf.supSizes = "sizes" in image;
+	pf.supPicture = !!window.HTMLPictureElement;
+
+	if (pf.supSrcset && pf.supPicture && !pf.supSizes) {
+		(function(image2) {
+			image.srcset = "data:,a";
+			image2.src = "data:,a";
+			pf.supSrcset = image.complete === image2.complete;
+			pf.supPicture = pf.supSrcset && pf.supPicture;
+		})(document.createElement("img"));
+	}
 
 	// using pf.qsa instead of dom traversing does scale much better,
 	// especially on sites mixing responsive and non-responsive images
@@ -1324,7 +1329,7 @@
 	};
 
 	// If picture is supported, well, that's awesome.
-	if ( window.HTMLPictureElement ) {
+	if ( pf.supPicture ) {
 		picturefill = noop;
 		pf.fillImg = noop;
 	} else {
@@ -1373,16 +1378,17 @@
 					}
 				};
 			};
-
+			var lastClientWidth = docElem.clientHeight;
 			var onResize = function() {
-				isVwDirty = true;
-				pf.fillImgs();
+				isVwDirty = Math.max(window.innerWidth || 0, docElem.clientWidth) !== units.width || docElem.clientHeight !== lastClientWidth;
+				lastClientWidth = docElem.clientHeight;
+				if ( isVwDirty ) {
+					pf.fillImgs();
+				}
 			};
 
 			on( window, "resize", debounce(onResize, 99 ) );
 			on( document, "readystatechange", run );
-
-			types[ "image/webp" ] = detectTypeSupport("image/webp", "data:image/webp;base64,UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAABBxAR/Q9ERP8DAABWUDggGAAAADABAJ0BKgEAAQADADQlpAADcAD++/1QAA==" );
 		})();
 	}
 
@@ -1423,6 +1429,11 @@
 	} else if ( typeof define === "function" && define.amd ) {
 		// AMD support
 		define( "picturefill", function() { return picturefill; } );
+	}
+
+	// IE8 evals this sync, so it must be the last thing we do
+	if ( !pf.supPicture ) {
+		types[ "image/webp" ] = detectTypeSupport("image/webp", "data:image/webp;base64,UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAABBxAR/Q9ERP8DAABWUDggGAAAADABAJ0BKgEAAQADADQlpAADcAD++/1QAA==" );
 	}
 
 } )( window, document );
