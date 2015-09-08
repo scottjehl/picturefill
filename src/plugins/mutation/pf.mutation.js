@@ -16,6 +16,7 @@
 	run();
 
 }( function( picturefill ) {
+	/* jshint eqnull: true */
 	"use strict";
 
 	var document = window.document;

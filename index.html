@@ -52,11 +52,11 @@
 			<p>Feedback on this beta release is highly welcomed—if you encounter any problems, please <a href="https://github.com/scottjehl/picturefill/issues">file an issue on GitHub</a>.</p>
 			<ul>
 				<li>
-					<a href="https://cdn.rawgit.com/scottjehl/picturefill/3.0/dist/picturefill.js" class="download">picturefill.js</a>
+					<a href="https://cdn.rawgit.com/scottjehl/picturefill/3.0.0-rc1/dist/picturefill.js" class="download">picturefill.js</a>
 					<p class="meta">(development version, unminified code)</p>
 				</li>
 				<li>
-					<a href="https://cdn.rawgit.com/scottjehl/picturefill/3.0/dist/picturefill.min.js" class="download">picturefill.min.js</a>
+					<a href="https://cdn.rawgit.com/scottjehl/picturefill/3.0.0-rc1/dist/picturefill.min.js" class="download">picturefill.min.js</a>
 					<p class="meta">(production version, minified code)</p>
 				</li>
 			</ul>
@@ -76,7 +76,7 @@
 
 			<h2 class="hed-section" id="getting-started">Getting Started with Picturefill</h2>
 
-			<p>For basic usage of Picturefill: download one of the files listed above and reference it from the <code>head</code> section of your HTML document with the following code:</p>
+			<p>To start using Picturefill download one of the files listed above and reference it from the <code>head</code> section of your HTML document with the following code:</p>
 
 	<pre><code>&lt;script src=&quot;picturefill.js&quot;&gt;&lt;/script&gt;</code></pre>
 
@@ -96,7 +96,7 @@
 
 			<h2 class="hed-section" id="examples">Markup Patterns</h2>
 
-			<p>Once you've included picturefill.js, you can start adding responsive image elements to your site. Picturefill adds support for both the <code>picture</code> element and also new responsive attributes to the <code>img</code> element.</p>
+			<p>Once you've included picturefill.js, you can start adding responsive image elements to your site! Picturefill adds support for the the entire suite of responsive image solutions, including the <code>picture</code> element and new <code>img</code> element attributes.</p>
 
 			<p>There are a number of different <a href="http://usecases.responsiveimages.org">use cases</a> addressed by some combination of features from the <a href="http://picture.responsiveimages.org">responsive images specification</a>—here are some of the most common ones:</p>
 
@@ -140,6 +140,9 @@
 					srcset="examples/images/medium.jpg 375w, examples/images/large.jpg 480w, examples/images/extralarge.jpg 768w" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 			<a href="examples/demo-01.html" class="demo">Standalone <code>srcset</code> and <code>sizes</code> demo</a>
 
+			<p>The <code>sizes</code> syntax is used to define the spaces your image will occupy in your layout. <code>srcset</code> then defines a list of images and their inherent widths. This allows the browser to choose the smallest appropriate source for the size <em>available in that part of the layout</em>, rather than the viewport size alone.</p>
+
+			<p>It's beyond the scope of this guide to get into much detail about how to use the new <code>srcset</code> &amp; <code>sizes</code> attributes so we’d highly recommend reading the following post by Eric Portis: <a href="http://ericportis.com/posts/2014/srcset-sizes/">Srcset and Sizes</a>. Keep in mind that the same <a href="#caching">caching behavior</a> is applied to this usage of <code>srcset</code>, as well.</p>
 
 			<h3 class="hed-pattern" id="using-picture">Using the `picture` element</h3>
 			<p class="usecase">The <code>picture</code> element is used when you need explicit control over which source is shown at set viewport sizes.</p>
@@ -212,8 +215,8 @@
 			<p>Here's how that renders in your browser:</p>
 
 			<picture>
-					<source srcset="examples/images/large.webp" type="image/webp">
-					<img srcset="examples/images/large.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+				<source srcset="examples/images/large.webp" type="image/webp">
+				<img srcset="examples/images/large.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 			</picture>
 			<a href="examples/demo-04.html" class="demo">Standalone <code>type</code> attribute demo</a>
 
@@ -229,41 +232,49 @@
 
 			<h3 class="hed-subsection">Picturefill function options</h3>
 
-			<p>When running the <code>picturefill()</code> function, you can pass options specifying the following settings:</p>
+			<p>When running the <code>picturefill()</code> function, you can pass options specifying the following configuration options:</p>
 
 			<ul>
 				<li><strong>Elements:</strong> An array of <code>img</code> elements you'd like picturefill to evaluate. The Default value for <code>options.elements</code> is all <code>img</code> elements in the page that have a <code>srcset</code> attribute or have a <code>picture</code> element as a direct parent.
 	<pre><code>picturefill({
-  elements: [ document.getElementById( "myPicture" ) ]
+  elements: [ document.getElementById( "myImg" ) ]
 });</code></pre>
 				</li>
-				<li><strong>Reevaluate:</strong> Force picturefill to evaluate all elements in the <code>options.elements</code> array, even if they've already been evaluated. The default is <code>false</code>, except when a resize event triggers Picturefill to run (<code>options.reevaluate</code> is <code>true</code> in that case).
+				<li><strong>Reevaluate:</strong> Force picturefill to evaluate all elements in the <code>options.elements</code> array, even if they've already been evaluated. The default is <code>false</code>. This option has to be used, if you dynamically change the <code>srcset</code>/<code>sizes</code> attributes or modify associated <code>source</code> elements. As an alternative the <a href="dist/plugins/mutation/pf.mutation.js">mutation plugin</a> can be used.
 	<pre><code>picturefill({
-  reevaluate: true
+  reevaluate: true,
+  elements: [ document.getElementById( "myImg" ) ]
 });</code></pre>
 				</li>
 			</ul>
 
-			<h3 class="hed-subsection">Picturefill source selection option</h3>
 
-			<p>By default Picturefill tries to mimic the resource selection algorithm of Chrome (except that Picturefill, unlike the browser, doesn't know which image files are already cached). Picturefill 3.0 also comes with a new image custom source selection algorithm unique to Picturefill called <code>saveData</code>. The <code>saveData</code> algorithm weights the resource selection algorithm towards smaller image candidates on
-very high dppx devices (3dppx +), to conserve bandwidth.</p>
+			<h3 class="hed-subsection">Source selection algorithm option</h3>
 
-			<p>To use <code>saveData</code>, create a picturefillCFG array that runs before the main plugin:
+			<p>By default Picturefill attempts to mimic the resource selection algorithms current native implementations, but Picturefill 3 also includes an optional and experimental custom source selection algorithm. The <code>saveData</code> algorithm skews the resource selection algorithm toward smaller image candidates(<code>2x</code> on extremely high dppx devices (<code>3x</code> and up), to conserve bandwidth in situations where there may be little or no <em>visual</em> difference between sources.</p>
+
+			<p>To use <code>saveData</code>, create a <code>picturefillCFG</code> array that runs before the main plugin:
 
 			<pre><code>//generating the config array
 window.picturefillCFG = window.picturefillCFG || [];
 picturefillCFG.push([ "algorithm", "saveData" ]);</pre></code>
 
-			<p>Developer feedback on this new algorithm is welcome, especially if you've got some hard data.
+			<p>Developer feedback on this new algorithm is <em>highly</em> welcomed. We’d love to see some data around potential bandwidth savings, and this data may go on to inform native responsive image implementations in the future.</p>
 
 			<h2 class="hed-section" id="support">Browser Support</h2>
-			<p>Picturefill supports a broad range of browsers and devices, provided that you stick with the markup conventions documented above. </p>
+			<p>Picturefill supports a broad range of browsers and devices, provided that you stick with the markup conventions documented above.</p>
 
-			<h3  class="hed-subsection" id="gotchas">Support caveats to keep in mind</h3>
+			<!--<h3 class="hed-subsection" id="markup-conventions">Markup Conventions</h3>-->
+			<!-- TODO: Detail trade-offs of various markup/fallback patterns. -->
+
+			<h3 class="hed-subsection" id="gotchas">Support caveats</h3>
 
 			<p>Picturefill is tested broadly and works in a large number of browsers. That said, it does have some browser support considerations to keep in mind:</p>
 			<ul>
+				<li>For IE 9 and earlier, version 3 includes a small shim that polyfills the use of common media conditions (<code>min-width</code>, <code>max-width</code>, <code>min-height</code>, <code>max-height</code>). If you need old IE support for other media conditions, such as <code>orientation</code> or <code>aspect-ratio</code>, please additionally include the <a href="https://github.com/paulirish/matchMedia.js/">matchMedia polyfill</a>.</li>
+
+				<li>Picturefill 3 includes a small shim that polyfills common media conditions for IE9 and earlier (<code>min-width</code>, <code>max-width</code>, <code>min-height</code>, and <code>max-height</code>). If you need old IE support for other media conditions, such as <code>orientation</code> or <code>aspect-ratio</code>, please additionally include the <a href="https://github.com/paulirish/matchMedia.js/">matchMedia polyfill</a>.</li>
+
 				<li><strong>JS-Disabled Browsers only see alt text:</strong> When using the <code>picture</code> element, non-<code>picture</code> supporting browsers will only see <code>alt</code> attribute text as a fallback when JavaScript fails or is disabled. This is because any <code>noscript</code>-based workarounds (such as the one used in Picturefill version 1) will cause future browsers that support the <code>picture</code> element to show two images instead of one when JavaScript is off. Unfortunately, adding a <code>src</code> attribute with an external source to the <code>img</code> element in your <code>picture</code> element isn't a good workaround either, as any browser that exists today will fetch that <code>src</code> url even if it is not going to be used (which is wasteful), and an empty <code>src</code> can result in <a href="http://wilto.github.io/srcn-polyfills/">unexpected requests</a>. For valid markup, the shortest possible value for <code>src</code> (without firing an <code>onerror</code> event or a potential request) is <pre><code>src="data:image/gif;base64,R0lGODlhAQABAAAAADs="</pre></code></li>
 
 				<li><strong>Temporary extra HTTP Requests for <code>picture</code> usage in some browsers:</strong> In browsers that natively support <code>srcset</code> but do not yet support the <code>picture</code> element, users may experience a wasted HTTP request for each <code>picture</code> element on a page. This is because the browser's preparser will fetch one of the URLs listed in the <code>picture</code> element's child <code>img</code>'s <code>srcset</code> attribute as soon as possible during page load, before the JavaScript can evaluate the potential <code>picture</code> <code>source</code> elements for a better match. This problem will only affect browsers that have implemented <code>srcset</code> but not <code>picture</code>, which will hopefully be short-lived.</li>

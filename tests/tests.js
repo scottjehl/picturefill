@@ -764,6 +764,17 @@
 			picturefill( { elements: [ img ] } );
 
 		});
+
+
+		test( "`img` can be added outside the DOM without errors", function() {
+			var img = document.createElement( "img" );
+
+			img.setAttribute( "srcset", "data:img 500w" );
+
+			picturefill( { elements: [ img ] } );
+
+			assert.equal( img.src || img.currentSrc, "data:img" );
+		});
 	};
 
 	if( window.blanket ) {
@@ -775,15 +786,5 @@
 	} else {
 		startTests();
 	}
-
-	test( "`img` can be added outside the DOM without errors", function() {
-		var img = document.createElement( "img" );
-
-		img.setAttribute( "srcset", "data:img 500w" );
-
-		picturefill( { elements: [ img ] } );
-
-		assert.equal( img.src || img.currentSrc, "data:img" );
-	});
 
 })( window, jQuery );
