@@ -133,7 +133,7 @@
 		}
 	};
 
-	if (window.addEventListener && !window.HTMLPictureElement) {
+	if (window.addEventListener && !pf.supPicture) {
 		addEventListener("resize", reeval, false);
 	}
 
