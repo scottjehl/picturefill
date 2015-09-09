@@ -222,9 +222,6 @@
 
 	pf.parseSrcset = function( srcset ) {
 		/**
-		 * A lot of this was pulled from Boris Smus’ parser for the now-defunct WHATWG `srcset`
-		 * https://github.com/borismus/srcset-polyfill/blob/master/js/srcset-info.js
-		 *
 		 * 1. Let input (`srcset`) be the value passed to this algorithm.
 		 * 2. Let position be a pointer into input, initially pointing at the start of the string.
 		 * 3. Let raw candidates be an initially empty ordered list of URLs with associated
