@@ -40,11 +40,9 @@
 	pf.ns = "picturefill";
 
 	// srcset support test
-	(function() {
-		pf.srcsetSupported = "srcset" in image;
-		pf.sizesSupported = "sizes" in image;
-		pf.curSrcSupported = "currentSrc" in image;
-	})();
+	pf.srcsetSupported = "srcset" in image;
+	pf.sizesSupported = "sizes" in image;
+	pf.curSrcSupported = "currentSrc" in image;
 
 	// just a string trim workaround
 	pf.trim = function( str ) {
