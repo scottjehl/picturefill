@@ -91,6 +91,10 @@ main {
     letter-spacing: .125em;
     text-rendering: optimizeLegibility;
 }
+.hed-currentversion {
+    font-size: 1.35em;
+    letter-spacing: .09em;
+}
 .lede .hed-subsection {
     font-size: .9em;
 }
