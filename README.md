@@ -1,18 +1,18 @@
 # Picturefill
 A [responsive image](http://www.whatwg.org/specs/web-apps/current-work/multipage/embedded-content.html#embedded-content) polyfill.
-* Authors: Scott Jehl, Mat Marquis, Shawn Jansepar (2.0 refactor lead), and many more: see Authors.txt
+* Authors: See [Authors.txt](https://github.com/scottjehl/picturefill/blob/3.0/Authors.txt)
 * License: MIT
 
 [![build-status](https://api.travis-ci.org/scottjehl/picturefill.svg)](https://travis-ci.org/scottjehl/picturefill) [<img src="https://pf-slackin.herokuapp.com/badge.svg" alt="Join Slack channel">](https://pf-slackin.herokuapp.com/)
 
 Picturefill has three versions:
-* Version 2 (recommended) is a strict polyfill of the [Picture element draft specification](http://www.whatwg.org/specs/web-apps/current-work/multipage/embedded-content.html#embedded-content) and is the main version in development.
-* Version 1 mimics the Picture element pattern with `span` elements. It is maintained in the 1.2 branch.
+
+* Version 1 mimics the Picture element pattern with `span` elements. It is no longer maintained.
+* Version 2 is a lightweight polyfill of the [Picture element draft specification](http://www.whatwg.org/specs/web-apps/current-work/multipage/embedded-content.html#embedded-content).
+* Version 3.0.0 is the current stable release.
 
 ## Usage, Demos, Docs
-To find out how to use Picturefill on your sites, visit the project and demo site:
-
-[Picturefill Documentation, Downloads, and Demos Site](http://scottjehl.github.com/picturefill/)
+To find out how to use Picturefill, visit the [project site](http://scottjehl.github.com/picturefill/).
 
 ## The gotchas
 Be it browsers, the `picture` spec, or picturefill, there are a couple gotchas you should be aware of when working with Picturefill.
@@ -50,5 +50,4 @@ If you find a bug in Picturefill, please add it to [the issue tracker](https://g
 Picturefill discussion takes place via Slack. For an invitation, visit [https://pf-slackin.herokuapp.com/](https://pf-slackin.herokuapp.com/)
 
 ## Support
-
-Picturefill supports a broad range of browsers and devices (there are currently no known unsupported browsers), provided that you stick with the markup conventions provided.
+There are currently no known unsupported browsers, provided that you use the markup patterns provided.

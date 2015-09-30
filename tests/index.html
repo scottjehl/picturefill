@@ -1,13 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<title>picturefill tests</title>
-	<link rel="stylesheet" href="resources/qunit-1.10.0.css">
-	<script src="resources/qunit-1.10.0.js"></script>
-	<script src="resources/jquery-1.7.1.js"></script>
+	<meta charset="utf-8" />
+	<title>picturefill main tests</title>
+	<link rel="stylesheet" href="resources/qunit-1.17.1.css" />
+	<script src="resources/qunit-1.17.1.js"></script>
+	<script src="resources/jquery-1.11.2.js"></script>
+	<script>
+		document.createElement('picture');
+	</script>
+	<script src="resources/modernizr.js"></script>
 </head>
 <body>
+
+<script>
+	(function(){
+		var image = document.createElement( "img" );
+		window.imgGet = image.getAttribute;
+		window.imgSet = image.setAttribute;
+	})();
+	if(!window.picturefillCFG){
+		window.picturefillCFG = [];
+	}
+
+	window.picturefillCFG.push(['uT', true]);
+</script>
+<script src="../src/picturefill.js" data-cover></script>
+
+
 
 <div id="qunit"></div>
 
@@ -16,62 +36,88 @@
 	<!-- Functional tests -->
 	<picture>
 		<!-- First `source` in source order is selected -->
-		<source srcset="../examples/images/small.jpg"></source>
-		<source srcset="../examples/images/extralarge.jpg"></source>
+		<audio>
+			<source srcset="../examples/images/small.jpg" />
+			<source srcset="../examples/images/extralarge.jpg" />
+		</audio>
 		<img class="first-match">
-	</picture>
-
-	<picture>
-		<!-- First `source` in source order is selected -->
-		<img class="match">
-		<source srcset="baz"></source>
-		<img class="match-second">
 	</picture>
 
 	<!-- dummy elements used as a mock pictures -->
 	<picture class="video-shim">
-		<video>
+		<video style="display: none;">
 			<source class="source-one"/>
 			<source class="source-two"/>
 		</video>
 	</picture>
 
+	<picture class="audio-shim">
+		<audio>
+			<source class="source-one"/>
+			<source class="source-two"/>
+		</audio>
+	</picture>
+
 	<img src="bar" class="prop-check"/>
 
 	<picture>
+		<img srcset="imgsrcset" class="ignored-source-check">
+		<video style="display: none;">
+		<source srcset="sourcesrcset"></source>
+		</video>
+	</picture>
+
+	<picture>
+		<!-- First `source` in source order is selected -->
+		<img class="match">
+		<audio>
+			<source srcset="baz"></source>
+		</audio>
+		<img class="match-second" src="baz">
+	</picture>
+
+	<picture>
+		<!--[if IE 9]><video style="display: none;"><![endif]-->
 		<source type="foo" srcset="foo"/>
+		<!--[if IE 9]></video><![endif]-->
+
 		<img class="pending-check" src="test" />
 	</picture>
 
 	<picture>
+		<!--[if IE 9]><video style="display: none;"><![endif]-->
 		<source srcset="foo" media="bar"/>
+		<!--[if IE 9]></video><![endif]-->
 		<img class="match-check" src="test" />
 	</picture>
 
 	<picture>
-		<source srcset="foo" media="bar"/>
-		<img class="no-match-check" src="test" />
+		<video style="display: none;">
+			<source srcset="foo" media="bar"/>
+		</video>
+		<img class="no-match-check" src="" />
 	</picture>
 
 	<picture>
+		<!--[if IE 9]><video style="display: none;"><![endif]-->
 		<source media="bar"/>
-		<img class="no-srcset-check" src="test" />
-	</picture>
-
-	<picture>
-		<img class="ignored-source-check" srcset="foo"/>
-		<source srcset="bar"/>
+		<!--[if IE 9]></video><![endif]-->
+		<img class="no-srcset-check" src="" />
 	</picture>
 
 	<div class="src-source-check">
 		<picture>
-			<source src="foo"/>
+			<!--[if IE 9]><video style="display: none;"><![endif]-->
+			<source src="" />
+			<!--[if IE 9]></video><![endif]-->
 		</picture>
 	</div>
 
 </div>
-
-<script src="../src/picturefill.js"></script>
-<script src="tests.js"></script>
+<ul>
+	<li><a href="index-functional.html">functional tests</a></li>
+	<li><a href="index-mutation.html">mutation tests</a></li>
+</ul>
+<script src="tests.js" async=""></script>
 </body>
 </html>

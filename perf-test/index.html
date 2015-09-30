@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<title>test</title>
+</head>
+<body>
+<img
+		srcset="http://placehold.it/245x105 0.7x,
+        http://placehold.it/350x150 1x,
+        http://placehold.it/700x300 2x"
+		src="http://placehold.it/245x105"
+		alt="Static content image" />
+<img
+		srcset="http://placehold.it/466x200 466w,
+        http://placehold.it/700x300 700w,
+        http://placehold.it/1050x450 1050w,
+        http://placehold.it/1400x600 1400w"
+		sizes="(max-width: 1000px) calc(100vw - 20px), 1000px"
+		src="http://placehold.it/250x107"
+		alt="flexible image" />
+
+<img
+		srcset="http://placehold.it/466x200 466w,
+        http://placehold.it/700x300 700w,
+        http://placehold.it/1050x450 1050w,
+        http://placehold.it/1400x600 1400w"
+		sizes="(min-width:1230px) 570px, (min-width: 992px) 460px, (min-width: 768px) 360px, 100vw"
+		src="http://placehold.it/250x107"
+		alt="flexible image" />
+
+<img
+		srcset="http://placehold.it/466x200 466w,
+        http://placehold.it/700x300 700w,
+        http://placehold.it/1050x450 1050w,
+        http://placehold.it/1400x600 1400w"
+		sizes="(min-width:1230px) 23em, (min-width: 992px) 19em, (min-width: 768px) 22.5em, 100vw"
+		src="http://placehold.it/250x107"
+		alt="flexible image" />
+
+<img
+		srcset="http://placehold.it/466x200 466w,
+        http://placehold.it/700x300 700w,
+        http://placehold.it/1050x450 1050w,
+        http://placehold.it/1400x600 1400w"
+		sizes="(min-width: 768px) calc(33.3vw - 96px), (min-width: 480px) calc(50vw - 72px), calc(100vw - 48px)"
+		src="http://placehold.it/250x107"
+		alt="flexible image" />
+
+<img
+		srcset="http://placehold.it/466x200 466w,
+        http://placehold.it/700x300 700w,
+        http://placehold.it/1050x450 1050w,
+        http://placehold.it/1400x600 1400w"
+		sizes="(min-width: 768px) calc(33.3vw - 8em), (min-width: 480px) calc(50vw - 5em), calc(100vw - 3em)"
+		src="http://placehold.it/250x107"
+		alt="flexible image" />
+
+
+<picture>
+	<!--[if IE 9]><audio><![endif]-->
+	<source
+			srcset="http://placehold.it/500x600/11e87f/fff"
+			media="(max-width: 450px)" />
+	<source
+			srcset="http://placehold.it/700x300"
+			media="(max-width: 720px)" />
+	<source
+			srcset="http://placehold.it/1400x600/e8117f/fff"
+			media="(max-width: 1100px)" />
+	<!--[if IE 9]></audio><![endif]-->
+	<img
+			src="http://placehold.it/300x150/117fe8/fff"
+			srcset="http://placehold.it/1800x900/117fe8/fff"
+			alt="image with artdirection" />
+</picture>
+
+<picture>
+	<!--[if IE 9]><video style="display: none;"><![endif]-->
+	<source
+			srcset="http://placehold.it/525x225 1.5x,
+            http://placehold.it/350x150 1x"
+			media="(max-width: 380px)" />
+	<source
+			srcset="http://placehold.it/1400x600/e8117f/fff 1.5x,
+            http://placehold.it/1024x439/e8117f/fff 1x"
+			media="(max-width: 1050px)" />
+	<!--[if IE 9]></video><![endif]-->
+	<img
+			srcset="http://placehold.it/2100x900/117fe8/fff 1.5x,
+                http://placehold.it/1400x600/117fe8/fff 1x"
+			src="http://placehold.it/420x180/117fe8/fff"
+			alt="image with artdirection" />
+</picture>
+<script src="../dist/picturefill.min.js"></script>
+<!--
+<script src="https://cdnjs.cloudflare.com/ajax/libs/picturefill/2.2.0/picturefill.js"></script>
+-->
+<!--
+<script src="../dist/plugins/intrinsic-dimension/pf.intrinsic.min.js"></script>
+<script src="../dist/plugins/mutation/pf.mutation.min.js"></script>
+<script src="../dist/plugins/typesupport/pf.type.min.js"></script>
+-->
+<script>
+	picturefill();
+</script>
+
+<script>
+	(function(){
+		var i;
+		var triggerEvent = function(elem, name, details){
+			var event = document.createEvent('Event');
+			event.initEvent(name, true, true);
+			event.details = details || {};
+			elem.dispatchEvent(event);
+			return event;
+		};
+
+		console.time('run picturefill basic');
+		i = 0;
+		while(i < 20000){
+			picturefill();
+			i++;
+		}
+		console.timeEnd('run picturefill basic');
+
+		console.time('run picturefill reevaluate');
+		i = 0;
+		while(i < 300){
+			triggerEvent(window, 'resize');
+			picturefill({reevaluate: true});
+			i++;
+		}
+		console.timeEnd('run picturefill reevaluate');
+
+
+		console.time('run picturefill reparse');
+		i = 0;
+		while(i < 200){
+			triggerEvent(window, 'resize');
+			picturefill({reevaluate: true, reparse: true});
+			i++;
+		}
+		console.timeEnd('run picturefill reparse');
+	})();
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>picturefill mutation tests</title>
+	<link rel="stylesheet" href="resources/qunit-1.17.1.css" />
+	<script src="resources/qunit-1.17.1.js"></script>
+	<script src="resources/jquery-1.11.2.js"></script>
+	<script>
+		document.createElement('picture');
+	</script>
+	<script src="resources/modernizr.js"></script>
+</head>
+<body>
+<div id="qunit"></div>
+<script type="text/html" id="template">
+	<img class="simple-img" />
+	<picture>
+		<audio>
+			<source srcset="../examples/images/small.jpg" media="(max-width: 480px)">
+			<source srcset="../examples/images/extralarge.jpg" media="(max-width: 1280px)">
+		</audio>
+		<img srcset="../examples/images/extralarge.jpg" />
+	</picture>
+
+	<img class="w" srcset="../examples/images/small.jpg 300w, ../examples/images/extralarge.jpg 600w" sizes="33vw" />
+	<img class="x" srcset="../examples/images/small.jpg 1.x, ../examples/images/extralarge.jpg 2x" />
+
+	<div class="wrapper">
+		<img class="simple-img" />
+		<picture>
+			<audio>
+				<source srcset="../examples/images/small.jpg" media="(max-width: 480px)">
+				<source srcset="../examples/images/extralarge.jpg" media="(max-width: 1280px)">
+			</audio>
+			<img srcset="../examples/images/extralarge.jpg" />
+		</picture>
+
+		<img class="w" srcset="../examples/images/small.jpg 300w, ../examples/images/extralarge.jpg 600w" sizes="33vw" />
+		<img class="x" srcset="../examples/images/small.jpg 1.x, ../examples/images/extralarge.jpg 2x" />
+	</div>
+</script>
+<div id="qunit-fixture">
+	<div id="mutation-fixture"></div>
+	<div id="picturefill-fixture"></div>
+</div>
+<p><a href="index.html">Back to unit tests</a></p>
+
+<script>
+	(function(){
+		var image = document.createElement( "img" );
+		window.imgGet = image.getAttribute;
+		window.imgSet = image.setAttribute;
+	})();
+</script>
+<script src="../src/picturefill.js" data-cover></script>
+<script>
+	if(!window.picturefillCFG){
+		window.picturefillCFG = [];
+	}
+
+	window.picturefillCFG.push(['uT', true]);
+</script>
+<script src="../src/plugins/mutation/pf.mutation.js" data-cover></script>
+<script>
+	if ( !window.attachEvent ) {
+		//document.write("<script src=\"blanket.min.js\"><\/script>");
+	}
+</script>
+<script src="tests-mutations.js" async=""></script>
+</body>
+</html>
