@@ -71,7 +71,7 @@
 	}
 })(window);
 
-/*! Picturefill - v3.0.0-beta
+/*! Picturefill - v3.0.0
  * http://scottjehl.github.io/picturefill
  * Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt;
  *  License: MIT
