@@ -1100,7 +1100,6 @@
 			bestCandidate,
 			curSrc,
 			curCan,
-			isSameSet,
 			candidateSrc,
 			abortCurSrc;
 
@@ -1123,7 +1122,7 @@
 
 				// if current candidate is "best", "better" or "okay",
 				// set it to bestCandidate
-				if ( curCan && isSameSet && curCan.res >= dpr ) {
+				if ( curCan.res >= dpr ) {
 					bestCandidate = curCan;
 				}
 			}
