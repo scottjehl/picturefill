@@ -122,7 +122,7 @@
     grunt.loadNpmTasks("grunt-gh-pages");
     grunt.loadNpmTasks("grunt-release");
 
-	// Default task.
+  // Default task.
     grunt.registerTask("default", [ "jscs", "test", "clean", "concat", "copy", "uglify" ]);
     grunt.registerTask("test", [ "jscs", "jshint", "qunit" ]);
     grunt.registerTask("publish", [ "gh-pages" ]);

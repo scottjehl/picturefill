@@ -1,7 +1,5 @@
-Authors ordered by first contribution.
+External authors, ordered by first contribution.
 
-Scott Jehl, @scottjehl
-Mat Marquis, @wilto
 David Beesley, @davebeesley
 Gordon Brander, @gordonbrander
 Max Klenk, @maxklenk
@@ -32,3 +30,14 @@ James Kerr, @jkerr838
 Pascal Borreli, @pborreli
 Christoph Rohrer, @crohrer
 Krister Kari, @kristerkari
+Zoltan Hawryluk, @zoltan-dulac
+
+The Picturefill core team
+
+Scott Jehl, @scottjehl
+Mat Marquis, @wilto
+Mike Engel, @beardfury
+Alex Jegtnes, @jegtnes
+Sarah Forst, @quoo
+Alexander Farkas, @aFarkas
+Alex Bell, @albell
