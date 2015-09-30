@@ -11,7 +11,7 @@
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
 	document.createElement( "picture" );
 
-	var warn, eminpx, alwaysCheckWDescriptor, evalId;
+	var warn, eminpx, alwaysCheckWDescriptor, evalId, maxCachedDPR, goodCachedDPR;
 	// local object for method references and testing exposure
 	var pf = {};
 	var noop = function() {};
@@ -274,6 +274,14 @@
 
 		units.em = pf.getEmValue();
 		units.rem = units.em;
+
+		if (cfg.algorithm === "saveData") {
+			goodCachedDPR = 0.6 + (0.5 * pf.DPR);
+			maxCachedDPR = pf.DPR + 1 + (0.5 * pf.DPR);
+		} else {
+			goodCachedDPR = pf.DPR;
+			maxCachedDPR = pf.DPR + 99;
+		}
 	}
 
 	function chooseLowRes( lowerValue, higherValue, dprValue, isCached ) {
@@ -1123,7 +1131,7 @@
 
 				// if current candidate is "best", "better" or "okay",
 				// set it to bestCandidate
-				if ( curCan && isSameSet && curCan.res >= dpr ) {
+				if ( curCan && isSameSet && curCan.res >= goodCachedDPR && curCan.res < maxCachedDPR ) {
 					bestCandidate = curCan;
 				}
 			}
