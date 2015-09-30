@@ -1,7 +1,7 @@
 {
 	"name": "picturefill",
 	"repo": "scottjehl/picturefill",
-	"description": "A Polyfill for the HTML Picture Element (http://picture.responsiveimages.org/) that you can use today.",
+	"description": "A polyfill for responsive images (http://picture.responsiveimages.org/) that you can use today.",
 	"main": "dist/picturefill.js",
 	"scripts": [
 		"dist/picturefill.js"

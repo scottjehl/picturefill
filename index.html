@@ -35,7 +35,7 @@
 			<div class="lede">
 				<p>The <a href="http://picture.responsiveimages.org/"><code>picture</code> element, <code>srcset</code> and <code>sizes</code> attributes</a>, and associated features allow web developers to deliver an appropriate image to every user depending on a variety of conditions like screen size, viewport size, screen resolution, and more. Picturefill enables support for the <code>picture</code> element and associated features in browsers that do not yet support them, so you can start using them today!</p>
 
-				<p>Picturefill development is sponsored by <a href="http://filamentgroup.com"><img src="logos/fg-sm.png" class="filament-logo inline-logo" alt="Filament Group"></a> and <a href="http://bocoup.com"><img src="logos/bocoup-sm.png" class="bocoup-logo inline-logo" alt="Bocoup"></a>, and maintained by the <a href="https://github.com/scottjehl/picturefill/blob/master/Authors.txt">Picturefill Team</a>.</p>
+				<p>Picturefill development is sponsored by <a href="http://filamentgroup.com"><img src="logos/fg-sm.png" class="filament-logo inline-logo" alt="Filament Group"></a> and <a href="http://bocoup.com"><img src="logos/bocoup-sm.png" class="bocoup-logo inline-logo" alt="Bocoup"></a>, and maintained by the <a href="https://github.com/scottjehl/picturefill/blob/master/Authors.txt">Picturefill Team</a>. Ongoing discussion of the project is conducted via <a href="https://pf-slackin.herokuapp.com/">Slack</a>.</p>
 
 				<h3 class="hed-subsection" id="contributing">Contributing, Bug Reports, and More information</h3>
 
@@ -45,24 +45,24 @@
 
 			<h2 class="hed-section" id="download">Downloading Picturefill</h2>
 
-			<h3 class="hed-subsection">Picturefill Version 3.0.0 (Release Candidate 1)</h3>
+			<h3 class="hed-subsection hed-currentversion">Picturefill Version 3.0.0 (Stable)</h3>
 
 			<p>Version 3 is a <em>full rewrite</em> of the Picturefill codebase, featuring optimized performance, better emulation of native behavior, and parsers that adhere much more closely to <a href="http://picture.responsiveimages.org">the specification</a>. It also handles many of the quirks, shortcomings, and edge cases related to first-generation native implementations.</p>
 
-			<p>Feedback on this beta release is highly welcomed—if you encounter any problems, please <a href="https://github.com/scottjehl/picturefill/issues">file an issue on GitHub</a>.</p>
+			<p>Feedback on this release is highly welcomed—if you encounter any problems, please <a href="https://github.com/scottjehl/picturefill/issues">file an issue on GitHub</a>.</p>
 			<ul>
 				<li>
-					<a href="https://cdn.rawgit.com/scottjehl/picturefill/3.0.0-rc1/dist/picturefill.js" class="download">picturefill.js</a>
+					<a href="https://cdn.rawgit.com/scottjehl/picturefill/master/dist/picturefill.js" class="download">picturefill.js</a>
 					<p class="meta">(development version, unminified code)</p>
 				</li>
 				<li>
-					<a href="https://cdn.rawgit.com/scottjehl/picturefill/3.0.0-rc1/dist/picturefill.min.js" class="download">picturefill.min.js</a>
+					<a href="https://cdn.rawgit.com/scottjehl/picturefill/master/dist/picturefill.min.js" class="download">picturefill.min.js</a>
 					<p class="meta">(production version, minified code)</p>
 				</li>
 			</ul>
 
-			<h3 class="hed-subsection">Picturefill Version 2.3.1 (Stable)</h3>
-			<p>This is the old way, and it's still available. Please note however that <a href="https://css-tricks.com/please-update-picturefill/">because of a recently-fixed bug</a>, you should absolutely not be using any version of Picturefill prior to 2.3.1. If you are, please update immediately. These downloads include the <a href="https://github.com/paulirish/matchMedia.js/">matchMedia polyfill</a> for browsers that need it (like IE9).</p>
+			<h3 class="hed-subsection">Picturefill Version 2.3.1</h3>
+			<p>Picturefill 2 is a lightweight polyfill that may not perfectly match native responsive images behavior. Please note however that <a href="https://css-tricks.com/please-update-picturefill/">because of a recently-fixed bug</a>, you should absolutely not be using any version of Picturefill prior to 2.3.1. If you are, please update immediately. These downloads include the <a href="https://github.com/paulirish/matchMedia.js/">matchMedia polyfill</a> for browsers that need it (like IE9).</p>
 			<ul>
 				<li>
 					<a class="download" href="https://github.com/scottjehl/picturefill/blob/2.3.1/dist/picturefill.js">picturefill.js</a>
@@ -271,8 +271,6 @@ picturefillCFG.push([ "algorithm", "saveData" ]);</pre></code>
 
 			<p>Picturefill is tested broadly and works in a large number of browsers. That said, it does have some browser support considerations to keep in mind:</p>
 			<ul>
-				<li>For IE 9 and earlier, version 3 includes a small shim that polyfills the use of common media conditions (<code>min-width</code>, <code>max-width</code>, <code>min-height</code>, <code>max-height</code>). If you need old IE support for other media conditions, such as <code>orientation</code> or <code>aspect-ratio</code>, please additionally include the <a href="https://github.com/paulirish/matchMedia.js/">matchMedia polyfill</a>.</li>
-
 				<li>Picturefill 3 includes a small shim that polyfills common media conditions for IE9 and earlier (<code>min-width</code>, <code>max-width</code>, <code>min-height</code>, and <code>max-height</code>). If you need old IE support for other media conditions, such as <code>orientation</code> or <code>aspect-ratio</code>, please additionally include the <a href="https://github.com/paulirish/matchMedia.js/">matchMedia polyfill</a>.</li>
 
 				<li><strong>JS-Disabled Browsers only see alt text:</strong> When using the <code>picture</code> element, non-<code>picture</code> supporting browsers will only see <code>alt</code> attribute text as a fallback when JavaScript fails or is disabled. This is because any <code>noscript</code>-based workarounds (such as the one used in Picturefill version 1) will cause future browsers that support the <code>picture</code> element to show two images instead of one when JavaScript is off. Unfortunately, adding a <code>src</code> attribute with an external source to the <code>img</code> element in your <code>picture</code> element isn't a good workaround either, as any browser that exists today will fetch that <code>src</code> url even if it is not going to be used (which is wasteful), and an empty <code>src</code> can result in <a href="http://wilto.github.io/srcn-polyfills/">unexpected requests</a>. For valid markup, the shortest possible value for <code>src</code> (without firing an <code>onerror</code> event or a potential request) is <pre><code>src="data:image/gif;base64,R0lGODlhAQABAAAAADs="</pre></code></li>
