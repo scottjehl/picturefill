@@ -35,7 +35,7 @@ Be it browser issues, the responsive images specifications, or Picturefill itsel
 ```html
 <picture>
     <source srcset="../img/sample.svg" media="(min-width: 768px)" />
-    <img srcset="data:image/gifbase64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+    <img srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
         alt="Sample pic" />
 </picture>
 ```
