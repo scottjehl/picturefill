@@ -283,7 +283,7 @@
 			});
 		});
 
-		if(!window.HTMLPictureElement){
+		if(!window.HTMLPictureElement && !ri.supSizes){
 			(function(){
 				var test = function(attrType) {
 					return function(){
@@ -478,53 +478,55 @@
 
 		if(ri.mutationSupport && (roundedDPR == 1 || roundedDPR == 2)){
 			(function(){
-				asyncTest('change attributes on img[srcset][sizes]', function(){
-					var $wimage = f$('<img src="'+ relurls['350x150'] +'" ' +
-						'srcset="' + relurls['2100x900'] +' 2100w 900h,'+ absurls['2800x1200'] + ' 1200h 2800w, '+ relurls['1400x600'] + ' 1400w, ' +relurls['350x150'] +' 350w,'+ relurls['700x300'] +' 700w" ' +
-						' sizes="345px" />');
+				if(!ri.supSizes){
+					asyncTest('change attributes on img[srcset][sizes]', function(){
+						var $wimage = f$('<img src="'+ relurls['350x150'] +'" ' +
+							'srcset="' + relurls['2100x900'] +' 2100w 900h,'+ absurls['2800x1200'] + ' 1200h 2800w, '+ relurls['1400x600'] + ' 1400w, ' +relurls['350x150'] +' 350w,'+ relurls['700x300'] +' 700w" ' +
+							' sizes="345px" />');
 
 
-					runMutationTests($wimage, [
-						{
-							expects: {
-								currentSrc: roundedDPR == 2 ? absurls['700x300'] : absurls['350x150']
-							}
-						},
-						{
-							attrs: {
-								'sizes': 'calc(344px + 344px)'
+						runMutationTests($wimage, [
+							{
+								expects: {
+									currentSrc: roundedDPR == 2 ? absurls['700x300'] : absurls['350x150']
+								}
 							},
-							expects: {
-								currentSrc: roundedDPR == 2 ? absurls['1400x600'] : absurls['700x300']
-							}
-						},
-						{
-							attrs: {
-								srcset: absurls['2800x1200']
+							{
+								attrs: {
+									'sizes': 'calc(344px + 344px)'
+								},
+								expects: {
+									currentSrc: roundedDPR == 2 ? absurls['1400x600'] : absurls['700x300']
+								}
 							},
-							expects: {
-								currentSrc: absurls['2800x1200']
-							}
-						},
-						{
-							attrs: {
-								srcset: null
+							{
+								attrs: {
+									srcset: absurls['2800x1200']
+								},
+								expects: {
+									currentSrc: absurls['2800x1200']
+								}
 							},
-							expects: {
-								currentSrc: absurls['350x150'],
-								srcProp: absurls['350x150']
-							}
-						},
-						{
-							attrs: {
-								src: null
+							{
+								attrs: {
+									srcset: null
+								},
+								expects: {
+									currentSrc: absurls['350x150'],
+									srcProp: absurls['350x150']
+								}
 							},
-							expects: {
-								currentSrc: ''
+							{
+								attrs: {
+									src: null
+								},
+								expects: {
+									currentSrc: ''
+								}
 							}
-						}
-					]);
-				});
+						]);
+					});
+				}
 
 				asyncTest('change attributes on img[src]', function(){
 					var $wimage = f$('<img src="'+ relurls['350x150'] +'" />');
