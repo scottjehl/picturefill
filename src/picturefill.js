@@ -917,6 +917,8 @@
 					pf.supSizes = true;
 				}
 
+				alwaysCheckWDescriptor = pf.supSrcset && !pf.supSizes;
+
 				isSupportTestReady = true;
 				// force async
 				setTimeout(picturefill);
@@ -948,8 +950,6 @@
 
 	// container of supported mime types that one might need to qualify before using
 	pf.types =  types;
-
-	alwaysCheckWDescriptor = pf.supSrcset && !pf.supSizes;
 
 	pf.setSize = noop;
 
