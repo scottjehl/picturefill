@@ -179,6 +179,17 @@
   &lt;img srcset=&quot;examples/images/medium.jpg&quot; alt=&quot;…&quot;&gt;
 &lt;/picture&gt;</code></pre>
 
+			<h3 class="hed-subsection" id="fowi-safari">Preventing the Flash of Wrong Image™ on mobile Safari 8</h3>
+			<p>Sometimes when using picturefill in Safari 8 on iOS, the wrong image may briefly load before the correct source had been chosen. We call this the Flash of Wrong Image™. The only way to prevent this is by removing the <code>src</code> and <code>srcset</code> on the fallback image. <em>It's important to note, however, that this may cause the image from displaying on android devices</em>.</p>
+
+	<pre><code>&lt;picture&gt;
+  &lt;!--[if IE 9]&gt;&lt;video style=&quot;display: none;&quot;&gt;&lt;![endif]--&gt;
+  &lt;source srcset=&quot;examples/images/extralarge.jpg&quot; media=&quot;(min-width: 1000px)&quot;&gt;
+  &lt;source srcset=&quot;examples/images/large.jpg&quot; media=&quot;(min-width: 800px)&quot;&gt;
+  &lt;!--[if IE 9]&gt;&lt;/video&gt;&lt;![endif]--&gt;
+  &lt;img alt=&quot;…&quot;&gt;
+&lt;/picture&gt;</code></pre>
+
 			<h3 class="hed-subsection" id="using-media-and-srcset">`media` and `srcset` syntax:</h3>
 			<p>The <code>1x</code>/<code>2x</code> syntax can be used within <code>source</code> element <code>srcset</code> attributes as a shorthand for more complex resolution media queries.</p>
 
