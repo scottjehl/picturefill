@@ -1,4 +1,4 @@
-/*! Picturefill - v3.0.1 - 2015-09-30
+/*! Picturefill - v3.0.2 - 2015-11-02
  * http://scottjehl.github.io/picturefill
  * Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT
  */
@@ -11,7 +11,7 @@
 	/*jshint eqnull:true */
 	var ua = navigator.userAgent;
 
-	if ( window.HTMLPictureElement && ((/ecko/).test(ua) && ua.match(/rv\:(\d+)/) && RegExp.$1 < 41) ) {
+	if ( window.HTMLPictureElement && ((/ecko/).test(ua) && ua.match(/rv\:(\d+)/)) ) {
 		addEventListener("resize", (function() {
 			var timer;
 
@@ -87,6 +87,7 @@
 	var warn, eminpx, alwaysCheckWDescriptor, evalId;
 	// local object for method references and testing exposure
 	var pf = {};
+	var isSupportTestReady = false;
 	var noop = function() {};
 	var image = document.createElement( "img" );
 	var getImgAttr = image.getAttribute;
@@ -256,6 +257,9 @@
 	 * @param opt
 	 */
 	var picturefill = function( opt ) {
+
+		if (!isSupportTestReady) {return;}
+
 		var elements, i, plen;
 
 		var options = opt || {};
@@ -961,6 +965,8 @@
 	pf.supSizes = "sizes" in image;
 	pf.supPicture = !!window.HTMLPictureElement;
 
+	// UC browser does claim to support srcset and picture, but not sizes,
+	// this extended test reveals the browser does support nothing
 	if (pf.supSrcset && pf.supPicture && !pf.supSizes) {
 		(function(image2) {
 			image.srcset = "data:,a";
@@ -970,15 +976,44 @@
 		})(document.createElement("img"));
 	}
 
+	// Safari9 has basic support for sizes, but does't expose the `sizes` idl attribute
+	if (pf.supSrcset && !pf.supSizes) {
+
+		(function() {
+			var width2 = "data:image/gif;base64,R0lGODlhAgABAPAAAP///wAAACH5BAAAAAAALAAAAAACAAEAAAICBAoAOw==";
+			var width1 = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
+			var img = document.createElement("img");
+			var test = function() {
+				var width = img.width;
+
+				if (width === 2) {
+					pf.supSizes = true;
+				}
+
+				alwaysCheckWDescriptor = pf.supSrcset && !pf.supSizes;
+
+				isSupportTestReady = true;
+				// force async
+				setTimeout(picturefill);
+			};
+
+			img.onload = test;
+			img.onerror = test;
+			img.setAttribute("sizes", "9px");
+
+			img.srcset = width1 + " 1w," + width2 + " 9w";
+			img.src = width1;
+		})();
+
+	} else {
+		isSupportTestReady = true;
+	}
+
 	// using pf.qsa instead of dom traversing does scale much better,
 	// especially on sites mixing responsive and non-responsive images
 	pf.selShort = "picture>img,img[srcset]";
 	pf.sel = pf.selShort;
 	pf.cfg = cfg;
-
-	if ( pf.supSrcset ) {
-		pf.sel += ",img[" + srcsetAttr + "]";
-	}
 
 	/**
 	 * Shortcut property for `devicePixelRatio` ( for easy overriding in tests )
@@ -988,8 +1023,6 @@
 
 	// container of supported mime types that one might need to qualify before using
 	pf.types =  types;
-
-	alwaysCheckWDescriptor = pf.supSrcset && !pf.supSizes;
 
 	pf.setSize = noop;
 
@@ -1343,7 +1376,7 @@
 
 		// if img has picture or the srcset was removed or has a srcset and does not support srcset at all
 		// or has a w descriptor (and does not support sizes) set support to false to evaluate
-		imageData.supported = !( hasPicture || ( imageSet && !pf.supSrcset ) || isWDescripor );
+		imageData.supported = !( hasPicture || ( imageSet && !pf.supSrcset ) || (isWDescripor && !pf.supSizes) );
 
 		if ( srcsetParsed && pf.supSrcset && !imageData.supported ) {
 			if ( srcsetAttribute ) {
