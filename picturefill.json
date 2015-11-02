@@ -2,7 +2,7 @@
 	"name": "Picturefill",
 	"title": "Picturefill",
 	"description": "A polyfill for responsive images (http://picture.responsiveimages.org/) that you can use today.",
-	"version": "3.0.1",
+	"version": "3.0.2",
 	"homepage": "http://scottjehl.github.io/picturefill",
 	"author": {
 		"name": "https://github.com/scottjehl/picturefill/blob/master/Authors.txt",
