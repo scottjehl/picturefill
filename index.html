@@ -240,7 +240,7 @@
   elements: [ document.getElementById( "myImg" ) ]
 });</code></pre>
 				</li>
-				<li><strong>Reevaluate:</strong> Force picturefill to evaluate all elements in the <code>options.elements</code> array, even if they've already been evaluated. The default is <code>false</code>. This option has to be used, if you dynamically change the <code>srcset</code>/<code>sizes</code> attributes or modify associated <code>source</code> elements. As an alternative the <a href="dist/plugins/mutation/pf.mutation.js">mutation plugin</a> can be used.
+				<li><strong>Reevaluate:</strong> If you dynamically change the <code>srcset</code>, <code>sizes</code> attributes, or modify <code>source</code> elements, please use this reevaluate option and provide an array or array-like object of your mutated <code>img</code> elements. As an alternative the <a href="dist/plugins/mutation/pf.mutation.js">mutation plugin</a> can be used.
 	<pre><code>picturefill({
   reevaluate: true,
   elements: [ document.getElementById( "myImg" ) ]
@@ -248,12 +248,24 @@
 				</li>
 			</ul>
 
+			<h3 class="hed-subsection">Picturefill plugins/extensions</h3>
+
+			<p>Picturefill core polyfills the core part of responsive images, including full support for <code>srcset</code>, <code>sizes</code> and <code>picture</code>/<code>source</code>.</p>
+
+			<p>Some aspects of the native feature are left out to provide a clean and lightweight polyfill. In case you need a specific behavior of the native implementation not included in picturefill core, just add the corresponding plugin. The best way is to merge all scripts together.</p>
+
+			<ul>
+				<li><strong><a href="dist/plugins/intrinsic-dimension/">intrinsic dimension</a></strong>: This extension adds support for intrinsic dimension behavior of responsive images. It's useful when you don't style your images with CSS.</li>
+				<li><strong><a href="dist/plugins/mutation/">Mutation plugin</a></strong>: This plugin automatically detects any DOM mutation and polyfills new or changed responsive images automatically. It also adds support for responsive images IDL attributes/properties. If you have a highly dynamic website or a SPA you probably want to use this plugin. (This plugin does not work with IE8.)</li>
+				<li><strong><a href="dist/plugins/typesupport/">Type support</a></strong>: This plugin extends support for the <code>source[type]</code> attribute and detects JPG2000, APNG and JPEG XR support. If you want to use new image formats you probably want to use this plugin.</li>
+				<li><strong><a href="dist/plugins/oldie/">OldIE (IE6/7)</a></strong>: picturefill supports most browsers including IE8+. In case you need to support IE6/7, you can combine the oldIE plugin with jQuery to add support for these browsers.</li>
+			</ul>
 
 			<h3 class="hed-subsection">Source selection algorithm option</h3>
 
 			<p>By default Picturefill attempts to mimic the resource selection algorithms current native implementations, but Picturefill 3 also includes an optional and experimental custom source selection algorithm. The <code>saveData</code> algorithm skews the resource selection algorithm toward smaller image candidates(<code>2x</code> on extremely high dppx devices (<code>3x</code> and up), to conserve bandwidth in situations where there may be little or no <em>visual</em> difference between sources.</p>
 
-			<p>To use <code>saveData</code>, create a <code>picturefillCFG</code> array that runs before the main plugin:
+			<p>To use <code>saveData</code>, create a <code>picturefillCFG</code> array that runs before picturefill:
 
 			<pre><code>//generating the config array
 window.picturefillCFG = window.picturefillCFG || [];
