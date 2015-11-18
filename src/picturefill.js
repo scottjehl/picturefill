@@ -939,6 +939,9 @@
 	 * @returns {NodeList}
 	 */
 	pf.qsa = function(context, sel) {
+		if ( !( "querySelector" in document ) ) {
+			return [];
+		}
 		return context.querySelectorAll(sel);
 	};
 
