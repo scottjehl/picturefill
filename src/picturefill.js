@@ -972,7 +972,7 @@
 	 * @returns {NodeList}
 	 */
 	pf.qsa = function(context, sel) {
-		return context.querySelectorAll(sel);
+		return ( "querySelector" in context ) ? context.querySelectorAll(sel) : [];
 	};
 
 	/**
