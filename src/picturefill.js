@@ -969,7 +969,7 @@
 	 * Can be extended with jQuery/Sizzle for IE7 support
 	 * @param context
 	 * @param sel
-	 * @returns {NodeList}
+	 * @returns {NodeList|Array}
 	 */
 	pf.qsa = function(context, sel) {
 		return ( "querySelector" in context ) ? context.querySelectorAll(sel) : [];
