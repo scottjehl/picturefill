@@ -254,7 +254,7 @@
 	}
 
 	// test svg support
-	types[ "image/svg+xml" ] = document.implementation.hasFeature( "http://wwwindow.w3.org/TR/SVG11/feature#Image", "1.1" );
+	types[ "image/svg+xml" ] = document.implementation.hasFeature( "http://www.w3.org/TR/SVG11/feature#Image", "1.1" );
 
 	/**
 	 * updates the internal vW property with the current viewport width in px
