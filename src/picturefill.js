@@ -1352,6 +1352,15 @@
 		} else {
 			imageData.evaled = evalId;
 		}
+
+		element.onload = function() {
+			var loadedRes = this[pf.ns].curCan.res,
+				width = this.naturalWidth / loadedRes,
+				height = this.naturalHeight / loadedRes;
+
+			this.width = width;
+			this.height = height;
+		};
 	};
 
 	pf.setupRun = function() {
