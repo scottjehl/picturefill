@@ -31,6 +31,7 @@ Pascal Borreli, @pborreli
 Christoph Rohrer, @crohrer
 Krister Kari, @kristerkari
 Zoltan Hawryluk, @zoltan-dulac
+Lewis Dorigo, @lewisdorigo
 
 The Picturefill core team
 
