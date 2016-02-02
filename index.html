@@ -8,11 +8,8 @@
 
 		<link href='examples/styles.css' rel='stylesheet' type='text/css'>
 		<link href="https://raw.githubusercontent.com/ResponsiveImagesCG/responsiveimages.org/master/img/favicon.ico" rel="icon">
-		<script>
-			// Picture element HTML shim|v it for old IE (pairs with Picturefill.js)
-			document.createElement( "picture" );
-		</script>
-		<script async="true" src="dist/picturefill.js"></script>
+		<script async="" src="dist/plugins/intrinsic-dimension/pf.intrinsic.min.js"></script>
+		<script async="" src="dist/picturefill.min.js"></script>
 	</head>
 	<body>
 
@@ -118,7 +115,7 @@
 			<p>Here's how that renders on your display:</p>
 			<img srcset="examples/images/large.jpg 1x, examples/images/extralarge.jpg 2x" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 
-			<p>The <code>2x</code> source will be shown at the inherent width of the <code>1x</code> source—so the two sources will occupy the same space in your layout, but the <code>2x</code> source will be displayed at double the pixel density. This only applies to the <em>natural</em> size of the <code>img</code>—resizing the image via CSS will behave as expected.</p>
+			<p>If the <a href="dist/plugins/intrinsic-dimension/">intrinsic dimension plugin</a> is installed: The <code>2x</code> source will be shown at the inherent width of the <code>1x</code> source—so the two sources will occupy the same space in your layout, but the <code>2x</code> source will be displayed at double the pixel density. This only applies to the <em>natural</em> size of the <code>img</code>—resizing the image via CSS will behave as expected.</p>
 
 			<p class="note" id="caching">Modern browsers that support <code>srcset</code> natively may select a cached file that meets the minimum media condition, even if it is “overkill” for the current media condition. For example, a <code>2x</code> file may be shown on a <code>1x</code> device, if that <code>2x</code> file is already in the cache—there’d be no reason to make an additional request when the user will see no discernable difference, after all. This is typically encountered only on sites with multiple versions of the same image displayed in multiple elements at different sizes (like our demo page). The occasional selection of "oversize" resources—depending on the cache—is currently an expected behavior in native implementations and you may encounter it during testing.</p>
 
