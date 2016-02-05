@@ -1,6 +1,6 @@
-/*! Picturefill - v3.0.2 - 2015-11-02
+/*! Picturefill - v3.0.2 - 2016-02-04
  * http://scottjehl.github.io/picturefill
- * Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT
+ * Copyright (c) 2016 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT
  */
 /*! Gecko-Picture - v1.0
  * https://github.com/scottjehl/picturefill/tree/3.0/src/plugins/gecko-picture
@@ -11,7 +11,7 @@
 	/*jshint eqnull:true */
 	var ua = navigator.userAgent;
 
-	if ( window.HTMLPictureElement && ((/ecko/).test(ua) && ua.match(/rv\:(\d+)/)) ) {
+	if ( window.HTMLPictureElement && ((/ecko/).test(ua) && ua.match(/rv\:(\d+)/) && RegExp.$1 < 45) ) {
 		addEventListener("resize", (function() {
 			var timer;
 
@@ -327,7 +327,7 @@
 	}
 
 	// test svg support
-	types[ "image/svg+xml" ] = document.implementation.hasFeature( "http://wwwindow.w3.org/TR/SVG11/feature#Image", "1.1" );
+	types[ "image/svg+xml" ] = document.implementation.hasFeature( "http://www.w3.org/TR/SVG11/feature#Image", "1.1" );
 
 	/**
 	 * updates the internal vW property with the current viewport width in px
@@ -1042,10 +1042,10 @@
 	 * Can be extended with jQuery/Sizzle for IE7 support
 	 * @param context
 	 * @param sel
-	 * @returns {NodeList}
+	 * @returns {NodeList|Array}
 	 */
 	pf.qsa = function(context, sel) {
-		return context.querySelectorAll(sel);
+		return ( "querySelector" in context ) ? context.querySelectorAll(sel) : [];
 	};
 
 	/**
