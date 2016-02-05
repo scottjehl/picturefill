@@ -268,6 +268,8 @@
 
 		pf.DPR = DPR || 1;
 
+		pf.initDPR = pf.DPR > 1.4 ? 1.2 : 0.9;
+
 		units.width = Math.max(window.innerWidth || 0, docElem.clientWidth);
 		units.height = Math.max(window.innerHeight || 0, docElem.clientHeight);
 
@@ -285,7 +287,7 @@
 
 		//experimental
 		if (cfg.algorithm === "saveData" ){
-			if ( lowerValue > 2.7 ) {
+			if ( lowerValue > 1.9 ) {
 				meanDensity = dprValue + 1;
 			} else {
 				tooMuch = higherValue - dprValue;
@@ -1148,14 +1150,14 @@
 
 			// if browser can abort image request and the image has a higher pixel density than needed
 			// and this image isn't downloaded yet, we skip next part and try to save bandwidth
-			abortCurSrc = (supportAbort && !img.complete && curCan.res - 0.1 > dpr);
+			abortCurSrc = (supportAbort && !img.complete && curCan.res - 0.5 > dpr);
 
 			if ( !abortCurSrc ) {
 				curCan.cached = true;
 
 				// if current candidate is "best", "better" or "okay",
 				// set it to bestCandidate
-				if ( curCan.res >= dpr ) {
+				if ( curCan.res >= dpr || (curCan.url === imageData.src && curCan.res > pf.initDPR) ) {
 					bestCandidate = curCan;
 				}
 			}

@@ -1,6 +1,6 @@
-/*! Picturefill - v3.0.2 - 2015-11-02
+/*! Picturefill - v3.0.2 - 2016-01-31
  * http://scottjehl.github.io/picturefill
- * Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT
+ * Copyright (c) 2016 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT
  */
 /*! Gecko-Picture - v1.0
  * https://github.com/scottjehl/picturefill/tree/3.0/src/plugins/gecko-picture
@@ -327,7 +327,7 @@
 	}
 
 	// test svg support
-	types[ "image/svg+xml" ] = document.implementation.hasFeature( "http://wwwindow.w3.org/TR/SVG11/feature#Image", "1.1" );
+	types[ "image/svg+xml" ] = document.implementation.hasFeature( "http://www.w3.org/TR/SVG11/feature#Image", "1.1" );
 
 	/**
 	 * updates the internal vW property with the current viewport width in px
@@ -340,6 +340,8 @@
 		sizeLengthCache = {};
 
 		pf.DPR = DPR || 1;
+
+		pf.initDPR = pf.DPR > 1.4 ? 1.2 : 0.9;
 
 		units.width = Math.max(window.innerWidth || 0, docElem.clientWidth);
 		units.height = Math.max(window.innerHeight || 0, docElem.clientHeight);
@@ -358,7 +360,7 @@
 
 		//experimental
 		if (cfg.algorithm === "saveData" ){
-			if ( lowerValue > 2.7 ) {
+			if ( lowerValue > 1.9 ) {
 				meanDensity = dprValue + 1;
 			} else {
 				tooMuch = higherValue - dprValue;
@@ -1042,10 +1044,10 @@
 	 * Can be extended with jQuery/Sizzle for IE7 support
 	 * @param context
 	 * @param sel
-	 * @returns {NodeList}
+	 * @returns {NodeList|Array}
 	 */
 	pf.qsa = function(context, sel) {
-		return context.querySelectorAll(sel);
+		return ( "querySelector" in context ) ? context.querySelectorAll(sel) : [];
 	};
 
 	/**
@@ -1221,14 +1223,14 @@
 
 			// if browser can abort image request and the image has a higher pixel density than needed
 			// and this image isn't downloaded yet, we skip next part and try to save bandwidth
-			abortCurSrc = (supportAbort && !img.complete && curCan.res - 0.1 > dpr);
+			abortCurSrc = (supportAbort && !img.complete && curCan.res - 0.5 > dpr);
 
 			if ( !abortCurSrc ) {
 				curCan.cached = true;
 
 				// if current candidate is "best", "better" or "okay",
 				// set it to bestCandidate
-				if ( curCan.res >= dpr ) {
+				if ( curCan.res >= dpr || (curCan.url === imageData.src && curCan.res > pf.initDPR) ) {
 					bestCandidate = curCan;
 				}
 			}
