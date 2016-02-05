@@ -179,8 +179,8 @@
   &lt;img srcset=&quot;examples/images/medium.jpg&quot; alt=&quot;…&quot;&gt;
 &lt;/picture&gt;</code></pre>
 
-			<h3 class="hed-subsection" id="fowi-safari">Preventing the Flash of Wrong Image™ on mobile Safari 8</h3>
-			<p>Sometimes when using picturefill in Safari 8 on iOS, the wrong image may briefly load before the correct source had been chosen. We call this the Flash of Wrong Image™. The only way to prevent this is by removing the <code>src</code> and <code>srcset</code> on the fallback image. <em>It's important to note, however, that this may cause the image from displaying on android devices</em>.</p>
+			<h3 class="hed-subsection" id="fowi-safari">Preventing the Flash of Wrong Image™ on Safari</h3>
+			<p>Sometimes when using picturefill in Safari, the wrong image may briefly load before the correct source had been chosen. We call this the Flash of Wrong Image™. The only way to prevent this is by removing the <code>src</code> and <code>srcset</code> on the fallback image. <em>It's important to note, however, that this may cause the image from displaying on android devices (with picturefill 2.x)</em>.</p>
 
 	<pre><code>&lt;picture&gt;
   &lt;!--[if IE 9]&gt;&lt;video style=&quot;display: none;&quot;&gt;&lt;![endif]--&gt;
