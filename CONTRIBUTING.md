@@ -1,13 +1,29 @@
 # Contributing
 
 ## Project Scope
+
 Picturefill aims to polyfill the standard features of the `picture` element and related `srcset`, `sizes`, `type`, and `media` attributes (some of which work on `img` elements without a `picture` parent as well). Issues and contributions that fall outside of this scope are not likely to be accepted by the project. Some exceptions include workarounds that improve browser support for standard features.
 
-## Code License
+## Submitting issues
 
-Picturefill is an open source project falling under the MIT License. By using, distributing, or contributing to this project, you accept and agree that all code within the Picturefill project are licensed under MIT license.
+While we always welcome new issues, please take a look through our open and closed issues to see if it's been brought up before. We're happy to reopen closed issues if it still persists.
+
+### FAQ / Frequent Issues
+
+_Q_: **Firefox isn't updating the src on window resize.**  
+_A_: This is a known issue, ever since firefox added partial support in Firefox 38. It's slated to be fixed in Firefox 46.
+
+_Q_: **I have an issue/question about the `picture` element/spec.**  
+_A_: Since Picturefill is only a polyfill, there's a repo for general `picture` discussion [here](https://github.com/ResponsiveImagesCG/picture-element).
+
+_Q_: **I have a question about how to use `srcset`, `sizes`, or `picture`.**  
+_A_: Understandable—it's a lot of stuff to use! There's a handy resource from Eric Portis on [srcset & sizes](https://ericportis.com/posts/2014/srcset-sizes/). Additionally, the [picturefill website](https://scottjehl.github.io/picturefill) has a lot of demos and walks through some edge cases and how to solve them.
 
 ## Working on Picturefill
+
+### Code License
+
+Picturefill is an open source project falling under the MIT License. By using, distributing, or contributing to this project, you accept and agree that all code within the Picturefill project are licensed under MIT license.
 
 ### Issue Discussion
 
@@ -16,6 +32,7 @@ General Picturefill discussion takes place in Slack, at [http://picturefill.slac
 You can connect to the Picturefill Slack channel [via IRC](https://slack.zendesk.com/hc/en-us/articles/201727913-Connecting-to-Slack-over-IRC-and-XMPP) (SSL enabled).
 
 ### Modifying the code
+
 First, ensure that you have the latest [Node.js](http://nodejs.org/) or [io.js](http://iojs.org) and [npm](http://npmjs.org/) installed.
 
 Test that Grunt's CLI is installed by running `grunt --version`.  If the command isn't found, run `npm install -g grunt-cli`.  For more information about installing Grunt, see the [getting started guide](http://gruntjs.com/getting-started).
@@ -54,7 +71,9 @@ The rules of [semver](http://semver.org/) don’t necessarily apply here in the 
 Please don't edit files in the `dist` subdirectory as they are generated via Grunt. You'll find source code in the `src` subdirectory!
 
 #### Code style
+
 Regarding code style like indentation and whitespace, **follow the conventions you see used in the source already.**
 
 #### PhantomJS
+
 While Grunt can run the included unit tests via [PhantomJS](http://phantomjs.org/), this shouldn't be considered a substitute for the real thing. Please be sure to test the `test/*.html` unit test file(s) in _actual_ browsers.
