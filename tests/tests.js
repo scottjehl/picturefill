@@ -747,10 +747,14 @@
 		});
 
 		asyncTest( "`img` can be added outside the DOM without errors", function() {
-			var runTest, timer;
+			var timer;
 			var img = document.createElement( "img" );
 			var runTest = function(){
-				equal( img.currentSrc || img.src, "data:img" );
+				if ('currentSrc' in img || !op.supSizes){
+					equal( img.currentSrc || img.src, "data:img" );
+				} else {
+					equal( img.srcset, "data:img 500w" );
+				}
 				start();
 				img.onload = null;
 				img.onerror = null;

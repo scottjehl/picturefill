@@ -8,11 +8,8 @@
 
 		<link href='examples/styles.css' rel='stylesheet' type='text/css'>
 		<link href="https://raw.githubusercontent.com/ResponsiveImagesCG/responsiveimages.org/master/img/favicon.ico" rel="icon">
-		<script>
-			// Picture element HTML shim|v it for old IE (pairs with Picturefill.js)
-			document.createElement( "picture" );
-		</script>
-		<script async="true" src="dist/picturefill.js"></script>
+		<script async="" src="dist/plugins/intrinsic-dimension/pf.intrinsic.min.js"></script>
+		<script async="" src="dist/picturefill.min.js"></script>
 	</head>
 	<body>
 
@@ -45,7 +42,7 @@
 
 			<h2 class="hed-section" id="download">Downloading Picturefill</h2>
 
-			<h3 class="hed-subsection hed-currentversion">Picturefill Version 3.0.1 (Stable)</h3>
+			<h3 class="hed-subsection hed-currentversion">Picturefill Version 3.0.2 (Stable)</h3>
 
 			<p>Version 3 is a <em>full rewrite</em> of the Picturefill codebase, featuring optimized performance, better emulation of native behavior, and parsers that adhere much more closely to <a href="http://picture.responsiveimages.org">the specification</a>. It also handles many of the quirks, shortcomings, and edge cases related to first-generation native implementations.</p>
 
@@ -82,7 +79,7 @@
 
 			<p>To allow your page to load more efficiently, we'd recommend adding an <code>async</code> attribute to that <code>script</code> tag as well. This tells the browser that it can load picturefill asynchronously, without waiting for it to finish before loading the rest of the document. If you add this attribute, you'll need to add a line of script before the <code>script</code> tag as well to allow older browsers to recognize <code>picture</code> elements if it encounters them in the page before picturefill has finished loading. </p>
 
-			<p class="hed-subsection">Reccomended Usage:</p>
+			<p class="hed-subsection">Recommended Usage:</p>
 
 	<pre><code>&lt;head&gt;
   &lt;script&gt;
@@ -113,12 +110,12 @@
 			<h3 class="hed-pattern" id="img-srcset">Using the `srcset` attribute</h3>
 			<p class="usecase">The <code>srcset</code> attribute (without <code>sizes</code>) is used to serve larger—but otherwise identical—image sources to high resolution displays only.</p>
 
-			<pre><code>&lt;img srcset=&quot;examples/images/large.jpg 1x, examples/images/extralarge.jpg 2x&quot; alt=&quot;…&quot;&gt;</code></pre>
+			<pre><code>&lt;img srcset=&quot;examples/images/image-384.jpg 1x, examples/images/image-768.jpg 2x&quot; alt=&quot;…&quot;&gt;</code></pre>
 
 			<p>Here's how that renders on your display:</p>
-			<img srcset="examples/images/large.jpg 1x, examples/images/extralarge.jpg 2x" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
+			<img srcset="examples/images/image-384.jpg 1x, examples/images/image-768.jpg 2x" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 
-			<p>The <code>2x</code> source will be shown at the inherent width of the <code>1x</code> source—so the two sources will occupy the same space in your layout, but the <code>2x</code> source will be displayed at double the pixel density. This only applies to the <em>natural</em> size of the <code>img</code>—resizing the image via CSS will behave as expected.</p>
+			<p>If the <a href="dist/plugins/intrinsic-dimension/">intrinsic dimension plugin</a> is installed: The <code>2x</code> source will be automatically scaled down by 2  — so that the image will occupy the same space in your layout as the <code>1x</code>, but the <code>2x</code> source will be displayed at double the pixel density. This only applies to the <em>natural</em> size of the <code>img</code>—resizing the image via CSS or with the <code>width</code> content attribute will behave as expected.</p>
 
 			<p class="note" id="caching">Modern browsers that support <code>srcset</code> natively may select a cached file that meets the minimum media condition, even if it is “overkill” for the current media condition. For example, a <code>2x</code> file may be shown on a <code>1x</code> device, if that <code>2x</code> file is already in the cache—there’d be no reason to make an additional request when the user will see no discernable difference, after all. This is typically encountered only on sites with multiple versions of the same image displayed in multiple elements at different sizes (like our demo page). The occasional selection of "oversize" resources—depending on the cache—is currently an expected behavior in native implementations and you may encounter it during testing.</p>
 
@@ -177,6 +174,17 @@
   &lt;source srcset=&quot;examples/images/large.jpg&quot; media=&quot;(min-width: 800px)&quot;&gt;
   &lt;!--[if IE 9]&gt;&lt;/video&gt;&lt;![endif]--&gt;
   &lt;img srcset=&quot;examples/images/medium.jpg&quot; alt=&quot;…&quot;&gt;
+&lt;/picture&gt;</code></pre>
+
+			<h3 class="hed-subsection" id="fowi-safari">Preventing the Flash of Wrong Image™ on Safari</h3>
+			<p>Sometimes when using picturefill in Safari, the wrong image may briefly load before the correct source had been chosen. We call this the Flash of Wrong Image™. The only way to prevent this is by removing the <code>src</code> and <code>srcset</code> on the fallback image. <em>It's important to note, however, that this may cause the image from displaying on old android devices (2.3)</em>.</p>
+
+	<pre><code>&lt;picture&gt;
+  &lt;!--[if IE 9]&gt;&lt;video style=&quot;display: none;&quot;&gt;&lt;![endif]--&gt;
+  &lt;source srcset=&quot;examples/images/extralarge.jpg&quot; media=&quot;(min-width: 1000px)&quot;&gt;
+  &lt;source srcset=&quot;examples/images/large.jpg&quot; media=&quot;(min-width: 800px)&quot;&gt;
+  &lt;!--[if IE 9]&gt;&lt;/video&gt;&lt;![endif]--&gt;
+  &lt;img alt=&quot;…&quot;&gt;
 &lt;/picture&gt;</code></pre>
 
 			<h3 class="hed-subsection" id="using-media-and-srcset">`media` and `srcset` syntax:</h3>
@@ -240,7 +248,7 @@
   elements: [ document.getElementById( "myImg" ) ]
 });</code></pre>
 				</li>
-				<li><strong>Reevaluate:</strong> Force picturefill to evaluate all elements in the <code>options.elements</code> array, even if they've already been evaluated. The default is <code>false</code>. This option has to be used, if you dynamically change the <code>srcset</code>/<code>sizes</code> attributes or modify associated <code>source</code> elements. As an alternative the <a href="dist/plugins/mutation/pf.mutation.js">mutation plugin</a> can be used.
+				<li><strong>Reevaluate:</strong> If you dynamically change the <code>srcset</code>, <code>sizes</code> attributes, or modify <code>source</code> elements, please use this reevaluate option and provide an array or array-like object of your mutated <code>img</code> elements. As an alternative the <a href="dist/plugins/mutation/pf.mutation.js">mutation plugin</a> can be used.
 	<pre><code>picturefill({
   reevaluate: true,
   elements: [ document.getElementById( "myImg" ) ]
@@ -248,12 +256,24 @@
 				</li>
 			</ul>
 
+			<h3 class="hed-subsection">Picturefill plugins/extensions</h3>
+
+			<p>Picturefill core polyfills the core part of responsive images, including full support for <code>srcset</code>, <code>sizes</code> and <code>picture</code>/<code>source</code>.</p>
+
+			<p>Some aspects of the native feature are left out to provide a clean and lightweight polyfill. In case you need a specific behavior of the native implementation not included in picturefill core, just add the corresponding plugin. The best way is to merge all scripts together.</p>
+
+			<ul>
+				<li><strong><a href="dist/plugins/intrinsic-dimension/">intrinsic dimension</a></strong>: This extension adds support for intrinsic dimension behavior of responsive images. It's useful when you don't style your images with CSS.</li>
+				<li><strong><a href="dist/plugins/mutation/">Mutation plugin</a></strong>: This plugin automatically detects any DOM mutation and polyfills new or changed responsive images automatically. It also adds support for responsive images IDL attributes/properties. If you have a highly dynamic website or a SPA you probably want to use this plugin. (This plugin does not work with IE8.)</li>
+				<li><strong><a href="dist/plugins/typesupport/">Type support</a></strong>: This plugin extends support for the <code>source[type]</code> attribute and detects JPG2000, APNG and JPEG XR support. If you want to use new image formats you probably want to use this plugin.</li>
+				<li><strong><a href="dist/plugins/oldie/">OldIE (IE6/7)</a></strong>: picturefill supports most browsers including IE8+. In case you need to support IE6/7, you can combine the oldIE plugin with jQuery to add support for these browsers.</li>
+			</ul>
 
 			<h3 class="hed-subsection">Source selection algorithm option</h3>
 
 			<p>By default Picturefill attempts to mimic the resource selection algorithms current native implementations, but Picturefill 3 also includes an optional and experimental custom source selection algorithm. The <code>saveData</code> algorithm skews the resource selection algorithm toward smaller image candidates(<code>2x</code> on extremely high dppx devices (<code>3x</code> and up), to conserve bandwidth in situations where there may be little or no <em>visual</em> difference between sources.</p>
 
-			<p>To use <code>saveData</code>, create a <code>picturefillCFG</code> array that runs before the main plugin:
+			<p>To use <code>saveData</code>, create a <code>picturefillCFG</code> array that runs before picturefill:
 
 			<pre><code>//generating the config array
 window.picturefillCFG = window.picturefillCFG || [];
