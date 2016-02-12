@@ -1,5 +1,5 @@
-/*! Picturefill - v3.0.2 - 2016-02-04
- * http://scottjehl.github.io/picturefill
+/*! picturefill - v3.0.2 - 2016-02-12
+ * https://scottjehl.github.io/picturefill/
  * Copyright (c) 2016 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT
  */
 /*! Gecko-Picture - v1.0
@@ -71,7 +71,7 @@
 	}
 })(window);
 
-/*! Picturefill - v3.0.1
+/*! Picturefill - v3.0.2
  * http://scottjehl.github.io/picturefill
  * Copyright (c) 2015 https://github.com/scottjehl/picturefill/blob/master/Authors.txt;
  *  License: MIT
