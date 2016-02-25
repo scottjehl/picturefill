@@ -1157,7 +1157,7 @@
 
 				// if current candidate is "best", "better" or "okay",
 				// set it to bestCandidate
-				if ( curCan.res >= dpr || (curCan.url === imageData.src && curCan.res > pf.initDPR) ) {
+				if ( curCan.res >= dpr || (curCan.url === imageData.src && curCan.res > pf.initDPR) || (cfg.algorithm === "saveData" && curCan.res > 1.5) ) {
 					bestCandidate = curCan;
 				}
 			}
