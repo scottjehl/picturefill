@@ -287,6 +287,8 @@
 				var GETIMGATTRS = {
 					src: 1
 				};
+				pf.getAttr = getImgAttr;
+				pf.setAttr = setImgAttr;
 
 				if ( pf.supSrcset && !pf.supSizes ) {
 					GETIMGATTRS.srcset = 1;
