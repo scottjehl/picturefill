@@ -282,8 +282,6 @@
 
 				var image = document.createElement( "img" );
 				var imgIdls = [];
-				var getImgAttr = image.getAttribute;
-				var setImgAttr = image.setAttribute;
 				var GETIMGATTRS = {
 					src: 1
 				};
@@ -299,7 +297,7 @@
 							if ( GETIMGATTRS[ attr ] && (internal = this[ pf.ns ]) && ( internal[attr] !== undefined ) ) {
 								return internal[ attr ];
 							}
-							return getImgAttr.apply( this, arguments );
+							return pf.getImgAttr.apply( this, arguments );
 						},
 						writeable: true,
 						enumerable: true,
@@ -318,10 +316,10 @@
 				imgIdls.forEach(function(idl) {
 					Object.defineProperty(HTMLImageElement.prototype, idl, {
 						set: function( value ) {
-							setImgAttr.call( this, idl, value );
+							pf.setImgAttr.call( this, idl, value );
 						},
 						get: function() {
-							return getImgAttr.call( this, idl ) || "";
+							return pf.getImgAttr.call( this, idl ) || "";
 						},
 						enumerable: true,
 						configurable: true
