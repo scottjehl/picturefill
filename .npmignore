@@ -1,0 +1,8 @@
+examples
+gruntfile.js
+.jscsrc
+.jshintrc
+src
+tests
+logos
+.travis.yml
