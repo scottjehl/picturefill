@@ -20,7 +20,8 @@
   "engines": {
     "node": ">= 0.8.0"
   },
-  "main": "./dist/picturefill",
+  "main": "empty.js",
+  "browser": "./dist/picturefill",
   "scripts": {
     "test": "grunt test --verbose"
   },
