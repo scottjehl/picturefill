@@ -49,11 +49,11 @@
 			<p>Feedback on this release is highly welcomed—if you encounter any problems, please <a href="https://github.com/scottjehl/picturefill/issues">file an issue on GitHub</a>.</p>
 			<ul>
 				<li>
-					<a href="https://cdn.rawgit.com/scottjehl/picturefill/master/dist/picturefill.js" class="download">picturefill.js</a>
+					<a href="https://cdn.rawgit.com/scottjehl/picturefill/3.0.2/dist/picturefill.js" class="download">picturefill.js</a>
 					<p class="meta">(development version, unminified code)</p>
 				</li>
 				<li>
-					<a href="https://cdn.rawgit.com/scottjehl/picturefill/master/dist/picturefill.min.js" class="download">picturefill.min.js</a>
+					<a href="https://cdn.rawgit.com/scottjehl/picturefill/3.0.2/dist/picturefill.min.js" class="download">picturefill.min.js</a>
 					<p class="meta">(production version, minified code)</p>
 				</li>
 			</ul>
@@ -115,7 +115,7 @@
 			<p>Here's how that renders on your display:</p>
 			<img srcset="examples/images/image-384.jpg 1x, examples/images/image-768.jpg 2x" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
 
-			<p>If the <a href="dist/plugins/intrinsic-dimension/">intrinsic dimension plugin</a> is installed: The <code>2x</code> source will be automatically scaled down by 2  — so that the image will occupy the same space in your layout as the <code>1x</code>, but the <code>2x</code> source will be displayed at double the pixel density. This only applies to the <em>natural</em> size of the <code>img</code>—resizing the image via CSS or with the <code>width</code> content attribute will behave as expected.</p>
+			<p>If the <a href="dist/plugins/intrinsic-dimension/pf.intrinsic.min.js">intrinsic dimension plugin</a> is installed: The <code>2x</code> source will be automatically scaled down by 2  — so that the image will occupy the same space in your layout as the <code>1x</code>, but the <code>2x</code> source will be displayed at double the pixel density. This only applies to the <em>natural</em> size of the <code>img</code>—resizing the image via CSS or with the <code>width</code> content attribute will behave as expected.</p>
 
 			<p class="note" id="caching">Modern browsers that support <code>srcset</code> natively may select a cached file that meets the minimum media condition, even if it is “overkill” for the current media condition. For example, a <code>2x</code> file may be shown on a <code>1x</code> device, if that <code>2x</code> file is already in the cache—there’d be no reason to make an additional request when the user will see no discernable difference, after all. This is typically encountered only on sites with multiple versions of the same image displayed in multiple elements at different sizes (like our demo page). The occasional selection of "oversize" resources—depending on the cache—is currently an expected behavior in native implementations and you may encounter it during testing.</p>
 
@@ -248,7 +248,7 @@
   elements: [ document.getElementById( "myImg" ) ]
 });</code></pre>
 				</li>
-				<li><strong>Reevaluate:</strong> If you dynamically change the <code>srcset</code>, <code>sizes</code> attributes, or modify <code>source</code> elements, please use this reevaluate option and provide an array or array-like object of your mutated <code>img</code> elements. As an alternative the <a href="dist/plugins/mutation/pf.mutation.js">mutation plugin</a> can be used.
+				<li><strong>Reevaluate:</strong> If you dynamically change the <code>srcset</code>, <code>sizes</code> attributes, or modify <code>source</code> elements, please use this reevaluate option and provide an array or array-like object of your mutated <code>img</code> elements. As an alternative the <a href="dist/plugins/mutation/pf.mutation.min.js">mutation plugin</a> can be used.
 	<pre><code>picturefill({
   reevaluate: true,
   elements: [ document.getElementById( "myImg" ) ]
@@ -263,10 +263,10 @@
 			<p>Some aspects of the native feature are left out to provide a clean and lightweight polyfill. In case you need a specific behavior of the native implementation not included in picturefill core, just add the corresponding plugin. The best way is to merge all scripts together.</p>
 
 			<ul>
-				<li><strong><a href="dist/plugins/intrinsic-dimension/">intrinsic dimension</a></strong>: This extension adds support for intrinsic dimension behavior of responsive images. It's useful when you don't style your images with CSS.</li>
-				<li><strong><a href="dist/plugins/mutation/">Mutation plugin</a></strong>: This plugin automatically detects any DOM mutation and polyfills new or changed responsive images automatically. It also adds support for responsive images IDL attributes/properties. If you have a highly dynamic website or a SPA you probably want to use this plugin. (This plugin does not work with IE8.)</li>
-				<li><strong><a href="dist/plugins/typesupport/">Type support</a></strong>: This plugin extends support for the <code>source[type]</code> attribute and detects JPG2000, APNG and JPEG XR support. If you want to use new image formats you probably want to use this plugin.</li>
-				<li><strong><a href="dist/plugins/oldie/">OldIE (IE6/7)</a></strong>: picturefill supports most browsers including IE8+. In case you need to support IE6/7, you can combine the oldIE plugin with jQuery to add support for these browsers.</li>
+				<li><strong><a href="dist/plugins/intrinsic-dimension/pf.intrinsic.min.js">intrinsic dimension</a></strong>: This extension adds support for intrinsic dimension behavior of responsive images. It's useful when you don't style your images with CSS.</li>
+				<li><strong><a href="dist/plugins/mutation/pf.mutation.min.js">Mutation plugin</a></strong>: This plugin automatically detects any DOM mutation and polyfills new or changed responsive images automatically. It also adds support for responsive images IDL attributes/properties. If you have a highly dynamic website or a SPA you probably want to use this plugin. (This plugin does not work with IE8.)</li>
+				<li><strong><a href="dist/plugins/typesupport/pf.type.min.js">Type support</a></strong>: This plugin extends support for the <code>source[type]</code> attribute and detects JPG2000, APNG and JPEG XR support. If you want to use new image formats you probably want to use this plugin.</li>
+				<li><strong><a href="dist/plugins/oldie/pf.oldie.js">OldIE (IE6/7)</a></strong>: picturefill supports most browsers including IE8+. In case you need to support IE6/7, you can combine the oldIE plugin with jQuery to add support for these browsers.</li>
 			</ul>
 
 			<h3 class="hed-subsection">Source selection algorithm option</h3>
