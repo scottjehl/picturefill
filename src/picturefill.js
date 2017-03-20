@@ -17,9 +17,6 @@
 	var isSupportTestReady = false;
 	var noop = function() {};
 	var image = document.createElement( "img" );
-	var getImgAttr = image.getAttribute;
-	var setImgAttr = image.setAttribute;
-	var removeImgAttr = image.removeAttribute;
 	var docElem = document.documentElement;
 	var types = {};
 	var cfg = {
@@ -1250,16 +1247,16 @@
 		var imageData = element[ pf.ns ];
 
 		if ( imageData.src === undefined || options.src ) {
-			imageData.src = getImgAttr.call( element, "src" );
+			imageData.src = element.getAttribute( "src" );
 			if ( imageData.src ) {
-				setImgAttr.call( element, srcAttr, imageData.src );
+				element.setAttribute( srcAttr, imageData.src );
 			} else {
-				removeImgAttr.call( element, srcAttr );
+				element.removeAttribute( srcAttr );
 			}
 		}
 
 		if ( imageData.srcset === undefined || options.srcset || !pf.supSrcset || element.srcset ) {
-			srcsetAttribute = getImgAttr.call( element, "srcset" );
+			srcsetAttribute = element.getAttribute( "srcset" );
 			imageData.srcset = srcsetAttribute;
 			srcsetParsed = true;
 		}
@@ -1274,7 +1271,7 @@
 		if ( imageData.srcset ) {
 			imageSet = {
 				srcset: imageData.srcset,
-				sizes: getImgAttr.call( element, "sizes" )
+				sizes: element.getAttribute( "sizes" )
 			};
 
 			imageData.sets.push( imageSet );
@@ -1307,10 +1304,10 @@
 
 		if ( srcsetParsed && pf.supSrcset && !imageData.supported ) {
 			if ( srcsetAttribute ) {
-				setImgAttr.call( element, srcsetAttr, srcsetAttribute );
+				element.setAttribute( srcsetAttr, srcsetAttribute );
 				element.srcset = "";
 			} else {
-				removeImgAttr.call( element, srcsetAttr );
+				element.removeAttribute( srcsetAttr );
 			}
 		}
 
