@@ -21,6 +21,7 @@
     "node": ">= 0.8.0"
   },
   "main": "./dist/picturefill",
+  "types": "./src/picturefill.d.ts",
   "scripts": {
     "test": "grunt test --verbose"
   },
