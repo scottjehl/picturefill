@@ -3,7 +3,7 @@ A [responsive image](http://www.whatwg.org/specs/web-apps/current-work/multipage
 * Authors: See [Authors.txt](https://raw.githubusercontent.com/scottjehl/picturefill/master/Authors.txt)
 * License: MIT
 
-[![build-status](https://api.travis-ci.org/scottjehl/picturefill.svg)](https://travis-ci.org/scottjehl/picturefill) [<img src="https://pf-slackin.herokuapp.com/badge.svg" alt="Join Slack channel">](https://pf-slackin.herokuapp.com/) [![picturefill on npm](https://img.shields.io/npm/v/picturefill.svg?style=flat)](https://www.npmjs.com/package/picturefill)
+[![build-status](https://api.travis-ci.org/scottjehl/picturefill.svg)](https://travis-ci.org/scottjehl/picturefill) [<img src="https://pf-slackin.herokuapp.com/badge.svg" alt="Join Slack channel">](https://pf-slackin.herokuapp.com/) [![picturefill on npm](https://img.shields.io/npm/v/picturefill.svg?style=flat)](https://www.npmjs.com/package/picturefill) [![jsDelivr Hits](https://data.jsdelivr.com/v1/package/npm/picturefill/badge?style=rounded)](https://www.jsdelivr.com/package/npm/picturefill)
 
 Picturefill has three versions:
 
