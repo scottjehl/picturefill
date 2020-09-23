@@ -977,7 +977,7 @@
 
 	/**
 	 * Shortcut method for matchMedia ( for easy overriding in tests )
-	 * wether native or pf.mMQ is used will be decided lazy on first call
+	 * whether native or pf.mMQ is used will be decided lazy on first call
 	 * @returns {boolean}
 	 */
 	pf.matchesMedia = function() {
