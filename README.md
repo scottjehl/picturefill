@@ -12,7 +12,7 @@ Picturefill has three versions:
 * Version 3.0.3 is the current stable release.
 
 ## Usage, Demos, Docs
-To find out how to use Picturefill, visit the [project site](http://scottjehl.github.com/picturefill/).
+To find out how to use Picturefill, visit the [project site](http://scottjehl.github.io/picturefill/).
 
 ## The gotchas
 Be it browser issues, the responsive images specifications, or Picturefill itself, there are a couple gotchas you should be aware of when working with Picturefill:
